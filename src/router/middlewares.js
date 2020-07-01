@@ -6,7 +6,11 @@ import { AuthService } from '@/services/auth.service'
  * @WARN Must be always first in middleware chain
  */
 export async function initCurrentUserStateMiddleware (to, from, next) {
-  const currentUserId = $store.state.user.currentUser.id
+
+ var currentUserId = null;   
+ if( $store.state.user.currentUser!=null){ 
+    currentUserId = $store.state.user.currentUser.id
+ }
 
   if (AuthService.hasRefreshToken() && !currentUserId) {
     try {
@@ -25,7 +29,11 @@ export async function initCurrentUserStateMiddleware (to, from, next) {
  * Check access permission to auth routes
  */
 export function checkAccessMiddleware (to, from, next) {
-  const currentUserId = $store.state.user.currentUser.id
+   var currentUserId = null;   
+ if( $store.state.user.currentUser!=null){ 
+    currentUserId = $store.state.user.currentUser.id
+ }
+ 
   const isAuthRoute = to.matched.some(item => item.meta.isAuth)
 
   if (isAuthRoute && currentUserId) return next()

@@ -1,0 +1,4 @@
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticStyle:{"padding-bottom":"400px"}},[(_vm.currentProcessSection)?_c('b-row',[_c('b-col',{staticClass:"mx-auto",attrs:{"cols":"6"}},[_c('div',{staticClass:"h4 text-white text-uppercase clearfix"},[_c('h3',{staticClass:"h4 float-left",staticStyle:{"padding-top":"9px"}},[_vm._v(" "+_vm._s(_vm.$t('New ideas'))+" "),_c('span',{staticClass:"h4 text-gray-lighter"},[_vm._v(_vm._s(_vm.newIdeas.length))])])]),_vm._l((_vm.newIdeas),function(item){return _c('idea-card',{key:item.id,attrs:{"idea":item}})}),(_vm.newIdeas.length==0)?_c('div',[_c('p',{staticClass:"alert alert-warning"},[_vm._v(" "+_vm._s(_vm.$t("There are no records for the given criteria"))+" ")])]):_vm._e()],2)],1):_vm._e()],1)}
+var staticRenderFns = []
+
+export { render, staticRenderFns }

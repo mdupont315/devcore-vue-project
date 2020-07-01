@@ -1,0 +1,4 @@
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"buttons"},[(_vm.deleting)?_c('div',{staticClass:"overlay",class:{'top-all':true},on:{"click":_vm.overlayClick}}):_vm._e(),(_vm.showEditButton)?_c('b-button',{class:_vm.btnEditClass,on:{"click":_vm.editItem}},[_c('i',{staticClass:"mdi mdi-pencil"})]):_vm._e(),(_vm.showDeleteButton)?_c('confirm-button',{class:_vm.btnDeleteClass,attrs:{"btnClass":_vm.btnDeleteClass,"confirmText":_vm.$t('Delete'),"confirmTitle":_vm.deleteTitle,"confirmMessage":_vm.deleteMessage,"confirmPlacement":_vm.deleteConfirmPlacement,"confirmBoundary":_vm.deleteConfirmBoundary},on:{"showConfirm":_vm.showConfirm,"confirm":_vm.deleteItem}},[_c('i',{staticClass:"mdi mdi-close"})]):_vm._e()],1)}
+var staticRenderFns = []
+
+export { render, staticRenderFns }

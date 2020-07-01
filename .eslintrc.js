@@ -18,6 +18,15 @@ module.exports = {
     'no-trailing-spaces': [
       'error', {'skipBlankLines': true}
     ],
+    'quotes': [0, "double"],
+    'semi': 0,
+    'spaced-comment': 0,
+    'space-before-function-paren': 0,
+    'padded-blocks': 0,
+    'eqeqeq': 0,
+    'no-multiple-empty-lines': 0,
+    'eol-last': 0,
+
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   },
