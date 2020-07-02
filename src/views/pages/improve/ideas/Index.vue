@@ -112,7 +112,13 @@
 <script>
 import { mapGetters } from "vuex";
 import EventBus from "@/lib/eventbus";
+import TopNav from "@/views/layouts/components/TopNav";
+import MainNav from "@/views/layouts/components/MainNav";
 export default {
+   components: {
+    "top-nav": TopNav,
+    "main-nav": MainNav
+  },
   data: () => ({
     currentComponent: null
   }),

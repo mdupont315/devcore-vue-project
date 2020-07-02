@@ -22,6 +22,8 @@ module.exports = {
     'semi': 0,
     'indent': 0,
     'comma-dangle': 0,
+    'func-call-spacing': 0,
+    'space-in-parens': 0,
     'spaced-comment': 0,
     'space-before-function-paren': 0,
     'padded-blocks': 0,

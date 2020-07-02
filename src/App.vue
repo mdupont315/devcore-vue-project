@@ -1,7 +1,7 @@
 <style>
   @import './assets/css/style.css';
 </style>
-<script src="http://localhost:8098"></script>
+
 <template>
   <div id="app" :class="container_class">
     <div class="overlay" v-if="show_overlay" @click="overlayClicked"></div>

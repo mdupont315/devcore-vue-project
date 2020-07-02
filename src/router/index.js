@@ -125,6 +125,7 @@ const routes = [
           import ( /* webpackChunkName: "improve" */ '@/views/pages/improve/ideas/Index'),
       meta: {
           middleware: [auth],
+          layout: 'default-layout',
       },
       children: [{
               path: 'ideas/:type?',
@@ -135,6 +136,7 @@ const routes = [
                   middleware: [auth],
                   title: 'Ideas',
                   permissions: "improve/idea/manage",
+                  layout: 'default-layout',
                   titleButton: () =>
                       import ( /* webpackChunkName: "improve" */ '@/views/pages/improve/ideas/TitleButton'),
                   //topRight: () => import(/* webpackChunkName: "improve" */'@/views/pages/manage/proccess/SearchBar'),
@@ -182,7 +184,8 @@ const routes = [
               topCentral: () =>
                   import ( /* webpackChunkName: "manage" */ '@/views/pages/analysis/general/CentralBar'),
           },
-      }, ]
+      },
+    ]
   },
   {
       path: '/support',
@@ -313,7 +316,7 @@ const routes = [
               meta: {
                   middleware: [auth],
                   title: 'Projects',
-                  //permissions: "project/manage", 
+                  //permissions: "project/manage",
                   titleButton: () =>
                       import ( /* webpackChunkName: "manage" */ '@/views/pages/manage/project/TitleButton'),
                   topRight: () =>
