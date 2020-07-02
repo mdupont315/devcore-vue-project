@@ -1,8 +1,7 @@
 import VeeValidate from 'vee-validate'
 import Vue from 'vue'
-//import validationMessages from 'vee-validate/dist/locale/en';
+import validationMessages from 'vee-validate/dist/locale/en';
 import i18n from '../i18n';
-import * as validationMessages from '@/locales/en.json';
 
 export const maxArrayCountRule = {
     getMessage(field, maxCount, data) {
