@@ -1,4 +1,0 @@
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return (_vm.$can('core/companyTool/create'))?_c('div',{staticClass:"ml-3"},[_c('b-button',{directives:[{name:"b-tooltip",rawName:"v-b-tooltip.hover",modifiers:{"hover":true}}],staticClass:"text-uppercase",attrs:{"size":"sm","variant":"primary","title":_vm.$t('Create New') + ' ' + _vm.$t('Tool'),"id":"btnNew"},on:{"click":_vm.togglePopOver}},[_c('i',{staticClass:"mdi mdi-plus"}),_vm._v(" "+_vm._s(_vm.$t('New'))+" ")]),_c('b-popover',{ref:"popover",staticClass:"form-popover",attrs:{"target":"btnNew","show":_vm.showPopOver,"placement":"bottom"},on:{"update:show":function($event){_vm.showPopOver=$event}}},[_c('b-card',{staticStyle:{"width":"300px"},attrs:{"no-body":""}},[_c('b-card-body',[_c('tool-form',{on:{"done":_vm.togglePopOver}})],1)],1)],1)],1):_vm._e()}
-var staticRenderFns = []
-
-export { render, staticRenderFns }

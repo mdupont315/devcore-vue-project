@@ -1,4 +1,0 @@
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"empty-slot"},[_vm._t("icon",[_vm._m(0)]),_vm._t("default",[_c('div',{staticClass:"h4 text-center text-gray-light"},[_vm._v(_vm._s(_vm.$t('Just the empty space...')))])]),_c('div',{staticClass:"text-center text-gray-light"},[_vm._t("content")],2)],2)}
-var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"h3 text-center"},[_c('i',{staticClass:"mdi mdi-flask-empty-outline text-gray-light",staticStyle:{"font-size":"80px","font-weight":"100"}})])}]
-
-export { render, staticRenderFns }

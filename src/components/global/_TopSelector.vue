@@ -1,4 +1,0 @@
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"top-selector",class:{expanded:_vm.expanded}},[_c('div',{staticClass:"title"},[_vm._v(_vm._s(_vm.title))]),_c('div',{ref:"currentSelection",staticClass:"current-selection",on:{"click":_vm.toggle}},[_c('div',{staticClass:"text-overflow"},[_vm._t("current",[_vm._v(_vm._s(_vm.$t('All')))],null,{value:this.currentItem, items:_vm.items})],2)]),_c('div',{staticClass:"selector-wrapper"},[_c('b-popover',{attrs:{"target":function (){ return _vm.$refs.currentSelection; },"placement":"bottom"}},[_c('div',{staticClass:"top-selector-content"},[_c('div',{staticClass:"content"},_vm._l((_vm.items),function(item,index){return _c('div',{key:index,staticClass:"item",class:{active:_vm.isItemActive(item)}},[_vm._t("item",[_vm._v(_vm._s(item))],null,{item:item, items:_vm.items})],2)}),0)])])],1)])}
-var staticRenderFns = []
-
-export { render, staticRenderFns }

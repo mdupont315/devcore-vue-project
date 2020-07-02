@@ -1,4 +1,0 @@
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"editable-table-cell"},[(!_vm.editing)?_vm._t("default",[(_vm.staticValue)?_c('span',[_vm._v(_vm._s(_vm.staticValue))]):_vm._e()]):_vm._e(),(_vm.editing)?_vm._t("editing",[_c('b-input',_vm._b({attrs:{"size":"sm"},on:{"input":_vm.input},model:{value:(_vm.item[_vm.property]),callback:function ($$v) {_vm.$set(_vm.item, _vm.property, $$v)},expression:"item[property]"}},'b-input',_vm.$attrs,false))],{"editing":_vm.editing}):_vm._e()],2)}
-var staticRenderFns = []
-
-export { render, staticRenderFns }
