@@ -5,8 +5,10 @@
 <template>
   <div id="app" :class="container_class">
     <div class="overlay" v-if="show_overlay" @click="overlayClicked"></div>
-    <router-view v-if="loaded" />
-    <portal-target name="layers"></portal-target>
+    <component :is="layout" >
+      <router-view v-if="loaded" />
+      <portal-target name="layers"></portal-target>
+    </component>
     <vue-snotify />
     <ws-update-notify v-if="ws_updated"></ws-update-notify>
   </div>
@@ -15,6 +17,9 @@
 import { mapGetters } from "vuex";
 import { loadApp } from "@/lib/utils";
 import UpdateFound from "./components/UpdateFound";
+
+const defaultLayout = "default-layout";
+
 export default {
   components: {
     "ws-update-notify": UpdateFound
@@ -25,6 +30,9 @@ export default {
     };
   },
   computed: {
+    layout() {
+      return (this.$route.meta.layout || defaultLayout );
+    },
     ...mapGetters({
       show_navbar: "app/show_navbar",
       container_class: "app/container_class",
