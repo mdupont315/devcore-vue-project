@@ -1,6 +1,6 @@
 @font-face {
     font-family: FuturaBQ;
-    src: url(/fonts/FuturaBQ.woff) format("woff");
+    src: url(../fonts/FuturaBQ.woff) format("woff");
   }/*!
    * Bootstrap v4.5.0 (https://getbootstrap.com/)
    * Copyright 2011-2020 The Bootstrap Authors
@@ -13522,13 +13522,20 @@
     vertical-align: text-bottom;
   }
   
-  /* @font-face {
-    font-family:Material Design Icons;src:url(../fonts/materialdesignicons-webfont.2d0a0d8f.eot);src:url(../fonts/materialdesignicons-webfont.2d0a0d8f.eot?#iefix&v=4.9.95) format("embedded-opentype"),url(../fonts/materialdesignicons-webfont.d0066537.woff2) format("woff2"),url(../fonts/materialdesignicons-webfont.b4917be2.woff) format("woff"),url(../fonts/materialdesignicons-webfont.f5111234.ttf) format("truetype");font-weight:400;font-style:normal;
-  } */
+  @font-face {
+    font-family:'Material Design Icons';
+    src: url(../fonts/materialdesignicons-webfont.woff) format("woff");
+    /* src:url(../fonts/materialdesignicons-webfont.eot);
+    src:url(../fonts/materialdesignicons-webfont.eot?#iefix&v=4.9.95) format("embedded-opentype"),
+    url(../fonts/materialdesignicons-webfont.woff2) format("woff2"),
+    url(../fonts/materialdesignicons-webfont.woff) format("woff"),
+    url(../fonts/materialdesignicons-webfont.ttf) format("truetype");
+    font-weight:400;font-style:normal; */
+  }
   
   .mdi-set,.mdi:before {
     display: inline-block;
-    font: normal normal normal 24px/1 Material Design Icons;
+    font: normal normal normal 24px/1 'Material Design Icons';
     font-size: inherit;
     text-rendering: auto;
     line-height: inherit;
@@ -36868,7 +36875,7 @@
   }
   
   .main-nav .menu-wrapper .main-menu .item.item-header>.title:before {
-    font-family: Material Design Icons;
+    font-family: 'Material Design Icons';
     width: 10px;
     height: 15px;
     position: absolute;
@@ -37046,7 +37053,7 @@
   
   .editable-dashboard .sortable-wrapper>.item .header .tools .expander:before {
     content: "\F615";
-    font-family: Material Design Icons;
+    font-family: 'Material Design Icons';
     display: block;
     position: absolute;
     width: 15px;
@@ -39851,7 +39858,7 @@
     border-top: 5px solid #fff;
     border-bottom: none;
     content: "";
-    font-family: Material Design Icons;
+    font-family: 'Material Design Icons';
     display: block;
     top: 7px;
     position: absolute;
@@ -39898,7 +39905,7 @@
     border-top: 5px solid #242526;
     border-bottom: none;
     content: "";
-    font-family: Material Design Icons;
+    font-family: 'Material Design Icons';
     display: block;
     top: 5px;
     position: absolute;
@@ -45390,7 +45397,7 @@
   
   .input-group.search:before {
     content: "\F349";
-    font-family: Material Design Icons;
+    font-family: 'Material Design Icons';
     position: absolute;
     display: block;
     color: #333;
@@ -45564,7 +45571,7 @@
   }
   
   .btn-expand:after {
-    font-family: Material Design Icons;
+    font-family: 'Material Design Icons';
     content: "\FB0B";
     position: relative;
     display: inline-block;

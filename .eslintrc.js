@@ -20,6 +20,8 @@ module.exports = {
     ],
     'quotes': [0, "double"],
     'semi': 0,
+    'indent': 0,
+    'comma-dangle': 0,
     'spaced-comment': 0,
     'space-before-function-paren': 0,
     'padded-blocks': 0,
