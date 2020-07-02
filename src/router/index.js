@@ -121,7 +121,8 @@ const routes = [
       path: '/improve',
       name: 'improve',
       component: () =>
-          import ( /* webpackChunkName: "improve" */ '@/views/pages/improve/Index'),
+          // import ( /* webpackChunkName: "improve" */ '@/views/pages/improve/Index'),
+          import ( /* webpackChunkName: "improve" */ '@/views/pages/improve/ideas/Index'),
       meta: {
           middleware: [auth],
       },

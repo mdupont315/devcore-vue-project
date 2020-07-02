@@ -1,8 +1,70 @@
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('li',{class:{'active': _vm.active},on:{"click":function($event){return _vm.toggle(_vm.item,$event)}}},[(_vm.item.url)?_c('router-link',{staticClass:"title",attrs:{"to":_vm.item.url}},[(_vm.item.icon)?_c('i',{staticClass:"mdi icon",class:_vm.item.icon}):_vm._e(),_vm._v(" "+_vm._s(_vm.item.title)+" ")]):_c('span',{staticClass:"title"},[(_vm.item.icon)?_c('i',{staticClass:"mdi icon",class:_vm.item.icon}):_vm._e(),_vm._v(" "+_vm._s(_vm.item.title)+" ")]),(_vm.item.children)?_c('ul',{staticClass:"nav sub-menu"},_vm._l((_vm.item.children),function(subitem,subindex){return _c('li',{key:subindex,staticClass:"item link",class:{'active':_vm.$route.matched.some(function (ref) {
-	var name = ref.name;
-
-	return name === subitem.name;
-})},on:{"click":function($event){$event.stopPropagation();return _vm.subItemClick($event, _vm.item)}}},[_c('router-link',{staticClass:"title",attrs:{"to":subitem.url}},[_vm._v(" "+_vm._s(subitem.title)+" ")])],1)}),0):_vm._e()],1)}
-var staticRenderFns = []
-
-export { render, staticRenderFns }
+<template>
+  <li :class="{'active': active}" @click="toggle(item,$event)">
+    <router-link class="title" :to="item.url" v-if="item.url">
+      <i class="mdi icon" :class="item.icon" v-if="item.icon"></i>
+      {{ item.title }}
+    </router-link>
+    <span class="title" v-else>
+      <i class="mdi icon" :class="item.icon" v-if="item.icon"></i>
+      {{ item.title }}
+    </span>
+    <ul class="nav sub-menu" v-if="item.children">
+      <li
+        v-for="(subitem,subindex) in item.children"
+        :key="subindex"
+        @click.stop="subItemClick($event, item)"
+        class="item link"
+        :class="{'active':$route.matched.some(({ name }) => name === subitem.name)}"
+      >
+        <router-link :to="subitem.url" class="title">
+          <!--<i class="mdi" :class="subitem.icon" v-if="subitem.icon"></i>-->
+          {{ subitem.title }}
+        </router-link>
+      </li>
+    </ul>
+  </li>
+</template>
+<script>
+import { /*mapState,*/ mapGetters } from "vuex";
+export default {
+  name: "menu-item",
+  props: {
+    item: {
+      type: Object,
+      required: true
+    }
+  },
+  computed: {
+    active: {
+      get: function() {
+        return (
+          this.expandedItems.some(({ name }) => name === this.item.name)
+        );
+      }
+    },
+    ...mapGetters({
+      expandedItems: "nav/currentExpandedItems"
+    })
+  },
+  mounted() {
+   if(this.$route.matched.some(({ name }) => name === this.item.name)){
+     this.activate(this.item)
+   }
+  },
+  methods: {
+    activate(item){
+      this.$store.dispatch("nav/activateItem", item);
+    },
+    toggle(item) {
+      if (item.children) {
+        this.$store.dispatch("nav/toggleItem", item);
+      } else {
+        this.$store.dispatch("nav/activateItem", item);
+      }
+    },
+    subItemClick(e) {
+      e.stopPropagation();
+    }
+  }
+};
+</script>

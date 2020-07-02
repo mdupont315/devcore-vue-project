@@ -187,10 +187,12 @@ export const apolloClient = new ApolloClient({
     defaultOptions: {
         watchQuery: {
             errorPolicy: 'all',
-            fetchPolicy: 'cache-and-network',
+            // fetchPolicy: 'cache-and-network',
+            fetchPolicy: 'no-cache',
         },
         query: {
-            fetchPolicy: 'cache-and-network',
+            // fetchPolicy: 'cache-and-network',
+            fetchPolicy: 'no-cache',
             errorPolicy: 'all',
         },
     },
