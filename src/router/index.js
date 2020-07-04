@@ -121,8 +121,8 @@ const routes = [
       path: '/improve',
       name: 'improve',
       component: () =>
-          // import ( /* webpackChunkName: "improve" */ '@/views/pages/improve/Index'),
-          import ( /* webpackChunkName: "improve" */ '@/views/pages/improve/ideas/Index'),
+          import ( /* webpackChunkName: "improve" */ '@/views/pages/improve/Index'),
+        //   import ( /* webpackChunkName: "improve" */ '@/views/pages/improve/ideas/Index'),
       meta: {
           middleware: [auth],
           layout: 'default-layout',
@@ -138,7 +138,7 @@ const routes = [
                   permissions: "improve/idea/manage",
                   layout: 'default-layout',
                   titleButton: () =>
-                      import ( /* webpackChunkName: "improve" */ '@/views/pages/improve/ideas/TitleButton'),
+                  import ( /* webpackChunkName: "improve" */ '@/views/pages/improve/ideas/TitleButton'),
                   //topRight: () => import(/* webpackChunkName: "improve" */'@/views/pages/manage/proccess/SearchBar'),
                   topCentral: () =>
                       import ( /* webpackChunkName: "manage" */ '@/views/pages/improve/ideas/CentralBar'),
@@ -191,7 +191,7 @@ const routes = [
       path: '/support',
       name: 'support',
       component: () =>
-          import ( /* webpackChunkName: "improve" */ '@/views/pages/improve/Index'),
+          import ( /* webpackChunkName: "improve" */ '@/views/pages/support/Index'),
       meta: {
           middleware: [auth],
       },
@@ -231,8 +231,7 @@ const routes = [
       path: '/manage',
       name: 'manage',
       component: () =>
-          // import ( /* webpackChunkName: "manage" */ '@/views/pages/manage/Index'),
-          import ( /* webpackChunkName: "manage" */ '@/views/pages/manage/proccess/Index'),
+           import ( /* webpackChunkName: "manage" */ '@/views/pages/manage/Index'),
       meta: {
           middleware: [auth],
       },
