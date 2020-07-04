@@ -71,7 +71,7 @@
               >{{ (selectedProcess?`${selectedProcess.title} ${this.getCount('process',selectedProcess)}`:$t('Select process') + ' (' +(loading.process?$t('Loading...'):items.length>0?items.length:$t('No process available'))+ ')')}}</div>
               <div class="selector">
                 <perfect-scrollbar>
-                  <div style="position:relative;margin-right:15px">
+                  <div style="position:relative;">
                     <div
                       class="loading"
                       v-if="loading.stage"
@@ -79,7 +79,7 @@
                     >
                       <b-spinner></b-spinner>
                     </div>
-                    <ul class="list-unstyled m-0">
+                    <ul class="list-unstyled m-0 scrollY">
                       <li
                         class="item"
                         v-for="item in items"

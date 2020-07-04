@@ -39382,7 +39382,12 @@
   
   .process-selector-popover .sections .section.expanded .selector {
     max-height: 300px;
-    overflow-y: hidden;
+    /* overflow-y: hidden; */
+  }
+
+  .process-selector-popover .sections .section.expanded .selector .list-unstyled {
+    max-height: 300px;
+    overflow-y: scroll;
   }
   
   .process-selector-popover .sections .section.expanded .selector .ps {
@@ -39421,7 +39426,7 @@
     height: 20px;
     display: block;
     position: absolute;
-    right: 0;
+    right: 15px;
     top: 10px;
     border-radius: 50%;
   }
