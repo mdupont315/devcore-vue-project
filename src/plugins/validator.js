@@ -38,7 +38,7 @@ Vue.use(VeeValidate, {
     errorBagName: 'vErrors',
     fieldsBagName: 'vFields',
     dictionary: {
-        en: validationMessages
+        // en: validationMessages
     }
 });
 
