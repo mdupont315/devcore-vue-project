@@ -1,4 +1,12 @@
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('router-view')}
-var staticRenderFns = []
-
-export { render, staticRenderFns }
+<template>
+      <router-view></router-view>
+</template>
+<script>
+export default {
+   
+  data: () => ({
+    currentComponent: null
+  }),
+ 
+};
+</script>

@@ -256,8 +256,8 @@ const routes = [
               path: 'tool',
               name: 'tool',
               component: () =>
-                  // import ( /* webpackChunkName: "manage" */ '@/views/pages/manage/tool/Index'),
-                  import ( /* webpackChunkName: "manage" */ '@/views/pages/manage/proccess/Index'),
+                  import ( /* webpackChunkName: "manage" */ '@/views/pages/manage/tool/Index'),
+                //   import ( /* webpackChunkName: "manage" */ '@/views/pages/manage/proccess/Index'),
               children: [{
                       path: 'tools',
                       name: 'tool-tool',
