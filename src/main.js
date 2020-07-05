@@ -60,14 +60,17 @@ import '@/plugins/perfect-scrollbar'
 import '@/plugins/month-picker'
 
 //directives
-// import '@/directives'
+import '@/directives'
 
 //middlewares
 import '@/middlewares'
 
 //filters
-// import '@/filters'
+import '@/filters'
 
+import {
+    apolloProvider
+} from '@/plugins/apollo/client'
 
 //set the apollo client
 import gqlform from './lib/gqlform';
@@ -83,9 +86,7 @@ Vue.config.productionTip = false;
 Vue.component('default-layout', DefaultLayout);
 Vue.component('external-layout', ExternalLayout);
 
-import {
-    apolloProvider
-} from '@/plugins/apollo/client'
+
 
 
 window.vm = new Vue({

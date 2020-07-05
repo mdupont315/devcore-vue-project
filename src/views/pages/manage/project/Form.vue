@@ -98,7 +98,6 @@
               :placeholder="$t('Project type')"
               :reduce="v => v.id"
               :options="projectTypeOptions"
-              :disabled="true"
               :class="{'is-invalid':$validateState('type', form)===false, 'is-valid':$validateState('type', form)===true}"
             ></v-select>
             <label for="type">{{ $t('Project type') }}</label>

@@ -376,6 +376,18 @@ export default {
       if (this.$refs.input) {
         this.$refs.input.focus();
       }
+      
+      var itemFound = false;
+      this.filteredItems.map(r=>{
+        if(r.id ===item.id){
+          itemFound = true;
+        }
+      });
+
+      if(itemFound==false){
+        this.filteredItems.push(item)
+      }
+
       this.$emit("input", this.dataValue, event);
     },
     selectItem(item, event) {
