@@ -37194,7 +37194,13 @@
   
   .editable-dashboard .sortable-wrapper>.item:hover .item:hover>.header .title .tools .btn-action,.editable-dashboard .sortable-wrapper>.item:hover>.card>*>.header .title .tools .btn-action {
     opacity: 1;
-  }/*!
+  }
+  
+  .editable-dashboard .sortable-wrapper>.item:hover .item:hover>.header .title .tools .btn-action2,.editable-dashboard .sortable-wrapper>.item:hover>.card>*>.header .title .tools .btn-action2 {
+    opacity: 1;
+  }
+  
+  /*!
    * Hamburgers
    * @description Tasty CSS-animated hamburgers
    * @author Jonathan Suh @jonsuh
@@ -45676,4 +45682,32 @@
   /*** Custom Changes SP **/
   .pointer-selection{
     cursor: pointer;
+  }
+
+  .view-container{
+    position: absolute;
+    top:1px;
+    width: 100%
+  }
+
+  .view-container .title{
+    font-size: 15px;
+    font-weight: bold;
+  }
+
+  .editable-dashboard .sortable-wrapper>.item .header .title .tools .btn-action2 {
+   
+    opacity: 0;
+    cursor: pointer;
+    -webkit-transition: opacity .3s ease-in;
+    transition: opacity .3s ease-in;
+    background: #eee;
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    color: #4493d0;
+    border-radius: 3px;
+    line-height: 25px;
+    float: left;
+    margin: 2px;
   }
