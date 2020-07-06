@@ -6,7 +6,7 @@
   "author": "Usama Ayaz <usama.ayaz@siliconplex.com>",
   "scripts": {
     "serve": "vue-cli-service serve --fix",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --fix",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

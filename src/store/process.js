@@ -96,7 +96,11 @@ const getters = {
             return loadCurrent(state, section);
         }
     },
-    filteredItems: state => state.filter && state.filter.length > 3 ? state.all.filter(i => i.name.toLowerCase().includes(state.filter.toLowerCase())) : state.all,
+    filteredItems: state => state.filter && state.filter.length > 3 ? state.all.filter(i => 
+        {
+            return i.title.toLowerCase().includes(state.filter.toLowerCase())
+        }   
+            ) : state.all,
 }
 
 
@@ -299,6 +303,7 @@ const mutations = {
     SET_FILTER(state, value) {
         state.filter = value;
     },
+  
     CHECK_CURRENT_PROCESS(state) {
         const current = loadCurrent(state, state.currentSection);
         const currentStorage = state.storage[state.currentSection] || {};

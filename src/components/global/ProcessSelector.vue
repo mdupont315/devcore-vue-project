@@ -326,10 +326,7 @@ export default {
       this.loading.phase = true;
       if (this.current.process) {
         if (this.selectedProcess) {
-          // await this.$store.dispatch("process/findById", {
-          //   id: this.current.process.id,
-          //   ...Object.assign({}, this.defaultDetailFields, this.detail)
-          // });
+         
           if (this.onSelection) {
             await this.onSelection("process", this.current.process);
           }
@@ -638,6 +635,14 @@ export default {
       }
     },
     async apply() {
+      console.log("Set Current Process");
+      console.log( {
+        section: this.section,
+        process: this.selectedProcess,
+        stage: this.selectedStage,
+        operation: this.selectedOperation,
+        phase: this.selectedPhase
+      });
       await this.$store.dispatch("process/setCurrentProcess", {
         section: this.section,
         process: this.selectedProcess,
@@ -646,6 +651,7 @@ export default {
         phase: this.selectedPhase
       });
       if (this.onApply) {
+        window.vm.$emit("process_processChange");
         this.onApply({
           section: this.section,
           process: this.selectedProcess,

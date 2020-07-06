@@ -1,6 +1,38 @@
 <template>
   <div class="page animated fadeIn fast pg-process">
-    <div v-if="process && process.loaded && allProcess.length > 0">
+    <div class="ml-3" v-if="showStages" >
+     <b-button
+      size="sm"
+      class="text-uppercase"
+      variant="primary"
+      :title="$t('Back To Process')"
+      v-b-tooltip.hover
+      id="btnNew2"
+      @click="backToProcess"
+    >
+      <i class="mdi mdi-keyboard-backspace"></i>
+      {{ $t('Back To Process')}}
+    </b-button>
+   
+      <br/><br/>
+    </div>
+    <div v-if="!showStages && process && process.loaded && allProcess.length > 0">
+      <unblock-loader position="bottom" v-if="busy"></unblock-loader>
+      <div class="editable-dashboard" id="process-page-content" v-if="process">
+        <div class="sortable-wrapper t01 horizontal">
+          <process-card
+            class="item sortable-item"
+            :class="{'busy':busy}"
+            v-for="item in filteredProcess"
+            :key="item.id"
+            :item="item"
+            @editing="editingProcess"
+            @selectProcess="selectProcess"
+          ></process-card>
+        </div>
+      </div>
+    </div>
+    <div v-if="showStages">
       <unblock-loader position="bottom" v-if="busy"></unblock-loader>
       <div class="editable-dashboard" id="process-page-content" v-if="process">
         <draggable
@@ -17,6 +49,7 @@
             :item="item"
             @editing="editing"
           ></stage-card>
+
           <action-card
             ref="newStageCard"
             class="item newItem"
@@ -35,7 +68,7 @@
         </draggable>
       </div>
     </div>
-    <page-loader v-if="process && !process.loaded"></page-loader>
+    <page-loader v-if="loadingProcess || process && !process.loaded"></page-loader>
     <empty-page v-if="allProcess.length === 0"></empty-page>
   </div>
 </template>
@@ -44,6 +77,7 @@ import GQLForm from "@/lib/gqlform";
 import { /*mapState,*/ mapGetters } from "vuex";
 import draggable from "vuedraggable";
 import StageCard from "./stage/Card";
+import ProcessCard from "./process/Card";
 import StageForm from "./stage/Form";
 import { ProcessStage } from "@/models";
 import { scrollLeftToElement } from "@/lib/utils";
@@ -51,18 +85,38 @@ export default {
   components: {
     "stage-card": StageCard,
     "stage-form": StageForm,
+    "process-card": ProcessCard,
     draggable: draggable
+  },
+  props: {
+    detail: {
+      required: false,
+      type: Object,
+      default: () => ({})
+    },
+    defaultDetailFields: {
+      withStages: false,
+      withStagesFull: false,
+      withIdeas: false
+    }
   },
   data: () => ({
     busy: false,
     dataStages: [],
+    section: "process",
     newStage: null,
-    editingCard: false
+    editingCard: false,
+    selectedProcess: null,
+    showStages: false,
+    lastFilter: null
   }),
   computed: {
     ...mapGetters({
       current: "process/current",
-      allProcess: "process/all"
+      allProcess: "process/all",
+      filter: "process/filter",
+      filteredProcess: "process/filteredItems",
+      loadingProcess: "process/loading"
     }),
     currentProcess: {
       get: function() {
@@ -94,6 +148,8 @@ export default {
 
     //this.constructStages();
     window.vm.$on("addStage", this.addStage);
+    window.vm.$on("process_filterChange", this.processFilterChange);
+    window.vm.$on("process_processChange", this.processChange);
   },
   beforeDestroy() {
     window.vm.$off("addStage", this.addStage);
@@ -124,7 +180,6 @@ export default {
       });
     },
     async changeOrder(event) {
-      
       if (event.moved && event.moved.newIndex != event.moved.oldIndex) {
         const newOrder = event.moved.newIndex + 1;
         event.moved.element.dOrder = newOrder;
@@ -138,8 +193,6 @@ export default {
               processId: this.currentProcess.process.id
             })
           );
-
-          
 
           await this.$store.dispatch("process/findById", {
             id: this.process.id,
@@ -166,12 +219,46 @@ export default {
       this.$refs.newStageCard.changeMode("create");
       scrollLeftToElement(this.$refs.newStageCard.$el);
     },
+    processFilterChange() {
+      this.showStages = false;
+    },
+    processChange() {
+      this.showStages = true;
+    },
     closeStageForm() {
       this.$store.dispatch("app/showInnerOverlay", false);
       this.$refs.newStageCard.changeMode(null);
     },
     editing(editing) {
       this.editingCard = editing;
+    },
+    editingProcess(editing) {
+      this.editingCard = editing;
+    },
+    async selectProcess(process) {
+      this.selectedProcess = process;
+
+      await this.$store.dispatch("process/setCurrentProcess", {
+        section: this.section,
+        process: this.selectedProcess,
+        stage: null,
+        operation: null,
+        phase: null
+      });
+
+      this.selectedProcess = await this.$store.dispatch("process/findById", {
+        id: process.id,
+        ...Object.assign({}, this.defaultDetailFields, this.detail)
+      });
+      this.selectedProcess = this.$store.getters["process/all"].find(
+        o => o.id === process.id
+      );
+      // this.stages = this.selectedProcess.stages
+
+      this.showStages = true;
+    },
+    backToProcess() {
+      this.showStages = false;
     }
   }
 };

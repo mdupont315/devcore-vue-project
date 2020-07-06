@@ -29,7 +29,8 @@ export default {
   },
   methods: {
     async filterResults(filter) {
-      await this.$store.dispatch("process/filter", filter);
+    window.vm.$emit("process_filterChange");
+    await this.$store.dispatch("process/filter", filter);
     }
   }
 };

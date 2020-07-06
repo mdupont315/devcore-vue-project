@@ -45672,3 +45672,8 @@
   .align-top,.align-top td {
     vertical-align: top!important;
   }
+
+  /*** Custom Changes SP **/
+  .pointer-selection{
+    cursor: pointer;
+  }
