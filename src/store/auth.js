@@ -76,7 +76,9 @@ const actions = {
                 mutation: AUTH.updateProfile,
             })
             const currentUser = context.getters['user'];
-            const user = new User().deserialize({ ...currentUser,
+            const user = new User().deserialize(
+                {
+                    ...currentUser,
                 ...result.data.updateProfile
             });
             await context.commit('SET_USER', user)
@@ -96,9 +98,11 @@ const actions = {
             const result = await form.mutate({
                 mutation: AUTH.upateMyCompany,
             })
-            const currentUser = { ...context.getters['user']
+            const currentUser = {
+                ...context.getters['user']
             };
-            currentUser.company = { ...result.data.upateMyCompany
+            currentUser.company = {
+                ...result.data.upateMyCompany
             };
             const user = new User().deserialize(currentUser);
             await context.commit('SET_USER', user)
@@ -243,6 +247,11 @@ const actions = {
             data: session
         });
         context.commit('SET_CHECKED', true);
+        context.commit('SET_TOKEN', {
+            token: data.login.accessToken
+        }
+        );
+        
         EventBus.$emit('auth/LOGIN', {
             context: context,
             data: {
@@ -352,6 +361,10 @@ const mutations = {
     SET_USER(state, user) {
         state.session.user = user;
     },
+    SET_TOKEN(state, token) {
+        state.token = token;
+    },
+
     SET_LOADING(state, loading) {
         state.loading = loading;
     },
