@@ -3,7 +3,7 @@
     <b-row>
       <b-col class="col-12">
         <div class="form-label-group required">
-          <suggestions
+          <!-- <suggestions
             class="sm"
             :v-validate="'required'"
             v-model="form.name"
@@ -16,7 +16,7 @@
             <div slot="item" slot-scope="props" class="single-item">
               <span class="name">{{props.item.name}}</span>
             </div>
-          </suggestions>
+          </suggestions> -->
           <b-form-invalid-feedback>{{ $displayError('tool_id', form) }}</b-form-invalid-feedback>
         </div>
       </b-col>

@@ -65,6 +65,8 @@
             </table-editable-cell>
           </template>
 
+          
+
           <!-- yearly costs -->
           <template v-slot:cell(yearlyCosts)="row">
             <table-editable-cell
@@ -76,14 +78,14 @@
             >
               <template slot="editing" v-if="isRowEditing(row)">
                 {{$currency(row.item.yearlyCosts)}}
-                <!-- <b-input
+                <b-input
                   name="yearlyCosts"
                   size="sm"
                   v-model.number="updateForm.yearlyCosts"
                   :disabled="updateForm.busy"
                   v-validate="'required|numeric|min_value:0'"
                   :state="$validateState('yearlyCosts', updateForm)"
-                ></b-input>-->
+                ></b-input>
                 <b-form-invalid-feedback>{{ $displayError('yearlyCosts', updateForm) }}</b-form-invalid-feedback>
               </template>
             </table-editable-cell>
@@ -218,6 +220,8 @@ export default {
       }
     },
     async saveItem(form) {
+      var iadd = 12;
+      alert(iadd)
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         await this.$validator.reset();
@@ -285,7 +289,7 @@ export default {
           name: item.name,
           yearlyCosts: item.yearlyCosts,
           priceModel: item.priceModel ? item.priceModel.id : null,
-          tool: item.toolId
+          toolId: item.toolId
         });
         this.currentItem = item;
         this.$validator.reset();

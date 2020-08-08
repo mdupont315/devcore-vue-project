@@ -75,8 +75,8 @@
               <div v-if="updateForm.priceModel!='PROJECT'">
                 <b-form-input
                   id="name"
-                  :disabled="form.busy"
-                  v-model="form.updateForm"
+                  :disabled="updateForm.busy"
+                  v-model="updateForm.name"
                   :placeholder="$t('Price name')"
                   type="text"
                   name="name"
@@ -241,6 +241,7 @@ export default {
   data: () => {
     return {
       price: null,
+      form: null,
       currentItem: null,
       showPopOver: false,
       newItem: null,
@@ -323,8 +324,12 @@ export default {
       this.deleting = false;
       this.$validator.pause();
       this.$validator.reset();
+     
+      console.log("Check Toggle Items")
+      console.log((this.currentItem && this.currentItem.id === item.id))
+      console.log(item)
 
-      if (!item || (this.currentItem && this.currentItem.id === item.id)) {
+      if (item == null || (this.currentItem && this.currentItem.id === item.id)) {
         this.currentItem = null;
         this.updateForm = null;
       } else {
@@ -334,9 +339,9 @@ export default {
           companyToolId: this.toolModule.id,
           priceModel: item.priceModel,
           name: item.name,
-          parentType: "PROJECT",
+          parentType: item.parentType,
           parentId: item.parentId,
-          expiration: (item.expiration!=null)?moment(item.expiration).format("YYYY-MM-DD"):null,
+          expiration: (item.expiration != null) ? moment(item.expiration).format("YYYY-MM-DD") : null,
           price: item.price / 100
         });
 
@@ -351,8 +356,6 @@ export default {
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         await this.$validator.reset();
-        console.log(`this.mode === "edit"`)
-        console.log(form)
         await this.$store.dispatch("companyToolPrice/update", form);
         this.$emit("itemChanged");
       }

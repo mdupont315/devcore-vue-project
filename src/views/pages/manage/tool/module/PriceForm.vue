@@ -186,7 +186,10 @@ export default {
         await this.$validator.validateAll();
         if (!this.vErrors.any()) {
           await this.$validator.reset();
+          
           if (this.mode === "edit") {
+            console.log(`this.mode === "edit"`)
+            console.log(this.form)
             this.input = await this.$store.dispatch(
               "companyToolPrice/update",
               this.form
