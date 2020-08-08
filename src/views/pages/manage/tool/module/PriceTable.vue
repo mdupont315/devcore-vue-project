@@ -336,7 +336,7 @@ export default {
           name: item.name,
           parentType: "PROJECT",
           parentId: item.parentId,
-          expiration: moment(item.expiration).format("YYYY-MM-DD"),
+          expiration: (item.expiration!=null)?moment(item.expiration).format("YYYY-MM-DD"):null,
           price: item.price / 100
         });
 
@@ -351,6 +351,8 @@ export default {
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         await this.$validator.reset();
+        console.log(`this.mode === "edit"`)
+        console.log(form)
         await this.$store.dispatch("companyToolPrice/update", form);
         this.$emit("itemChanged");
       }
