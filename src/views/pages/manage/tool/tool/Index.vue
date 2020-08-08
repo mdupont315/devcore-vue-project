@@ -78,14 +78,6 @@
             >
               <template slot="editing" v-if="isRowEditing(row)">
                 {{$currency(row.item.yearlyCosts)}}
-                <b-input
-                  name="yearlyCosts"
-                  size="sm"
-                  v-model.number="updateForm.yearlyCosts"
-                  :disabled="updateForm.busy"
-                  v-validate="'required|numeric|min_value:0'"
-                  :state="$validateState('yearlyCosts', updateForm)"
-                ></b-input>
                 <b-form-invalid-feedback>{{ $displayError('yearlyCosts', updateForm) }}</b-form-invalid-feedback>
               </template>
             </table-editable-cell>
