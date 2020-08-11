@@ -116,7 +116,7 @@
         </template>
 
         <!-- yearlyCosts -->
-        <template v-slot:cell(yearlyCosts)="row">{{$currency(row.item.yearlyCosts)}}</template>
+        <template v-slot:cell(yearlyCosts)="row">{{$currency(calculateModulesTotal(row.item))}}</template>
 
         <!-- actions -->
         <template v-slot:cell(actions)="row" class="actions">
@@ -258,6 +258,22 @@ export default {
   },
   async mounted() {},
   methods: {
+     calculateModulesTotal(item) {
+       
+        if (item.info.prices && item.info.prices.length > 0) {
+          let sum = 0;
+
+         
+            item.info.prices.map( (priceObj) => {
+                sum += (priceObj.price / 100)
+            });
+
+         
+
+          return sum;
+        }
+        return 0;
+    },
     isRowEditing(row) {
       return (
         row &&

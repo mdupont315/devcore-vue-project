@@ -15,6 +15,8 @@ module.exports = {
     'generator-star-spacing': 0,
     'dot-notation': 0,
     'no-useless-catch': 0,
+    'template-tag-spacing': 0,
+    'no-unneeded-ternary': 0,
     // allow variables like >> user_id
     'camelcase': 0,
     'no-trailing-spaces': [

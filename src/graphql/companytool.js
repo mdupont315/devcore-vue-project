@@ -14,6 +14,16 @@ export const COMPANY_TOOL_FRAGMENT = gql `
       toolId,
       createdAt,
       updatedAt,
+      modules{
+          name,
+          prices{
+            name,
+            priceModel,
+            yearlyCosts,
+            price,
+            priceInterval
+            }
+       }      
     }
 `;
 

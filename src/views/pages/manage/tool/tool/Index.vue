@@ -74,10 +74,10 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="yearlyCosts"
-              :staticValue="$currency(row.item.yearlyCosts)"
+              :staticValue="$currency(calculateModulesTotal(row.item))"
             >
               <template slot="editing" v-if="isRowEditing(row)">
-                {{$currency(row.item.yearlyCosts)}}
+                {{$currency(calculateModulesTotal(row.item))}}
                 <b-form-invalid-feedback>{{ $displayError('yearlyCosts', updateForm) }}</b-form-invalid-feedback>
               </template>
             </table-editable-cell>
@@ -193,7 +193,7 @@ export default {
       filter: this.filter,
       force: true
     });
-    //console.log(this.items);
+    console.log(this.items);
     //this.$store.dispatch("toolArea/findAll");
   },
   methods: {
@@ -204,6 +204,23 @@ export default {
         this.currentItem.id === (row.item ? row.item.id : row.id)
       );
     },
+    calculateModulesTotal(item) {
+        if (item.modules && item.modules.length > 0) {
+          let sum = 0;
+
+          item.modules.map((moduleObj) => {
+
+             moduleObj.prices.map( (priceObj) => {
+                sum += (priceObj.price / 100)
+            });
+
+          })
+         
+
+          return sum;
+        }
+        return 0;
+    },
     overlayClick() {
       if (this.currentItem) {
         this.toggleItem(null);
@@ -212,8 +229,7 @@ export default {
       }
     },
     async saveItem(form) {
-      var iadd = 12;
-      alert(iadd)
+    
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         await this.$validator.reset();
