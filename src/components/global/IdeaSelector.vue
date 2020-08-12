@@ -5,7 +5,7 @@
     @input="change"
     selector-class="list"
     :v-bind="$props"
-    :placeholder="$t('Ideas')"
+    :placeholder="placeHolderText"
     :state="state"
     :outside-close="!showPopOver"
     v-model="dataValue"
@@ -63,7 +63,9 @@
 import { /*mapState,*/ mapGetters } from "vuex";
 export default {
   name: "idea-selector",
+  
   props: {
+    placeHolderText: null,
     items: {
       required: false,
       type: Array
@@ -103,6 +105,7 @@ export default {
   //   }
   // },
   data: () => ({
+    
     showPopOver: false,
     dataValue: [],
     ready: false,

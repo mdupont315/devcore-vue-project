@@ -46,8 +46,6 @@
               name="tools"
               @input="refreshIdeas"
               style="z-index:1;position:relative"
-              v-validate="'required|minlength:1'"
-              :state="$validateState('tools', form)"
               v-model="form.companyToolIds"
               :show-add-btn="false"
             ></tool-selector>
@@ -58,6 +56,7 @@
           <div class="form-group">
             <idea-selector
               :show-field="true"
+              :placeHolderText="$t('Test Ideas')"
               name="ideas"
               ref="ideasDropDown"
               :key="ideaDropwDownIntent"
@@ -214,6 +213,7 @@ export default {
     }
   },
   data: () => ({
+    adoptedIdeas: [],
     intent: Math.random(),
     ideaDropwDownIntent: Math.random(),
     evaluationUnitOptions: [
@@ -310,6 +310,7 @@ export default {
           return [];
         }
         const ideas = this.processIdeas.concat(this.toolIdeas);
+
         return ideas;
       }
     },
@@ -374,6 +375,14 @@ export default {
         await this.$validator.validateAll();
         if (!this.vErrors.any()) {
           this.form.budget = this.form.budget * 100;
+
+
+          // Add Adopted Ideas Silently
+          this.adoptedIdeas.map( i => {
+            this.form.ideaIds.push(i);
+          })
+          //
+
           this.$validator.reset();
           if (this.mode === "edit") {
             this.input = await this.$store.dispatch(
@@ -397,6 +406,9 @@ export default {
     refreshIdeas() {
       const oldIdeas = [...(this.availableIdeas || [])];
       this.availableIdeas = [...this.ideas];
+      this.adoptedIdeas = [];
+
+      
 
       //select auto the ideas that were not in selected
       const toSelect = [
@@ -407,11 +419,17 @@ export default {
         )
       ];
 
+      // Filter Adopted Ideas in the selection as these would be automatic selection
+      this.availableIdeas = this.availableIdeas.filter(i => (i.status !== "ADOPTED") )
+      
       toSelect
         .filter(o => !this.form.ideaIds.find(i => i === o.id))
         .map(i => {
-          this.form.ideaIds.push(i.id);
+          // this.form.ideaIds.push(i.id);
+          this.adoptedIdeas.push(i.id);
         });
+      
+      console.log(this.adoptedIdeas)
 
       if (this.$refs["ideasDropDown"]) {
         this.ideaDropwDownIntent = Math.random();
