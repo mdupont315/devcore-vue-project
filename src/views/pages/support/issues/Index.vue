@@ -164,7 +164,9 @@ export default {
     items: {
       get: function() {
         let items = [];
+        
         if (this.process) {
+
           this.process.stages.map(s => {
             s.companyRolesWithChild.map(o => {
               let id = s.id + "_" + o.id;
@@ -175,6 +177,9 @@ export default {
               it.issues = this.issues.filter(is => {
                 return is.stageId == s.id && is.author.companyRoleId == o.id;
               });
+
+              console.log("*** Support Issues ***")
+              console.log(it.issues);
 
               it.issues.map(is => {
                 it.totalLoss += is.totalValue;

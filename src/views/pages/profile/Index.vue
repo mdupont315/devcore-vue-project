@@ -1,5 +1,6 @@
 <template>
-  <default-layout>
+  
+  <div class="spcustom-container">
     <div class="page bg-white">
       <div class="container">
         <h2 class="h1 border-bottom">{{ user.fullName }}</h2>
@@ -162,7 +163,7 @@
         </b-form>
       </div>
     </div>
-  </default-layout>
+  </div>  
 </template>
 <script>
 import { /*mapState,*/ mapGetters } from "vuex";

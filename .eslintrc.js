@@ -18,6 +18,7 @@ module.exports = {
     'template-tag-spacing': 0,
     'no-unneeded-ternary': 0,
     'no-unused-expressions': 0,
+    'prefer-const': 0,
     // allow variables like >> user_id
     'camelcase': 0,
     'no-trailing-spaces': [

@@ -2,15 +2,16 @@
   <div
     :class="'imageFileField' + cssClass + ' ' + (disabled?'disabled':'') +' ' + (uploading?'uploading':'')"
   >
+  <div class="deleteIcon" @click.prevent="remove" v-if="canDelete && !uploading">
+        <i class="mdi mdi-trash-can" />
+      </div>
     <div class="display" ref="display">
       <div class="uploadIcon">
         <i class="mdi mdi-cancel disabled" v-if="disabled" />
         <i class="mdi-upload mdi uploading animated fadeInUp infinite" v-else-if="uploading" />
         <i class="mdi mdi-cloud-upload" v-else />
       </div>
-      <div class="deleteIcon" @click.prevent="remove" v-if="canDelete && !uploading">
-        <i class="mdi mdi-trash-can" />
-      </div>
+      
       <img ref="currentImageElement" :id="id + '-img'" class="showFile" :src="currentSrc" />
     </div>
     <input

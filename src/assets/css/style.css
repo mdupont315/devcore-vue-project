@@ -36755,9 +36755,9 @@
     display: block;
     border-radius: 3px;
     padding: 3px;
-    right: 45px;
+    right: 5px;
     z-index: 1;
-    top: 25px;
+    top: 5px;
   }
   
   .imageFileField.uploading .display .uploadIcon .uploading {
@@ -45710,4 +45710,12 @@
     line-height: 25px;
     float: left;
     margin: 2px;
+  }
+
+
+  .spcustom-container {
+    padding-left: 50px;
+    padding-right: 10px;
+    padding-top: 20px;
+    width: 100%;
   }
