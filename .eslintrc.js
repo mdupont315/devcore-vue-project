@@ -13,6 +13,7 @@ module.exports = {
     'arrow-parens': 0,
     // allow async-await
     'generator-star-spacing': 0,
+    'no-extend-native': 0,
     'dot-notation': 0,
     'no-useless-catch': 0,
     'template-tag-spacing': 0,

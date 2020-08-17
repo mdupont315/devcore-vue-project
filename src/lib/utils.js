@@ -1,6 +1,8 @@
 import store from "../store";
 import router from "../router";
 import ServerResponse from "../models/response.model";
+import supportedLocales from "@/config/supported-locales"
+
 let loadingCount = 0;
 
 String.prototype.capitalize = function() {
@@ -135,8 +137,10 @@ export function queryToPromise(query, options = {
     })
 }
 
+
+
 export async function loadApp() {
-    const requested = '/loading' !== window.location.pathname ? window.location.pathname + window.location.search : '/';
+    const requested = window.location.pathname !== '/loading' ? window.location.pathname + window.location.search : '/';
     blockUi();
     //router.replace('/loading', () => { }, () => { });
     // init the session store
@@ -203,4 +207,15 @@ export async function loadApp() {
                 subscription.unsubscribe();
             }
         })*/
+}
+
+export function getSupportedLocales() {
+    let annotatedLocales = []
+    for (const code of Object.keys(supportedLocales)) {
+      annotatedLocales.push({
+        code,
+        name: supportedLocales[code]
+      })
+    }
+    return annotatedLocales
 }

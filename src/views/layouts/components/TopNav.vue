@@ -21,7 +21,7 @@
         <span class="hamburger-inner"></span>
       </span>
     </b-button> -->
-<!-- 
+<!--
     <b-button class="d-none d-md-inline-block" @click="toggleNav" variant="light">
       <i class="mdi-menu mdi"></i>
     </b-button> -->
@@ -43,7 +43,11 @@
         <component v-if="page.topRight" :is="page.topRight"></component>
         <portal-target name="topbar-right"></portal-target>
       </b-nav-item>
+      <div class="nav__end">
+          <locales-switcher />
+        </div>
       <div class="profile">
+        
         <inner-overlay @click="closeDropDown" v-if="zIndex>0"></inner-overlay>
         <b-nav-item-dropdown
           right
@@ -102,10 +106,11 @@
 </template>
 <script>
 import { /*mapState,*/ mapGetters } from "vuex";
+
 export default {
   name: "top-nav",
   data: () => ({
-    dropDown:false,
+    dropDown: false,
   }),
   computed: {
     ...mapGetters({
@@ -142,3 +147,20 @@ export default {
   }
 };
 </script>
+<style scoped>
+
+.nav__start,
+.nav__end {
+  display: flex;
+  align-items: center;
+}
+.nav img {
+  margin-right: 1rem;
+}
+.nav a {
+  margin-right: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  text-decoration: none;
+}
+</style>

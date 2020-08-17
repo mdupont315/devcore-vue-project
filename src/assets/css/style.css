@@ -45719,3 +45719,8 @@
     padding-top: 20px;
     width: 100%;
   }
+
+  .spcustom-locales{
+    padding: 5px;
+    border: 1px solid #E5E5E5;
+  }
