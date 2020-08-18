@@ -148,6 +148,9 @@ export default {
             );
           }
           await this.initForm();
+          await this.$store.dispatch("companyTool/findAll", {
+            force: true
+          });
           this.$emit("input", this.input);
           this.$emit("done");
         }
