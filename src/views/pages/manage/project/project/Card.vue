@@ -165,7 +165,7 @@ export default {
         userIds: this.item.users.map(i => i.id),
         name: this.item.name,
         budget: this.item.budget,
-        process: this.item.process.id,
+        process: ( this.item.process ) ? this.item.process.id : this.item.processId,
         stage: this.stage.id
       };
     },
