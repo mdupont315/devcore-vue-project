@@ -40117,8 +40117,7 @@
     animation-fill-mode: both;
     -webkit-backface-visibility: visible;
     backface-visibility: visible;
-    -webkit-animation-name: zoomIn;
-    animation-name: zoomIn;
+    
   }
   
   .default-layout .layout .top-nav .profile .button-profile-content {
@@ -45723,4 +45722,8 @@
   .spcustom-locales{
     padding: 5px;
     border: 1px solid #E5E5E5;
+  }
+
+  .spcustom-avatarContainer{
+    min-width: 27px;
   }

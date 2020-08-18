@@ -52,12 +52,13 @@
         <b-nav-item-dropdown
           right
           ref="profileDropDown"
+          
           @hidden="closeDropDown"
           @shown="showDropDown"
         >
           <template v-slot:button-content>
             <img
-              class="rounded-circle avatar shadow-lg d-none d-md-inline-block"
+              class="rounded-circle avatar shadow-lg d-none d-md-inline-block spcustom-avatarContainer"
               :src="user.getAvatarUrl('50x50')"
               height="30px"
               style="margin-top:5px"

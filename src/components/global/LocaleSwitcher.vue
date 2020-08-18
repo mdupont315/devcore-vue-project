@@ -25,8 +25,6 @@ export default {
             value: element.code,
           })
         });
-        console.log("*** Locales Found **")
-        console.log(items)
         return items;
       }
     }
