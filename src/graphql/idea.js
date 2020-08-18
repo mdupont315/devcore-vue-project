@@ -17,7 +17,8 @@ export const IDEA_FRAGMENT = gql `
       parentType,
       version,
       type,
-      totalEvaluations
+      totalEvaluations,
+      evaluationSum,
     #   stageId,
     #   operationId,
     #   phaseId,

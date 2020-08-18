@@ -58,7 +58,7 @@
       <author-time :user="idea.author" :time="idea.createdAt" class="d-inline-block"></author-time>
       <div class="info float-right">
         <span v-if="idea.evaluationsCount > 0" class="font-15x ml-2">
-          <b-badge variant="black">{{ $tc('evaluation.count', idea.evaluationsCount) }}</b-badge>
+          <b-badge variant="black">{{ $tc('evaluation.count', idea.evaluationsCount)  }} ,  {{ $currency(calcEvaluationAvg())}}</b-badge>
         </span>
         <span v-if="idea.improvementsCount > 0" class="font-15x ml-2">
           <b-badge variant="primary">{{ idea.improvementsCount }}</b-badge>
@@ -138,6 +138,12 @@ export default {
         tool: { id: toolId }
       });
     },
+    calcEvaluationAvg(){
+        if(this.idea.evaluationsCount > 0 && this.idea.evaluationSum != null && this.idea.evaluationSum != 0){
+          return ((this.idea.evaluationSum/100)/this.idea.evaluationsCount);
+        }
+        return 0;
+    },
     toggleIdea() {
       this.showDetail = !this.showDetail;
       if (this.showDetail) {
@@ -191,6 +197,9 @@ export default {
           break;
       }
     }
-  }
+  },
+   mounted () {
+     console.log(this.idea);
+   }
 };
 </script>
