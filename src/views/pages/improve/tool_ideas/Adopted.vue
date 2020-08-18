@@ -1,20 +1,13 @@
 <template>
-  <div style="padding-bottom:400px">
+  <div>
     <b-row v-if="currentProcessSection">
-      <b-col cols="6" class="mx-auto">
-        <div class="h4 text-white text-uppercase clearfix">
-          <h3 class="h4 float-left" style="padding-top:9px">
-            {{ $t('New ideas') }}
-            <span class="h4 text-gray-lighter">{{ newIdeas.length }}</span>
-          </h3>&nbsp;
-          <!-- <b-button
-            size="md"
-            class="ml-2 text-uppercase float-left"
-            style="padding:5px 15px;line-height:1.3em;font-size:18px"
-          >+ {{ $t('Add new')}}</b-button>-->
-        </div>
-        <idea-card v-for="item in newIdeas" :key="item.id" :idea="item"></idea-card>
-        <div v-if="newIdeas.length==0">
+      <b-col class="col-6 mx-auto">
+        <h3 class="h4 text-white text-uppercase" style="padding-top:15px">
+          {{ $t('Adopted ideas') }}
+          <span class="text-gray-lighter">{{ adoptedIdeas.length }}</span>
+        </h3>
+        <idea-card v-for="item in adoptedIdeas" :key="item.id" :idea="item"></idea-card>
+        <div v-if="adoptedIdeas.length==0">
           <p class="alert alert-warning">{{ $t("There are no records for the given criteria") }}</p>
         </div>
       </b-col>
@@ -77,14 +70,14 @@ export default {
         return null;
       }
     },
-    newIdeas: {
+    adoptedIdeas: {
       get: function() {
         if (this.currentProcessSectionName) {
           return this.$store.getters[
             "toolIdea/by" + this.currentProcessSectionName.capitalize()
           ](this.currentProcessSection.id).filter(
             i =>
-              this.filterByProcessSection(i,"NEW") &&
+             this.filterByProcessSection(i,"ADOPTED")  &&
               (this.tool ? i.tool.id === this.tool.toolId : true)
           );
         }
@@ -93,6 +86,7 @@ export default {
     }
   },
   methods: {
+
     filterByProcessSection(item,status){
        switch(this.currentProcessSectionName){
          case 'process':

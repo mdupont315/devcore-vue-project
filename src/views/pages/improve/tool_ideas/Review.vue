@@ -1,20 +1,23 @@
 <template>
-  <div style="padding-bottom:400px">
+  <div>
     <b-row v-if="currentProcessSection">
-      <b-col cols="6" class="mx-auto">
-        <div class="h4 text-white text-uppercase clearfix">
-          <h3 class="h4 float-left" style="padding-top:9px">
-            {{ $t('New ideas') }}
-            <span class="h4 text-gray-lighter">{{ newIdeas.length }}</span>
-          </h3>&nbsp;
-          <!-- <b-button
-            size="md"
-            class="ml-2 text-uppercase float-left"
-            style="padding:5px 15px;line-height:1.3em;font-size:18px"
-          >+ {{ $t('Add new')}}</b-button>-->
+      <b-col>
+        <h3 class="h4 text-white text-uppercase" style="padding-top:15px">
+          {{ $t('In testing') }}
+          <span class="text-gray-lighter">{{ testingIdeas.length }}</span>
+        </h3>
+        <idea-card v-for="item in testingIdeas" :key="item.id" :idea="item"></idea-card>
+        <div v-if="testingIdeas.length==0">
+          <p class="alert alert-warning">{{ $t("There are no records for the given criteria") }}</p>
         </div>
-        <idea-card v-for="item in newIdeas" :key="item.id" :idea="item"></idea-card>
-        <div v-if="newIdeas.length==0">
+      </b-col>
+      <b-col>
+        <h3 class="h4 text-white text-uppercase" style="padding-top:15px">
+          {{ $t('Evaluated ideas') }}
+          <span class="text-gray-lighter">{{ evaluatedIdeas.length }}</span>
+        </h3>
+        <idea-card v-for="item in evaluatedIdeas" :key="item.id" :idea="item"></idea-card>
+        <div v-if="evaluatedIdeas.length==0">
           <p class="alert alert-warning">{{ $t("There are no records for the given criteria") }}</p>
         </div>
       </b-col>
@@ -77,14 +80,30 @@ export default {
         return null;
       }
     },
-    newIdeas: {
+    testingIdeas: {
       get: function() {
-        if (this.currentProcessSectionName) {
+        if (this.currentProcessSection) {
           return this.$store.getters[
             "toolIdea/by" + this.currentProcessSectionName.capitalize()
           ](this.currentProcessSection.id).filter(
             i =>
-              this.filterByProcessSection(i,"NEW") &&
+              this.filterByProcessSection(i,"TESTING")  &&
+              !i.hasReviews &&
+              (this.tool ? i.tool.id === this.tool.toolId : true)
+          );
+        }
+        return [];
+      }
+    },
+    evaluatedIdeas: {
+      get: function() {
+        if (this.currentProcessSection) {
+          return this.$store.getters[
+            "toolIdea/by" + this.currentProcessSectionName.capitalize()
+          ](this.currentProcessSection.id).filter(
+            i =>
+              this.filterByProcessSection(i,"EVALUATED") &&
+              i.hasReviews &&
               (this.tool ? i.tool.id === this.tool.toolId : true)
           );
         }
@@ -93,7 +112,8 @@ export default {
     }
   },
   methods: {
-    filterByProcessSection(item,status){
+
+     filterByProcessSection(item,status){
        switch(this.currentProcessSectionName){
          case 'process':
            return (item.status === status)

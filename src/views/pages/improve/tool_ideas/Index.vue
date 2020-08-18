@@ -195,7 +195,7 @@ export default {
             "toolIdea/by" + this.currentProcessSectionName.capitalize()
           ](this.currentProcessSection.id).filter(
             i =>
-              i.status === "NEW" &&
+              this.filterByProcessSection(i,"NEW") &&
               (this.tool ? i.tool.id === this.tool.toolId : true)
           );
         }
@@ -219,7 +219,7 @@ export default {
             "toolIdea/by" + this.currentProcessSectionName.capitalize()
           ](this.currentProcessSection.id).filter(
             i =>
-              i.status === "TESTING" &&
+              this.filterByProcessSection(i,"TESTING") &&
               (this.tool ? i.tool.id === this.tool.toolId : true)
           );
         }
@@ -233,7 +233,7 @@ export default {
             "toolIdea/by" + this.currentProcessSectionName.capitalize()
           ](this.currentProcessSection.id).filter(
             i =>
-              i.status === "ADOPTED" &&
+              this.filterByProcessSection(i,"ADOPTED") &&
               (this.tool ? i.tool.id === this.tool.toolId : true)
           );
         }
@@ -294,6 +294,27 @@ export default {
 
   },
   methods: {
+    filterByProcessSection(item,status){
+       switch(this.currentProcessSectionName){
+         case 'process':
+           return (item.status === status)
+           break;
+         case 'stage':
+           return (item.status === status && item.parentType === 'process_stage'  )
+           break;
+         case 'operation':
+           return (item.status === status && item.parentType === 'process_operation'  )
+           break;
+
+        case 'phase':
+           return (item.status === status && item.parentType === 'process_phase'  )
+           break;  
+         default: 
+           return false;
+
+
+       }
+    },
     isActive(name) {
       return (
         this.$route.params.type === name ||
