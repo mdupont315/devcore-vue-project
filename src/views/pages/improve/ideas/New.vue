@@ -70,7 +70,9 @@ export default {
       get: function() {
         if (this.currentProcessSectionName) {
           return this.$store.getters["idea/by" + this.currentProcessSectionName.capitalize()](this.currentProcessSection.id).filter(
-            i => i.status === "NEW"
+            i => {
+                return this.filterByProcessSection(i,"NEW") 
+            }
           );
         }
         return [];
@@ -78,6 +80,29 @@ export default {
     }
   },
   
-  methods: {}
+  methods: {
+    filterByProcessSection(item,status){
+       switch(this.currentProcessSectionName){
+         case 'process':
+           return (item.status === status)
+           break;
+         case 'stage':
+           return (item.status === status && item.parentType === 'process_stage'  )
+           break;
+         case 'operation':
+           return (item.status === status && item.parentType === 'process_operation'  )
+           break;
+
+        case 'phase':
+           return (item.status === status && item.parentType === 'process_phase'  )
+           break;  
+         default: 
+           return false;
+
+
+       }
+    }
+
+  }
 };
 </script>

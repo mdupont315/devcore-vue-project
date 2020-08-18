@@ -76,7 +76,7 @@ export default {
         if (this.currentProcessSection) {
           return this.$store.getters[
             "idea/by" + this.currentProcessSectionName.capitalize()
-          ](this.currentProcessSection.id).filter(i => i.status === "TESTING" && !i.hasReviews);
+          ](this.currentProcessSection.id).filter(i => this.filterByProcessSection(i,"TESTING") && !i.hasReviews);
         }
         return [];
       }
@@ -87,13 +87,34 @@ export default {
           return this.$store.getters[
             "idea/by" + this.currentProcessSectionName.capitalize()
           ](this.currentProcessSection.id).filter(
-            i => i.status === "TESTING" && i.hasReviews
+            i => this.filterByProcessSection(i,"TESTING") && i.hasReviews
           );
         }
         return [];
       }
     }
   },
-  methods: {}
+  methods: { 
+    filterByProcessSection(item,status){
+       switch(this.currentProcessSectionName){
+         case 'process':
+           return (item.status === status)
+           break;
+         case 'stage':
+           return (item.status === status && item.parentType === 'process_stage'  )
+           break;
+         case 'operation':
+           return (item.status === status && item.parentType === 'process_operation'  )
+           break;
+
+        case 'phase':
+           return (item.status === status && item.parentType === 'process_phase'  )
+           break;  
+         default: 
+           return false;
+
+
+       }
+    }}
 };
 </script>
