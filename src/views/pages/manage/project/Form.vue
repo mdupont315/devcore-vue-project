@@ -374,6 +374,7 @@ export default {
       try {
         await this.$validator.validateAll();
         if (!this.vErrors.any()) {
+         
           this.form.budget = this.form.budget * 100;
 
 
@@ -400,9 +401,11 @@ export default {
           this.$emit("done");
         }
       } catch (ex) {
+        this.form.budget = this.form.budget / 100;
         console.error(ex.message);
       }
     },
+    
     refreshIdeas() {
       const oldIdeas = [...(this.availableIdeas || [])];
       this.availableIdeas = [...this.ideas];
