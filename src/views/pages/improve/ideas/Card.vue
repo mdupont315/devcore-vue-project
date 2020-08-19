@@ -58,8 +58,12 @@
       <author-time :user="idea.author" :time="idea.createdAt" class="d-inline-block"></author-time>
       <div class="info float-right">
         <span v-if="idea.evaluationsCount > 0" class="font-15x ml-2">
-          <b-badge variant="black">{{ $tc('evaluation.count', idea.evaluationsCount)  }} ,  {{ $currency(calcEvaluationAvg())}}</b-badge>
+          <b-badge variant="black">{{ idea.evaluationsCount }} </b-badge>
         </span>
+        <span v-if="idea.evaluationsCount > 0" class="font-15x ml-2">
+          <b-badge variant="black">{{ $currency(calcEvaluationAvg())}}</b-badge>
+        </span>
+        
         <span v-if="idea.improvementsCount > 0" class="font-15x ml-2">
           <b-badge variant="primary">{{ idea.improvementsCount }}</b-badge>
         </span>
