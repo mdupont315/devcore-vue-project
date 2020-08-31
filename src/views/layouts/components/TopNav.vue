@@ -27,7 +27,7 @@
     </b-button> -->
 
     <b-navbar-nav class="d-none d-md-flex">
-      <h1 class="h4 ml-3 mb-0 text-uppercase page-title">{{ page.title }}</h1>
+      <h1 class="h4 ml-3 mb-0 text-uppercase page-title">{{ $t(page.title) }}</h1>
       <component v-if="page.titleButton" :is="page.titleButton"></component>
        <portal-target name="topbar-left"></portal-target>
     </b-navbar-nav>

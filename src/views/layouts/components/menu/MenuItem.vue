@@ -2,11 +2,11 @@
   <li :class="{'active': active}" @click="toggle(item,$event)">
     <router-link class="title" :to="item.url" v-if="item.url">
       <i class="mdi icon" :class="item.icon" v-if="item.icon"></i>
-      {{ item.title }}
+      {{ $t(item.title) }}
     </router-link>
     <span class="title" v-else>
       <i class="mdi icon" :class="item.icon" v-if="item.icon"></i>
-      {{ item.title }}
+      {{ $t(item.title) }}
     </span>
     <ul class="nav sub-menu" v-if="item.children">
       <li
@@ -18,7 +18,7 @@
       >
         <router-link :to="subitem.url" class="title">
           <!--<i class="mdi" :class="subitem.icon" v-if="subitem.icon"></i>-->
-          {{ subitem.title }}
+          {{ $t(subitem.title) }}
         </router-link>
       </li>
     </ul>
@@ -47,12 +47,12 @@ export default {
     })
   },
   mounted() {
-   if(this.$route.matched.some(({ name }) => name === this.item.name)){
+   if (this.$route.matched.some(({ name }) => name === this.item.name)) {
      this.activate(this.item)
    }
   },
   methods: {
-    activate(item){
+    activate(item) {
       this.$store.dispatch("nav/activateItem", item);
     },
     toggle(item) {

@@ -22,7 +22,7 @@
       <div v-if="$can('auth/user/create')" class="text-center p-3">
         <small
           class="px-3 text-center d-block mb-3"
-        >{{ 'Invite your team and start collaborating now!'}}</small>
+        >{{ $t('Invite your team and start collaborating now!')}}</small>
         <b-button
           size="lg"
           @click="showInviteModal = !showInviteModal"
