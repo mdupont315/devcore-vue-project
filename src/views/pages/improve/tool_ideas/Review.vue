@@ -88,7 +88,7 @@ export default {
           ](this.currentProcessSection.id).filter(
             i =>
               this.filterByProcessSection(i,"TESTING")  &&
-              !i.hasReviews &&
+              i.hasReviews &&
               (this.tool ? i.tool.id === this.tool.toolId : true)
           );
         }

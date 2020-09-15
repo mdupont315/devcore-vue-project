@@ -92,7 +92,7 @@
             block
             :loading="form.busy"
             @click="completeStage"
-          >{{ $t('action.close', {name:$t('stage')}) }}</loading-button>
+          >{{ $t('action.close', {name:$t('Stage')}) }}</loading-button>
         </div>
         <div class="mt-3" v-if="stage.status==='STARTED' && item.type==='NORMAL'">
           <loading-button
@@ -100,7 +100,7 @@
             block
             :loading="form.busy"
             @click="nextStage"
-          >{{ $t('action.next', {name:$t('stage')}) }}</loading-button>
+          >{{ $t('action.next', {name:$t('Stage')}) }}</loading-button>
         </div>
 
         <div class="mt-3" v-if="stage.status==='STARTED' && item.type==='ON_GOING'">
@@ -109,7 +109,7 @@
             block
             :loading="form.busy"
             @click="completeStage"
-          >{{ $t('action.evaluate', {name:$t('stage')}) }}</loading-button>
+          >{{ $t('action.evaluate', {name:$t('Stage')}) }}</loading-button>
         </div>
       </div>
     </div>
