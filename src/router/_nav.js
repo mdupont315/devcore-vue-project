@@ -78,7 +78,8 @@ export default function getItems(user) {
                     name: 'analysis-general'
                 },
                 //permissions: 'process/process/manage',
-            }, ]
+            },
+        ]
         },
         {
             title: i18n.t('Manage'),
@@ -146,6 +147,15 @@ export default function getItems(user) {
                     permissions: 'tool/productCategory/manage',
                     url: {
                         name: 'tool-productcategory'
+                    },
+                },
+                {
+                    title: i18n.t('Company management'),
+                    name: 'company-c',
+                    icon: 'mdi-account',
+                    permissions: 'auth/user/manage',
+                    url: {
+                        name: 'super-admin-companies'
                     },
                 },
                 {

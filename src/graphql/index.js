@@ -10,6 +10,7 @@ export const TEST_QUERY = gql `
 
 export * from './auth';
 export * from './currency';
+export * from './company';
 export * from './company_role';
 export * from './user';
 export * from './role';

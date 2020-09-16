@@ -117,6 +117,7 @@ const routes = [
           title: 'Company'
       }
   },
+ 
   {
       path: '/improve',
       name: 'improve',
@@ -306,6 +307,22 @@ const routes = [
                   topRight: () =>
                       import ( /* webpackChunkName: "manage" */ '@/views/pages/manage/user/SearchBar'),
               },
+          },
+          {
+            path: 'companies',
+            name: 'super-admin-companies',
+            component: () =>
+                import ( /* webpackChunkName: "manage" */ '@/views/pages/manage/company/Index'),
+            meta: {
+                middleware: [auth],
+                title: 'Companies',
+                permissions: "auth/user/manage",
+                titleButton: () =>
+                    import ( /* webpackChunkName: "manage" */ '@/views/pages/manage/company/TitleButton'),
+                //topCentral: () => import(/* webpackChunkName: "manage" */'@/views/pages/manage/user/CentralBar'),
+                topRight: () =>
+                    import ( /* webpackChunkName: "manage" */ '@/views/pages/manage/company/SearchBar'),
+            },
           },
           {
               path: 'projects',

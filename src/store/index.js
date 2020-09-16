@@ -10,6 +10,7 @@ import app from './app';
 import auth from './auth';
 import profile from './profile';
 import currency from './currency';
+import company from './company';
 import companyRole from './company_role';
 import process from './process';
 import processStage from './processstage';
@@ -84,6 +85,7 @@ const store = new Vuex.Store({
         tool,
         toolModule,
         toolCategory,
+        company,
         companyRole,
         user,
         role,
@@ -108,6 +110,7 @@ const store = new Vuex.Store({
 })
 
 function resetStates() {
+    store.commit('company/RESET_STATE');
     store.commit('companyRole/RESET_STATE');
     store.commit('user/RESET_STATE');
     store.commit('role/RESET_STATE');
