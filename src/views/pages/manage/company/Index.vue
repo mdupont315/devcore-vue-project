@@ -111,23 +111,23 @@
             <div v-if="isRowEditing(row)" class="text-right">
               <table-edit-tools-buttons
                 :item="row.item"
-                :showSaveButton="$can('auth/user/update', row.item)"
+                :showSaveButton="$can('core/company/update', row.item)"
                 :disableSaveButton="vErrors.any()||updateForm.busy"
-                :showDeleteButton="$can('auth/user/delete', row.item)"
+                :showDeleteButton="$can('core/company/delete', row.item)"
                 :loading="updateForm.busy"
                 @cancel="toggleItem(row.item)"
                 @delete="toggleItem(null)"
                 @save="saveItem(updateForm)"
-                store="user"
+                store="company"
               ></table-edit-tools-buttons>
             </div>
             <!-- when the row is not editing -->
             <table-tools-buttons
               v-else
               :item="row.item"
-              :showEditButton="$can('auth/user/update', row.item)"
-              :showDeleteButton="$can('auth/user/delete', row.item)"
-              store="user"
+              :showEditButton="$can('core/company/update', row.item)"
+              :showDeleteButton="$can('core/company/delete', row.item)"
+              store="company"
               @editItem="toggleItem(row.item)"
             ></table-tools-buttons>
           </template>
@@ -166,7 +166,6 @@ export default {
         return [
           { key: "name", label: this.$t("name"), sortable: true },
           { key: "currencyCode", label: this.$t("Currency"), sortable: true },
-          { key: "lang", label: this.$t("Lang"), sortable: true },
           { key: "actions", label: this.$t("Manage"), class: "actions" }
         ];
       }

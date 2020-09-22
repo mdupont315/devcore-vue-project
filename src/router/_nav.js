@@ -153,7 +153,7 @@ export default function getItems(user) {
                     title: i18n.t('Company management'),
                     name: 'company-c',
                     icon: 'mdi-account',
-                    permissions: 'auth/user/manage',
+                    permissions: 'core/company/manage',
                     url: {
                         name: 'super-admin-companies'
                     },

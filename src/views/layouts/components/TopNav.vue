@@ -27,6 +27,7 @@
     </b-button> -->
 
     <b-navbar-nav class="d-none d-md-flex">
+      
       <h1 class="h4 ml-3 mb-0 text-uppercase page-title">{{ $t(page.title) }}</h1>
       <component v-if="page.titleButton" :is="page.titleButton"></component>
        <portal-target name="topbar-left"></portal-target>
@@ -35,10 +36,12 @@
     <b-navbar-nav class="d-none d-md-flex flex-grow-1 align-items-center flex-column">
       <component v-if="page.topCentral" :is="page.topCentral"></component>
       <portal-target name="topbar-central"></portal-target>
+      <h5 v-if="$can('core/company/manage')">{{ $t('Super Admininstrator Panel') }}</h5>
     </b-navbar-nav>
 
     <!-- Right aligned nav items -->
     <b-navbar-nav class="ml-auto">
+      
       <b-nav-item>
         <component v-if="page.topRight" :is="page.topRight"></component>
         <portal-target name="topbar-right"></portal-target>
@@ -77,7 +80,7 @@
                 <div class>
                   <small>
                     <i class="mdi mdi-eye-outline"></i>
-                    {{ user.roles[0].name}} | {{ user.companyRole.name }}
+                    {{ user.roles[0].name}} | <span v-if="user.companyRole">{{ user.companyRole.name }}</span>
                   </small>
                 </div>
                 <div class="username font-weight-bold">{{ user.fullName }}</div>
@@ -126,7 +129,9 @@ export default {
       },
     }
   },
-  mounted() {},
+  mounted() {
+    
+  },
   methods: {
     async logout() {
       try {

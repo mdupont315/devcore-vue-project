@@ -88,7 +88,8 @@ export default {
   }),
   computed: {
     ...mapGetters({
-      loaded: "app/loaded"
+      loaded: "app/loaded",
+      user: "auth/user",
     })
   },
   mounted() {},
@@ -99,9 +100,16 @@ export default {
         blockUi();
         await this.$store.dispatch("app/load");
         this.$store.dispatch("app/asyncLoad");
+        let defaultRoute = "/";
+
+        if ( this.user && this.user.can("core/company/manage") ) {
+           await this.$router.replace("manage/companies");
+        }
+       
         await this.$router.replace(
-          this.$store.getters["app/intented_route"] || "/"
+          this.$store.getters["app/intented_route"] || defaultRoute
         );
+
       } catch (ex) {
         if (ex.code && ex.code === "MUST_VERIFY_EMAIL") {
           await this.$router.push({

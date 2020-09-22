@@ -10,6 +10,8 @@
   </ul>
 </template>
 <script>
+import { mapGetters } from "vuex";
+// import { PERM_COMPANY_MANAGE } from '@/config/app';
 import MenuItem from "./MenuItem";
 export default {
   name: "nav-menu",
@@ -21,6 +23,11 @@ export default {
       type: Array,
       required: true
     }
+  },
+  computed: {
+    ...mapGetters({
+      user: "auth/user",
+    })
   },
   data: () => ({
     filteredElements: []
@@ -38,7 +45,7 @@ export default {
             ret.push(item);
           }
         } else {
-          if (this.checkPermission(item)) {
+          if (this.checkPermission(item) && this.checkPanelValidate(item)) {
             ret.push(item);
           }
         }
@@ -50,6 +57,14 @@ export default {
         return this.$can(item.permissions);
       }
       return true;
+    },
+    checkPanelValidate(item) {
+        if ( this.user.can("core/company/manage") &&
+            item.permissions !== "core/company/manage" ) {
+          return false;
+        } else {
+          return true;
+        }
     }
   }
 };

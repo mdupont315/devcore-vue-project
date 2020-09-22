@@ -316,7 +316,7 @@ const routes = [
             meta: {
                 middleware: [auth],
                 title: 'Companies',
-                permissions: "auth/user/manage",
+                permissions: "core/company/manage",
                 titleButton: () =>
                     import ( /* webpackChunkName: "manage" */ '@/views/pages/manage/company/TitleButton'),
                 //topCentral: () => import(/* webpackChunkName: "manage" */'@/views/pages/manage/user/CentralBar'),

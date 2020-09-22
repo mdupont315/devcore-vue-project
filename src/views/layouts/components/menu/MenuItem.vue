@@ -43,7 +43,8 @@ export default {
       }
     },
     ...mapGetters({
-      expandedItems: "nav/currentExpandedItems"
+      expandedItems: "nav/currentExpandedItems",
+      user: "auth/user",
     })
   },
   mounted() {

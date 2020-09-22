@@ -1,10 +1,11 @@
 <template>
-  <div class="ml-3" v-if="$can('auth/user/create')">
+  <div class="ml-3" v-if="$can('core/company/create')">
+   
     <b-button
       size="sm"
       class="text-uppercase"
       variant="primary"
-      :title="$t('Create New') + ' ' + $t('User')"
+      :title="$t('Create New') + ' ' + $t('Company')"
       v-b-tooltip.hover
       id="btnNew"
       @click="togglePopOver"
@@ -12,6 +13,7 @@
       <i class="mdi mdi-plus"></i>
       {{ $t('New')}}
     </b-button>
+    <!-- <lable v-if='user.can("core/company/manage")'>SUPER ADMIN</lable> -->
     <b-popover
       target="btnNew"
       :show.sync="showPopOver"
@@ -28,6 +30,7 @@
   </div>
 </template>
 <script>
+import { mapGetters } from "vuex";
 import ClickOutside from "vue-click-outside";
 import Form from "./Form";
 export default {
@@ -42,6 +45,12 @@ export default {
   },
   components: {
     "area-form": Form
+  },
+  computed: {
+    ...mapGetters({
+      loaded: "app/loaded",
+      user: "auth/user",
+    })
   },
   methods: {
     togglePopOver() {

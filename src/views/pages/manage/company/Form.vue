@@ -150,8 +150,7 @@ export default {
         await this.$validator.validateAll();
         if (!this.vErrors.any()) {
           await this.$validator.reset();
-          console.log("*** SAVE FORM *** ")
-          console.log(this.form)
+         
           if (this.mode === "edit") {
             this.input = await this.$store.dispatch("company/update", this.form);
           } else {
