@@ -219,3 +219,15 @@ export function getSupportedLocales() {
     }
     return annotatedLocales
 }
+
+export function isSuperUser() {
+    console.log(store.state.auth.session)
+    console.log(store.state)
+    // return false;
+    if ( store.state.auth.session && store.state.auth.session.user.can('core/company/manage') ) {
+      return true;
+    } else {
+     return false;
+   }
+   
+}

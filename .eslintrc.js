@@ -37,6 +37,7 @@ module.exports = {
     'eqeqeq': 0,
     'no-multiple-empty-lines': 0,
     'eol-last': 0,
+    'vue/no-unused-vars': 0,
 
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'

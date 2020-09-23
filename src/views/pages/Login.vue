@@ -103,7 +103,7 @@ export default {
         let defaultRoute = "/";
 
         if ( this.user && this.user.can("core/company/manage") ) {
-           await this.$router.replace("manage/companies");
+           await this.$router.replace("/manage/companies");
         }
        
         await this.$router.replace(

@@ -47,3 +47,5 @@ export function setPageTitleMiddleware (to, from, next) {
   if (pageTitle) window.document.title = pageTitle.meta.title
   next()
 }
+
+

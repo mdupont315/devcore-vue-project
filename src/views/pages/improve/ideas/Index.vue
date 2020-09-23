@@ -125,6 +125,7 @@ export default {
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
+      user: "auth/user",
       loading: "process/loading"
     }),
     process: {
@@ -164,7 +165,7 @@ export default {
         if (this.currentProcessSectionName) {
           return this.$store.getters[
             "idea/by" + this.currentProcessSectionName.capitalize()
-          ](this.currentProcessSection.id).filter(i => this.filterByProcessSection(i,"NEW") );
+          ](this.currentProcessSection.id).filter(i => this.filterByProcessSection(i, "NEW") );
         }
         return [];
       }
@@ -174,7 +175,7 @@ export default {
         if (this.currentProcessSectionName) {
           return this.$store.getters[
             "idea/by" + this.currentProcessSectionName.capitalize()
-          ](this.currentProcessSection.id).filter(i => this.filterByProcessSection(i,"TESTING"));
+          ](this.currentProcessSection.id).filter(i => this.filterByProcessSection(i, "TESTING"));
         }
         return [];
       }
@@ -184,7 +185,7 @@ export default {
         if (this.currentProcessSectionName) {
           return this.$store.getters[
             "idea/by" + this.currentProcessSectionName.capitalize()
-          ](this.currentProcessSection.id).filter(i => this.filterByProcessSection(i,"ADOPTED"));
+          ](this.currentProcessSection.id).filter(i => this.filterByProcessSection(i, "ADOPTED"));
         }
         return [];
       }
@@ -231,7 +232,10 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
+    if ( this.user.can("core/company/manage") ) {
+         await this.$router.replace("/manage/companies");
+    }
     this.loadComponent();
     if (this.process.process) {
       this.$store.dispatch("process/findById", {
@@ -253,22 +257,21 @@ export default {
     });
   },
   methods: {
-     filterByProcessSection(item,status){
-       switch(this.currentProcessSectionName){
+     filterByProcessSection(item, status) {
+       switch (this.currentProcessSectionName) {
          case 'process':
            return (item.status === status)
-           break;
+           
          case 'stage':
-           return (item.status === status && item.parentType === 'process_stage'  )
-           break;
+           return (item.status === status && item.parentType === 'process_stage' )
+           
          case 'operation':
-           return (item.status === status && item.parentType === 'process_operation'  )
-           break;
-
+           return (item.status === status && item.parentType === 'process_operation' )
+     
         case 'phase':
-           return (item.status === status && item.parentType === 'process_phase'  )
-           break;  
-         default: 
+           return (item.status === status && item.parentType === 'process_phase' )
+          
+         default:
            return false;
 
 
@@ -312,7 +315,8 @@ export default {
           break;
       }
     },
-    loadComponent() {
+    async loadComponent() {
+     
       this.currentComponent = () =>
         import(
           "./" +

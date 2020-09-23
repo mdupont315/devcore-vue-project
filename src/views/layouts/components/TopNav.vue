@@ -91,7 +91,8 @@
               </b-dropdown-item>
               <b-dropdown-item
                 :to="{name:'my-company'}"
-                v-if="$can('auth/user/edit_my_company')"
+                v-if="$can('auth/user/edit_my_company') == true && $can('core/company/manage') == false"
+              
               >
                 <i class="mdi mdi-domain"></i>
                 {{ $t('My Company')}}

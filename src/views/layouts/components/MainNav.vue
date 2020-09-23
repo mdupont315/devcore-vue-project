@@ -19,7 +19,7 @@
       <div class="menu-wrapper">
         <navigation :items="nav" />
       </div>
-      <div v-if="$can('auth/user/create')" class="text-center p-3">
+      <div v-if="$can('auth/user/create')== true && $can('core/company/manage') == false" class="text-center p-3">
         <small
           class="px-3 text-center d-block mb-3"
         >{{ $t('Invite your team and start collaborating now!')}}</small>
