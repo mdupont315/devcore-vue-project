@@ -2,7 +2,7 @@
   <div>
     <b-form v-if="form" class="hide-labels" @submit.prevent="saveItem">
       <b-card no-body class="d-block">
-        <b-card-body class="p-0" :class="{'p-3':mode==='edit'}">
+        <b-card-body class="p-0" :class="{ 'p-3': mode === 'edit' }">
           <div class="form-group">
             <b-form-input
               id="title"
@@ -15,74 +15,99 @@
               v-validate="'required|min:4'"
               v-autofocus
             ></b-form-input>
-            <label for="title">{{ $t('Idea title') }}</label>
-            <b-form-invalid-feedback>{{ $displayError('title', form) }}</b-form-invalid-feedback>
+            <label for="title">{{ $t("Idea title") }}</label>
+            <b-form-invalid-feedback>{{
+              $displayError("title", form)
+            }}</b-form-invalid-feedback>
           </div>
-          <div class="form-label-group select required" v-if="form.type==='TOOL'">
+          <div
+            class="form-label-group select required"
+            v-if="form.type === 'TOOL'"
+          >
             <v-select
               label="name"
               v-validate="'required'"
               data-vv-name="tool"
               v-model="form.companyToolId"
               :placeholder="$t('Tool')"
-              :reduce="tool => tool.id"
+              :reduce="(tool) => tool.id"
               :options="tools"
               class="text-capitalize"
-              :class="{'is-invalid':$validateState('tool', form)===false, 'is-valid':$validateState('tool', form)===true}"
+              :class="{
+                'is-invalid': $validateState('tool', form) === false,
+                'is-valid': $validateState('tool', form) === true,
+              }"
             ></v-select>
-            <label for="stage">{{ $t('Tool') }}</label>
-            <b-form-invalid-feedback>{{ $displayError('tool', form) }}</b-form-invalid-feedback>
+            <label for="stage">{{ $t("Tool") }}</label>
+            <b-form-invalid-feedback>{{
+              $displayError("tool", form)
+            }}</b-form-invalid-feedback>
           </div>
           <div class="form-label-group select required">
             <v-select
               label="title"
-              :disabled="form.status!='NEW'"
+              :disabled="form.status != 'NEW'"
               v-validate="''"
               data-vv-name="stage_id"
               v-model="form.stageId"
               :placeholder="$t('Stage')"
-              :reduce="stage => stage.id"
+              :reduce="(stage) => stage.id"
               @input="changeStage"
               :options="process.process.stages"
               class="text-capitalize"
-              :class="{'is-invalid':$validateState('stage_id', form)===false, 'is-valid':$validateState('stage_id', form)===true}"
+              :class="{
+                'is-invalid': $validateState('stage_id', form) === false,
+                'is-valid': $validateState('stage_id', form) === true,
+              }"
             ></v-select>
-            <label for="stage">{{ $t('Stage') }}</label>
-            <b-form-invalid-feedback>{{ $displayError('stage_id', form) }}</b-form-invalid-feedback>
+            <label for="stage">{{ $t("Stage") }}</label>
+            <b-form-invalid-feedback>{{
+              $displayError("stage_id", form)
+            }}</b-form-invalid-feedback>
           </div>
           <div class="form-label-group select required" v-if="form.stageId">
             <v-select
               label="title"
               v-validate="''"
-              :disabled="form.status!='NEW'"
+              :disabled="form.status != 'NEW'"
               data-vv-name="operation_id"
               v-model="form.operationId"
               :placeholder="$t('Operation')"
-              :reduce="operation => operation.id"
+              :reduce="(operation) => operation.id"
               @input="changeOperation"
               class="text-capitalize"
               :options="operations"
-              :class="{'is-invalid':$validateState('operation', form)===false, 'is-valid':$validateState('operation', form)===true}"
+              :class="{
+                'is-invalid': $validateState('operation', form) === false,
+                'is-valid': $validateState('operation', form) === true,
+              }"
             ></v-select>
-            <label for="operation">{{ $t('Operation') }}</label>
-            <b-form-invalid-feedback>{{ $displayError('operation_id', form) }}</b-form-invalid-feedback>
+            <label for="operation">{{ $t("Operation") }}</label>
+            <b-form-invalid-feedback>{{
+              $displayError("operation_id", form)
+            }}</b-form-invalid-feedback>
           </div>
 
           <div class="form-label-group select required" v-if="form.operationId">
             <v-select
               label="title"
               v-validate="''"
-              :disabled="form.status!='NEW'"
+              :disabled="form.status != 'NEW'"
               data-vv-name="phase"
               v-model="form.phaseId"
               :placeholder="$t('Phase')"
-              :reduce="phase => phase.id"
+              :reduce="(phase) => phase.id"
               :options="phases"
               class="text-capitalize"
-              :class="{'is-invalid':$validateState('phase', form)===false, 'is-valid':$validateState('phase', form)===true}"
+              :class="{
+                'is-invalid': $validateState('phase', form) === false,
+                'is-valid': $validateState('phase', form) === true,
+              }"
             ></v-select>
-            <label for="phase">{{ $t('Phase') }}</label>
-            <b-form-invalid-feedback>{{ $displayError('phase', form) }}</b-form-invalid-feedback>
+            <label for="phase">{{ $t("Phase") }}</label>
+            <b-form-invalid-feedback>{{
+              $displayError("phase", form)
+            }}</b-form-invalid-feedback>
           </div>
           <div class="form-label-group select required">
             <b-form-textarea
@@ -91,32 +116,35 @@
               v-model="form.description"
               v-autoresize
               :placeholder="$t('Idea description')"
-              style="max-height:150px"
+              style="max-height: 150px"
               name="description"
               :state="$validateState('description', form)"
               v-validate="''"
             ></b-form-textarea>
-            <label for="description">{{ $t('Idea description') }}</label>
-            <b-form-invalid-feedback>{{ $displayError('description', form) }}</b-form-invalid-feedback>
+            <label for="description">{{ $t("Idea description") }}</label>
+            <b-form-invalid-feedback>{{
+              $displayError("description", form)
+            }}</b-form-invalid-feedback>
           </div>
           <div>
             <file-field
               v-model="form.file"
               @input="fileChanged"
               :placeholder="$t('Upload guide')"
-              :title="currentFile?currentFile.title:$t('Upload guide')"
+              :title="currentFile ? currentFile.title : $t('Upload guide')"
               :current-file="currentFile"
             />
           </div>
         </b-card-body>
-        <b-card-footer :class="{'px-0':mode==='create'}">
+        <b-card-footer :class="{ 'px-0': mode === 'create' }">
           <loading-button
-            :disabled="vErrors.any()||form.busy"
+            :disabled="vErrors.any() || form.busy"
             :loading="form.busy"
             size="lg"
             block
             type="submit"
-          >{{ $t('Save changes') }}</loading-button>
+            >{{ $t("Save changes") }}</loading-button
+          >
         </b-card-footer>
       </b-card>
     </b-form>
@@ -128,18 +156,18 @@ import { mapGetters } from "vuex";
 export default {
   props: {
     item: {
-      required: true
+      required: true,
     },
     section: {
       required: false,
       type: String,
-      default: () => "ideas"
+      default: () => "ideas",
     },
     type: {
       required: false,
       type: String,
-      default: () => "PROCESS"
-    }
+      default: () => "PROCESS",
+    },
   },
   data: () => ({
     input: null,
@@ -159,58 +187,59 @@ export default {
       sourceId: null,
       sourceType: null,
       status: "NEW",
-      type: "PROCESS"
-    })
+      type: "PROCESS",
+    }),
   }),
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
       currentTool: "companyTool/current",
-      tools: "companyTool/all"
+      tools: "companyTool/all",
     }),
     process: {
-      get: function() {
+      get: function () {
         return this.currentProcess(this.section);
-      }
+      },
     },
     stages: {
-      get: function() {
+      get: function () {
         return this.process.process.stages || [];
-      }
+      },
     },
     operations: {
-      get: function() {
+      get: function () {
         if (!this.form.stageId || !this.stages) {
           return [];
         }
         return (
-          this.stages.find(i => i.id == this.form.stageId).operations || []
+          this.stages.find((i) => i.id == this.form.stageId).operations || []
         );
-      }
+      },
     },
     phases: {
-      get: function() {
+      get: function () {
         if (!this.form.operationId || !this.operations) {
           return [];
         }
 
         return (
-          this.operations.find(i => i.id == this.form.operationId).phases || []
+          this.operations.find((i) => i.id == this.form.operationId).phases ||
+          []
         );
-      }
+      },
     },
     currentProcessSection: {
-      get: function() {
+      get: function () {
         return (
           this.process.phase ||
           this.process.operation ||
           this.process.stage ||
           this.process.process
         );
-      }
+      },
     },
     currentProcessSectionName: {
-      get: function() {
+      get: function () {
         if (this.process.phase) {
           return "phase";
         }
@@ -224,20 +253,20 @@ export default {
           return "process";
         }
         return null;
-      }
+      },
     },
     mode: {
-      get: function() {
+      get: function () {
         return this.item.id ? "edit" : "create";
-      }
-    }
+      },
+    },
   },
   async mounted() {
     this.input = this.item;
     this.currentFile = this.item.file;
     if (this.process) {
       await this.$store.dispatch("process/findById", {
-        id: this.process.process.id
+        id: this.process.process.id,
       });
       //  await this.$store.dispatch(this.storeName + "/findByProcess", {
       //   id: this.process.process.id
@@ -262,8 +291,8 @@ export default {
           (this.process.phase ? this.process.phase.id : null);
       }
       Object.keys(this.input || {})
-        .filter(key => key in this.form)
-        .forEach(key => (this.form[key] = this.input[key]));
+        .filter((key) => key in this.form)
+        .forEach((key) => (this.form[key] = this.input[key]));
       this.form.type = this.input.type;
       this.form.stageId = this.input.stageId;
       this.form.operationId = this.input.operationId;
@@ -289,8 +318,11 @@ export default {
     },
     async saveItem() {
       await this.$validator.validateAll();
+
       if (!this.vErrors.any()) {
-        await this.$validator.reset();
+        console.log("asd");
+          this.$validator.reset();
+   
         if (this.mode === "edit") {
           await this.$store.dispatch(this.storeName + "/update", this.form);
         } else {
@@ -299,14 +331,14 @@ export default {
         this.$emit("done");
         this.$store.dispatch("process/findById", {
           id: this.form.processId,
-          force: true
+          force: true,
         });
         this.$store.dispatch(this.storeName + "/findByProcess", {
           id: this.form.processId,
-          force: true
+          force: true,
         });
       }
-    }
-  }
+    },
+  },
 };
 </script>

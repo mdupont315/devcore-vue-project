@@ -1,7 +1,11 @@
 <template>
   <div
     class="super-select"
-    :class="{'expanded':expanded, 'is-invalid': state===false, 'no-field':!showInput}"
+    :class="{
+      expanded: expanded,
+      'is-invalid': state === false,
+      'no-field': !showInput,
+    }"
     v-click-outside="ousideClicked"
   >
     <div class="input-wrapper" v-if="showInput" @click="toggleExpanded">
@@ -10,59 +14,96 @@
         name="input"
         ref="input"
         class="field"
-        :placeholder="expanded?activePlaceholder:(dataValue&&dataValue.length>0?null:placeholder)"
+        :placeholder="
+          expanded
+            ? activePlaceholder
+            : dataValue && dataValue.length > 0
+            ? null
+            : placeholder
+        "
         @keyup="filter"
         v-model="filterValue"
-        :class="{focused:expanded}"
+        :class="{ focused: expanded }"
         :disabled="disabled"
         @focus="open"
       />
       <div class="header-display">
-        <div class="counter" v-if="!expanded && dataValue && dataValue.length > 0">
+        <div
+          class="counter"
+          v-if="!expanded && dataValue && dataValue.length > 0"
+        >
           <slot
             name="selection-count"
-            v-bind="{values:this.dataValue||[], items:items}"
-          >{{ $tc('selection.count', dataValue && dataValue.length?dataValue.length:0) }}</slot>
+            v-bind="{ values: this.dataValue || [], items: items }"
+            >{{
+              $tc(
+                "selection.count",
+                dataValue && dataValue.length ? dataValue.length : 0
+              )
+            }}</slot
+          >
         </div>
         <div class="items">
           <div class="d-flex overflow-hidden justify-content-end">
-            <div class="flex-grow-1" style="max-width:65%">
-              <slot name="header-display" v-bind="{values:this.dataValue||[], items:items}"></slot>
+            <div class="flex-grow-1" style="max-width: 65%">
+              <slot
+                name="header-display"
+                v-bind="{ values: this.dataValue || [], items: items }"
+              ></slot>
             </div>
             <div
-              style="font-size:.8rem"
+              style="font-size: 0.8rem"
               ref="headerOverflowSelected"
               class="overflow-selected"
-              v-b-tooltip="{  placement: 'top', boundary:'viewport' }"
+              v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
               :title="$t('Click to see all items')"
               @click.stop="close"
-              v-show="dataValue && dataValue.length>0"
+              v-show="dataValue && dataValue.length > 0"
             >
               <slot
                 name="header-display-overflow"
-                v-bind="{values:this.dataValue||[], items:items}"
-              >{{ dataValue && dataValue.length>maxDisplayItems?dataValue.length - maxDisplayItems + ' ' + $t('more'):'...' }}</slot>
+                v-bind="{ values: this.dataValue || [], items: items }"
+                >{{
+                  dataValue && dataValue.length > maxDisplayItems
+                    ? dataValue.length - maxDisplayItems + " " + $t("more")
+                    : "..."
+                }}</slot
+              >
             </div>
           </div>
           <b-popover
-            :target="()=>$refs.headerOverflowSelected"
+            :target="() => $refs.headerOverflowSelected"
             placement="right"
             class="form-popover"
             ref="headerOverflowSelectedPopover"
           >
-            <b-card no-body style="width:200px;" v-click-outside="closeHeaderDetailsPopOver">
+            <b-card
+              no-body
+              style="width: 200px"
+              v-click-outside="closeHeaderDetailsPopOver"
+            >
               <div
                 class="p-2 pb-0 border-bottom bg-light"
-                style="border-radius:3px 3px 0 0"
+                style="border-radius: 3px 3px 0 0"
                 v-if="dataValue"
               >
-                <span class="h5">{{ dataValue.length }} {{ $t('selected') }}</span>
-                <span class="close cursor-pointer float-right" @click="closeHeaderDetailsPopOver">
+                <span class="h5"
+                  >{{ dataValue.length }} {{ $t("selected") }}</span
+                >
+                <span
+                  class="close cursor-pointer float-right"
+                  @click="closeHeaderDetailsPopOver"
+                >
                   <i class="mdi mdi-close"></i>
                 </span>
               </div>
-              <b-card-body style="max-height:178px;overflow:auto;font-size:1.1rem">
-                <slot name="display-details" v-bind="{values:this.dataValue||[], items:items}"></slot>
+              <b-card-body
+                style="max-height: 178px; overflow: auto; font-size: 1.1rem"
+              >
+                <slot
+                  name="display-details"
+                  v-bind="{ values: this.dataValue || [], items: items }"
+                ></slot>
               </b-card-body>
             </b-card>
           </b-popover>
@@ -73,15 +114,29 @@
       <div class="header">
         <slot name="dropdown-header"></slot>
       </div>
-      <div class="dropdown-actions text-right p-1 px-3" v-if="allowSelectAll && mode==='multiple'">
-        <span class="cursor-pointer text-primary" @click.stop="selectAll">{{ $t('All') }}</span> |
-        <span class="cursor-pointer text-primary" @click.stop="unselectAll">{{ $t('None') }}</span> |
-        <span class="cursor-pointer text-primary" @click.stop="toggleAll">{{ $t('Toggle') }}</span>
+      <div
+        class="dropdown-actions text-right p-1 px-3"
+        v-if="allowSelectAll && mode === 'multiple'"
+      >
+        <span class="cursor-pointer text-primary" @click.stop="selectAll">{{
+          $t("All")
+        }}</span>
+        |
+        <span class="cursor-pointer text-primary" @click.stop="unselectAll">{{
+          $t("None")
+        }}</span>
+        |
+        <span class="cursor-pointer text-primary" @click.stop="toggleAll">{{
+          $t("Toggle")
+        }}</span>
       </div>
       <ul class="items" v-if="filteredItems && filteredItems.length > 0">
         <li
           class="item"
-          :class="{'selected':isSelected(item), 'disabled':isItemDisabled(item)}"
+          :class="{
+            selected: isSelected(item),
+            disabled: isItemDisabled(item),
+          }"
           v-for="item in filteredItems"
           :key="item.id"
           @click.stop="toggleItem(item, $event)"
@@ -91,13 +146,21 @@
         >
           <slot
             name="dropdown-item"
-            v-bind="{item:item, selected:isSelected(item), label:getItemLabel(item), value:getItemValue(item)}"
-          >{{ getItemLabel(item) }}</slot>
+            v-bind="{
+              item: item,
+              selected: isSelected(item),
+              label: getItemLabel(item),
+              value: getItemValue(item),
+            }"
+            >{{ getItemLabel(item) }}</slot
+          >
         </li>
       </ul>
       <div class="empty" v-else>
         <slot name="empty-text">
-          <p class="alert alert-warning m-3">{{ $t('There are no records for the given criteria') }}</p>
+          <p class="alert alert-warning m-3">
+            {{ $t("There are no records for the given criteria") }}
+          </p>
         </slot>
       </div>
       <div class="footer" v-if="showFooter">
@@ -108,37 +171,60 @@
           <div class="content">
             <div class="d-flex w-100">
               <div class="flex-grow-1">
-                <slot name="footer-display" v-bind="{values:this.dataValue||[], items:items}"></slot>
+                <slot
+                  name="footer-display"
+                  v-bind="{ values: this.dataValue || [], items: items }"
+                ></slot>
               </div>
               <div
                 v-if="showFooterSelection"
                 ref="footerOverflowSelected"
                 class="overflow-selected"
-                v-b-tooltip="{  placement: 'top', boundary:'viewport' }"
+                v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
                 :title="$t('Click to see all items')"
-                v-show="dataValue && dataValue.length>0"
-              >{{ dataValue && dataValue.length>maxDisplayItems?dataValue.length - maxDisplayItems + ' ' + $t('more'):'...' }}</div>
+                v-show="dataValue && dataValue.length > 0"
+              >
+                {{
+                  dataValue && dataValue.length > maxDisplayItems
+                    ? dataValue.length - maxDisplayItems + " " + $t("more")
+                    : "..."
+                }}
+              </div>
             </div>
             <b-popover
-              :target="()=>$refs.footerOverflowSelected"
+              :target="() => $refs.footerOverflowSelected"
               placement="right"
               class="form-popover"
               ref="footerOverflowSelectedPopover"
               v-if="expanded && showFooterSelection"
             >
-              <b-card no-body style="width:200px" v-click-outside="closeFooterDetailsPopOver">
+              <b-card
+                no-body
+                style="width: 200px"
+                v-click-outside="closeFooterDetailsPopOver"
+              >
                 <div
                   class="p-2 pb-0 border-bottom bg-light"
-                  style="border-radius:3px 3px 0 0"
+                  style="border-radius: 3px 3px 0 0"
                   v-if="dataValue"
                 >
-                  <span class="h5">{{ dataValue.length }} {{ $t('selected') }}</span>
-                  <span class="close cursor-pointer float-right" @click="closeHeaderDetailsPopOver">
+                  <span class="h5"
+                    >{{ dataValue.length }} {{ $t("selected") }}</span
+                  >
+                  <span
+                    class="close cursor-pointer float-right"
+                    @click="closeHeaderDetailsPopOver"
+                  >
                     <i class="mdi mdi-close"></i>
                   </span>
                 </div>
-                <b-card-body style="max-height:178px;overflow:auto;font-size:1.1rem">
-                  <slot name="display-details" v-bind="{values:this.dataValue||[], items:items}"></slot>
+                <b-card-body
+                  style="max-height: 178px; overflow: auto; font-size: 1.1rem"
+                >
+                  <slot
+                    name="display-details"
+                    v-bind="{ values: this.dataValue || [], items: items }"
+                  ></slot>
                 </b-card-body>
               </b-card>
             </b-popover>
@@ -146,11 +232,17 @@
           <div class="addNew" v-if="showAddBtn">
             <slot name="footer-add-btn"></slot>
           </div>
-          <small v-if="mode==='multiple'" class="counter">
+          <small v-if="mode === 'multiple'" class="counter">
             <slot
               name="selection-count"
-              v-bind="{values:this.dataValue||[], items:items}"
-            >{{ $tc('selection.count', dataValue && dataValue.length?dataValue.length:0) }}</slot>
+              v-bind="{ values: this.dataValue || [], items: items }"
+              >{{
+                $tc(
+                  "selection.count",
+                  dataValue && dataValue.length ? dataValue.length : 0
+                )
+              }}</slot
+            >
           </small>
         </slot>
       </div>
@@ -162,113 +254,113 @@ export default {
   name: "super-select",
   props: {
     placeholder: {
-      required: false
+      required: false,
     },
     maxDisplayItems: {
       required: false,
       type: Number,
-      default: () => 5
+      default: () => 5,
     },
     activePlaceholder: {
       required: false,
-      default: function() {
+      default: function () {
         return this.$t("Type to search");
-      }
+      },
     },
     disabled: {
-      required: false
+      required: false,
     },
     mode: {
       type: String,
-      validator: val => ["single", "multiple"].includes(val),
-      default: () => "multiple"
+      validator: (val) => ["single", "multiple"].includes(val),
+      default: () => "multiple",
     },
     value: {
-      required: false
+      required: false,
     },
     items: {
-      required: true
+      required: true,
     },
     name: {
       required: false,
-      default: () => "super_select_" + Math.random()
+      default: () => "super_select_" + Math.random(),
     },
     allowSelectAll: {
       required: false,
-      default: () => true
+      default: () => true,
     },
     isSelectedFn: {
       name: "item-selected",
       required: false,
-      type: Function
+      type: Function,
     },
     getItemValueFn: {
       name: "item-value",
       required: false,
-      type: Function
+      type: Function,
     },
     valueKey: {
       name: "value-key",
       required: false,
       type: String,
-      default: () => "id"
+      default: () => "id",
     },
     getItemLabelFn: {
       name: "item-label",
       required: false,
-      type: Function
+      type: Function,
     },
     labelKey: {
       name: "label-key",
       required: false,
       type: String,
-      default: () => "name"
+      default: () => "name",
     },
     isItemDisabledFn: {
       name: "item-disabled",
       required: false,
-      type: Function
+      type: Function,
     },
     showInput: {
       name: "show-input",
       required: false,
       type: Boolean,
-      default: () => true
+      default: () => true,
     },
     showFooter: {
       name: "show-footer",
       required: false,
       type: Boolean,
-      default: () => true
+      default: () => true,
     },
     showFooterSelection: {
       required: false,
       type: Boolean,
-      default: () => true
+      default: () => true,
     },
     selectorClass: {
       required: false,
-      name: "selector-class"
+      name: "selector-class",
     },
     state: {
-      required: false
+      required: false,
     },
     showAddBtn: {
       name: "show-add-btn",
       required: false,
       default: () => false,
-      type: Boolean
+      type: Boolean,
     },
     outsideClose: {
       name: "outside-close",
       required: false,
       default: () => false,
-      type: Boolean
+      type: Boolean,
     },
     filterFn: {
       required: false,
-      type: Function
-    }
+      type: Function,
+    },
   },
   $_veeValidate: {
     // fetch the current value from the innerValue defined in the component data.
@@ -277,13 +369,13 @@ export default {
     },
     value() {
       return this.value;
-    }
+    },
   },
   data: () => ({
     dataValue: null,
     expanded: false,
     filterValue: null,
-    filteredItems: []
+    filteredItems: [],
   }),
   mounted() {
     if (!this.value) {
@@ -294,8 +386,8 @@ export default {
       }
     } else {
       this.dataValue = [];
-      this.dataValue = this.value.filter(v => {
-        return this.items.find(o => this.getItemValue(o) === v) != null;
+      this.dataValue = this.value.filter((v) => {
+        return this.items.find((o) => this.getItemValue(o) === v) != null;
       });
     }
     this.filteredItems = this.items;
@@ -340,7 +432,7 @@ export default {
         return itemValue === this.dataValue;
       } else {
         this.dataValue = this.dataValue || [];
-        return this.dataValue.some(i => i === itemValue);
+        return this.dataValue.some((i) => i === itemValue);
       }
     },
     isItemDisabled(item) {
@@ -376,16 +468,16 @@ export default {
       if (this.$refs.input) {
         this.$refs.input.focus();
       }
-      
+
       var itemFound = false;
-      this.filteredItems.map(r=>{
-        if(r.id ===item.id){
+      this.filteredItems.map((r) => {
+        if (r.id === item.id) {
           itemFound = true;
         }
       });
 
-      if(itemFound==false){
-        this.filteredItems.push(item)
+      if (itemFound == false) {
+        this.filteredItems.push(item);
       }
 
       this.$emit("input", this.dataValue, event);
@@ -401,7 +493,7 @@ export default {
       this.$emit("itemSelected", item, event);
     },
     selectAll() {
-      this.filteredItems.map(i => {
+      this.filteredItems.map((i) => {
         if (!this.isSelected(i)) {
           this.selectItem(i);
         }
@@ -416,19 +508,19 @@ export default {
       } else {
         this.dataValue = this.dataValue || [];
         this.dataValue = this.dataValue.filter(
-          v => v != this.getItemValue(item)
+          (v) => v != this.getItemValue(item)
         );
       }
       this.$emit("itemUnselected", item, event);
     },
     unselectAll() {
-      this.filteredItems.map(i => {
+      this.filteredItems.map((i) => {
         this.deselectItem(i);
       });
       this.$emit("input", this.dataValue, event);
     },
     toggleAll() {
-      this.filteredItems.map(i => {
+      this.filteredItems.map((i) => {
         if (this.isSelected(i)) {
           this.deselectItem(i);
         } else {
@@ -448,7 +540,7 @@ export default {
       } else {
         this.filteredItems = this.items;
       }
-    }
-  }
+    },
+  },
 };
 </script>

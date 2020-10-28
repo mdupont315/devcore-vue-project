@@ -196,55 +196,55 @@ import { mapGetters } from "vuex";
 export default {
   props: {
     idea: {
-      required: false
-    }
+      required: false,
+    },
   },
   components: {
     "idea-form": IdeaForm,
     "improvement-card": ImprovementCard,
-    "report-chart": IdeaReportChart
+    "report-chart": IdeaReportChart,
   },
   data: () => ({
     editing: false,
     editForm: null,
-    storeName: "idea"
+    storeName: "idea",
   }),
   computed: {
     ...mapGetters({
-      allProcess: "process/all"
+      allProcess: "process/all",
     }),
     process: {
       get() {
-        return this.allProcess.find(p => p.id === this.idea.processId);
-      }
+        return this.allProcess.find((p) => p.id === this.idea.processId);
+      },
     },
     stage: {
       get() {
         return this.process
-          ? this.process.stages.find(p => p.id === this.idea.stageId)
+          ? this.process.stages.find((p) => p.id === this.idea.stageId)
           : null;
-      }
+      },
     },
     operation: {
       get() {
         return this.stage
-          ? this.stage.operations.find(p => p.id === this.idea.operationId)
+          ? this.stage.operations.find((p) => p.id === this.idea.operationId)
           : null;
-      }
+      },
     },
     phase: {
       get() {
         return this.operation
-          ? this.operation.phases.find(p => p.id === this.idea.phaseId)
+          ? this.operation.phases.find((p) => p.id === this.idea.phaseId)
           : null;
-      }
-    }
+      },
+    },
   },
   async mounted() {
     this.storeName = this.idea.type === "PROCESS" ? "idea" : "toolIdea";
     await this.$store.dispatch(this.storeName + "/findById", {
       id: this.idea.id,
-      force: true
+      force: true,
     });
   },
   methods: {
@@ -257,7 +257,7 @@ export default {
     async updateStatus() {
       this.editForm = new GQLForm({
         id: this.idea.id,
-        status: this.idea.status === "NEW" ? "TESTING" : "ADOPTED"
+        status: this.idea.status === "NEW" ? "TESTING" : "ADOPTED",
       });
       await this.$store.dispatch(
         this.storeName + "/changeStatus",
@@ -265,22 +265,22 @@ export default {
       );
       this.$store.dispatch(this.storeName + "/findByProcess", {
         id: this.idea.processId,
-        force: true
+        force: true,
       });
       this.closed();
     },
     async deleteItem() {
       this.editForm = new GQLForm({
-        id: this.idea.id
+        id: this.idea.id,
       });
       await this.$store.dispatch(this.storeName + "/delete", this.editForm);
       this.$store.dispatch(this.storeName + "/findByProcess", {
         id: this.idea.processId,
-        force: true
+        force: true,
       });
       this.$store.dispatch("process/findById", {
         id: this.idea.processId,
-        force: true
+        force: true,
       });
       this.closed();
     },
@@ -288,7 +288,7 @@ export default {
       event.preventDefault();
       this.$store.dispatch("companyTool/setCurrent", {
         section: "toolIdeas",
-        tool: { id: toolId }
+        tool: { id: toolId },
       });
     },
     breadcrumbClick(event, section) {
@@ -300,7 +300,7 @@ export default {
             process: this.process,
             stage: null,
             operation: null,
-            phase: null
+            phase: null,
           });
           break;
         case "stage":
@@ -309,7 +309,7 @@ export default {
             process: this.process,
             stage: this.stage,
             operation: null,
-            phase: null
+            phase: null,
           });
           break;
         case "operation":
@@ -318,7 +318,7 @@ export default {
             process: this.process,
             stage: this.stage,
             operation: this.operation,
-            phase: null
+            phase: null,
           });
           break;
         case "phase":
@@ -327,11 +327,11 @@ export default {
             process: this.process,
             stage: this.stage,
             operation: this.operation,
-            phase: this.phase
+            phase: this.phase,
           });
           break;
       }
-    }
-  }
+    },
+  },
 };
 </script>

@@ -3,7 +3,8 @@ import ApolloClient from 'apollo-client';
 //import { BatchHttpLink } from 'apollo-link-batch-http';
 //import { WebSocketLink } from 'apollo-link-ws';
 import {
-    InMemoryCache
+    InMemoryCache,
+    IntrospectionFragmentMatcher
 } from 'apollo-cache-inmemory';
 import {
     ApolloLink
@@ -25,17 +26,17 @@ import {
 // import {
 //     IntrospectionFragmentMatcher
 // } from 'apollo-cache-inmemory';
-// import introspectionQueryResultData from '../../../fragmentTypes.json';
+import introspectionQueryResultData from '@/fragmentTypes.json';
 
-// const fragmentMatcher = new IntrospectionFragmentMatcher({
-//     introspectionQueryResultData
-// });
+const fragmentMatcher = new IntrospectionFragmentMatcher({
+    introspectionQueryResultData
+});
 
-// const cache = new InMemoryCache({
-//     fragmentMatcher
-// });
+const cache = new InMemoryCache({
+    fragmentMatcher
+});
 
-const cache = new InMemoryCache();
+//const cache = new InMemoryCache();
 
 /*
 const batchHttpLink = new BatchHttpLink({

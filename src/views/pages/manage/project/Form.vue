@@ -376,12 +376,7 @@ export default {
         if (!this.vErrors.any()) {
          
           this.form.budget = this.form.budget * 100;
-
-
-          // Add Adopted Ideas Silently
-          this.adoptedIdeas.map( i => {
-            this.form.ideaIds.push(i);
-          })
+          this.form.ideaIds = [...new Set(this.adoptedIdeas)];
           //
 
           this.$validator.reset();
@@ -432,8 +427,6 @@ export default {
           this.adoptedIdeas.push(i.id);
         });
       
-      console.log(this.adoptedIdeas)
-
       if (this.$refs["ideasDropDown"]) {
         this.ideaDropwDownIntent = Math.random();
         this.$refs["ideasDropDown"].$forceUpdate();
