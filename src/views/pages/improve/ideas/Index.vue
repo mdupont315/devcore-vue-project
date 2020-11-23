@@ -326,12 +326,13 @@ export default {
 
       this.currentComponent = () =>
         import(
-          `./${
-            this.$route.params.type
+          "./" +
+            (this.$route.params.type
               ? this.$route.params.type.capitalize()
-              : "New"
-            }.vue`
+              : "New") +
+            ".vue"
         );
+
     }
   }
 };

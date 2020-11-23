@@ -9,7 +9,7 @@ const appUrls = {
 };
 
 module.exports = {
-  publicPath: process.env.VUE_APP_SUBFOLDER || "/",
+  //publicPath: process.env.VUE_APP_SUBFOLDER || "/",
   lintOnSave: false,
   outputDir: "../wwwroot",
   pluginOptions: {

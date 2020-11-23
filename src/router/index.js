@@ -168,6 +168,7 @@ const routes = [
           import(
             /* webpackChunkName: "improve" */ "@/views/pages/improve/tool_ideas/Index"
           ),
+
         meta: {
           middleware: [auth],
           title: "Tool Ideas",

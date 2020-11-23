@@ -49,27 +49,20 @@ export default {
         target = target.parentElement;
       }
       var parent = target.parentElement;
-      var chartId = parseInt(parent.classList[0].split("-")[0], 10);
-      console.log(chartId);
-      var chart = Chart.instances[chartId];
       var index = Array.prototype.slice.call(parent.children).indexOf(target);
 
-      chart.legend.options.onClick.call(
-        chart,
+      this.chart.legend.options.onClick.call(
+        this.chart,
         event,
-        chart.legend.legendItems[index]
+        this.chart.legend.legendItems[index]
       );
-      if (chart.isDatasetVisible(index)) {
+      if (this.chart.isDatasetVisible(index)) {
         target.classList.remove("hidden");
       } else {
         target.classList.add("hidden");
       }
     },
     renderChart() {
-      if (this.chart) {
-        this.chart.destroy();
-      }
-
       this.chart = new Chart(this.$refs.analysis__lineChart, {
         type: "line",
         data: {
@@ -82,28 +75,58 @@ export default {
           responsive: true,
           legendCallback: function (chart) {
             var text = [];
-            text.push('<ul class="' + chart.id + '-legend">');
+            var totalPotential = {
+							value: 0,
+							color: "#000000",
+							currency: "€",
+							text: "Potential"
+						};
+
+            // text.push('<ul class="' + chart.id + '-legend">');
+            text.push(`<ul class=legend__block-content>`);
             for (var i = 0; i < chart.data.datasets.length; i++) {
               var str = chart.data.datasets[i].label
                 ? chart.data.datasets[i].label
                 : "";
 
-              var calcTotal = (data, num) => {
+              const calcTotal = (data, num) => {
                 return data + num;
               };
+              const currencyContent = (dataset) => {
+                const currencyConverted = {
+                  euro: "€",
+                  dollar: "$",
+                };
 
+                return `${dataset.data.reduce(calcTotal)} ${
+                  currencyConverted[dataset.currency.value]
+                }`;
+              };
+
+              const indexedData = chart.data.datasets[i];
+              const tagNameBlock = `legend__block-item-outer`;
               text.push(
-                `<li style="padding:5px;letter-spacing:1px">
-								<div style="color:black">${str}</div>
-								<div style="color:${chart.data.datasets[i].color}"> ${chart.data.datasets[
-                  i
-                ].data.reduce(calcTotal)}
-                 </div>
+                `<li style="padding:5px;letter-spacing:1px" class="${tagNameBlock}">
+								<div style="color:${
+                  indexedData.textColor
+                }" class="legend__block-item-inner">${str}</div>
+								<div style="color:${
+                  indexedData.currency.color
+                }" class="legend__block-item-inner"">
+								${currencyContent(indexedData)}</div></li>
 								`
               );
-              text.push("</li>");
+							totalPotential.value += indexedData.data.reduce(calcTotal);
+							totalPotential.color = indexedData.textColor;
+
             }
             text.push("</ul>");
+            text.unshift(`
+						<div class="legend__block-total-block">
+						<div class="legend__block-total-text">${totalPotential.text.toUpperCase()}</div>
+						<div class="legend__block-total-value">${totalPotential.value} ${totalPotential.currency}</div>
+						</div>`);
+
             return text.join("");
           },
           tooltips: {
@@ -131,8 +154,10 @@ export default {
 
       var myLegendContainer = document.getElementById("chart-legends");
       myLegendContainer.innerHTML = this.chart.generateLegend();
+      var legendItems = document.getElementsByClassName(
+        "legend__block-item-outer"
+      );
 
-      var legendItems = myLegendContainer.getElementsByTagName("li");
       for (var i = 0; i < legendItems.length; i += 1) {
         legendItems[i].addEventListener(
           "click",
@@ -140,7 +165,13 @@ export default {
           false
         );
       }
+      this.chart.update();
     },
+  },
+  beforeDestroy() {
+    if (this.chart) {
+      this.chart.destroy();
+    }
   },
   mounted() {
     this.renderChart();
@@ -148,26 +179,33 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+#chart-legends {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+		font-weight: 600;
+}
 
-[class="0-legend"] {
+.legend__block-total-value{
+	color:#4394D0;
+}
+.legend__block-total-text{
+ letter-spacing: 2px;
+ font-size: 1em;
+}
+.legend__block-content {
   cursor: pointer;
   list-style-type: none;
   padding-left: 0;
 }
-[class="0-legend"] li {
+.legend__block-content li {
   display: inline-block;
   padding: 0 5px;
 }
-[class="0-legend"] li.hidden {
+.legend__block-content li.hidden {
   text-decoration: line-through;
-}
-[class="0-legend"] li span {
-  border-radius: 5px;
-  display: inline-block;
-  height: 10px;
-  margin-right: 10px;
-  width: 10px;
 }
 
 .analysis-line-chart__container {
@@ -176,4 +214,4 @@ export default {
   width: 90%;
   height: 60%;
 }
-</stylescopedscopedscoped>
+</style>

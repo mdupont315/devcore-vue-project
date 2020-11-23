@@ -47,6 +47,11 @@ const staticDatasetConfig = {
 // console.log(dynamicDatasetConfig);
 
 const options = {
+  elements: {
+    line: {
+      tension: 0,
+    },
+	},
   scales: {
     yAxes: [
       {
@@ -74,13 +79,12 @@ const options = {
     xAxes: [
       {
         display: true,
-        stacked: true,
+				stacked: true,
         scaleLabel: {
           padding: 10,
         },
         ticks: {
           beginAtZero: true,
-          max: 12,
           fontColor: "#000000",
           padding: 10,
         },
@@ -111,45 +115,45 @@ export default {
           data: [1, 12, 14, 16, 19, 24, 27],
           backgroundColor: "#add0eb",
           borderColor: "#4394D0",
-          color: "#4394D0",
-          currency: "euro",
+          textColor: "#000000",
+          currency: { value: "euro", color: "#4394D0" },
         },
         {
           label: "PEOPLE",
           data: [1, 9, 17, 22, 25, 31, 32],
           backgroundColor: "#4394D0",
           borderColor: "#add0eb",
-          color: "#4394D0",
-          currency: "euro",
+          textColor: "#000000",
+          currency: { value: "euro", color: "#4394D0" },
         },
         {
           label: "PROCESS",
           data: [1, 12, 18, 24, 29, 33, 35],
           backgroundColor: "#add0eb",
           borderColor: "#4394D0",
-          color: "#4394D0",
-          currency: "euro",
+          textColor: "#000000",
+          currency: { value: "euro", color: "#4394D0" },
         },
         {
           label: "TOOLS",
           data: [1, 14, 19, 26, 31, 35, 39],
           backgroundColor: "#4394D0",
           borderColor: "#add0eb",
-          color: "#4394D0",
-          currency: "euro",
+          textColor: "#000000",
+          currency: { value: "euro", color: "#4394D0" },
         },
         {
           label: "IDEAS",
           data: [1, 18, 22, 27, 31, 34, 38],
           backgroundColor: "#add0eb",
           borderColor: "#4394D0",
-          color: "#4394D0",
-          currency: "euro",
+          textColor: "#000000",
+          currency: { value: "euro", color: "#4394D0" },
         },
       ],
       chartOptions: options,
       chartWidth: 400,
-      chartHeight: 300,
+      chartHeight: 400,
       analyticsData: [
         {
           topic: "issues",

@@ -366,13 +366,14 @@ export default {
 		},
 		loadComponent() {
 			this.currentComponent = () =>
-				import(
-					`./${
-						this.$route.params.type
-							? this.$route.params.type.capitalize()
-							: "New"
-					}.vue`
-				);
+			   import(
+          "./" +
+            (this.$route.params.type
+              ? this.$route.params.type.capitalize()
+              : "New") +
+            ".vue"
+        );
+
 		},
 	},
 };
