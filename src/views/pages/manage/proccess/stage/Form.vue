@@ -2,20 +2,20 @@
   <div>
     <div class="p-2">
       <b-card>
-        <b-form @submit.prevent="save" @keyup="$validator.validateAll()" class="hide-labels">
+        <b-form class="hide-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
           <b-row>
             <b-col cols="12">
               <div class="form-group">
                 <b-form-input
                   id="name"
-                  :disabled="form.busy"
                   v-model="form.title"
                   v-autofocus
+                  v-validate="'required|min:4'"
+                  :disabled="form.busy"
                   :placeholder="$t('Stage name')"
                   type="text"
                   name="title"
                   :state="$validateState('title', form)"
-                  v-validate="'required|min:4'"
                   autofocus
                 ></b-form-input>
                 <label for="name">{{ $t('Name') }}</label>
@@ -25,11 +25,11 @@
             <b-col cols="12">
               <div class="form-group">
                 <company-role-selector
+                  v-model="form.companyRoles"
                   :show-field="true"
                   name="companyRoles"
                   style="z-index:1;position:relative"
                   :state="$validateState('companyRoles', form)"
-                  v-model="form.companyRoles"
                   :show-add-btn="$can('core/companyRole/create')"
                 ></company-role-selector>
                 <b-form-invalid-feedback>{{ $displayError('companyRoles', form) }}</b-form-invalid-feedback>
@@ -54,6 +54,7 @@
 </template>
 <script>
 import GQLForm from "@/lib/gqlform";
+
 export default {
   props: {
     value: {
@@ -63,7 +64,7 @@ export default {
   data: () => ({
     input: null,
     form: new GQLForm({
-      //id: undefined,
+      // id: undefined,
       processId: null,
       title: null,
       companyRoles: []

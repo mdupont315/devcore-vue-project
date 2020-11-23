@@ -4,7 +4,7 @@
     style="min-height:350px"
   >
     <div class="period-selector text-right p-2 px-4 flex-grow-0 position-relative">
-      <unit-selector :units="intervals" v-model="filter.data.interval" @change="changePeriod" />
+      <unit-selector v-model="filter.data.interval" :units="intervals" @change="changePeriod" />
       <div class="text-right pr-4 float-right position-absolute" style="top:3px; right:0">
         <span v-if="idea.evaluationsCount > 0" class="font-15x ml-2 float-right">
           <b-badge variant="black">{{ $tc('evaluation.count', idea.evaluationsCount) }}</b-badge>
@@ -26,6 +26,7 @@
 import moment from "moment";
 import { numberFormat } from "@/lib/functions";
 import IdeaChart from "./IdeaChart";
+
 export default {
   components: {
     "idea-chart": IdeaChart
@@ -146,24 +147,24 @@ export default {
           const d = reportData.data[k];
           data.labels.push(k);
           max =
-            max > Math.abs(d["loss"]["total"])
+            max > Math.abs(d.loss.total)
               ? max
-              : Math.abs(d["loss"]["total"]);
+              : Math.abs(d.loss.total);
           max =
-            max > Math.abs(d["gain"]["total"])
+            max > Math.abs(d.gain.total)
               ? max
-              : Math.abs(d["gain"]["total"]);
+              : Math.abs(d.gain.total);
 
-          datasets["loss"].data.push(numberFormat(d["loss"]["total"] / 100));
-          datasets["loss_average"].data.push(
-            numberFormat(d["loss"]["average"] / 100)
+          datasets.loss.data.push(numberFormat(d.loss.total / 100));
+          datasets.loss_average.data.push(
+            numberFormat(d.loss.average / 100)
           );
-          datasets["gain"].data.push(numberFormat(d["gain"]["total"] / 100));
-          datasets["gain_average"].data.push(
-            numberFormat(d["gain"]["average"] / 100)
+          datasets.gain.data.push(numberFormat(d.gain.total / 100));
+          datasets.gain_average.data.push(
+            numberFormat(d.gain.average / 100)
           );
-          datasets["average"].data.push(
-            numberFormat(d["total_value"]["average"] / 100)
+          datasets.average.data.push(
+            numberFormat(d.total_value.average / 100)
           );
         });
 
@@ -172,7 +173,7 @@ export default {
       });
 
       this.chartData = {
-        data: data,
+        data,
         options: {
           defaultFontSize: 8,
           responsive: true,
@@ -229,7 +230,7 @@ export default {
       //     .add("year", -1)
 
       let from = moment().utc();
-      let to = moment().utc();
+      const to = moment().utc();
 
       switch (this.filter.data.interval) {
         case "quarter":

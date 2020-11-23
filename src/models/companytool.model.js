@@ -5,6 +5,7 @@ import CompanyToolModuleModel from "./companytoolmodule.model";
 
 export default class CompanyToolModel extends BaseModel {
     modules = [];
+
     _showDetails = false;
 
     deserialize(input) {

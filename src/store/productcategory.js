@@ -36,13 +36,13 @@ const actions = {
     async create(context, form) {
         const result = await form.mutate({
             mutation: PRODUCT_CATEGORY.create,
-            /*update(cache, result) {
+            /* update(cache, result) {
                 const { productCategoryFindAll } = cache.readQuery({ query: PRODUCT_CATEGORY.findAll });
                 cache.writeQuery({
                     query: PRODUCT_CATEGORY.findAll,
                     data: { productCategoryFindAll: productCategoryFindAll.concat([result.data.productCategoryCreate]) },
                 });
-            }*/
+            } */
         });
         const role = new ProductCategory().deserialize(result.data.productCategoryCreate);
         await context.dispatch('findAll', {
@@ -79,19 +79,19 @@ const actions = {
         filter = null,
         force = false
     } = {}) {
-        if (context.getters['all'].length === 0 || force) {
+        if (context.getters.all.length === 0 || force) {
             filter = filter || {
                 data: {
                     orderBy: ["name"]
                 }
 
             };
-            filter.busy = context.getters['all'].length < 1;
+            filter.busy = context.getters.all.length < 1;
             try {
-                /*const { data } = await apolloClient.watchquery({
+                /* const { data } = await apolloClient.watchquery({
                     query: PRODUCT_CATEGORY.findAll,
                     variables: { filter: filter }
-                });*/
+                }); */
                 const query = apolloClient.watchQuery({
                     query: PRODUCT_CATEGORY.findAll,
                     variables: {
@@ -110,7 +110,7 @@ const actions = {
                 filter.busy = false;
             }
         }
-        return context.getters['all'];
+        return context.getters.all;
     },
 
     async filter(context, filter) {
@@ -135,8 +135,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

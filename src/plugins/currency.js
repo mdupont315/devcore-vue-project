@@ -3,7 +3,7 @@ import store from '../store';
 import {
     numberFormat
 } from '../lib/functions';
-//function for check the users permissions
+// function for check the users permissions
 Vue.use({
     install(Vue) {
 

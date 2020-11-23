@@ -68,6 +68,7 @@
 </template>
 <script>
 import GQLForm from "@/lib/gqlform";
+
 export default {
   props: {
     items: {
@@ -96,7 +97,7 @@ export default {
   },
   computed: {
     fields: {
-      get: function() {
+      get() {
         return [
           { key: "user", label: this.$t("User"), sortable: true },
           {

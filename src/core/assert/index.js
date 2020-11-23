@@ -1,5 +1,5 @@
-import { AssertionError } from './AssertionError'
 import * as util from 'util'
+import { AssertionError } from './AssertionError'
 
 const UUID_REGEXP = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const URL_REGEXP = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i

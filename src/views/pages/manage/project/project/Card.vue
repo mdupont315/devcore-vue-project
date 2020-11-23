@@ -1,6 +1,6 @@
 <template>
   <div class="card border py-2 mb-2 shadow-sm project-card" :class="{expanded:expanded}">
-    <layer style="width:100%" v-if="editing" @closed="toggleEdit">
+    <layer v-if="editing" style="width:100%" @closed="toggleEdit">
       <b-card style="top:-7px;width:300px">
         <project-form v-model="editItem" mode="edit" @done="toggleEdit"></project-form>
       </b-card>
@@ -8,7 +8,7 @@
     <div class="card-header header">
       <h3 class="h5 m-0 text-capitalize text-overflow text-bold">{{ item.name }}</h3>
       <div class="tools">
-        <span class="btn-action" @click="toggleEdit" v-if="$can('core/project/update', item)">
+        <span v-if="$can('core/project/update', item)" class="btn-action" @click="toggleEdit">
           <i class="mdi mdi-pencil"></i>
         </span>
       </div>
@@ -22,8 +22,8 @@
         <div class="stats" @click.stop="toggle">
           <div class="content">
             <span
-              class="percent"
               v-if="item.hasReviews"
+              class="percent"
               :class="{negative: item.getStageConsolidatedPercent(stage.id)<0}"
             >{{item.getStageConsolidatedPercent(stage.id)>=0?'+':''}}{{ item.getStageConsolidatedPercent(stage.id) | numberFormat('0.00') }} %</span>
           </div>
@@ -33,8 +33,8 @@
         <div v-if="!detailsForm.busy">
           <!-- <div v-if="stage.status!=='STARTED'"> -->
           <div
-            class="card bg-primary rounded-0 text-white mt-3 mb-0 ideas detail-card"
             v-if="stage.ideas.length > 0"
+            class="card bg-primary rounded-0 text-white mt-3 mb-0 ideas detail-card"
           >
             <div class="card-body px-3 py-2">
               <layer v-if="showIdeas" @closed="toggleIdeas">
@@ -58,8 +58,8 @@
             </div>
           </div>
           <div
-            class="card bg-danger rounded-0 text-white mt-0 issues detail-card"
             v-if="item.issues.filter(o=>o.projectStageId===stage.id).length > 0"
+            class="card bg-danger rounded-0 text-white mt-0 issues detail-card"
           >
             <div class="card-body px-3 py-2">
               <layer v-if="showIssues" @closed="toggleIssues">
@@ -86,7 +86,7 @@
         <div v-else class="text-center p-3">
           <b-spinner variant="primary"></b-spinner>
         </div>
-        <div class="mt-3" v-if="stage.status==='EVALUATIONS_PENDING'">
+        <div v-if="stage.status==='EVALUATIONS_PENDING'" class="mt-3">
           <loading-button
             size="lg"
             block
@@ -94,7 +94,7 @@
             @click="completeStage"
           >{{ $t('action.close', {name:$t('Stage')}) }}</loading-button>
         </div>
-        <div class="mt-3" v-if="stage.status==='STARTED' && item.type==='NORMAL'">
+        <div v-if="stage.status==='STARTED' && item.type==='NORMAL'" class="mt-3">
           <loading-button
             size="lg"
             block
@@ -103,7 +103,7 @@
           >{{ $t('action.next', {name:$t('Stage')}) }}</loading-button>
         </div>
 
-        <div class="mt-3" v-if="stage.status==='STARTED' && item.type==='ON_GOING'">
+        <div v-if="stage.status==='STARTED' && item.type==='ON_GOING'" class="mt-3">
           <loading-button
             size="lg"
             block
@@ -120,6 +120,7 @@ import GQLForm from "@/lib/gqlform";
 import ProjectForm from "../Form";
 import IssueTable from "./IssueTable";
 import IdeaTable from "./IdeaTable";
+
 export default {
   components: {
     "project-form": ProjectForm,

@@ -1,11 +1,11 @@
 <template>
   <b-button v-bind="$attrs" @click="click">
-    <b-spinner small v-if="loading"></b-spinner> <slot />
+    <b-spinner v-if="loading" small></b-spinner> <slot />
   </b-button>
 </template>
 <script>
 export default {
-  name: "loading-button",
+  name: "LoadingButton",
   props: {
     loading: {
       type: Boolean,

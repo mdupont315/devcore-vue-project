@@ -1,16 +1,16 @@
 <template>
-  <b-form @submit.prevent="save" @keyup="$validator.validateAll()" class="hide-labels">
+  <b-form class="hide-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
     <b-row>
       <b-col class="col-12">
         <div class="form-label-group required">
           <suggestions
+            v-model="form.name"
             class="sm"
             :v-validate="'required'"
-            v-model="form.name"
             :options="{debounce:250, inputClass:'form-control form-control-sm', autofocus:true, placeholder:$t('Name')}"
             :state="$validateState('tool_id', form)"
-            :onInputChange="onToolInputChange"
-            :onItemSelected="onToolSelected"
+            :on-input-change="onToolInputChange"
+            :on-item-selected="onToolSelected"
             :class="{'is-invalid':$validateState('tool_id', form)===false, 'is-valid':$validateState('tool_id', form)===true}"
           >
             <div slot="item" slot-scope="props" class="single-item">
@@ -77,7 +77,7 @@
           class="mt-3 text-center"
         >
           <hr />
-          <b-button variant="outline-danger" type="button" @click.prevent="deleteItem" block>
+          <b-button variant="outline-danger" type="button" block @click.prevent="deleteItem">
             <i class="mdi mdi-trash-can"></i>
             {{ $t('Delete') }}
           </b-button>
@@ -87,8 +87,8 @@
   </b-form>
 </template>
 <script>
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
-import { /*mapState,*/ mapGetters } from "vuex";
 
 export default {
   props: {
@@ -123,7 +123,7 @@ export default {
     this.input = this.value;
     await this.$store.dispatch("companyTool/findAll");
     await this.initForm();
-    //await this.$store.dispatch("toolArea/findAll");
+    // await this.$store.dispatch("toolArea/findAll");
   },
   methods: {
     async initForm() {

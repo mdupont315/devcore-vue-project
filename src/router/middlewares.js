@@ -7,8 +7,8 @@ import { AuthService } from '@/services/auth.service'
  */
 export async function initCurrentUserStateMiddleware (to, from, next) {
 
- var currentUserId = null;   
- if( $store.state.user.currentUser!=null){ 
+ let currentUserId = null;   
+ if ( $store.state.user.currentUser != null){ 
     currentUserId = $store.state.user.currentUser.id
  }
 
@@ -29,8 +29,8 @@ export async function initCurrentUserStateMiddleware (to, from, next) {
  * Check access permission to auth routes
  */
 export function checkAccessMiddleware (to, from, next) {
-   var currentUserId = null;   
- if( $store.state.user.currentUser!=null){ 
+   let currentUserId = null;   
+ if ( $store.state.user.currentUser != null){ 
     currentUserId = $store.state.user.currentUser.id
  }
  

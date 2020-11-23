@@ -13,15 +13,15 @@
               <div class="d-flex flex-row">
                 <div class="flex-grow-1 position-relative">
                   <b-input
+                    ref="editInput"
                     v-model="editForm.title"
+                    v-validate="'required|min:4'"
                     size="sm"
                     name="title"
                     :disabled="editForm.busy"
-                    ref="editInput"
                     class="no-focus-style"
                     style="margin:0!important"
                     :state="$validateState('title', editForm)"
-                    v-validate="'required|min:4'"
                   />
                   <b-form-invalid-feedback>{{ $displayError('title', editForm) }}</b-form-invalid-feedback>
                 </div>
@@ -30,15 +30,15 @@
                   size="xs"
                   variant="transparent"
                   class="action mdi mdi-check text-success font-15x m-0 outline-none"
-                  @click="saveItem"
                   :title="$t('Save')"
+                  @click="saveItem"
                 ></b-button>
                 <b-button
                   size="xs"
                   variant="transparent"
                   class="action mdi mdi-close text-danger font-15x m-0 outline-none"
-                  @click="cancelEdit"
                   :title="$t('Cancel')"
+                  @click="cancelEdit"
                 ></b-button>
               </div>
             </div>
@@ -69,9 +69,9 @@
       </div>
       
     </b-card>
-    <div class="form" v-if="editForm">
-      <layer :key="intent" @closed="cancelEdit" style="width:100%">
-        <div class="overlay transparent" @click="closeRolesPopover" v-if="showRolesPopover" />
+    <div v-if="editForm" class="form">
+      <layer :key="intent" style="width:100%" @closed="cancelEdit">
+        <div v-if="showRolesPopover" class="overlay transparent" @click="closeRolesPopover" />
         <b-form @submit.prevent="saveItem">
           <div>
             <b-row>
@@ -80,15 +80,15 @@
                   <div ref="editRolesPlaceholder" style="height:1px;position:absolute;width:100%"></div>
                   <div class="form-group my-0">
                     <b-textarea
+                      :key="intent"
                       v-model="editForm.title"
-                      class="no-style my-0"
-                      style="min-height:70px; overflow:hidden"
                       v-autofocus="true"
                       v-autoresize
-                      :state="$validateState('title', editForm)"
                       v-validate="'required|min:4'"
+                      class="no-style my-0"
+                      style="min-height:70px; overflow:hidden"
+                      :state="$validateState('title', editForm)"
                       name="title"
-                      :key="intent"
                     ></b-textarea>
                     <b-form-invalid-feedback>{{ $displayError('title', editForm) }}</b-form-invalid-feedback>
                   </div>
@@ -106,11 +106,11 @@
             </b-row>
           </div>
           <b-popover
+            :key="intent"
             placement="right"
             :show="true"
             :target="()=>$refs.editRolesPlaceholder"
             custom-class="no-arrow transparent"
-            :key="intent"
           >
         
           </b-popover>
@@ -121,10 +121,10 @@
 </template>
 
 <script>
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
 import { ProcessStage, ProcessOperation } from "@/models";
 
-import { /*mapState,*/ mapGetters } from "vuex";
 export default {
   props: {
     item: {
@@ -159,12 +159,12 @@ export default {
       }
     },
     operations: {
-      get: function() {
+      get() {
         return [...this.item.operations].sort((a, b) => {
           return a.dOrder > b.dOrder ? 1 : -1;
         });
       },
-      set: function(value) {
+      set(value) {
         this.item.operations = value.sort((a, b) => {
           return a.dOrder > b.dOrder ? 1 : -1;
         });
@@ -180,11 +180,11 @@ export default {
     },
     toggleMenu() {
       this.showMenu = !this.showMenu;
-      //this.showOverlay=this.showMenu;
+      // this.showOverlay=this.showMenu;
     },
     hideMenu() {
       this.showMenu = false;
-      //this.showOverlay=false;
+      // this.showOverlay=false;
     },
     toggleEdit() {
       this.$store.dispatch("app/showInnerOverlay");
@@ -251,7 +251,7 @@ export default {
         // eslint-disable-next-line
       } catch (ex) {
         console.log(ex);
-        //dont care about the error
+        // dont care about the error
       } finally {
         this.orderBusy = false;
       }

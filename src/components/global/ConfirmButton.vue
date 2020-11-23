@@ -1,12 +1,12 @@
 <template>
   <div class="confirm-button-wrapper">
     <div
+      v-if="showConfirmMessage && showOverlay"
       class="overlay"
       :class="{'top-all':true}"
-      v-if="showConfirmMessage && showOverlay"
       @click="overlayClick"
     ></div>
-    <b-button v-bind="$attrs" block ref="button" :class="btnClass" :style="btnStyle" @click="toggleConfirm">
+    <b-button ref="button" v-bind="$attrs" block :class="btnClass" :style="btnStyle" @click="toggleConfirm">
       <slot name="default" />
     </b-button>
     <b-popover
@@ -24,8 +24,8 @@
             <p class="m-0">{{ confirmMessage }}</p>
           </b-card-body>
           <b-card-footer>
-            <b-button  @click="confirm" :class="confirmClass" block>{{ confirmText }}</b-button>
-            <b-button variant="link" class="text-dark" size="sm" @click="cancel" block>
+            <b-button  :class="confirmClass" block @click="confirm">{{ confirmText }}</b-button>
+            <b-button variant="link" class="text-dark" size="sm" block @click="cancel">
               <small>{{ cancelText }}</small>
             </b-button>
           </b-card-footer>
@@ -36,7 +36,7 @@
 </template>
 <script>
 export default {
-  name: "confirm-button",
+  name: "ConfirmButton",
   props: {
     btnClass: {
       required: false
@@ -47,28 +47,28 @@ export default {
     confirmTitle: {
       type: String,
       required: false,
-      default: function() {
+      default() {
         return this.$t("Are you sure?");
       }
     },
     confirmMessage: {
       type: String,
       required: false,
-      default: function() {
+      default() {
         return this.$t("Do you want to perform this action?");
       }
     },
     confirmText: {
       type: String,
       required: false,
-      default: function() {
+      default() {
         return this.$t("Ok");
       }
     },
     cancelText: {
       type: String,
       required: false,
-      default: function() {
+      default() {
         return this.$t("Cancel");
       }
     },
@@ -86,7 +86,7 @@ export default {
     },
     confirmClass:{
         required:false,
-        default:()=>'btn-danger'
+        default:() => 'btn-danger'
     },
     contentClass:{
       required:false
@@ -110,7 +110,7 @@ export default {
     },
     confirm() {
       this.$emit("confirm");
-      this.showConfirmMessage=false;
+      this.showConfirmMessage = false;
     }
   }
 };

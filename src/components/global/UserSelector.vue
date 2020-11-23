@@ -2,19 +2,19 @@
   <super-select
     :items="users"
     class="image-selector"
-    @input="change"
     selector-class="columns columns-3"
+    v-model="dataValue"
     :v-bind="$props"
+    ref="selector"
     :placeholder="$t('Users')"
+    v-if="ready"
     :state="state"
     :outside-close="!showPopOver"
-    v-model="dataValue"
-    ref="selector"
-    v-if="ready"
     :show-input="showInput"
-    :filterFn="filter"
+    :filter-fn="filter"
+    @input="change"
     :show-add-btn="showAddBtn"
-    :maxDisplayItems="6"
+    :max-display-items="6"
     @close="close"
   >
     <template slot="selection-count" slot-scope="props">{{ $tc('user.count', props.values.length) }}</template>
@@ -33,8 +33,8 @@
         <div
           v-for="item in selectedItems.slice(0,maxDisplayItems)"
           :key="item.id"
-          class="avatar-item"
           v-b-tooltip="{  placement: 'top', boundary:'viewport' }"
+          class="avatar-item"
           :title="item.fullName"
         >
           <img :src="item.getAvatarUrl('50x50')" height="22" />
@@ -42,7 +42,7 @@
       </div>
     </template>
     <template slot="display-details" slot-scope="props">
-      <ul class="list-unstyled" v-if="props.items">
+      <ul v-if="props.items" class="list-unstyled">
         <li v-for="item in selectedItems" :key="item.id" class="my-1">
           <img class="border rounded-circle" :src="item.getAvatarUrl('50x50')" height="30" />
           {{ item.fullName }}
@@ -56,12 +56,12 @@
       </ul>
     </template>
     <template slot="footer-display">
-      <div class="stacked-avatars single-line" v-if="showFooterSelection">
+      <div v-if="showFooterSelection" class="stacked-avatars single-line">
         <div
           v-for="item in selectedItems.slice(0,maxDisplayItems)"
           :key="item.id"
-          class="avatar-item"
           v-b-tooltip="{  placement: 'bottom', boundary:'viewport' }"
+          class="avatar-item"
           :title="item.fullName"
         >
           <img :src="item.getAvatarUrl('50x50')" height="22" @click="removeItem(item, $event)" />
@@ -71,9 +71,10 @@
   </super-select>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
+
 export default {
-  name: "user-selector",
+  name: "UserSelector",
   props: {
     items: {
       required: false,

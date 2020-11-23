@@ -5,7 +5,7 @@
 </template>
 <script>
 export default {
-  name: "unblock-loader",
+  name: "UnblockLoader",
   props: {
     position: {
       required: false

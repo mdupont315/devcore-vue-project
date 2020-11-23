@@ -15,16 +15,16 @@ const initialState = () => {
     return {
         loading: false,
         all: [{
-                "id": "ONE_TIME_PAYMENT",
-                "name": "ONE_TIME_PAYMENT"
+                id: "ONE_TIME_PAYMENT",
+                name: "ONE_TIME_PAYMENT"
             },
             {
-                "id": "LICENSE",
-                "name": "LICENSE"
+                id: "LICENSE",
+                name: "LICENSE"
             },
             {
-                "id": "PROJECT",
-                "name": "PROJECT"
+                id: "PROJECT",
+                name: "PROJECT"
             },
         ],
         filter: null
@@ -48,13 +48,13 @@ const actions = {
     async create(context, form) {
         const result = await form.mutate({
             mutation: PRICE_MODEL.create,
-            /*update(cache, result) {
+            /* update(cache, result) {
                 const { priceModelFindAll } = cache.readQuery({ query: PRICE_MODEL.findAll });
                 cache.writeQuery({
                     query: PRICE_MODEL.findAll,
                     data: { priceModelFindAll: priceModelFindAll.concat([result.data.priceModelCreate]) },
                 });
-            }*/
+            } */
         });
         const role = new PriceModel().deserialize(result.data.priceModelCreate);
         await context.dispatch('findAll', {
@@ -91,19 +91,19 @@ const actions = {
         filter = null,
         force = false
     } = {}) {
-        if (context.getters['all'].length === 0 || force) {
+        if (context.getters.all.length === 0 || force) {
             filter = filter || {
                 data: {
                     orderBy: ["name"]
                 }
 
             };
-            filter.busy = context.getters['all'].length < 1;
+            filter.busy = context.getters.all.length < 1;
             try {
-                /*const { data } = await apolloClient.watchquery({
+                /* const { data } = await apolloClient.watchquery({
                     query: PRICE_MODEL.findAll,
                     variables: { filter: filter }
-                });*/
+                }); */
                 const query = apolloClient.watchQuery({
                     query: PRICE_MODEL.findAll,
                     variables: {
@@ -122,7 +122,7 @@ const actions = {
                 filter.busy = false;
             }
         }
-        return context.getters['all'];
+        return context.getters.all;
     },
 
     async filter(context, filter) {
@@ -147,8 +147,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

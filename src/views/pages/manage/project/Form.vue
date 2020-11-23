@@ -1,24 +1,24 @@
 <template>
   <div>
     <b-form
+      v-if="ready"
+      class="hide-labels"
       @submit.prevent="save"
       @keyup="$validator.validateAll()"
-      class="hide-labels"
-      v-if="ready"
     >
       <b-row>
         <b-col class="col-12">
           <div class="form-label-group required">
             <b-form-input
               id="name"
-              :disabled="form.busy"
               v-model="form.name"
+              v-validate="'required|min:4'"
+              v-autofocus
+              :disabled="form.busy"
               :placeholder="$t('Project name')"
               type="text"
               name="name"
               :state="$validateState('name', form)"
-              v-validate="'required|min:4'"
-              v-autofocus
             ></b-form-input>
             <label for="name">{{ $t('Name') }}</label>
             <b-form-invalid-feedback>{{ $displayError('name', form) }}</b-form-invalid-feedback>
@@ -27,44 +27,43 @@
         <b-col cols="12">
           <div class="form-group">
             <user-selector
+              v-model="form.userIds"
+              v-validate="'required|minlength:1'"
               :show-field="true"
               name="users"
               style="z-index:1;position:relative"
-              v-validate="'required|minlength:1'"
               :state="$validateState('users', form)"
-              v-model="form.userIds"
               :items="users"
               :show-add-btn="false"
             ></user-selector>
             <b-form-invalid-feedback>{{ $displayError('users', form) }}</b-form-invalid-feedback>
           </div>
         </b-col>
-        <b-col cols="12" v-if="mode==='create'">
+        <b-col v-if="mode==='create'" cols="12">
           <div class="form-group">
             <tool-selector
+              v-model="form.companyToolIds"
               :show-field="true"
               name="tools"
-              @input="refreshIdeas"
               style="z-index:1;position:relative"
-              v-model="form.companyToolIds"
               :show-add-btn="false"
+              @input="refreshIdeas"
             ></tool-selector>
             <b-form-invalid-feedback>{{ $displayError('tools', form) }}</b-form-invalid-feedback>
           </div>
         </b-col>
-        <b-col cols="12" v-if="mode==='create'">
+        <b-col v-if="mode==='create'" cols="12">
           <div class="form-group">
             <idea-selector
-              :show-field="true"
-              :placeHolderText="$t('Test Ideas')"
-              name="ideas"
               ref="ideasDropDown"
               :key="ideaDropwDownIntent"
+              v-model="form.ideaIds"
+              :show-field="true"
+              :place-holder-text="$t('Test Ideas')"
+              name="ideas"
               :items="availableIdeas"
               style="z-index:1;position:relative"
-              v-validate="'required|minlength:1'"
               :state="$validateState('ideas', form)"
-              v-model="form.ideaIds"
               :show-add-btn="false"
             ></idea-selector>
             <b-form-invalid-feedback>{{ $displayError('ideas', form) }}</b-form-invalid-feedback>
@@ -74,13 +73,13 @@
           <div class="form-label-group required">
             <b-form-input
               id="budget"
-              :disabled="form.busy"
               v-model.number="form.budget"
+              v-validate="'required|numeric|min_value:0'"
+              :disabled="form.busy"
               :placeholder="$t('Budget')"
               type="number"
               name="budget"
               :state="$validateState('budget', form)"
-              v-validate="'required|numeric|min_value:0'"
             ></b-form-input>
             <label for="budget">{{ $t('Budget') }}</label>
             <b-form-invalid-feedback>{{ $displayError('budget', form) }}</b-form-invalid-feedback>
@@ -89,11 +88,11 @@
         <b-col class="col-12">
           <div class="form-label-group required">
             <v-select
-              label="label"
-              :getOptionLabel="(v)=>this.$t(v.label)"
-              v-validate="'required'"
-              data-vv-name="type"
               v-model="form.type"
+              v-validate="'required'"
+              label="label"
+              :get-option-label="(v)=>this.$t(v.label)"
+              data-vv-name="type"
               :placeholder="$t('Project type')"
               :reduce="v => v.id"
               :options="projectTypeOptions"
@@ -106,11 +105,11 @@
         <b-col class="col-12">
           <div class="form-label-group required">
             <v-select
-              label="label"
-              :getOptionLabel="(v)=>this.$t(v.label)"
-              v-validate="'required'"
-              data-vv-name="evaluation_type"
               v-model="form.evaluationType"
+              v-validate="'required'"
+              label="label"
+              :get-option-label="(v)=>this.$t(v.label)"
+              data-vv-name="evaluation_type"
               :placeholder="$t('Evaluation type')"
               :reduce="v => v.id"
               :options="evaluationTypeOptions"
@@ -121,19 +120,19 @@
             <b-form-invalid-feedback>{{ $displayError('evaluation_type', form) }}</b-form-invalid-feedback>
           </div>
         </b-col>
-        <b-col class="col-12" v-if="form.evaluationType==='PERIODIC'">
+        <b-col v-if="form.evaluationType==='PERIODIC'" class="col-12">
           <b-row>
             <b-col class="col-4 pr-1">
               <div class="form-label-group required">
                 <b-form-input
                   id="evaluation_interval_amount"
-                  :disabled="form.busy"
                   v-model.number="form.evaluationIntervalAmount"
+                  v-validate="'required|numeric|min_value:0'"
+                  :disabled="form.busy"
                   :placeholder="$t('Interval')"
                   type="number"
                   name="evaluation_interval_amount"
                   :state="$validateState('evaluation_interval_amount', form)"
-                  v-validate="'required|numeric|min_value:0'"
                 ></b-form-input>
                 <label for="evaluation_interval_amount">{{ $t('Evaluation interval') }}</label>
                 <b-form-invalid-feedback>{{ $displayError('evaluation_interval_amount', form) }}</b-form-invalid-feedback>
@@ -142,11 +141,11 @@
             <b-col class="col-8 pl-1">
               <div class="form-label-group required">
                 <v-select
-                  label="label"
-                  :getOptionLabel="(v)=>this.$t(v.label)"
-                  v-validate="'required'"
-                  data-vv-name="evaluation_interval_unit"
                   v-model="form.evaluationIntervalUnit"
+                  v-validate="'required'"
+                  label="label"
+                  :get-option-label="(v)=>this.$t(v.label)"
+                  data-vv-name="evaluation_interval_unit"
                   :placeholder="$t('Period')"
                   :reduce="v => v.id"
                   :options="evaluationUnitOptions"
@@ -175,12 +174,12 @@
             <hr />
             <confirm-button
               variant="transparent"
-              :confirmMessage="$t('This action cannot be undone!')"
-              :confirmTitle="$t('Delete project')+'?'"
-              :confirmText="$t('Delete project')"
-              btnClass="btn-outline-danger"
+              :confirm-message="$t('This action cannot be undone!')"
+              :confirm-title="$t('Delete project')+'?'"
+              :confirm-text="$t('Delete project')"
+              btn-class="btn-outline-danger"
               size="sm"
-              :showOverlay="false"
+              :show-overlay="false"
               block
               @confirm="deleteItem"
             >
@@ -197,8 +196,8 @@
   </div>
 </template>
 <script>
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
-import { /*mapState,*/ mapGetters } from "vuex";
 
 export default {
   props: {
@@ -274,14 +273,14 @@ export default {
   }),
   computed: {
     process: {
-      get: function() {
+      get() {
         return this.currentProcess("projects")
           ? this.currentProcess("projects").process
           : null;
       }
     },
     processIdeas: {
-      get: function() {
+      get() {
         if (!this.process) {
           return [];
         }
@@ -291,7 +290,7 @@ export default {
       }
     },
     toolIdeas: {
-      get: function() {
+      get() {
         if (!this.process) {
           return [];
         }
@@ -305,7 +304,7 @@ export default {
       }
     },
     ideas: {
-      get: function() {
+      get() {
         if (!this.process) {
           return [];
         }
@@ -323,7 +322,7 @@ export default {
     //       a.firstName > b.firstName ? 1 : -1
     //     );
     //  }
-    //},
+    // },
     ...mapGetters({
       currentProcess: "process/current",
       currentUser: "auth/user",
@@ -346,18 +345,18 @@ export default {
   },
   methods: {
     async loadIdeas() {
-      //if (this.process && this.processIdeas.length == 0) {
+      // if (this.process && this.processIdeas.length == 0) {
       await this.$store.dispatch("idea/findByProcess", {
         id: this.process.id
       });
-      //}
+      // }
     },
     async loadToolIdeas() {
-      //if (this.process && this.toolIdeas.length == 0) {
+      // if (this.process && this.toolIdeas.length == 0) {
       await this.$store.dispatch("toolIdea/findByProcess", {
         id: this.process.id
       });
-      //}
+      // }
     },
     async loadUsers() {
       await this.$store.dispatch("user/findAll", {});
@@ -365,16 +364,17 @@ export default {
     async initForm() {
       Object.keys(this.input || {})
         .filter(key => key in this.form)
-        .forEach(key => (this.form[key] = this.input[key]));
-      this.form.budget = this.form.budget / 100;
-      this.form["processId"] = this.process.id;
+				.forEach(key => (this.form[key] = this.input[key]));
+				console.log(this.form.budget);
+      this.form.budget = this.form.budget === 0 ? this.form.budget : this.form.budget / 100;
+      this.form.processId = this.process.id;
       this.refreshIdeas();
     },
     async save() {
       try {
         await this.$validator.validateAll();
         if (!this.vErrors.any()) {
-         
+
           this.form.budget = this.form.budget * 100;
           this.form.ideaIds = [...new Set(this.adoptedIdeas)];
           //
@@ -400,15 +400,15 @@ export default {
         console.error(ex.message);
       }
     },
-    
+
     refreshIdeas() {
       const oldIdeas = [...(this.availableIdeas || [])];
       this.availableIdeas = [...this.ideas];
       this.adoptedIdeas = [];
 
-      
 
-      //select auto the ideas that were not in selected
+
+      // select auto the ideas that were not in selected
       const toSelect = [
         ...new Set(
           this.availableIdeas.filter(
@@ -419,17 +419,17 @@ export default {
 
       // Filter Adopted Ideas in the selection as these would be automatic selection
       this.availableIdeas = this.availableIdeas.filter(i => (i.status !== "ADOPTED") )
-      
+
       toSelect
         .filter(o => !this.form.ideaIds.find(i => i === o.id))
         .map(i => {
           // this.form.ideaIds.push(i.id);
           this.adoptedIdeas.push(i.id);
         });
-      
-      if (this.$refs["ideasDropDown"]) {
+
+      if (this.$refs.ideasDropDown) {
         this.ideaDropwDownIntent = Math.random();
-        this.$refs["ideasDropDown"].$forceUpdate();
+        this.$refs.ideasDropDown.$forceUpdate();
       }
       this.ideas;
     },

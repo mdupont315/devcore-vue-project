@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-card class="border shadow-sm mb-3 px-3 pt-3 pb-0" style="position:relative">
-      <inner-overlay style="z-index:1" @click="togglePopOver" v-if="showPopOver"></inner-overlay>
+      <inner-overlay v-if="showPopOver" style="z-index:1" @click="togglePopOver"></inner-overlay>
       <b-card-body class="p-0">
         <p class="text-justify">{{ item.description }}</p>
       </b-card-body>
@@ -11,19 +11,19 @@
           <confirm-button
             class="d-inline-block"
             variant="transparent"
-            btnClass="text-danger p-0 border-0"
-            btnStyle="outline:none!important;box-shadow:none!important"
+            btn-class="text-danger p-0 border-0"
+            btn-style="outline:none!important;box-shadow:none!important"
             @confirm="deleteItem"
           >
             <i class="mdi mdi-close" style="font-size:2rem"></i>
             <small class="d-block text-gray" style="line-height:1em">{{ $t('Delete') }}</small>
           </confirm-button>
           <b-button
-            @click="startCreation"
             ref="btnNew"
             variant="transparent"
             class="text-success p-0 border-0 ml-4"
             style="outline:none!important;box-shadow:none!important"
+            @click="startCreation"
           >
             <i class="mdi mdi-check" style="font-size:2rem"></i>
             <small class="d-block text-gray" style="line-height:1em">{{ $t('Create revision') }}</small>
@@ -32,16 +32,16 @@
       </b-card-footer>
     </b-card>
     <b-popover
+      ref="popover"
+      v-click-outside
       :target="()=>this.$refs['btnNew']"
       :show.sync="showPopOver"
       placement="top"
       class="form-popover"
-      v-click-outside
-      ref="popover"
     >
       <b-card no-body style="width:400px">
         <b-card-body>
-          <idea-form @done="loadIdea" :item="newIdea"></idea-form>
+          <idea-form :item="newIdea" @done="loadIdea"></idea-form>
         </b-card-body>
       </b-card>
     </b-popover>
@@ -50,7 +50,11 @@
 <script>
 import { Idea } from "@/models";
 import IdeaFrom from "./Form";
+
 export default {
+  components: {
+    "idea-form": IdeaFrom
+  },
   props: {
     item: {
       type: Object,
@@ -60,9 +64,6 @@ export default {
       type: Object,
       required: true
     }
-  },
-  components: {
-    "idea-form": IdeaFrom
   },
   data: () => ({
     showPopOver: false,
@@ -90,7 +91,7 @@ export default {
         this.newIdea = new Idea();
         this.newIdea.parent = this.idea.parent;
         this.newIdea.title =
-          this.idea.title + "(" + (this.idea.version + 1) + ")";
+          `${this.idea.title}(${this.idea.version + 1})`;
         this.newIdea.description = this.item.description;
         this.newIdea.parent = this.idea.parent;
         this.newIdea.processId = this.idea.processId;

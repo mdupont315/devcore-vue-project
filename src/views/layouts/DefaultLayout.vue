@@ -1,23 +1,24 @@
 <template>
-  <div class="layout" v-if="user">
+  <div v-if="user" class="layout">
     <top-nav></top-nav>
-    <div class="content" id="content-wrapper">
+    <div id="content-wrapper" class="content">
       <main-nav></main-nav>
-      <main class="main" id="main">
+      <main id="main" class="main">
         <div class="wrapper">
           <slot />
         </div>
       </main>
     </div>
   </div>
-  
+
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import TopNav from "./components/TopNav";
 import MainNav from "./components/MainNav";
+
 export default {
-  name: "default-layout",
+  name: "DefaultLayout",
   components: {
     "top-nav": TopNav,
     "main-nav": MainNav

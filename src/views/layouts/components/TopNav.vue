@@ -7,55 +7,40 @@
     class="top-nav shadow-sm"
     :style="{'z-index':zIndex}"
   >
-    <b-navbar-brand :to="{name:'home'}" class="logo">
+    <b-navbar-brand :to="{name:'home'}" class="logo minw-250px">
       <img src="@/assets/img/logo.svg" />
     </b-navbar-brand>
 
-    <!-- <b-button
-      class="toggle-menu-btn hamburger hamburger--slider d-block d-md-none"
-      :class="{'is-active':navActive}"
-      @click="toggleNav"
-      variant="light"
-    >
-      <span class="hamburger-box">
-        <span class="hamburger-inner"></span>
-      </span>
-    </b-button> -->
-<!--
-    <b-button class="d-none d-md-inline-block" @click="toggleNav" variant="light">
-      <i class="mdi-menu mdi"></i>
-    </b-button> -->
+    <b-navbar-nav class="d-none d-md-flex minw-15">
 
-    <b-navbar-nav class="d-none d-md-flex">
-      
       <h1 class="h4 ml-3 mb-0 text-uppercase page-title">{{ $t(page.title) }}</h1>
-      <component v-if="page.titleButton" :is="page.titleButton"></component>
+      <component :is="page.titleButton" v-if="page.titleButton"></component>
        <portal-target name="topbar-left"></portal-target>
     </b-navbar-nav>
 
-    <b-navbar-nav class="d-none d-md-flex flex-grow-1 align-items-center flex-column">
-      <component v-if="page.topCentral" :is="page.topCentral"></component>
+    <b-navbar-nav class="d-none d-md-flex flex-grow-1 align-items-end flex-column maxw-30">
+      <component :is="page.topCentral" v-if="page.topCentral"></component>
       <portal-target name="topbar-central"></portal-target>
       <h5 v-if="$can('core/company/manage')">{{ $t('Super Admininstrator Panel') }}</h5>
     </b-navbar-nav>
 
     <!-- Right aligned nav items -->
     <b-navbar-nav class="ml-auto">
-      
+
       <b-nav-item>
-        <component v-if="page.topRight" :is="page.topRight"></component>
+        <component :is="page.topRight" v-if="page.topRight"></component>
         <portal-target name="topbar-right"></portal-target>
       </b-nav-item>
       <div class="nav__end">
           <locales-switcher />
         </div>
       <div class="profile">
-        
-        <inner-overlay @click="closeDropDown" v-if="zIndex>0"></inner-overlay>
+
+        <inner-overlay v-if="zIndex>0" @click="closeDropDown"></inner-overlay>
         <b-nav-item-dropdown
-          right
           ref="profileDropDown"
-          
+          right
+
           @hidden="closeDropDown"
           @shown="showDropDown"
         >
@@ -90,9 +75,9 @@
                 {{ $t('My Profile')}}
               </b-dropdown-item>
               <b-dropdown-item
-                :to="{name:'my-company'}"
                 v-if="$can('auth/user/edit_my_company') == true && $can('core/company/manage') == false"
-              
+                :to="{name:'my-company'}"
+
               >
                 <i class="mdi mdi-domain"></i>
                 {{ $t('My Company')}}
@@ -110,10 +95,10 @@
   </b-navbar>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 
 export default {
-  name: "top-nav",
+  name: "TopNav",
   data: () => ({
     dropDown: false,
   }),
@@ -125,13 +110,13 @@ export default {
       onTop: "app/show_top_nav_on_top"
     }),
     zIndex: {
-      get: function() {
+      get() {
         return this.onTop || this.dropDown ? 9999 : 0;
       },
     }
   },
   mounted() {
-    
+
   },
   methods: {
     async logout() {
@@ -156,6 +141,13 @@ export default {
 </script>
 <style scoped>
 
+.nav-item{
+	align-self: center;
+}
+
+.profile{
+	align-self:center;
+}
 .nav__start,
 .nav__end {
   display: flex;
@@ -169,5 +161,23 @@ export default {
   font-weight: bold;
   color: #fff;
   text-decoration: none;
+}
+
+.maxw-30{
+	max-width:30%;
+}
+.minw-15{
+	min-width:15%;
+}
+
+.minw-250px{
+	min-width:250px;
+}
+.ml-auto{
+	height: 100%;
+}
+
+.top-nav{
+	height: 100%;
 }
 </style>

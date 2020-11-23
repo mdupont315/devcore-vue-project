@@ -28,7 +28,7 @@ export default function getItems(user) {
                     url: {
                         name: 'ideas'
                     },
-                    //permissions: 'process/process/manage',
+                    // permissions: 'process/process/manage',
                 },
                 {
                     title: i18n.t('Tool Ideas'),
@@ -37,7 +37,7 @@ export default function getItems(user) {
                     url: {
                         name: 'tool-ideas'
                     },
-                    //permissions: 'process/process/manage',
+                    // permissions: 'process/process/manage',
                 }
             ]
         },
@@ -77,7 +77,7 @@ export default function getItems(user) {
                 url: {
                     name: 'analysis-general'
                 },
-                //permissions: 'process/process/manage',
+                // permissions: 'process/process/manage',
             },
         ]
         },

@@ -1,17 +1,17 @@
 <template>
-  <b-form @submit.prevent="save" @keyup="$validator.validateAll()" class="hide-labels">
+  <b-form class="hide-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
     <b-row>
       <b-col class="col-12">
         <div class="form-label-group required">
           <b-form-input
             id="name"
-            :disabled="form.busy"
             v-model="form.name"
+            v-validate="'required|min:4'"
+            :disabled="form.busy"
             :placeholder="$t('Company Name')"
             type="text"
             name="name"
             :state="$validateState('name', form)"
-            v-validate="'required|min:4'"
             autofocus
           ></b-form-input>
           <label for="name">{{ $t('Company Name') }}</label>
@@ -22,8 +22,8 @@
         <div class="form-label-group required">
           <b-form-input
             id="adminEmail"
-            :disabled="form.busy"
             v-model="form.adminEmail"
+            :disabled="form.busy"
             :placeholder="$t('Admin Email')"
             type="text"
             name="adminEmail"
@@ -38,13 +38,13 @@
         <div class="form-label-group required">
           <b-form-select
                   id="currencyCode"
-                  :disabled="form.busy"
                   v-model="form.currencyCode"
+                  v-validate="'required'"
+                  :disabled="form.busy"
                   :placeholder="$t('Currency')"
                   type="text"
                   name="currencyCode"
                   :state="$validateState('currencyCode', form)"
-                  v-validate="'required'"
                 >
                   <option :value="null">--- {{ $t('None')}} ---</option>
                   <option
@@ -79,9 +79,9 @@
           <b-button
             variant="link"
             type="button"
-            @click.prevent="resetPassword"
             class="text-danger"
             block
+            @click.prevent="resetPassword"
           >{{ $t('Reset password') }}</b-button>
         </div>
       </b-col>
@@ -89,8 +89,8 @@
   </b-form>
 </template>
 <script>
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
-import { /*mapState,*/ mapGetters } from "vuex";
 import { User } from "@/models";
 
 export default {

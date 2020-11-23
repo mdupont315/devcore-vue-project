@@ -100,14 +100,14 @@ const actions = {
         filter = null,
         force = false
     } = {}) {
-        if (context.getters['all'].length === 0 || force) {
+        if (context.getters.all.length === 0 || force) {
             filter = filter || {
                 data: {
                     orderBy: ["name"]
                 }
 
             };
-            filter.busy = context.getters['all'].length < 1;
+            filter.busy = context.getters.all.length < 1;
             try {
                 const query = apolloClient.watchQuery({
                     query: COMPANY_TOOL_MODULE.findAll,
@@ -127,7 +127,7 @@ const actions = {
                 filter.busy = false;
             }
         }
-        return context.getters['all'];
+        return context.getters.all;
     },
 
     async findById(context, filter) {
@@ -194,8 +194,7 @@ const mutations = {
     SET_ITEM(state, value) {
         const index = state.all.findIndex(el => el.id === value.id);
         if (index > -1) {
-            const copy = { ...state.all[index]
-            };
+            const copy = { ...state.all[index] };
             value._showDetails = copy._showDetails;
             state.all[index] = value;
             state.all = [...state.all];
@@ -219,8 +218,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

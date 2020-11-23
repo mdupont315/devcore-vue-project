@@ -38,7 +38,7 @@ const actions = {
         } = await apolloClient.query({
             query: TOOL.findAll,
             variables: {
-                filter: filter
+                filter
             },
             fetchPolicy: 'default',
         });
@@ -61,8 +61,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

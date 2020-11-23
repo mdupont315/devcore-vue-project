@@ -1,36 +1,37 @@
 <template>
-  <div class="ml-3" v-if="$can('improve/idea/create') && process && process.stages.length > 0">
+  <div v-if="$can('improve/idea/create') && process && process.stages.length > 0" class="ml-3">
     <b-button
+      id="btnNew"
+      v-b-tooltip.hover
       size="sm"
       class="text-uppercase"
       variant="primary"
       :title="$t('Create New') + ' ' + $t('Idea')"
-      v-b-tooltip.hover
-      id="btnNew"
       @click.stop="togglePopOver"
     >
       <i class="mdi mdi-plus"></i>
       {{ $t('New')}}
     </b-button>
     <b-popover
+      ref="popover"
       target="btnNew"
       :show.sync="showPopOver"
       placement="bottom"
       class="form-popover"
-      ref="popover"
     >
       <b-card no-body style="width:500px">
         <b-card-body>
-          <idea-form @done="togglePopOver" type="TOOL" :item="item" :key="'ideaForm_'+intent"></idea-form>
+          <idea-form :key="'ideaForm_'+intent" type="TOOL" :item="item" @done="togglePopOver"></idea-form>
         </b-card-body>
       </b-card>
     </b-popover>
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import Form from "../ideas/Form";
 import { Idea } from "@/models";
+
 export default {
   data: () => {
     return {
@@ -45,7 +46,7 @@ export default {
       currentProcess: "process/current"
     }),
     process: {
-      get: function() {
+      get() {
         return this.currentProcess("toolIdeas")
           ? this.currentProcess("toolIdeas").process
           : null;

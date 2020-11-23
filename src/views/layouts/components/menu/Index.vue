@@ -13,8 +13,9 @@
 import { mapGetters } from "vuex";
 // import { PERM_COMPANY_MANAGE } from '@/config/app';
 import MenuItem from "./MenuItem";
+
 export default {
-  name: "nav-menu",
+  name: "NavMenu",
   components: {
     item: MenuItem
   },
@@ -44,11 +45,9 @@ export default {
           if (item.children.length > 0) {
             ret.push(item);
           }
-        } else {
-          if (this.checkPermission(item) && this.checkPanelValidate(item)) {
+        } else if (this.checkPermission(item) && this.checkPanelValidate(item)) {
             ret.push(item);
           }
-        }
       });
       return ret;
     },
@@ -62,9 +61,9 @@ export default {
         if ( this.user.can("core/company/manage") &&
             item.permissions !== "core/company/manage" ) {
           return false;
-        } else {
+        } 
           return true;
-        }
+        
     }
   }
 };

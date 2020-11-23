@@ -13,7 +13,8 @@ async function middlewarePipeline(context, middleware, index) {
             context, middleware, index + 1
         )
 
-        await nextMiddleware({ ...context,
+        await nextMiddleware({
+ ...context,
             next: nextPipeline
         })
 
@@ -24,7 +25,7 @@ router.beforeEach(async (to, from, next) => {
     if (!to.meta.middleware) {
         return next()
     }
-    const middleware = to.meta.middleware
+    const { middleware } = to.meta
 
     const context = {
 
@@ -33,7 +34,7 @@ router.beforeEach(async (to, from, next) => {
         next,
         store
     }
-    let result = await middleware[0]({
+    const result = await middleware[0]({
         ...context,
         next: await middlewarePipeline(context, middleware, 1)
     })

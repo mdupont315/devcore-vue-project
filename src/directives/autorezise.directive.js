@@ -8,10 +8,10 @@ Vue.directive('autoresize', {
             return;
         }
         el.style.height = "auto";
-        el.style.height = el.scrollHeight + 'px';
+        el.style.height = `${el.scrollHeight}px`;
         el.addEventListener("keyup", () => {
             el.style.height = "auto";
-            el.style.height = el.scrollHeight + 'px';
+            el.style.height = `${el.scrollHeight}px`;
         })
     },
     update(el, binding) {
@@ -20,6 +20,6 @@ Vue.directive('autoresize', {
             return;
         }
         el.style.height = "auto";
-        el.style.height = el.scrollHeight + 'px';
+        el.style.height = `${el.scrollHeight}px`;
     }
 });

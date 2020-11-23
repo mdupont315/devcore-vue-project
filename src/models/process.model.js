@@ -7,10 +7,15 @@ import UserModel from "./user.model";
 
 export default class ProcessModel extends BaseModel {
     title = null;
+
     company = null;
+
     stages = [];
+
     ideas = [];
+
     projects = [];
+
     companyRoles = [];
 
     // loaded = {
@@ -24,7 +29,7 @@ export default class ProcessModel extends BaseModel {
 
     loaded = false;
 
-    //table details reactive property
+    // table details reactive property
     _showDetails = false;
 
     get stageStats() {

@@ -42,13 +42,13 @@ const actions = {
     async create(context, form) {
         const result = await form.mutate({
             mutation: ISSUE.create,
-            /*update(cache, result) {
+            /* update(cache, result) {
                 const { issueFindAll } = cache.readQuery({ query: ISSUE.findAll });
                 cache.writeQuery({
                     query: ISSUE.findAll,
                     data: { issueFindAll: issueFindAll.concat([result.data.issueCreate]) },
                 });
-            }*/
+            } */
         });
         const role = new Issue().deserialize(result.data.issueCreate);
         await context.dispatch('findAll', {
@@ -94,14 +94,14 @@ const actions = {
                 id: form.id
             }
         });
-        //await context.dispatch('findAll', { force: true });
+        // await context.dispatch('findAll', { force: true });
         return result.data.issueDelete;
     },
 
     async deleteMany(context, form) {
         form.ids.map((id) => {
             context.commit('REMOVE_ITEM', {
-                id: id
+                id
             });
         });
 
@@ -111,7 +111,7 @@ const actions = {
                 ids: form.ids
             }
         });
-        //await context.dispatch('findAll', { force: true });
+        // await context.dispatch('findAll', { force: true });
         return result.data.issueDeleteMany;
     },
 
@@ -170,7 +170,7 @@ const actions = {
             result.data.issueFindAll.map(o => {
                 context.commit("SET_ITEM", new Issue().deserialize(o));
             });
-            return context.getters['all'].filter(o => o.stageId === filter.id);
+            return context.getters.all.filter(o => o.stageId === filter.id);
         }
     },
 
@@ -178,7 +178,7 @@ const actions = {
         filter = null,
         force = false
     } = {}) {
-        if (context.getters['all'].length === 0 || force) {
+        if (context.getters.all.length === 0 || force) {
             filter = filter || {
                 data: {
                     orderBy: ["title"],
@@ -191,12 +191,12 @@ const actions = {
                 }
 
             };
-            filter.busy = context.getters['all'].length < 1;
+            filter.busy = context.getters.all.length < 1;
             try {
-                /*const { data } = await apolloClient.watchquery({
+                /* const { data } = await apolloClient.watchquery({
                     query: ISSUE.findAll,
                     variables: { filter: filter }
-                });*/
+                }); */
                 const query = apolloClient.watchQuery({
                     query: ISSUE.findAll,
                     variables: {
@@ -215,7 +215,7 @@ const actions = {
                 filter.busy = false;
             }
         }
-        return context.getters['all'];
+        return context.getters.all;
     },
 
     async filter(context, filter) {
@@ -258,8 +258,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

@@ -2,14 +2,14 @@
   <div>
     <div class="d-flex justify-content-end">
       <confirm-button
-        class="mr-2 max-width"
-        :btnClass="btnDeleteClass"
         v-if="showDeleteButton"
-        :confirmText="$t('Delete')"
-        :confirmTitle="deleteTitle"
-        :confirmMessage="deleteMessage"
-        :confirmPlacement="deleteConfirmPlacement"
-        :confirmBoundary="deleteConfirmBoundary"
+        class="mr-2 max-width"
+        :btn-class="btnDeleteClass"
+        :confirm-text="$t('Delete')"
+        :confirm-title="deleteTitle"
+        :confirm-message="deleteMessage"
+        :confirm-placement="deleteConfirmPlacement"
+        :confirm-boundary="deleteConfirmBoundary"
         @showConfirm="showConfirm"
         @confirm="deleteItem"
       >
@@ -17,20 +17,20 @@
       </confirm-button>
 
       <b-button
+        v-if="showSaveButton"
         :class="btnEditClass"
         style="max-width:150px"
-        v-if="showSaveButton"
         :disabled="disableSaveButton"
         :loading="loading"
         @click="save"
       >
-        <b-spinner small v-if="loading"></b-spinner>
+        <b-spinner v-if="loading" small></b-spinner>
         {{ $t('Save') }}
       </b-button>
       <b-button
+        v-if="showCancelButton"
         :class="btnCancelClass"
         variant="link"
-        v-if="showCancelButton"
         :disabled="disableCancelButton"
         @click="cancel"
       >{{ $t('Cancel') }}</b-button>
@@ -39,8 +39,9 @@
 </template>
 <script>
 import GQLForm from "@/lib/gqlform";
+
 export default {
-  name: "table-edit-tools-buttons",
+  name: "TableEditToolsButtons",
   props: {
     item: {
       type: Object,
@@ -87,14 +88,14 @@ export default {
     deleteTitle: {
       type: String,
       required: false,
-      default: function() {
+      default() {
         return this.$t("Delete item?");
       }
     },
     deleteMessage: {
       type: String,
       required: false,
-      default: function() {
+      default() {
         return this.$t("This action cannot be undone!");
       }
     },
@@ -136,7 +137,7 @@ export default {
       try {
         this.$emit("delete", this.item);
         await this.$store.dispatch(
-          this.store + "/delete",
+          `${this.store}/delete`,
           new GQLForm({ id: this.item.id }, null)
         );
       } finally {

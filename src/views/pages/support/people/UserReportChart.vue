@@ -4,7 +4,7 @@
     style="min-height:250px"
   >
     <div class="period-selector text-right p-2 px-4 flex-grow-0 position-relative">
-      <unit-selector :units="intervals" v-model="filter.data.interval" @change="changePeriod" />
+      <unit-selector v-model="filter.data.interval" :units="intervals" @change="changePeriod" />
       <!-- <div class="text-right pr-4 float-right position-absolute" style="top:3px; right:0">
         <span v-if="idea.evaluationsCount > 0" class="font-15x ml-2 float-right">
           <b-badge variant="black">{{ $tc('evaluation.count', idea.evaluationsCount) }}</b-badge>
@@ -26,6 +26,7 @@
 import moment from "moment";
 import { numberFormat } from "@/lib/functions";
 import ReportChart from "./ReportChart";
+
 export default {
   components: {
     "report-chart": ReportChart
@@ -120,20 +121,20 @@ export default {
           const d = reportData.data[k];
           data.labels.push(k);
           max =
-            max > Math.abs(d["loss"]["total"])
+            max > Math.abs(d.loss.total)
               ? max
-              : Math.abs(d["loss"]["total"]);
+              : Math.abs(d.loss.total);
           max =
-            max > Math.abs(d["gain"]["total"])
+            max > Math.abs(d.gain.total)
               ? max
-              : Math.abs(d["gain"]["total"]);
+              : Math.abs(d.gain.total);
 
-          datasets["average"].data.push(
-            numberFormat(d["general_total_Value"]["average"] / 100)
+          datasets.average.data.push(
+            numberFormat(d.general_total_Value.average / 100)
           );
 
-          datasets["current_average"].data.push(
-            numberFormat(d["total_value"]["total"] / 100)
+          datasets.current_average.data.push(
+            numberFormat(d.total_value.total / 100)
           );
         });
 
@@ -142,7 +143,7 @@ export default {
       });
 
       this.chartData = {
-        data: data,
+        data,
         options: {
           defaultFontSize: 8,
           responsive: true,
@@ -200,7 +201,7 @@ export default {
       //     .add("year", -1)
 
       let from = moment().utc();
-      let to = moment().utc();
+      const to = moment().utc();
 
       switch (this.filter.data.interval) {
         case "quarter":

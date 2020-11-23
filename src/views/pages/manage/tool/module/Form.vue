@@ -1,16 +1,16 @@
 <template>
-  <b-form @submit.prevent="save" @keyup="$validator.validateAll()" class="hide-labels">
+  <b-form class="hide-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
     <b-row>
       <b-col class="col-12">
         <div class="form-label-group required">
           <suggestions
+            v-model="form.name"
             class="sm"
             :v-validate="'required'"
-            v-model="form.name"
             :options="{debounce:250, inputClass:'form-control form-control-sm', autofocus:true, placeholder:$t('Module Name')}"
             :state="$validateState('toolModule', form)"
-            :onInputChange="onToolModuleInputChange"
-            :onItemSelected="onToolModuleSelected"
+            :on-input-change="onToolModuleInputChange"
+            :on-item-selected="onToolModuleSelected"
             :class="{'is-invalid':$validateState('toolModule', form)===false, 'is-valid':$validateState('toolModule', form)===true}"
           >
             <div slot="item" slot-scope="props" class="single-item">
@@ -74,7 +74,7 @@
         >{{ $t('Save changes')}}</loading-button>
         <div v-if="mode==='edit' && $can('tool/toolModule/delete', input)" class="mt-3 text-center">
           <hr />
-          <b-button variant="outline-danger" type="button" @click.prevent="deleteItem" block>
+          <b-button variant="outline-danger" type="button" block @click.prevent="deleteItem">
             <i class="mdi mdi-trash-can"></i>
             {{ $t('Delete') }}
           </b-button>
@@ -84,8 +84,8 @@
   </b-form>
 </template>
 <script>
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
-import { /*mapState,*/ mapGetters } from "vuex";
 
 export default {
   props: {

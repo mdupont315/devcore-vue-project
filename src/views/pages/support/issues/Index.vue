@@ -1,9 +1,9 @@
 <template>
   <div class="page animated fadeIn">
     <div
+      v-if="currentItem || currentRowDetails"
       class="overlay"
       :class="{'top-all':this.showInnerOverlayOnTop}"
-      v-if="currentItem || currentRowDetails"
       @click="overlayClick"
     ></div>
 
@@ -62,49 +62,49 @@
                 <b-button
                   :ref="`btnNewIdea${row.item.rowId}`"
                   size="xs"
-                  @click="newIdea(row)"
                   variant="action"
                   class="btn-primary btn-block text-uppercase text-bold"
                   style="font-size:1.2rem;padding:3px"
+                  @click="newIdea(row)"
                 >{{ $t('New idea') }}</b-button>
 
                 <b-popover
+                  ref="popover"
                   :target="()=>$refs[`btnNewIdea${row.item.rowId}`]"
                   :show.sync="showIdeaPopover"
                   placement="bottom"
                   class="form-popover"
-                  ref="popover"
                 >
                   <b-card no-body style="width:300px">
                     <b-card-body>
-                      <idea-form section="issues" @done="closeIdeaForm" :item="idea"></idea-form>
+                      <idea-form section="issues" :item="idea" @done="closeIdeaForm"></idea-form>
                     </b-card-body>
                   </b-card>
                 </b-popover>
                 <b-button
                   size="xs"
-                  @click="toggleItem(null)"
                   variant="transparent"
                   class="btn-link text-gray btn-block text-uppercase text-bold shadow-0"
                   style="font-size:1rem;padding:3px;margin:0"
+                  @click="toggleItem(null)"
                 >{{ $t('Cancel') }}</b-button>
               </div>
             </div>
-            <div class="buttons" v-else>
+            <div v-else class="buttons">
               <b-button
                 size="xs"
-                @click="newIdea(row)"
                 variant="action"
                 class="btn-primary btn-block text-uppercase text-bold"
                 style="font-size:1.2rem;padding:3px"
+                @click="newIdea(row)"
               >{{ $t('New idea') }}</b-button>
               <b-button
-                @click="showDetails(row)"
+                v-if="$can('process/process/manage')"
                 size="xs"
                 variant="action"
                 class="btn-light btn-expand btn-block text-uppercase text-bold m-0"
                 style="font-size:1.2rem;padding:3px"
-                v-if="$can('process/process/manage')"
+                @click="showDetails(row)"
               >{{ (row.item._showDetails)?$t('Close'):$t('Details') }}</b-button>
             </div>
           </template>
@@ -121,7 +121,7 @@
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
 import IdeaForm from "../../improve/ideas/Form";
 import IssuesTable from "./IssuesTable";
@@ -157,20 +157,20 @@ export default {
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top"
     }),
     process: {
-      get: function() {
+      get() {
         return this.currentProcess("issues").process;
       }
     },
     items: {
-      get: function() {
+      get() {
         let items = [];
         
         if (this.process) {
 
           this.process.stages.map(s => {
             s.companyRolesWithChild.map(o => {
-              let id = s.id + "_" + o.id;
-              let it = { ...s };
+              const id = `${s.id}_${o.id}`;
+              const it = { ...s };
               it.companyRole = o;
               it.rowId = id;
               it.totalLoss = 0;
@@ -214,7 +214,7 @@ export default {
       }
     },
     issues: {
-      get: function() {
+      get() {
         if (this.process) {
           return this.$store.getters["issue/byProcess"](this.process.id);
         }
@@ -222,7 +222,7 @@ export default {
       }
     },
     fields: {
-      get: function() {
+      get() {
         return [
           { key: "name", label: this.$t("Stage"), sortable: true },
           {

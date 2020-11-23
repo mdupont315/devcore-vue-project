@@ -1,15 +1,15 @@
 <template>
   <div class="page animated fadeIn">
     <div
-      class="editable-dashboard"
       v-if="process && (!loading || items.length>0 && process.stages.length>0)"
+      class="editable-dashboard"
     >
       <div class="sortable-wrapper t01 horizontal">
         <div
-          class="process-stage item sortable-item enable-drag"
           v-for="stage in process.stages"
           :key="stage.id"
           :ref="`stage_${stage.id}`"
+          class="process-stage item sortable-item enable-drag"
         >
           <div class="card stage-card bg-light">
             <div>
@@ -20,20 +20,20 @@
                   >{{ stage.title }}</h2>
                 </div>
               </div>
-              <div class="card-body" v-if="getProjectFromStage(stage).length>0">
+              <div v-if="getProjectFromStage(stage).length>0" class="card-body">
                 <project-card
                   v-for="project in getProjectFromStage(stage)"
                   :key="constructRefForItem(project, stage)"
+                  :ref="constructRefForItem(project, stage)"
                   :item="project"
                   :stage="project.getStage(stage.id)"
-                  :ref="constructRefForItem(project, stage)"
                   :expanded="currentItem && currentItem.id===project.getStage(stage.id).id"
                   @itemChanged="itemChanged"
                   @toggled="itemToggled"
                   @itemDetailsToggled="itemDetailsToggled"
                 ></project-card>
               </div>
-              <div class="card-body" v-else>
+              <div v-else class="card-body">
                 <empty-slot></empty-slot>
               </div>
             </div>
@@ -46,7 +46,7 @@
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
 import ProjectCard from "./Card";
 import { scrollLeftToElement } from "@/lib/utils";
@@ -74,7 +74,7 @@ export default {
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top"
     }),
     process: {
-      get: function() {
+      get() {
         return this.currentProcess("projects").process;
       }
     },
@@ -103,7 +103,7 @@ export default {
   },
   methods: {
     getProjectFromStage(stage) {
-      const it= this.items
+      const it = this.items
         .filter(
           o =>
             o.getStage(stage.id) && o.getStage(stage.id).status != "NOT_STARTED"
@@ -224,7 +224,7 @@ export default {
     },
     itemDetailsToggled(expanded, item, stage) {
       if (expanded) {
-        const ref = this.$refs[`stage_` + stage.stageId];
+        const ref = this.$refs[`stage_${stage.stageId}`];
         if (ref) {
           this.$nextTick(() => scrollLeftToElement(ref[0]));
         }

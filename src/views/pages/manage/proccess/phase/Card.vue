@@ -7,7 +7,7 @@
       <div class="title pl-0">
         <h2 class="h5 m-0 text-capitalize text-left text-overflow text-bold">{{ item.title }}</h2>
         <div class="tools">
-          <span class="btn-action" @click="toggleEdit" v-if="$can('process/phase/update', item)">
+          <span v-if="$can('process/phase/update', item)" class="btn-action" @click="toggleEdit">
             <i class="mdi mdi-pencil"></i>
           </span>
         </div>
@@ -21,9 +21,9 @@
             <div
               v-for="role in item.companyRoles"
               :key="role.id"
+              v-b-tooltip="{  placement: 'top', boundary:'viewport' }"
               class="avatar-item"
               :title="role.name"
-              v-b-tooltip="{  placement: 'top', boundary:'viewport' }"
             >
               <img :src="role.getAvatarUrl('50x50')" height="22" />
             </div>
@@ -32,10 +32,10 @@
       </div>
     </div>
 
-    <div class="form" v-if="editForm">
+    <div v-if="editForm" class="form">
       <layer :key="intent" @closed="cancelEdit">
         <div ref="editRolesPlaceholder" style="height:1px"></div>
-        <div class="overlay transparent" @click="closeRolesPopover" v-if="showRolesPopover" />
+        <div v-if="showRolesPopover" class="overlay transparent" @click="closeRolesPopover" />
         <b-form @submit.prevent="saveItem">
           <div>
             <b-row>
@@ -43,29 +43,29 @@
                 <b-card class="bg-white shadow-sm" no-body>
                   <div class="form-group my-0">
                     <b-input
+                      :key="intent"
                       v-model="editForm.title"
-                      class="no-style my-0"
-                      style="min-height:20px; height:30px; overflow:hidden"
                       v-autofocus="true"
                       v-autoresize
-                      :state="$validateState('title', editForm)"
                       v-validate="'required|min:4'"
+                      class="no-style my-0"
+                      style="min-height:20px; height:30px; overflow:hidden"
+                      :state="$validateState('title', editForm)"
                       :placeholder="$t('Phase name')"
                       name="title"
-                      :key="intent"
                     ></b-input>
                     <b-form-invalid-feedback>{{ $displayError('title', editForm) }}</b-form-invalid-feedback>
                   </div>
                   <div class="form-group my-0">
                     <b-textarea
+                      :key="intent"
                       v-model="editForm.description"
+                      v-autoresize
                       class="no-style my-0"
                       style="min-height:20px; overflow:hidden"
-                      v-autoresize
                       :placeholder="$t('Phase description')"
                       :state="$validateState('description', editForm)"
                       name="description"
-                      :key="intent"
                     ></b-textarea>
                     <b-form-invalid-feedback>{{ $displayError('description', editForm) }}</b-form-invalid-feedback>
                   </div>
@@ -83,28 +83,28 @@
             </b-row>
           </div>
           <b-popover
+            :key="intent"
             placement="rightbottom"
             :show="true"
             :target="()=>$refs.editRolesPlaceholder"
             custom-class="no-arrow transparent offset-t-5"
-            :key="intent"
           >
             <b-card class="bg-light shadow-sm" no-body style="width:210px">
               <b-card-body>
                 <ul
-                  class="list-inline break mb-0"
                   v-if="editForm.companyRoles && editForm.companyRoles.length>0"
+                  class="list-inline break mb-0"
                 >
                   <li
-                    class="list-inline-item my-1 mx-1"
                     v-for="role in selectedRoles"
                     :key="role.id"
+                    class="list-inline-item my-1 mx-1"
                   >
                     <img
+                      v-b-tooltip.hover
                       :src="role.getAvatarUrl('50x50')"
                       class="rounded rounded-circle border"
                       height="30"
-                      v-b-tooltip.hover
                       :title="role.name"
                     />
                   </li>
@@ -113,11 +113,11 @@
               </b-card-body>
               <b-card-footer class="mx-2">
                 <b-button
+                  ref="btnAssignRoles"
                   block
                   variant="white"
                   class="text-primary"
                   size="md"
-                  ref="btnAssignRoles"
                   @click="toggleRolesPopover"
                 >+ {{$t('Assign roles')}}</b-button>
                 <b-popover
@@ -128,29 +128,29 @@
                 >
                   <div style="width:210px; overflow:hidden;" class="rounded">
                     <company-role-selector
-                      v-model="editForm.companyRoles"
                       :key="intent"
+                      v-model="editForm.companyRoles"
                       selector-class="rounded"
                       :show-input="false"
-                      :showFooterDisplay="false"
+                      :show-footer-display="false"
                       :show-footer-selection="false"
-                      @close="toggleRolesPopover"
                       :items="availableRoles"
                       :show-add-btn="$can('core/companyRole/create')"
+                      @close="toggleRolesPopover"
                     ></company-role-selector>
                   </div>
                 </b-popover>
               </b-card-footer>
             </b-card>
-            <div class="mt-2" v-if="$can('process/phase/delete', editItem)">
+            <div v-if="$can('process/phase/delete', editItem)" class="mt-2">
               <confirm-button
                 variant="transparent"
-                :confirmMessage="$t('This action cannot be undone!')"
-                :confirmTitle="$t('Delete phase')+'?'"
-                :confirmText="$t('Delete phase')"
-                btnClass="text-white border outline-none"
+                :confirm-message="$t('This action cannot be undone!')"
+                :confirm-title="$t('Delete phase')+'?'"
+                :confirm-text="$t('Delete phase')"
+                btn-class="text-white border outline-none"
                 size="xs"
-                :showOverlay="false"
+                :show-overlay="false"
                 block
                 @confirm="deleteItem"
               >{{ $t('Delete phase') }}</confirm-button>
@@ -162,10 +162,12 @@
   </div>
 </template>
 <script>
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
 import { ProcessPhase } from "@/models";
-import { /*mapState,*/ mapGetters } from "vuex";
+
 export default {
+  components: {},
   props: {
     item: {
       required: false
@@ -177,7 +179,6 @@ export default {
       required: false
     }
   },
-  components: {},
   data: () => ({
     showOverlay: false,
     showMenu: false,
@@ -213,11 +214,11 @@ export default {
   methods: {
     toggleMenu() {
       this.showMenu = !this.showMenu;
-      //this.showOverlay=this.showMenu;
+      // this.showOverlay=this.showMenu;
     },
     hideMenu() {
       this.showMenu = false;
-      //this.showOverlay=false;
+      // this.showOverlay=false;
     },
     toggleEdit() {
       this.$store.dispatch("app/showInnerOverlay");

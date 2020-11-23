@@ -18,6 +18,7 @@
 <script>
 import { mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
+
 export default {
   data: () => ({
     // Create a new form instance
@@ -35,8 +36,8 @@ export default {
   async mounted() {
     if (this.$route.query) {
       this.form.fields = {
-        username: this.$route.query["username"],
-        code: this.$route.query["code"]
+        username: this.$route.query.username,
+        code: this.$route.query.code
       };
       await this.send();
     } else {

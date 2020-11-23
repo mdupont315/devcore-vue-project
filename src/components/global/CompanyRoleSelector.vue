@@ -2,20 +2,20 @@
   <super-select
     :items="roles"
     class="image-selector"
-    @input="change"
     selector-class="columns columns-3"
+    v-model="dataValue"
     :v-bind="$props"
+    ref="selector"
     :placeholder="$t('Roles')"
+    v-if="ready"
     :state="state"
     :outside-close="!showPopOver"
-    v-model="dataValue"
-    ref="selector"
-    v-if="ready"
     :show-input="showInput"
     :show-footer-display="showFooterSelection"
+    @input="change"
     :show-add-btn="showAddBtn"
+    :filter-fn="filter"
     @close="close"
-    :filterFn="filter"
   >
     <template slot="selection-count" slot-scope="props">{{ $tc('role.count', props.values.length) }}</template>
     <template slot="dropdown-item" slot-scope="props">
@@ -33,8 +33,8 @@
         <div
           v-for="item in selectedItems"
           :key="item.id"
-          class="avatar-item"
           v-b-tooltip="{  placement: 'top', boundary:'viewport' }"
+          class="avatar-item"
           :title="item.name"
         >
           <img :src="item.getAvatarUrl('50x50')" height="22" @click="removeItem(item, $event)" />
@@ -42,7 +42,7 @@
       </div>
     </template>
     <template slot="display-details" slot-scope="props">
-      <ul class="list-unstyled" v-if="props.items">
+      <ul v-if="props.items" class="list-unstyled">
         <li v-for="item in selectedItems" :key="item.id" class="my-1">
           <img class="border rounded-circle" :src="item.getAvatarUrl('50x50')" height="30" />
           {{ item.name }}
@@ -56,12 +56,12 @@
       </ul>
     </template>
     <template slot="footer-display">
-      <div class="stacked-avatars single-line" v-if="showFooterSelection">
+      <div v-if="showFooterSelection" class="stacked-avatars single-line">
         <div
           v-for="item in selectedItems"
           :key="item.id"
-          class="avatar-item"
           v-b-tooltip="{  placement: 'bottom', boundary:'viewport' }"
+          class="avatar-item"
           :title="item.name"
         >
           <img :src="item.getAvatarUrl('50x50')" height="22" @click="removeItem(item, $event)" />
@@ -76,10 +76,10 @@
       >+ {{ $t('New') }}</b-button>
       <!-- <layer v-if="showPopOver" @closed="togglePopOver" style="z-index:3; position:relative"> -->
       <b-popover
+        ref="popover"
         :target="()=>$refs.btnNewRole"
         placement="bottom"
         class="form-popover"
-        ref="popover"
         :show.sync="showPopOver"
       >
         <b-card no-body style="width:320px">
@@ -93,10 +93,11 @@
   </super-select>
 </template>
 <script>
+import { /* mapState, */ mapGetters } from "vuex";
 import RoleForm from "@/views/pages/manage/company_role/Form";
-import { /*mapState,*/ mapGetters } from "vuex";
+
 export default {
-  name: "company-role-selector",
+  name: "CompanyRoleSelector",
   components: {
     "role-form": RoleForm
   },

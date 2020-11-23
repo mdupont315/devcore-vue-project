@@ -12,7 +12,7 @@
 <script>
 export default {
   async mounted() {
-    //await this.$store.dispatch("idea/findAll");
+    // await this.$store.dispatch("idea/findAll");
   },
   methods: {
     async onSelectionChange(section, item) {

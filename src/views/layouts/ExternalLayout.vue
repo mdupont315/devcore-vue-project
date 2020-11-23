@@ -7,7 +7,7 @@
 </template>
 <script>
 export default {
-  name: "external-layout",
+  name: "ExternalLayout",
   mounted() {
     this.$store.dispatch("app/showNavbar", false);
   }

@@ -3,7 +3,7 @@
 </template>
 <script>
 export default {
-  name: "select-all-textarea",
+  name: "SelectAllTextarea",
   methods: {
     focus(event) {
       this.$el.focus();

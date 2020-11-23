@@ -32,20 +32,20 @@
         <template v-slot:head(actions)>
           <div class="text-right" style="position:relative">
             <b-button
-              @click="togglePopOver"
               ref="btnNewProduct"
+              v-show="!currentItem && $can('core/companyTool/create')"
               variant="primary btn-action"
               size="xs"
               class="px-3"
               style="position:absolute;top:-14px;right:0"
-              v-show="!currentItem && $can('core/companyTool/create')"
+              @click="togglePopOver"
             >+ {{ $t('New') }}</b-button>
           </div>
           <b-popover
+            ref="popover"
             :target="()=>$refs.btnNewProduct"
             :show.sync="showPopOver"
             class="form-popover"
-            ref="popover"
             placement="bottom"
             boundary="viewport"
           >
@@ -53,9 +53,9 @@
               <b-card-body>
                 <price-form
                   v-if="newItem"
-                  :companyTool="toolModule"
-                  @done="formDone"
                   v-model="newItem"
+                  :company-tool="toolModule"
+                  @done="formDone"
                 ></price-form>
               </b-card-body>
             </b-card>
@@ -69,19 +69,19 @@
             :editing="isRowEditing(row)"
             :item="updateForm"
             property="name"
-            :staticValue="row.item.priceModel!='PROJECT'?row.item.name:row.item.parent.name"
+            :static-value="row.item.priceModel!='PROJECT'?row.item.name:row.item.parent.name"
           >
-            <template slot="editing" v-if="isRowEditing(row)">
+            <template v-if="isRowEditing(row)" slot="editing">
               <div v-if="updateForm.priceModel!='PROJECT'">
                 <b-form-input
                   id="name"
-                  :disabled="updateForm.busy"
                   v-model="updateForm.name"
+                  v-validate="'required|min:4'"
+                  :disabled="updateForm.busy"
                   :placeholder="$t('Price name')"
                   type="text"
                   name="name"
                   :state="$validateState('name', updateForm)"
-                  v-validate="'required|min:4'"
                 ></b-form-input>
                 <b-form-invalid-feedback>{{ $displayError('name', updateForm) }}</b-form-invalid-feedback>
               </div>
@@ -112,9 +112,9 @@
             :editing="isRowEditing(row)"
             :item="updateForm"
             property="priceModel"
-            :staticValue="$t('priceModel.'+row.item.priceModel)"
+            :static-value="$t('priceModel.'+row.item.priceModel)"
           >
-            <template slot="editing" v-if="isRowEditing(row)">
+            <template v-if="isRowEditing(row)" slot="editing">
               <b-select
                 v-model="updateForm.priceModel"
                 name="priceModel"
@@ -140,18 +140,18 @@
             :editing="isRowEditing(row)"
             :item="updateForm"
             property="yearlyCosts"
-            :staticValue="$currency(row.item.yearlyCosts/100)"
+            :static-value="$currency(row.item.yearlyCosts/100)"
           >
-            <template slot="editing" v-if="isRowEditing(row)">
+            <template v-if="isRowEditing(row)" slot="editing">
               <b-input
+                v-model.number="price"
+                v-validate="'required|numeric|min:0'"
                 name="price"
                 type="number"
                 size="sm"
-                v-model.number="price"
                 :disabled="updateForm.busy"
-                v-validate="'required|numeric|min:0'"
-                @change="changePrice"
                 :state="$validateState('price', updateForm)"
+                @change="changePrice"
               ></b-input>
               <b-form-invalid-feedback>{{ $displayError('price', updateForm) }}</b-form-invalid-feedback>
             </template>
@@ -165,19 +165,19 @@
             :editing="isRowEditing(row)"
             :item="updateForm"
             property="yearlyCosts"
-            :staticValue="formatDate(row.item.expiration)"
+            :static-value="formatDate(row.item.expiration)"
           >
-            <template slot="editing" v-if="isRowEditing(row)">
+            <template v-if="isRowEditing(row)" slot="editing">
               <b-input
+                v-if="updateForm.priceModel==='LICENSE'"
+                v-model="updateForm.expiration"
+                v-validate="'required'"
                 name="expiration"
                 type="date"
-                v-if="updateForm.priceModel==='LICENSE'"
                 size="sm"
-                v-model="updateForm.expiration"
                 :disabled="updateForm.busy"
-                v-validate="'required'"
-                @change="changePrice"
                 :state="$validateState('expiration', updateForm)"
+                @change="changePrice"
               ></b-input>
               <b-form-invalid-feedback>{{ $displayError('expiration', updateForm) }}</b-form-invalid-feedback>
             </template>
@@ -189,30 +189,30 @@
           <!-- when the row is editing -->
           <div v-if="isRowEditing(row)" class="text-right d-flex justify-content-end">
             <table-edit-tools-buttons
+              ref="editButtons"
               :item="row.item"
-              :showSaveButton="$can('core/companyTool/update', row.item)"
-              :disableSaveButton="vErrors.any()||updateForm.busy"
+              :show-save-button="$can('core/companyTool/update', row.item)"
+              :disable-save-button="vErrors.any()||updateForm.busy"
               :loading="updateForm.busy"
-              :showDeleteButton="$can('core/companyTool/delete', row.item)"
+              :show-delete-button="$can('core/companyTool/delete', row.item)"
+              store="companyToolPrice"
+              delete-confirm-boundary="viewport"
               @cancel="toggleItem(row.item)"
               @deleted="itemDeleted"
               @save="saveItem(updateForm)"
-              ref="editButtons"
-              store="companyToolPrice"
-              deleteConfirmBoundary="viewport"
             ></table-edit-tools-buttons>
           </div>
           <!-- when the row is not editing -->
-          <div class="d-flex justify-content-end" v-else>
+          <div v-else class="d-flex justify-content-end">
             <div class="float-right">
               <table-tools-buttons
                 :item="row.item"
-                @deleted="itemDeleted"
-                :showEditButton="$can('core/companyTool/update', row.item)"
-                :btnEditClass="'btn-white btn-sm border-0 text-primary'"
-                :btnDeleteClass="'btn-white btn-sm border-0 text-danger'"
-                :showDeleteButton="$can('core/companyTool/delete', row.item)"
+                :show-edit-button="$can('core/companyTool/update', row.item)"
+                :btn-edit-class="'btn-white btn-sm border-0 text-primary'"
+                :btn-delete-class="'btn-white btn-sm border-0 text-danger'"
+                :show-delete-button="$can('core/companyTool/delete', row.item)"
                 store="companyToolPrice"
+                @deleted="itemDeleted"
                 @editItem="toggleItem(row.item)"
               ></table-tools-buttons>
             </div>
@@ -223,20 +223,21 @@
   </div>
 </template>
 <script>
+import { mapGetters } from "vuex";
+import moment from "moment";
 import { CompanyToolPrice } from "@/models";
 import GQLForm from "@/lib/gqlform";
 import PriceForm from "./PriceForm";
-import { mapGetters } from "vuex";
-import moment from "moment";
+
 export default {
+  components: {
+    "price-form": PriceForm
+  },
   props: {
     toolModule: {
       type: Object,
       required: true
     }
-  },
-  components: {
-    "price-form": PriceForm
   },
   data: () => {
     return {
@@ -257,7 +258,7 @@ export default {
       projects: "project/all"
     }),
     fields: {
-      get: function() {
+      get() {
         return [
           { key: "name", label: this.$t("Name"), sortable: true },
           { key: "priceModel", label: this.$t("Price model"), sortable: true },
@@ -333,7 +334,7 @@ export default {
         this.currentItem = null;
         this.updateForm = null;
       } else {
-        this.currentItem = item ? item : null;
+        this.currentItem = item || null;
         this.updateForm = new GQLForm({
           id: item.id,
           companyToolId: this.toolModule.id,

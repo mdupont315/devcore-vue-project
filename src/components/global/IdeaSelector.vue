@@ -2,20 +2,20 @@
   <super-select
     :items="ideas"
     class="text-selector"
-    @input="change"
     selector-class="list"
+    v-model="dataValue"
     :v-bind="$props"
+    ref="selector"
     :placeholder="placeHolderText"
+    v-if="ready"
     :state="state"
     :outside-close="!showPopOver"
-    v-model="dataValue"
-    ref="selector"
-    v-if="ready"
     :show-input="showInput"
     :show-footer-selection="false"
-    :filterFn="filter"
+    @input="change"
+    :filter-fn="filter"
     :show-add-btn="showAddBtn"
-    :maxDisplayItems="1"
+    :max-display-items="1"
     @close="close"
   >
     <template slot="selection-count" slot-scope="props">{{
@@ -31,14 +31,14 @@
     </template>
     <template slot="header-display">
       <div
-        class="selected-item"
         v-if="selectedItems && selectedItems.length > 0"
+        class="selected-item"
       >
         <div
-          class="text-overflow"
           v-for="item in selectedItems.slice(0, maxDisplayItems)"
           :key="item.id"
           v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
+          class="text-overflow"
           :title="item.title"
         >
           {{ item.title }}
@@ -46,14 +46,14 @@
       </div>
     </template>
     <template slot="header-display-overflow">
-      <span class="overflow" v-if="selectedItems.length > maxDisplayItems">{{
+      <span v-if="selectedItems.length > maxDisplayItems" class="overflow">{{
         selectedItems && selectedItems.length > maxDisplayItems
           ? "+" + (selectedItems.length - maxDisplayItems)
           : null
       }}</span>
     </template>
     <template slot="display-details" slot-scope="props">
-      <ul class="list-unstyled" v-if="props.items">
+      <ul v-if="props.items" class="list-unstyled">
         <li v-for="item in selectedItems" :key="item.id" class="my-1 row">
           <span class="col-10 text-overflow"
             >{{ item.title }} {{ item.status }}</span
@@ -70,9 +70,10 @@
   </super-select>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
+
 export default {
-  name: "idea-selector",
+  name: "IdeaSelector",
 
   props: {
     placeHolderText: null,

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <process-selector max-level="process" show-count="items" section="process" :allowEdit="true" :onApply="onApply"></process-selector>
+    <process-selector max-level="process" show-count="items" section="process" :allow-edit="true" :on-apply="onApply"></process-selector>
   </div>
 </template>
 <script>

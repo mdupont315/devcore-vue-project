@@ -69,7 +69,7 @@ export default {
   },
   computed: {
     fields: {
-      get: function() {
+      get() {
         return [
           { key: "issue", label: this.$t("Issue"), sortable: false },
           {

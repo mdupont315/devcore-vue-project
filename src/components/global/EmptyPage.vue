@@ -15,6 +15,6 @@
 </template>
 <script>
 export default {
-  name: "empty-page"
+  name: "EmptyPage"
 };
 </script>

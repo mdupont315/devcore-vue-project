@@ -4,11 +4,11 @@
       <b-col cols="3" class="pr-0">
         <strong>{{ $t('Project') }}</strong>
         <v-select
+          v-model="currentProjectId"
+          v-validate="''"
           class="v-3 text-capitalize"
           label="name"
-          v-validate="''"
           :clearable="false"
-          v-model="currentProjectId"
           :placeholder="$t('Project')"
           :reduce="project => project.id"
           :options="projects"
@@ -37,8 +37,8 @@
       </b-col>
       <b-col cols="3">
         <report-chart
-          ref="report"
           v-if="this.currentProject"
+          ref="report"
           :project="this.currentProject"
           :user="item.user"
         />
@@ -48,6 +48,7 @@
 </template>
 <script>
 import UserReportChart from "./UserReportChart";
+
 export default {
   components: {
     "report-chart": UserReportChart
@@ -71,7 +72,7 @@ export default {
   },
   computed: {
     fields: {
-      get: function() {
+      get() {
         return [
           { key: "stage", label: this.$t("Stage"), sortable: false },
           {
@@ -119,8 +120,8 @@ export default {
         p => p.projectId == projectId
       );
       this.$nextTick(() => {
-        if (this.$refs["report"]) {
-          this.$refs["report"].drawReport();
+        if (this.$refs.report) {
+          this.$refs.report.drawReport();
         }
       });
     },

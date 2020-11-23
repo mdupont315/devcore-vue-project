@@ -1,9 +1,9 @@
 <template>
   <div class="page animated fadeIn">
     <div
+      v-if="currentItem || currentRowDetails || resetingPassword"
       class="overlay"
       :class="{'top-all':this.showInnerOverlayOnTop || resetingPassword}"
-      v-if="currentItem || currentRowDetails || resetingPassword"
       @click="overlayClick"
     ></div>
     <div class="container-fluid">
@@ -51,14 +51,14 @@
                 />
                 {{ row.item.firstName }} {{row.item.lastName}}
               </span>
-              <template slot="editing" v-if="isRowEditing(row)">
+              <template v-if="isRowEditing(row)" slot="editing">
                 <div class="d-flex">
                   <div class="flex-grow-1 mr-1" style="position:relative">
                     <b-input
-                      name="firstName"
-                      size="sm"
                       v-model="updateForm.firstName"
                       v-validate="'required|min:4'"
+                      name="firstName"
+                      size="sm"
                       :state="$validateState('firstName', updateForm)"
                       :disabled="updateForm.busy"
                     ></b-input>
@@ -66,28 +66,28 @@
                   </div>
                   <div class="flex-grow-1" style="position:relative">
                     <b-input
-                      name="lastName"
-                      size="sm"
                       v-model="updateForm.lastName"
                       v-validate="'required|min:4'"
+                      name="lastName"
+                      size="sm"
                       :state="$validateState('lastName', updateForm)"
                       :disabled="updateForm.busy"
                     ></b-input>
                     <b-form-invalid-feedback>{{ $displayError('lastName', updateForm) }}</b-form-invalid-feedback>
                   </div>
                 </div>
-                <div class="edit-tools-buttons" v-if="$can('auth/user/reset_password', row.item)">
+                <div v-if="$can('auth/user/reset_password', row.item)" class="edit-tools-buttons">
                   <confirm-button
                     size="sm"
                     variant="link"
-                    btnClass="text-undecorated text-white"
+                    btn-class="text-undecorated text-white"
                     style="margin-left:-10px;margin-top:10px"
-                    :showOverlay="false"
+                    :show-overlay="false"
+                    confirm-class="btn-primary"
+                    :confirm-title=" $t('Reset') + ' ' + row.item.firstName + ' ' +$t('password') +'?'"
+                    :confirm-message="$t('We will send a new password to') + ' ' + row.item.email"
+                    :confirm-text="$t('Reset password')"
                     @confirm="resetPassword(row.item)"
-                    confirmClass="btn-primary"
-                    :confirmTitle=" $t('Reset') + ' ' + row.item.firstName + ' ' +$t('password') +'?'"
-                    :confirmMessage="$t('We will send a new password to') + ' ' + row.item.email"
-                    :confirmText="$t('Reset password')"
                   >{{ $t('Reset password') }}</confirm-button>
                 </div>
               </template>
@@ -101,15 +101,15 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="email"
-              :staticValue="row.item.email"
+              :static-value="row.item.email"
             >
-              <template slot="editing" v-if="isRowEditing(row)">
+              <template v-if="isRowEditing(row)" slot="editing">
                 <b-input
+                  v-model="updateForm.email"
+                  v-validate="'required|email'"
                   name="email"
                   type="email"
                   size="sm"
-                  v-model="updateForm.email"
-                  v-validate="'required|email'"
                   :state="$validateState('email', updateForm)"
                   :disabled="updateForm.busy"
                 ></b-input>
@@ -125,9 +125,9 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="roleId"
-              :staticValue="row.item.role?row.item.role.name:$t('N/A')"
+              :static-value="row.item.role?row.item.role.name:$t('N/A')"
             >
-              <template slot="editing" v-if="isRowEditing(row)">
+              <template v-if="isRowEditing(row)" slot="editing">
                 <b-select
                   v-model="updateForm.roleId"
                   name="roleId"
@@ -149,9 +149,9 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="companyRoleId"
-              :staticValue="row.item.companyRole?row.item.companyRole.name:$t('N/A')"
+              :static-value="row.item.companyRole?row.item.companyRole.name:$t('N/A')"
             >
-              <template slot="editing" v-if="isRowEditing(row)">
+              <template v-if="isRowEditing(row)" slot="editing">
                 <b-select
                   v-model="updateForm.companyRoleId"
                   name="companyRoleId"
@@ -177,15 +177,15 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="yearlyCosts"
-              :staticValue="$currency(row.item.yearlyCosts / 100)"
+              :static-value="$currency(row.item.yearlyCosts / 100)"
             >
-              <template slot="editing" v-if="isRowEditing(row)">
+              <template v-if="isRowEditing(row)" slot="editing">
                 <b-input
+                  v-model.number="updateForm.yearlyCosts"
+                  v-validate="'required|min:0'"
                   name="yearlyCosts"
                   type="number"
                   size="sm"
-                  v-model.number="updateForm.yearlyCosts"
-                  v-validate="'required|min:0'"
                   :state="$validateState('yearlyCosts', updateForm)"
                   :disabled="updateForm.busy"
                 ></b-input>
@@ -200,22 +200,22 @@
             <div v-if="isRowEditing(row)" class="text-right">
               <table-edit-tools-buttons
                 :item="row.item"
-                :showSaveButton="$can('auth/user/update', row.item)"
-                :disableSaveButton="vErrors.any()||updateForm.busy"
-                :showDeleteButton="$can('auth/user/delete', row.item)"
+                :show-save-button="$can('auth/user/update', row.item)"
+                :disable-save-button="vErrors.any()||updateForm.busy"
+                :show-delete-button="$can('auth/user/delete', row.item)"
                 :loading="updateForm.busy"
+                store="user"
                 @cancel="toggleItem(row.item)"
                 @delete="toggleItem(null)"
                 @save="saveItem(updateForm)"
-                store="user"
               ></table-edit-tools-buttons>
             </div>
             <!-- when the row is not editing -->
             <table-tools-buttons
               v-else
               :item="row.item"
-              :showEditButton="$can('auth/user/update', row.item)"
-              :showDeleteButton="$can('auth/user/delete', row.item)"
+              :show-edit-button="$can('auth/user/update', row.item)"
+              :show-delete-button="$can('auth/user/delete', row.item)"
               store="user"
               @editItem="toggleItem(row.item)"
             ></table-tools-buttons>
@@ -226,8 +226,9 @@
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
+
 export default {
   components: {},
   data: () => {
@@ -249,7 +250,7 @@ export default {
       roles: "role/all"
     }),
     fields: {
-      get: function() {
+      get() {
         return [
           { key: "fullName", label: this.$t("Name"), sortable: true },
           { key: "email", label: this.$t("Email"), sortable: true },

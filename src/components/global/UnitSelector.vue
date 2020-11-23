@@ -4,14 +4,14 @@
       v-for="unit in units"
       :key="getValue(unit)"
       class="unit"
-      @click="($event)=>changeValue(unit)"
       :class="getClass(unit)"
+      @click="($event)=>changeValue(unit)"
     >{{ $t(getLabel(unit)) }}</div>
   </div>
 </template>
 <script>
 export default {
-  name: "unit-selector",
+  name: "UnitSelector",
   props: {
     value: {
       required: true
@@ -44,7 +44,7 @@ export default {
     getClass(unit) {
       return {
         ...unit.cssClass,
-        ["active"]: this.getValue(unit) === this.dataValue
+        active: this.getValue(unit) === this.dataValue
       };
     },
     getLabel(unit) {

@@ -1,6 +1,6 @@
 import VeeValidate from 'vee-validate'
 import Vue from 'vue'
-import validationMessages from 'vee-validate/dist/locale/en';
+//import validationMessages from 'vee-validate/dist/locale/en';
 import i18n from '../i18n';
 
 export const maxArrayCountRule = {
@@ -50,7 +50,7 @@ function getErrorMessage(vue, ref, form = null) {
     return form && form.getError(ref) ? form.getError(ref).message : null;
 }
 
-//function for check the field states
+// function for check the field states
 Vue.use({
     install(Vue) {
 

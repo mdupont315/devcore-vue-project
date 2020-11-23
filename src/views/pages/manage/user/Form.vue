@@ -1,17 +1,17 @@
 <template>
-  <b-form @submit.prevent="save" @keyup="$validator.validateAll()" class="hide-labels">
+  <b-form class="hide-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
     <b-row>
       <b-col class="col-12">
         <div class="form-label-group required">
           <b-form-input
             id="firstName"
-            :disabled="form.busy"
             v-model="form.firstName"
+            v-validate="'required|min:4'"
+            :disabled="form.busy"
             :placeholder="$t('First name')"
             type="text"
             name="firstName"
             :state="$validateState('firstName', form)"
-            v-validate="'required|min:4'"
             autofocus
           ></b-form-input>
           <label for="firstName">{{ $t('First name') }}</label>
@@ -22,13 +22,13 @@
         <div class="form-label-group required">
           <b-form-input
             id="lastName"
-            :disabled="form.busy"
             v-model="form.lastName"
+            v-validate="'required|min:4'"
+            :disabled="form.busy"
             :placeholder="$t('Last name')"
             type="text"
             name="lastName"
             :state="$validateState('lastName', form)"
-            v-validate="'required|min:4'"
           ></b-form-input>
           <label for="lastName">{{ $t('Last name') }}</label>
           <b-form-invalid-feedback>{{ $displayError('lastName', form) }}</b-form-invalid-feedback>
@@ -38,13 +38,13 @@
         <div class="form-label-group required">
           <b-form-input
             id="email"
-            :disabled="form.busy"
             v-model="form.email"
+            v-validate="'required|email'"
+            :disabled="form.busy"
             :placeholder="$t('Email')"
             type="email"
             name="email"
             :state="$validateState('email', form)"
-            v-validate="'required|email'"
           ></b-form-input>
           <label for="email">{{ $t('Email') }}</label>
           <b-form-invalid-feedback>{{ $displayError('email', form) }}</b-form-invalid-feedback>
@@ -55,15 +55,15 @@
         <div class="form-label-group required">
           <b-form-input
             id="yearlyCosts"
+            v-model.number="form.yearlyCosts"
+            v-validate="'required|numeric|min:0'"
             step="1"
             min="0"
             :disabled="form.busy"
-            v-model.number="form.yearlyCosts"
             :placeholder="$t('Yearly Costs')"
             type="number"
             name="yearlyCosts"
             :state="$validateState('yearlyCosts', form)"
-            v-validate="'required|numeric|min:0'"
           ></b-form-input>
           <label
             for="yearlyCosts"
@@ -75,10 +75,10 @@
       <b-col class="col-12">
         <div class="form-label-group select required">
           <v-select
-            label="name"
-            v-validate="'required'"
-            data-vv-name="companyRole"
             v-model="form.companyRoleId"
+            v-validate="'required'"
+            label="name"
+            data-vv-name="companyRole"
             :placeholder="$t('Role')"
             :reduce="role => role.id"
             :options="companyRoles"
@@ -92,10 +92,10 @@
       <b-col class="col-12">
         <div class="form-label-group select required">
           <v-select
-            label="name"
-            v-validate="'required'"
-            data-vv-name="role"
             v-model="form.roleId"
+            v-validate="'required'"
+            label="name"
+            data-vv-name="role"
             :placeholder="$t('Permissions')"
             :reduce="role => role.id"
             :options="roles"
@@ -140,9 +140,9 @@
           <b-button
             variant="link"
             type="button"
-            @click.prevent="resetPassword"
             class="text-danger"
             block
+            @click.prevent="resetPassword"
           >{{ $t('Reset password') }}</b-button>
         </div>
       </b-col>
@@ -150,8 +150,8 @@
   </b-form>
 </template>
 <script>
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
-import { /*mapState,*/ mapGetters } from "vuex";
 import { User } from "@/models";
 
 export default {
@@ -199,8 +199,8 @@ export default {
       Object.keys(this.input)
         .filter(key => key in this.form)
         .forEach(key => (this.form[key] = this.input[key]));
-      this.form["roleId"] = this.input.role ? this.input.role.id : null;
-      this.form["companyRoleId"] = this.input.companyRole
+      this.form.roleId = this.input.role ? this.input.role.id : null;
+      this.form.companyRoleId = this.input.companyRole
         ? this.input.companyRole.id
         : null;
     },

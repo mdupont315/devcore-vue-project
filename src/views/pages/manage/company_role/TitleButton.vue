@@ -1,23 +1,23 @@
 <template>
-  <div class="ml-3" v-if="$can('core/companyRole/create')">
+  <div v-if="$can('core/companyRole/create')" class="ml-3">
     <b-button
+      id="btnNew"
+      v-b-tooltip.hover
       size="sm"
       class="text-uppercase"
       variant="primary"
       :title="$t('Create New') + ' ' + $t('Role')"
-      v-b-tooltip.hover
-      id="btnNew"
       @click="togglePopOver"
     >
       <i class="mdi mdi-plus"></i>
       {{ $t('New')}}
     </b-button>
     <b-popover
+      ref="popover"
       target="btnNew"
       :show.sync="showPopOver"
       placement="bottom"
       class="form-popover"
-      ref="popover"
     >
       <b-card no-body style="width:300px">
         <b-card-body>
@@ -30,18 +30,19 @@
 <script>
 import ClickOutside from "vue-click-outside";
 import Form from "./Form";
+
 export default {
-  data: () => {
-    return {
-      option: false,
-      showPopOver: false
-    };
-  },
   directives: {
     ClickOutside
   },
   components: {
     "area-form": Form
+  },
+  data: () => {
+    return {
+      option: false,
+      showPopOver: false
+    };
   },
   methods: {
     togglePopOver() {

@@ -29,7 +29,6 @@ const initialState = () => {
         sectionsLoaded: {},
     }
 };
-
 function loadCurrent(state, section) {
     const current = {
         process: null,
@@ -41,8 +40,9 @@ function loadCurrent(state, section) {
         return current;
     }
     state.storage[section] = state.storage[section] || {};
-    //state.current[section] = state.current[section] || {};
-    //console.log(state.storage[section])
+
+    // state.current[section] = state.current[section] || {};
+    // console.log(state.storage[section])
 
     if (state.storage[section].processId) {
         current.process = state.all.find(p => p.id === state.storage[section].processId);
@@ -56,7 +56,7 @@ function loadCurrent(state, section) {
             current.stage = current.process.stages.find(i => i.id === state.storage[section].stageId);
         }
         if (!current.stage) {
-            //current.stage = current.process.stages[0];
+            // current.stage = current.process.stages[0];
         }
 
         if (state.storage[section].operationId) {
@@ -64,7 +64,7 @@ function loadCurrent(state, section) {
         }
 
         if (!current.operation) {
-            //current.operation = current.stage ? current.stage.operations[0] : null;
+            // current.operation = current.stage ? current.stage.operations[0] : null;
         }
 
         if (state.storage[section].phaseId) {
@@ -72,7 +72,7 @@ function loadCurrent(state, section) {
         }
 
         if (!current.phase) {
-            //current.phase = current.operation ? current.operation.phases[0] : null;
+            // current.phase = current.operation ? current.operation.phases[0] : null;
         }
     } else {
         current.stage = null;
@@ -96,10 +96,9 @@ const getters = {
             return loadCurrent(state, section);
         }
     },
-    filteredItems: state => state.filter && state.filter.length > 3 ? state.all.filter(i => 
-        {
+    filteredItems: state => state.filter && state.filter.length > 3 ? state.all.filter(i => {
             return i.title.toLowerCase().includes(state.filter.toLowerCase())
-        }   
+        }
             ) : state.all,
 }
 
@@ -303,12 +302,12 @@ const mutations = {
     SET_FILTER(state, value) {
         state.filter = value;
     },
-  
+
     CHECK_CURRENT_PROCESS(state) {
         const current = loadCurrent(state, state.currentSection);
         const currentStorage = state.storage[state.currentSection] || {};
 
-        //state.current[section] = current;
+        // state.current[section] = current;
 
         AppStorage.set('CURRENT_PROCESS', Object.assign(AppStorage.get('CURRENT_PROCESS', {}), {
             [state.currentSection]: {
@@ -341,8 +340,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

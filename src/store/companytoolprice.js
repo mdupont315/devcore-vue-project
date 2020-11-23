@@ -99,8 +99,7 @@ const mutations = {
     SET_ITEM(state, value) {
         const index = state.all.findIndex(el => el.id === value.id);
         if (index > -1) {
-            const copy = { ...state.all[index]
-            };
+            const copy = { ...state.all[index] };
             value._showDetails = copy._showDetails;
             state.all[index] = value;
             state.all = [...state.all];
@@ -113,8 +112,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

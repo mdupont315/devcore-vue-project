@@ -37,8 +37,11 @@ export class PeopleReportItemModel extends BaseModel {
 
 export default class PeopleReportModel extends BaseModel {
     avatar = null;
+
     avatarUrl = null;
+
     value = 0;
+
     projects = [];
 
     get activeProject() {

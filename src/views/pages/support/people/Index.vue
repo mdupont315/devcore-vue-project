@@ -4,19 +4,19 @@
       <div class="search-bar">
         <b-input-group style="margin-top:5px" class="search">
           <b-form-input
-            class="search"
             v-model="currentFilter"
-            @input="filterResults"
+            class="search"
             :placeholder="$t('Search users') + ` (${items.length})`"
+            @input="filterResults"
           ></b-form-input>
         </b-input-group>
       </div>
     </portal>
 
     <div
+      v-if="currentItem || currentRowDetails"
       class="overlay"
       :class="{'top-all':this.showInnerOverlayOnTop}"
-      v-if="currentItem || currentRowDetails"
       @click="overlayClick"
     ></div>
 
@@ -85,11 +85,11 @@
           <template v-slot:cell(actions)="row" class="actions">
             <div class="buttons">
               <b-button
-                @click="showDetails(row)"
                 size="xs"
                 variant="action"
                 class="btn-primary btn-expand btn-block text-uppercase m-0"
                 style="font-size:1.2rem;padding:3px"
+                @click="showDetails(row)"
               >{{ $t('Details') }}</b-button>
             </div>
           </template>
@@ -106,9 +106,10 @@
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
 import Details from "./Details";
+
 export default {
   components: {
     "item-details": Details
@@ -136,7 +137,7 @@ export default {
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top"
     }),
     filteredItems: {
-      get: function() {
+      get() {
         if (this.currentFilter !== "") {
           return this.items.filter(i => {
             return i.user.fullName.toLowerCase().includes(this.currentFilter.toLowerCase());
@@ -146,7 +147,7 @@ export default {
       }
     },
     fields: {
-      get: function() {
+      get() {
         return [
           { key: "fullName", label: this.$t("User"), sortable: true },
           { key: "companyRole", label: this.$t("Role"), sortable: true },

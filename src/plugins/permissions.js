@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import store from '../store';
 
-//function for check the users permissions
+// function for check the users permissions
 Vue.use({
     install(Vue) {
 

@@ -45,13 +45,13 @@ const actions = {
         form.type = form.type || 'TOOL';
         const result = await form.mutate({
             mutation: IDEA.create,
-            /*update(cache, result) {
+            /* update(cache, result) {
                 const { ideaFindAll } = cache.readQuery({ query: IDEA.findAll });
                 cache.writeQuery({
                     query: IDEA.findAll,
                     data: { ideaFindAll: ideaFindAll.concat([result.data.ideaCreate]) },
                 });
-            }*/
+            } */
         });
         const role = new Idea().deserialize(result.data.ideaCreate);
         await context.dispatch('findAll', {
@@ -162,10 +162,10 @@ const actions = {
         filter = null,
         force = false
     } = {}) {
-        if (context.getters['all'].length === 0 || force) {
+        if (context.getters.all.length === 0 || force) {
             filter = filter || {
                 data: {
-                    //orderBy: ["name"],
+                    // orderBy: ["name"],
                     where: {
                         and: [{
                             field: "type",
@@ -176,12 +176,12 @@ const actions = {
                 }
 
             };
-            filter.busy = context.getters['all'].length < 1;
+            filter.busy = context.getters.all.length < 1;
             try {
-                /*const { data } = await apolloClient.watchquery({
+                /* const { data } = await apolloClient.watchquery({
                     query: IDEA.findAll,
                     variables: { filter: filter }
-                });*/
+                }); */
                 const query = apolloClient.watchQuery({
                     query: IDEA.findAll,
                     variables: {
@@ -200,7 +200,7 @@ const actions = {
                 filter.busy = false;
             }
         }
-        return context.getters['all'];
+        return context.getters.all;
     },
 
     async filter(context, filter) {
@@ -235,8 +235,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

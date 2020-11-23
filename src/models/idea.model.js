@@ -33,6 +33,7 @@ export default class IdeaModel extends BaseModel {
     get operationId() {
         return this.parentStructure.operationId;
     }
+
     set operationId(value) {
         this.parentStructure.operationId = value;
     }
@@ -68,6 +69,7 @@ export default class IdeaModel extends BaseModel {
     get improvementsCount() {
         return this.stats && this.stats.improvements ? this.stats.improvements.total : 0;
     }
+
     get problemsCount() {
         return this.stats && this.stats.problems ? this.stats.problems.total : 0;
     }

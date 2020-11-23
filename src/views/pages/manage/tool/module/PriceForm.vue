@@ -1,14 +1,14 @@
 <template>
-  <b-form @submit.prevent="save" @keyup="$validator.validateAll()" class="hide-labels">
+  <b-form class="hide-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
     <b-row>
       <b-col class="col-12">
         <div class="form-label-group select required">
           <v-select
-            label="name"
-            v-validate="'required'"
-            data-vv-name="priceModel"
-            v-autofocus
             v-model="form.priceModel"
+            v-validate="'required'"
+            v-autofocus
+            label="name"
+            data-vv-name="priceModel"
             :placeholder="$t('Price model')"
             :reduce="priceModel => priceModel.id"
             :options="priceModels"
@@ -21,29 +21,29 @@
           <b-form-invalid-feedback>{{ $displayError('priceModel', form) }}</b-form-invalid-feedback>
         </div>
       </b-col>
-      <b-col class="col-12" v-if="form.priceModel!=='PROJECT'">
+      <b-col v-if="form.priceModel!=='PROJECT'" class="col-12">
         <div class="form-label-group required">
           <b-form-input
             id="name"
-            :disabled="form.busy"
             v-model="form.name"
+            v-validate="'required|min:4'"
+            :disabled="form.busy"
             :placeholder="$t('Price name')"
             type="text"
             name="name"
             :state="$validateState('name', form)"
-            v-validate="'required|min:4'"
           ></b-form-input>
           <label for="name">{{ $t('Name') }}</label>
           <b-form-invalid-feedback>{{ $displayError('name', form) }}</b-form-invalid-feedback>
         </div>
       </b-col>
-      <b-col class="col-12" v-if="form.priceModel==='PROJECT'">
+      <b-col v-if="form.priceModel==='PROJECT'" class="col-12">
         <div class="form-label-group select required">
           <v-select
-            label="name"
-            v-validate="'required'"
-            data-vv-name="project"
             v-model="form.parentId"
+            v-validate="'required'"
+            label="name"
+            data-vv-name="project"
             :placeholder="$t('Project')"
             :reduce="project => project.id"
             :options="projects"
@@ -56,12 +56,13 @@
           <b-form-invalid-feedback>{{ $displayError('project', form) }}</b-form-invalid-feedback>
         </div>
       </b-col>
-      <b-col class="col-12" v-if="form.priceModel==='LICENSE'">
+      <b-col v-if="form.priceModel==='LICENSE'" class="col-12">
         <div class="form-label-group required">
           <b-form-datepicker
             id="expiration"
-            name="expiration"
             v-model="form.expiration"
+            v-validate="'required'"
+            name="expiration"
             :disabled="form.busy"
             menu-class="w-100"
             :date-format-options="{
@@ -69,9 +70,8 @@
             }"
             reset-button
             :placeholder="$t('Expiration')"
-            @input="dateChanged"
-            v-validate="'required'"
             calendar-width="100%"
+            @input="dateChanged"
           ></b-form-datepicker>
           <label
             for="expiration"
@@ -83,16 +83,16 @@
         <div class="form-label-group required">
           <b-form-input
             id="price"
+            v-model.number="price"
             step="1"
             min="0"
+            v-validate="'required|numeric|min:0'"
             :disabled="form.busy"
-            v-model.number="price"
-            @change="changePrice"
             :placeholder="$t('Yearly Costs')"
             type="number"
             name="price"
             :state="$validateState('price', form)"
-            v-validate="'required|numeric|min:0'"
+            @change="changePrice"
           ></b-form-input>
           <label
             for="price"
@@ -115,7 +115,7 @@
         >{{ $t('Save changes')}}</loading-button>
         <div v-if="mode==='edit' && $can('tool/toolModule/delete', input)" class="mt-3 text-center">
           <hr />
-          <b-button variant="outline-danger" type="button" @click.prevent="deleteItem" block>
+          <b-button variant="outline-danger" type="button" block @click.prevent="deleteItem">
             <i class="mdi mdi-trash-can"></i>
             {{ $t('Delete') }}
           </b-button>
@@ -125,8 +125,8 @@
   </b-form>
 </template>
 <script>
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
-import { /*mapState,*/ mapGetters } from "vuex";
 
 export default {
   props: {
@@ -148,7 +148,7 @@ export default {
     input: null,
     price: null,
     form: new GQLForm({
-      //id: null,
+      // id: null,
       name: null,
       companyToolId: null,
       parentType: "PROJECT",

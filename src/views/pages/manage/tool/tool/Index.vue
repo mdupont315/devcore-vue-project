@@ -1,9 +1,9 @@
 <template>
   <div class="page animated fadeIn">
     <div
+      v-if="currentItem || currentRowDetails"
       class="overlay"
       :class="{'top-all':this.showInnerOverlayOnTop}"
-      v-if="currentItem || currentRowDetails"
       @click="overlayClick"
     ></div>
     <div class="container-fluid">
@@ -44,17 +44,17 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="name"
-              :staticValue="row.item.name"
+              :static-value="row.item.name"
             >
-              <template slot="editing" v-if="isRowEditing(row)">
+              <template v-if="isRowEditing(row)" slot="editing">
                 <suggestions
+                  v-model="updateForm.name"
                   class="sm"
                   name="tool"
-                  v-model="updateForm.name"
                   :options="{debounce:250, inputClass:'form-control form-control-sm', autofocus:true}"
                   :state="$validateState('tool', updateForm)"
-                  :onInputChange="onToolInputChange"
-                  :onItemSelected="onToolSelected"
+                  :on-input-change="onToolInputChange"
+                  :on-item-selected="onToolSelected"
                 >
                   <div slot="item" slot-scope="props" class="single-item">
                     <span class="name">{{props.item.name}}</span>
@@ -74,9 +74,9 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="yearlyCosts"
-              :staticValue="$currency(calculateModulesTotal(row.item))"
+              :static-value="$currency(calculateModulesTotal(row.item))"
             >
-              <template slot="editing" v-if="isRowEditing(row)">
+              <template v-if="isRowEditing(row)" slot="editing">
                 {{$currency(calculateModulesTotal(row.item))}}
                 <b-form-invalid-feedback>{{ $displayError('yearlyCosts', updateForm) }}</b-form-invalid-feedback>
               </template>
@@ -88,35 +88,35 @@
             <div v-if="isRowEditing(row)" class="text-right">
               <table-edit-tools-buttons
                 :item="row.item"
-                :showSaveButton="$can('core/companyTool/update', row.item)"
-                :disableSaveButton="vErrors.any()||updateForm.busy"
+                :show-save-button="$can('core/companyTool/update', row.item)"
+                :disable-save-button="vErrors.any()||updateForm.busy"
                 :loading="updateForm.busy"
-                :showDeleteButton="$can('core/companyTool/delete', row.item)"
+                :show-delete-button="$can('core/companyTool/delete', row.item)"
+                store="companyTool"
                 @cancel="toggleItem(row.item)"
                 @delete="toggleItem(null)"
                 @save="saveItem(updateForm)"
-                store="companyTool"
               ></table-edit-tools-buttons>
             </div>
-            <div class="d-flex" v-else>
+            <div v-else class="d-flex">
               <table-tools-buttons
                 style="max-width:100px"
                 class="flex-grow-1 mr-2"
                 store="companyTool"
                 :item="row.item"
+                :show-delete-button="false"
+                :show-edit-button="$can('core/companyTool/update', row.item) && (!currentRowDetails || currentRowDetails.item.id!=row.item.id)"
                 @editItem="toggleItem"
-                :showDeleteButton="false"
-                :showEditButton="$can('core/companyTool/update', row.item) && (!currentRowDetails || currentRowDetails.item.id!=row.item.id)"
               ></table-tools-buttons>
               <div class="flex-grow-1">
                 <b-button
-                  @click="showDetails(row)"
                   size="xs"
+                  v-if="$can('core/companyTool/manage')"
                   variant="action"
                   style="font-size: 1.2rem;padding: 3px;"
                   class="btn-primary btn-expand btn-block text-uppercase"
                   :class="{'expanded':currentRowDetails &&currentRowDetails.item.id === row.item.id}"
-                  v-if="$can('core/companyTool/manage')"
+                  @click="showDetails(row)"
                 >{{ (currentRowDetails && currentRowDetails.item.id === row.item.id? $t('Close') : $t('Details')) }}</b-button>
               </div>
             </div>
@@ -127,12 +127,12 @@
             <div class="row-details">
               <modules-table
                 ref="modulesTable"
+                :category-id="row.item.id"
+                :items="row.item.modules"
+                :company-tool="row.item"
+                :busy="loadingItem"
                 @itemChanged="itemChanged(row.item)"
                 @priceChanged="itemChanged(row.item)"
-                :categoryId="row.item.id"
-                :items="row.item.modules"
-                :companyTool="row.item"
-                :busy="loadingItem"
               ></modules-table>
             </div>
           </template>
@@ -142,14 +142,14 @@
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
-//import Form from "./Form";
+import { /* mapState, */ mapGetters } from "vuex";
+// import Form from "./Form";
 import ModulesTable from "../module/Table";
 import GQLForm from "@/lib/gqlform";
 
 export default {
   components: {
-    //"tool-form": Form,
+    // "tool-form": Form,
     "modules-table": ModulesTable
   },
   data: () => {
@@ -173,7 +173,7 @@ export default {
       priceModels: "priceModel/all"
     }),
     fields: {
-      get: function() {
+      get() {
         return [
           { key: "name", label: this.$t("Name"), sortable: true },
           // { key: "priceModel", label: this.$t("Price model"), sortable: true },
@@ -188,13 +188,13 @@ export default {
     }
   },
   async mounted() {
-    //this.$store.dispatch("priceModel/findAll");
+    // this.$store.dispatch("priceModel/findAll");
     this.$store.dispatch("companyTool/findAll", {
       filter: this.filter,
       force: true
     });
     console.log(this.items);
-    //this.$store.dispatch("toolArea/findAll");
+    // this.$store.dispatch("toolArea/findAll");
   },
   methods: {
     isRowEditing(row) {
@@ -327,9 +327,9 @@ export default {
       return response;
     },
     async itemChanged() {
-      //const copy = { ...this.currentRowDetails };
-      //this.showDetails(null);
-      //this.showDetails(copy);
+      // const copy = { ...this.currentRowDetails };
+      // this.showDetails(null);
+      // this.showDetails(copy);
       // this.currentRowDetails.toggleDetails();
       // this.currentRowDetails.item._showDetails=true;
       this.loadItem(this.currentRowDetails.item);

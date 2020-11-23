@@ -19,9 +19,9 @@
             <h2 class="h4 m-0 text-capitalize text-center text-overflow text-bold">{{ item.title }}</h2>
             <div class="tools">
               <span
+                v-if="$can('process/stage/update', item)"
                 class="btn-action"
                 @click="toggleEdit"
-                v-if="$can('process/stage/update', item)"
               >
                 <i class="mdi mdi-pencil"></i>
               </span>
@@ -45,8 +45,8 @@
                 <div
                   v-for="role in item.companyRoles"
                   :key="role.id"
-                  class="avatar-item"
                   v-b-tooltip="{  placement: 'top', boundary:'viewport' }"
+                  class="avatar-item"
                   :title="role.name"
                 >
                   <img :src="role.getAvatarUrl('50x50')" height="20" />
@@ -59,16 +59,16 @@
         </b-card-header>
         <b-card-body>
           <draggable
-            class="sortable-wrapper"
             v-model="operations"
+            class="sortable-wrapper"
             group="operations"
-            @change="onOperationDrag"
             v-bind="{disabled:orderBusy||editingCard, draggable:'.enable-drag', animation:200, filter:'.busy'}"
+            @change="onOperationDrag"
           >
             <operation-card
-              class="operation item"
               v-for="operation in operations"
               :key="operation.id"
+              class="operation item"
               :item="operation"
               :stage="item"
               @editing="editingOperation"
@@ -92,9 +92,9 @@
       </div>
       <div v-else>create new stage</div>
     </b-card>
-    <div class="form" v-if="editForm">
-      <layer :key="intent" @closed="cancelEdit" style="width:100%">
-        <div class="overlay transparent" @click="closeRolesPopover" v-if="showRolesPopover" />
+    <div v-if="editForm" class="form">
+      <layer :key="intent" style="width:100%" @closed="cancelEdit">
+        <div v-if="showRolesPopover" class="overlay transparent" @click="closeRolesPopover" />
         <b-form @submit.prevent="saveItem">
           <div>
             <b-row>
@@ -103,15 +103,15 @@
                   <div ref="editRolesPlaceholder" style="height:1px;position:absolute;width:100%"></div>
                   <div class="form-group my-0">
                     <b-textarea
+                      :key="intent"
                       v-model="editForm.title"
-                      class="no-style my-0"
-                      style="min-height:70px; overflow:hidden"
                       v-autofocus="true"
                       v-autoresize
-                      :state="$validateState('title', editForm)"
                       v-validate="'required|min:4'"
+                      class="no-style my-0"
+                      style="min-height:70px; overflow:hidden"
+                      :state="$validateState('title', editForm)"
                       name="title"
-                      :key="intent"
                     ></b-textarea>
                     <b-form-invalid-feedback>{{ $displayError('title', editForm) }}</b-form-invalid-feedback>
                   </div>
@@ -129,28 +129,28 @@
             </b-row>
           </div>
           <b-popover
+            :key="intent"
             placement="right"
             :show="true"
             :target="()=>$refs.editRolesPlaceholder"
             custom-class="no-arrow transparent"
-            :key="intent"
           >
             <b-card class="bg-light shadow-sm" no-body style="width:210px;margin-top:15px">
               <b-card-body>
                 <ul
-                  class="list-inline break mb-0"
                   v-if="editForm.companyRoles && editForm.companyRoles.length>0"
+                  class="list-inline break mb-0"
                 >
                   <li
-                    class="list-inline-item my-1 mx-1"
                     v-for="role in selectedRoles"
                     :key="role.id"
+                    class="list-inline-item my-1 mx-1"
                   >
                     <img
+                      v-b-tooltip.hover
                       :src="role.getAvatarUrl('50x50')"
                       class="rounded rounded-circle border"
                       height="30"
-                      v-b-tooltip.hover
                       :title="role.name"
                     />
                   </li>
@@ -159,11 +159,11 @@
               </b-card-body>
               <b-card-footer class="mx-2">
                 <b-button
+                  ref="btnAssignRoles"
                   block
                   variant="white"
                   class="text-primary"
                   size="md"
-                  ref="btnAssignRoles"
                   @click="toggleRolesPopover"
                 >+ {{$t('Assign roles')}}</b-button>
                 <b-popover
@@ -174,28 +174,28 @@
                 >
                   <div style="width:210px; overflow:hidden;" class="rounded">
                     <company-role-selector
-                      v-model="editForm.companyRoles"
                       :key="intent"
+                      v-model="editForm.companyRoles"
                       selector-class="rounded"
                       :show-input="false"
                       :show-footer-selection="false"
-                      :showFooterDisplay="false"
-                      @close="toggleRolesPopover"
+                      :show-footer-display="false"
                       :show-add-btn="$can('core/companyRole/create')"
+                      @close="toggleRolesPopover"
                     ></company-role-selector>
                   </div>
                 </b-popover>
               </b-card-footer>
             </b-card>
-            <div class="mt-2" v-if="$can('process/stage/delete', editItem)">
+            <div v-if="$can('process/stage/delete', editItem)" class="mt-2">
               <confirm-button
                 variant="transparent"
-                :confirmMessage="$t('This action cannot be undone!')"
-                :confirmTitle="$t('Delete stage')+'?'"
-                :confirmText="$t('Delete stage')"
-                btnClass="text-white border outline-none"
+                :confirm-message="$t('This action cannot be undone!')"
+                :confirm-title="$t('Delete stage')+'?'"
+                :confirm-text="$t('Delete stage')"
+                btn-class="text-white border outline-none"
                 size="xs"
-                :showOverlay="false"
+                :show-overlay="false"
                 block
                 @confirm="deleteItem"
               >{{ $t('Delete stage') }}</confirm-button>
@@ -208,13 +208,19 @@
 </template>
 
 <script>
+import draggable from "vuedraggable";
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
 import { ProcessStage, ProcessOperation } from "@/models";
-import draggable from "vuedraggable";
 import OperationCard from "../operation/Card";
 import OperationForm from "../operation/Form";
-import { /*mapState,*/ mapGetters } from "vuex";
+
 export default {
+  components: {
+    "operation-card": OperationCard,
+    "operation-form": OperationForm,
+    draggable
+  },
   props: {
     item: {
       required: false
@@ -222,11 +228,6 @@ export default {
     mode: {
       required: false
     }
-  },
-  components: {
-    "operation-card": OperationCard,
-    "operation-form": OperationForm,
-    draggable: draggable
   },
   data: () => ({
     showOverlay: false,
@@ -253,12 +254,12 @@ export default {
       }
     },
     operations: {
-      get: function() {
+      get() {
         return [...this.item.operations].sort((a, b) => {
           return a.dOrder > b.dOrder ? 1 : -1;
         });
       },
-      set: function(value) {
+      set(value) {
         this.item.operations = value.sort((a, b) => {
           return a.dOrder > b.dOrder ? 1 : -1;
         });
@@ -274,11 +275,11 @@ export default {
     },
     toggleMenu() {
       this.showMenu = !this.showMenu;
-      //this.showOverlay=this.showMenu;
+      // this.showOverlay=this.showMenu;
     },
     hideMenu() {
       this.showMenu = false;
-      //this.showOverlay=false;
+      // this.showOverlay=false;
     },
     toggleEdit() {
       this.$store.dispatch("app/showInnerOverlay");
@@ -369,7 +370,7 @@ export default {
         // eslint-disable-next-line
       } catch (ex) {
         console.log(ex);
-        //dont care about the error
+        // dont care about the error
       } finally {
         this.orderBusy = false;
       }

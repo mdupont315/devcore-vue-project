@@ -5,7 +5,7 @@ String.prototype.ucFirst = function() {
 }
 
 export function numberFormat(value, decimals = 2, format = "0.00") {
-    value = +(Math.round(value + "e+" + decimals) + "e-" + decimals);
+    value = +(`${Math.round(`${value}e+${decimals}`)}e-${decimals}`);
     return numeral(Number(value)).format(format); // displaying other groupings/separators is possible, look at the docsƒ
 }
 

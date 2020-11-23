@@ -2,7 +2,20 @@
 module.exports = {
   resolve: {
     alias: {
-      '@': require('path').resolve(__dirname, 'src')
+      "@": require("path").resolve(__dirname, "src")
     }
+  },
+  module: {
+    rules: [
+      {
+        test: /\.worker\.js$/,
+        use: {
+          loader: "worker-loader",
+          options: {
+            filename: "7.worker.js"
+          }
+        }
+      }
+    ]
   }
-}
+};

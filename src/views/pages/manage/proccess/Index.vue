@@ -1,13 +1,13 @@
 <template>
   <div class="page animated fadeIn fast pg-process">
-    <div class="ml-3" v-if="showStages" >
+    <div v-if="showStages" class="ml-3" >
      <b-button
+      id="btnNew2"
+      v-b-tooltip.hover
       size="sm"
       class="text-uppercase"
       variant="primary"
       :title="$t('Back To Process')"
-      v-b-tooltip.hover
-      id="btnNew2"
       @click="backToProcess"
     >
       <i class="mdi mdi-keyboard-backspace"></i>
@@ -17,14 +17,14 @@
       <br/><br/>
     </div>
     <div v-if="!showStages && process && process.loaded && allProcess.length > 0">
-      <unblock-loader position="bottom" v-if="busy"></unblock-loader>
-      <div class="editable-dashboard" id="process-page-content" v-if="process">
+      <unblock-loader v-if="busy" position="bottom"></unblock-loader>
+      <div v-if="process" id="process-page-content" class="editable-dashboard">
         <div class="sortable-wrapper t01 horizontal">
           <process-card
-            class="item sortable-item"
-            :class="{'busy':busy}"
             v-for="item in filteredProcess"
             :key="item.id"
+            class="item sortable-item"
+            :class="{'busy':busy}"
             :item="item"
             @editing="editingProcess"
             @selectProcess="selectProcess"
@@ -33,19 +33,19 @@
       </div>
     </div>
     <div v-if="showStages">
-      <unblock-loader position="bottom" v-if="busy"></unblock-loader>
-      <div class="editable-dashboard" id="process-page-content" v-if="process">
+      <unblock-loader v-if="busy" position="bottom"></unblock-loader>
+      <div v-if="process" id="process-page-content" class="editable-dashboard">
         <draggable
           v-model="stages"
           class="sortable-wrapper t01 horizontal"
-          @change="changeOrder"
           v-bind="{disabled:busy||editingCard, draggable:'.enable-drag', animation:200, filter:'.busy .newItem'}"
+          @change="changeOrder"
         >
           <stage-card
-            class="item sortable-item"
-            :class="{'busy':busy}"
             v-for="item in stages"
             :key="item.id"
+            class="item sortable-item"
+            :class="{'busy':busy}"
             :item="item"
             @editing="editing"
           ></stage-card>
@@ -73,20 +73,21 @@
   </div>
 </template>
 <script>
-import GQLForm from "@/lib/gqlform";
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import draggable from "vuedraggable";
+import GQLForm from "@/lib/gqlform";
 import StageCard from "./stage/Card";
 import ProcessCard from "./process/Card";
 import StageForm from "./stage/Form";
 import { ProcessStage } from "@/models";
 import { scrollLeftToElement } from "@/lib/utils";
+
 export default {
   components: {
     "stage-card": StageCard,
     "stage-form": StageForm,
     "process-card": ProcessCard,
-    draggable: draggable
+    draggable
   },
   props: {
     detail: {
@@ -119,24 +120,24 @@ export default {
       loadingProcess: "process/loading"
     }),
     currentProcess: {
-      get: function() {
+      get() {
         return this.current("process");
       }
     },
     process: {
-      get: function() {
+      get() {
         return this.currentProcess && this.currentProcess.process
           ? this.currentProcess.process
           : null;
       }
     },
     stages: {
-      get: function() {
+      get() {
         return [...this.process.stages].sort((a, b) => {
           return a.dOrder > b.dOrder ? 1 : -1;
         });
       },
-      set: function(value) {
+      set(value) {
         this.process.stages = value.sort((a, b) => {
           return a.dOrder > b.dOrder ? 1 : -1;
         });
@@ -146,7 +147,7 @@ export default {
   async mounted() {
     this.load();
 
-    //this.constructStages();
+    // this.constructStages();
     window.vm.$on("addStage", this.addStage);
     window.vm.$on("process_filterChange", this.processFilterChange);
     window.vm.$on("process_processChange", this.processChange);
@@ -156,14 +157,14 @@ export default {
   },
   methods: {
     async load() {
-      //the topbar will load
-      //this.$store.dispatch("process/findAll");
+      // the topbar will load
+      // this.$store.dispatch("process/findAll");
       if (this.process) {
         await this.$store.dispatch("process/findById", { id: this.process.id });
       }
     },
     calculateWidth() {
-      return (this.items.length + 1) * 360 + "px";
+      return `${(this.items.length + 1) * 360}px`;
     },
     constructStages() {
       if (!this.process) {
@@ -201,12 +202,12 @@ export default {
           });
           // eslint-disable-next-line
         } catch (ex) {
-          //dont care about the error
+          // dont care about the error
         } finally {
           this.busy = false;
         }
 
-        //this.constructStages();
+        // this.constructStages();
       }
     },
     prepareStage() {

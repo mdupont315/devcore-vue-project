@@ -15,6 +15,6 @@
 </template>
 <script>
 export default {
-  name: "empty-slot"
+  name: "EmptySlot"
 };
 </script>

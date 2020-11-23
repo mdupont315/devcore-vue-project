@@ -4,15 +4,15 @@
     <div class="page bg-white">
       <div class="container">
         <h2 class="h1 border-bottom">{{ user.fullName }}</h2>
-        <b-form @submit.prevent="save" @keyup="$validator.validateAll()" class="floating-labels">
+        <b-form class="floating-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
           <div class="text-center">
             <image-upload
+              ref="uploader"
               v-model="form.file"
               :uploading="form.busy"
               class="rounded"
+              :current-image="user.getAvatarUrl('200x200')"
               @remove="()=>form.deleteAvatar=true"
-              :currentImage="user.getAvatarUrl('200x200')"
-              ref="uploader"
             />
             <b-form-invalid-feedback>{{ $displayError('avatar', form) }}</b-form-invalid-feedback>
           </div>
@@ -22,13 +22,13 @@
               <div class="form-label-group required">
                 <b-form-input
                   id="firstName"
-                  :disabled="form.busy"
                   v-model="form.firstName"
+                  v-validate="'required|min:4'"
+                  :disabled="form.busy"
                   :placeholder="$t('First name')"
                   type="text"
                   name="firstName"
                   :state="$validateState('firstName', form)"
-                  v-validate="'required|min:4'"
                 ></b-form-input>
                 <label for="firstName">
                   <i class="mdi mdi-account"></i>
@@ -41,13 +41,13 @@
               <div class="form-label-group required">
                 <b-form-input
                   id="lastName"
-                  :disabled="form.busy"
                   v-model="form.lastName"
+                  v-validate="'required|min:4'"
+                  :disabled="form.busy"
                   :placeholder="$t('Last name')"
                   type="text"
                   name="lastName"
                   :state="$validateState('lastName', form)"
-                  v-validate="'required|min:4'"
                 ></b-form-input>
                 <label for="lastName">
                   <i class="mdi mdi-account"></i>
@@ -62,13 +62,13 @@
               <div class="form-label-group required">
                 <b-form-input
                   id="email"
-                  :disabled="form.busy"
                   v-model="form.email"
+                  v-validate="'required|email'"
+                  :disabled="form.busy"
                   :placeholder="$t('Email')"
                   :state="$validateState('email', form)"
                   type="email"
                   name="email"
-                  v-validate="'required|email'"
                 ></b-form-input>
                 <label for="email">
                   <i class="mdi mdi-email"></i>
@@ -99,17 +99,17 @@
                         <b-col class="col-12 col-lg-6">
                           <div class="form-label-group required">
                             <b-form-input
-                              class="shadow-sm"
                               id="password"
+                              ref="password"
+                              v-model="form.password"
+                              v-validate="{ required: this.form.changePassword, min:4 }"
+                              class="shadow-sm"
                               :state="$validateState('password')"
                               :disabled="form.busy"
-                              v-model="form.password"
                               :placeholder="$t('Password')"
                               type="password"
                               name="password"
-                              ref="password"
                               autocomplete="new-password"
-                              v-validate="{ required: this.form.changePassword, min:4 }"
                             ></b-form-input>
                             <label for="password">
                               <i class="mdi mdi-lock-question"></i>
@@ -121,16 +121,16 @@
                         <b-col class="col-12 col-lg-6">
                           <div class="form-label-group required">
                             <b-form-input
-                              class="shadow-sm"
                               id="passwordConfirmation"
+                              v-model="form.passwordConfirmation"
+                              v-validate="{ required: this.form.changePassword, min:4, confirmed:'password' }"
+                              class="shadow-sm"
                               :state="$validateState('passwordConfirmation')  && !form.hasError('passwordConfirmation')"
                               :disabled="form.busy"
-                              v-model="form.passwordConfirmation"
                               :placeholder="$t('Password confirm')"
                               type="password"
                               name="passwordConfirmation"
                               autocomplete="new-passwordConfirmation"
-                              v-validate="{ required: this.form.changePassword, min:4, confirmed:'password' }"
                             ></b-form-input>
                             <label for="passwordConfirmation">
                               <i class="mdi mdi-lock-question"></i>
@@ -166,7 +166,7 @@
   </div>  
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
 
 export default {
@@ -195,7 +195,7 @@ export default {
       Object.keys(this.user)
         .filter(key => key in this.form)
         .forEach(key => (this.form[key] = this.user[key]));
-      //set the image
+      // set the image
       this.$refs.uploader.image = this.user.getAvatarUrl("200x200");
     },
     async save() {
@@ -206,7 +206,7 @@ export default {
         this.initForm();
       }
 
-      /*try {
+      /* try {
         this.form.errors = null;
         await this.$store.dispatch("auth/login", this.form);
         console.log(this.$store.getters["app/intented_route"]);
@@ -217,7 +217,7 @@ export default {
         //console.log(processGraphQLErrors(ex));
       } finally {
         //this.$validator.reset();
-      }*/
+      } */
     }
   }
 };

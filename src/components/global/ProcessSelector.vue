@@ -1,23 +1,23 @@
 <template>
   <div class="process-selector">
-    <div class="label" v-show="!editing">{{ $t('Process') }}</div>
+    <div v-show="!editing" class="label">{{ $t('Process') }}</div>
     <div
       class="current-process"
       :class="{'expanded':expanded, editing:editing}"
       @click.stop="toggleSelector"
     >
       <span v-show="true">
-        <span class="edit-btn" @click.stop="initEdit" v-if="!editing && allowEdit">
+        <span v-if="!editing && allowEdit" class="edit-btn" @click.stop="initEdit">
           <i class="mdi mdi-pencil"></i>
         </span>
         <div
-          class="title"
-          @click.stop="toggleSelector"
-          :title="current.process?current.process.title.toUpperCase():null"
-          v-b-tooltip.hover
           ref="selectProcessBtn"
+          v-b-tooltip.hover
+          class="title"
+          :title="current.process?current.process.title.toUpperCase():null"
+          @click.stop="toggleSelector"
         >{{ current.process?`${current.process.title} ${this.getCount('process', current.process)}`:$t('Select process') }}</div>
-        <span class="arrow" v-show="!editing" @click.stop="toggleSelector"></span>
+        <span v-show="!editing" class="arrow" @click.stop="toggleSelector"></span>
       </span>
       <layer v-if="editing" @closed="initEdit">
         <div class="edit" style="width:300px; left:0">
@@ -25,15 +25,15 @@
           <div class="d-flex flex-row">
             <div class="flex-grow-1 position-relative">
               <b-input
+                ref="editInput"
                 v-model="editForm.title"
+                v-validate="'required|min:4'"
                 size="sm"
                 name="title"
                 :disabled="editForm.busy"
-                ref="editInput"
                 class="no-focus-style"
                 style="margin:0!important"
                 :state="$validateState('title', editForm)"
-                v-validate="'required|min:4'"
               />
               <b-form-invalid-feedback>{{ $displayError('title', editForm) }}</b-form-invalid-feedback>
             </div>
@@ -42,15 +42,15 @@
               size="xs"
               variant="transparent"
               class="action mdi mdi-check text-success font-15x m-0 outline-none"
-              @click="saveItem"
               :title="$t('Save')"
+              @click="saveItem"
             ></b-button>
             <b-button
               size="xs"
               variant="transparent"
               class="action mdi mdi-close text-danger font-15x m-0 outline-none"
-              @click="cancelEdit"
               :title="$t('Cancel')"
+              @click="cancelEdit"
             ></b-button>
           </div>
         </div>
@@ -62,8 +62,8 @@
           <div class="sections">
             <div
               class="section"
-              @click="toggleSection('process')"
               :class="{expanded:expandedSection==='process'}"
+              @click="toggleSection('process')"
             >
               <div class="label">{{ $t('Process') }}</div>
               <div
@@ -73,18 +73,18 @@
                 <perfect-scrollbar>
                   <div style="position:relative;">
                     <div
-                      class="loading"
                       v-if="loading.stage"
+                      class="loading"
                       style="background:rgba(0,0,0,.4);position:absolute;top:0;left:0;bottom:0;right:0;display:flex;justify-content:center;flex-direction:column; align-items:center;z-index:1;margin:0 -16px;height:100%"
                     >
                       <b-spinner></b-spinner>
                     </div>
                     <ul class="list-unstyled m-0 scrollY">
                       <li
-                        class="item"
                         v-for="item in items"
                         :key="item.id"
                         :ref="'process_'+item.id"
+                        class="item"
                         :class="{active:selectedProcess&&selectedProcess.id===item.id}"
                         @click.stop="selectProcess(item, true)"
                       >{{ item.title }} {{ getCount('process', item)}}</li>
@@ -98,8 +98,8 @@
             <div
               v-if="maxLevelNumber > 0"
               class="section"
-              @click="toggleSection('stage')"
               :class="{expanded:expandedSection==='stage'}"
+              @click="toggleSection('stage')"
             >
               <div class="label">{{ $t('Stage') }}</div>
               <div
@@ -115,10 +115,10 @@
                         @click="selectStage(null, true)"
                       >{{ $t('None') }}</li>
                       <li
-                        class="item"
                         v-for="item in (selectedProcess?selectedProcess.stages:[])"
                         :key="item.id"
                         :ref="'stage_'+item.id"
+                        class="item"
                         :class="{active:selectedStage&&selectedStage.id===item.id}"
                         @click.stop="selectStage(item, true)"
                       >{{ item.title }} {{ getCount('stage', item)}}</li>
@@ -132,8 +132,8 @@
             <div
               v-if="maxLevelNumber > 1"
               class="section"
-              @click="toggleSection('operation')"
               :class="{expanded:expandedSection==='operation'}"
+              @click="toggleSection('operation')"
             >
               <div class="label">{{ $t('Operation') }}</div>
               <div
@@ -149,10 +149,10 @@
                         @click="selectOperation(null, true)"
                       >{{ $t('None') }}</li>
                       <li
-                        class="item"
                         v-for="item in (selectedStage?selectedStage.operations:[])"
                         :key="item.id"
                         :ref="'operation_'+item.id"
+                        class="item"
                         :class="{active:selectedOperation&&selectedOperation.id===item.id}"
                         @click.stop="selectOperation(item, true)"
                       >{{ item.title }} {{ getCount('operation', item)}}</li>
@@ -166,8 +166,8 @@
             <div
               v-if="maxLevelNumber > 2"
               class="section"
-              @click="toggleSection('phase')"
               :class="{expanded:expandedSection==='phase'}"
+              @click="toggleSection('phase')"
             >
               <div class="label">{{ $t('Phase') }}</div>
               <div
@@ -183,10 +183,10 @@
                         @click="selectPhase(null, true)"
                       >{{ $t('None') }}</li>
                       <li
-                        class="item"
                         v-for="item in (selectedOperation?selectedOperation.phases:[])"
                         :key="item.id"
                         :ref="'phase_'+item.id"
+                        class="item"
                         :class="{active:selectedPhase&&selectedPhase.id===item.id}"
                         @click="selectPhase(item, true)"
                       >{{ item.title }} {{ getCount('phase', item)}}</li>
@@ -212,10 +212,11 @@
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
+
 export default {
-  name: "process-selector",
+  name: "ProcessSelector",
   props: {
     maxLevel: {
       required: false,
@@ -288,12 +289,12 @@ export default {
       currentProcess: "process/current"
     }),
     current: {
-      get: function() {
+      get() {
         return this.currentProcess(this.section);
       }
     },
     maxLevelNumber: {
-      get: function() {
+      get() {
         switch (this.maxLevel) {
           case "phase":
             return 3;
@@ -348,7 +349,7 @@ export default {
       }
       switch (this.showCount) {
         case "ideas": {
-          let count = item.ideasCount;
+          const count = item.ideasCount;
           // switch (section) {
           //   case "process":
           //     count = this.$store.getters["idea/byProcess"](item.id).length;
@@ -366,7 +367,7 @@ export default {
           return `(${this.$tc("idea.count", count)})`;
         }
         case "toolIdeas": {
-          let count = item.toolIdeasCount;
+          const count = item.toolIdeasCount;
           // switch (section) {
           //   case "process":
           //     count = this.$store.getters["toolIdea/byProcess"](item.id).length;
@@ -413,7 +414,7 @@ export default {
             this.$nextTick(() => {
               try {
                 this.$refs[
-                  "process_" + this.selectedProcess.id
+                  `process_${this.selectedProcess.id}`
                 ][0].scrollIntoView();
                 // eslint-disable-next-line
               } catch (ex) {}
@@ -425,7 +426,7 @@ export default {
             this.$nextTick(() => {
               try {
                 this.$refs[
-                  "stage_" + this.selectedStage.id
+                  `stage_${this.selectedStage.id}`
                 ][0].scrollIntoView();
                 // eslint-disable-next-line
               } catch (ex) {}
@@ -437,7 +438,7 @@ export default {
             this.$nextTick(() => {
               try {
                 this.$refs[
-                  "operation_" + this.selectedOperation.id
+                  `operation_${this.selectedOperation.id}`
                 ][0].scrollIntoView();
                 // eslint-disable-next-line
               } catch (ex) {}
@@ -449,7 +450,7 @@ export default {
             this.$nextTick(() => {
               try {
                 this.$refs[
-                  "phase_" + this.selectedPhase.id
+                  `phase_${this.selectedPhase.id}`
                 ][0].scrollIntoView();
                 // eslint-disable-next-line
               } catch (ex) {}
@@ -504,13 +505,13 @@ export default {
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         this.$nextTick(async () => {
-          //if (this.selectedProcess.title != this.editForm.fields.title) {
+          // if (this.selectedProcess.title != this.editForm.fields.title) {
           await this.$store.dispatch("process/update", this.editForm);
-          /*this.$store.dispatch(
+          /* this.$store.dispatch(
             "process/setCurrentProcess",
             this.items.find(o => o.id === process.id)
-          );*/
-          //}
+          ); */
+          // }
           this.initEdit();
         });
       }
@@ -555,7 +556,7 @@ export default {
           this.selectedOperation = null;
           this.selectedPhase = null;
           this.selectedStage = null;
-          //this.selectStage(this.selectedProcess.stages[0]);
+          // this.selectStage(this.selectedProcess.stages[0]);
         }
         this.loading.stage = false;
         this.loading.operation = false;
@@ -583,13 +584,13 @@ export default {
         lastStage.id != this.selectedStage.id ||
         !this.selectedOperation
       ) {
-        //this.selectOperation(this.selectedStage.operations[0]);
+        // this.selectOperation(this.selectedStage.operations[0]);
       } else {
         const operation = this.selectedStage.operations.find(
           i => i.id === this.selectedOperation.id
         );
         if (!operation) {
-          //this.selectOperation(this.selectedStage.operations[0]);
+          // this.selectOperation(this.selectedStage.operations[0]);
         } else {
           this.selectOperation(operation);
         }
@@ -613,13 +614,13 @@ export default {
         lastOperation.id != this.selectedOperation.id ||
         !this.selectedPhase
       ) {
-        //this.selectPhase(this.selectedOperation.phases[0]);
+        // this.selectPhase(this.selectedOperation.phases[0]);
       } else {
         const phase = this.selectedOperation.phases.find(
           i => i.id === this.selectedPhase.id
         );
         if (!phase) {
-          //this.selectPhase(this.selectedOperation.phases[0]);
+          // this.selectPhase(this.selectedOperation.phases[0]);
         } else {
           this.selectPhase(phase);
         }
@@ -660,7 +661,7 @@ export default {
           phase: this.selectedPhase
         });
       }
-      //await this.$store.dispatch("process/setCurrentStage", this.selectedStage);
+      // await this.$store.dispatch("process/setCurrentStage", this.selectedStage);
       this.close();
     }
   }

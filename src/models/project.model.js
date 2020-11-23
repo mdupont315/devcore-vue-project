@@ -2,11 +2,17 @@ import BaseModel from "./base.model";
 
 export default class ProjectModel extends BaseModel {
     ideas = [];
+
     userIdeas = [];
+
     issues = [];
+
     users = [];
+
     tools = [];
+
     stages = [];
+
     stats = {};
 
     getStage(stageId) {
@@ -37,7 +43,7 @@ export default class ProjectModel extends BaseModel {
         if (stageStats) {
             value = (stageStats.consolidatedValue * 100) / this.budget;
         }
-        //value=this.getIdeasImpactByStage(stageId) + this.getIssuesImpactByStage(stageId);
+        // value=this.getIdeasImpactByStage(stageId) + this.getIssuesImpactByStage(stageId);
         return value;
     }
 

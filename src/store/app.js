@@ -64,7 +64,7 @@ const actions = {
     },
     async toggleNav(context) {
         toggleClass(document.body, 'navbar-toggled');
-        context.commit('SHOW_NAVBAR', !context.state['show_navbar']);
+        context.commit('SHOW_NAVBAR', !context.state.show_navbar);
     },
     async showOverlay(context, {
         show,
@@ -83,8 +83,8 @@ const actions = {
         });
     },
     async overlayClicked(context, event) {
-        if (typeof context.state['on_overlay_click'] === 'function') {
-            context.state['on_overlay_click'](event);
+        if (typeof context.state.on_overlay_click === 'function') {
+            context.state.on_overlay_click(event);
         }
     },
     async toggleInnerOverlay(context) {
@@ -206,8 +206,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

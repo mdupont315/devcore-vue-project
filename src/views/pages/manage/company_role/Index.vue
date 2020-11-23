@@ -1,9 +1,9 @@
 <template>
   <div class="page animated fadeIn">
     <div
+      v-if="currentItem || currentRowDetails"
       class="overlay"
       :class="{'top-all':this.showInnerOverlayOnTop}"
-      v-if="currentItem || currentRowDetails"
       @click="overlayClick"
     ></div>
     <div class="container-fluid">
@@ -42,7 +42,7 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="name"
-              :staticValue="row.item.name"
+              :static-value="row.item.name"
             >
               <span>
                 <img
@@ -52,13 +52,13 @@
                 />
                 {{ row.item.name }}
               </span>
-              <template slot="editing" v-if="isRowEditing(row)">
+              <template v-if="isRowEditing(row)" slot="editing">
                 <b-input
+                  v-model="updateForm.name"
+                  v-validate="'required|min:4'"
                   name="name"
                   size="sm"
-                  v-model="updateForm.name"
                   :disabled="updateForm.busy"
-                  v-validate="'required|min:4'"
                   :state="$validateState('name', updateForm)"
                 ></b-input>
                 <b-form-invalid-feedback>{{ $displayError('name', updateForm) }}</b-form-invalid-feedback>
@@ -72,22 +72,22 @@
             <div v-if="isRowEditing(row)" class="text-right">
               <table-edit-tools-buttons
                 :item="row.item"
-                :showSaveButton="$can('core/companyRole/update', row.item)"
-                :disableSaveButton="vErrors.any()||updateForm.busy"
-                :showDeleteButton="$can('core/companyRole/delete', row.item)"
+                :show-save-button="$can('core/companyRole/update', row.item)"
+                :disable-save-button="vErrors.any()||updateForm.busy"
+                :show-delete-button="$can('core/companyRole/delete', row.item)"
                 :loading="updateForm.busy"
+                store="companyRole"
                 @cancel="toggleItem(row.item)"
                 @delete="toggleItem(null)"
                 @save="saveItem(updateForm)"
-                store="companyRole"
               ></table-edit-tools-buttons>
             </div>
             <!-- when the row is not editing -->
             <table-tools-buttons
               v-else
               :item="row.item"
-              :showEditButton="$can('core/companyRole/update', row.item)"
-              :showDeleteButton="$can('core/companyRole/delete', row.item)"
+              :show-edit-button="$can('core/companyRole/update', row.item)"
+              :show-delete-button="$can('core/companyRole/delete', row.item)"
               store="companyRole"
               @editItem="toggleItem(row.item)"
             ></table-tools-buttons>
@@ -98,8 +98,9 @@
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
+
 export default {
   components: {},
   data: () => {
@@ -118,7 +119,7 @@ export default {
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top"
     }),
     fields: {
-      get: function() {
+      get() {
         return [
           { key: "name", label: this.$t("Name"), sortable: true },
           { key: "actions", label: this.$t("Manage"), class: "actions" }

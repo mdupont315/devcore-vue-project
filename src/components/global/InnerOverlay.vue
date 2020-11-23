@@ -3,6 +3,6 @@
 </template>
 <script>
 export default {
-    name:"inner-overlay"
+    name:"InnerOverlay"
 }
 </script>

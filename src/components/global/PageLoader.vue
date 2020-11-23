@@ -5,7 +5,7 @@
 </template>
 <script>
 export default {
-  name: "page-loader",
+  name: "PageLoader",
   props: {
     variant: {
       type: String,

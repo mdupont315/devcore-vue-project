@@ -6,8 +6,9 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+
 export default {
-  name: "top-company-role-selector",
+  name: "TopCompanyRoleSelector",
   computed: {
     ...mapGetters({
       items: "companyRole/all"

@@ -25,21 +25,22 @@
         >{{ $t('Invite your team and start collaborating now!')}}</small>
         <b-button
           size="lg"
-          @click="showInviteModal = !showInviteModal"
           block
           variant="outline-primary"
+          @click="showInviteModal = !showInviteModal"
         >{{ $t('Invite to Devcore') }}</b-button>
       </div>
     </nav>
   </div>
 </template>
 <script>
+import { /* mapState, */ mapGetters } from "vuex";
 import nav from "@/router/_nav";
 import Navigation from "./menu/Index";
-import { /*mapState,*/ mapGetters } from "vuex";
 import UserForm from "../../pages/manage/user/Form";
+
 export default {
-  name: "top-nav",
+  name: "TopNav",
   components: {
     "user-form": UserForm,
     navigation: Navigation

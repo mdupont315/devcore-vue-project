@@ -2,7 +2,7 @@
   <div class="locale-switcher">
     🌐
    <select v-model="$i18n.locale" class="spcustom-locales">
-       <option :value="locale.value" v-for="locale in locales" :key="locale.value">
+       <option v-for="locale in locales" :key="locale.value" :value="locale.value">
         {{locale.text}}
       </option>
     </select>
@@ -12,13 +12,14 @@
 import {
     getSupportedLocales
 } from '../../lib/utils';
+
 export default {
-  name: "locales-switcher",
+  name: "LocalesSwitcher",
   computed: {
     locales: {
-      get: function() {
-        var items = [];
-        var annotedLabels = getSupportedLocales();
+      get() {
+        const items = [];
+        const annotedLabels = getSupportedLocales();
          annotedLabels.forEach(element => {
           items.push({
             text: element.name,

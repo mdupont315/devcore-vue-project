@@ -79,7 +79,7 @@ const actions = {
             mutation: COMPANY_TOOL.changeStatus,
         });
         const tool = new CompanyTool().deserialize(result.data.companyToolChangeStatus);
-        //await context.dispatch('findAll', { force: true });
+        // await context.dispatch('findAll', { force: true });
         return tool;
     },
 
@@ -103,9 +103,9 @@ const actions = {
         const result = await form.mutate({
             mutation: COMPANY_TOOL.delete
         });
-        //if (tool.parentId) {
-        //await context.dispatch('findAll', { force: true });
-        //}
+        // if (tool.parentId) {
+        // await context.dispatch('findAll', { force: true });
+        // }
         context.commit("REMOVE_ITEM", form);
         return result.data.companyToolDelete;
     },
@@ -114,14 +114,14 @@ const actions = {
         filter = null,
         force = false
     } = {}) {
-        if (context.getters['all'].length === 0 || force) {
+        if (context.getters.all.length === 0 || force) {
             filter = filter || {
                 data: {
-                    //orderBy: ["name"]
+                    // orderBy: ["name"]
                 }
 
             };
-            filter.busy = context.getters['all'].length < 1;
+            filter.busy = context.getters.all.length < 1;
             try {
                 const query = apolloClient.watchQuery({
                     query: COMPANY_TOOL.findAll,
@@ -141,7 +141,7 @@ const actions = {
                 filter.busy = false;
             }
         }
-        return context.getters['all'];
+        return context.getters.all;
     },
 
     async findById(context, filter) {
@@ -211,8 +211,7 @@ const mutations = {
     SET_ITEM(state, value) {
         const index = state.all.findIndex(el => el.id === value.id);
         if (index > -1) {
-            const copy = { ...state.all[index]
-            };
+            const copy = { ...state.all[index] };
             value._showDetails = copy._showDetails;
             state.all[index] = value;
             state.all = [...state.all];
@@ -236,8 +235,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

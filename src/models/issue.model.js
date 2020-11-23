@@ -32,6 +32,7 @@ export default class IssueModel extends BaseModel {
     get operationId() {
         return this.parentStructure.operationId;
     }
+
     set operationId(value) {
         this.parentStructure.operationId = value;
     }

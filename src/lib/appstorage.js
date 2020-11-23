@@ -1,5 +1,6 @@
 export class AppStorage {
     static loaded = false;
+
     static data = {};
 
     static load(force = false) {

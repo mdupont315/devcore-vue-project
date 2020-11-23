@@ -1,11 +1,11 @@
 <template>
-  <div>
-    <process-selector
-      max-level="process"
-      section="analysis"
-      :onApply="onApply"
-    ></process-selector>
-  </div>
+	<div>
+		<process-selector
+			max-level="process"
+			section="analysis"
+			:on-apply="onApply"
+		></process-selector>
+	</div>
 </template>
 <script>
 export default {

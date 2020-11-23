@@ -3,14 +3,14 @@
     <slot v-if="!editing">
       <span v-if="staticValue">{{ staticValue }}</span>
     </slot>
-    <slot name="editing" v-if="editing" v-bind:editing="editing">
-      <b-input size="sm" v-bind="$attrs" v-model="item[property]" @input="input"></b-input>
+    <slot v-if="editing" name="editing" :editing="editing">
+      <b-input v-model="item[property]" size="sm" v-bind="$attrs" @input="input"></b-input>
     </slot>
   </div>
 </template>
 <script>
 export default {
-  name: "table-editable-cell",
+  name: "TableEditableCell",
   props: {
     staticValue: {
       required: false

@@ -1,15 +1,15 @@
 <template>
-  <div class="author-time" v-if="user">
+  <div v-if="user" class="author-time">
     <img :src="user.getAvatarUrl('50x50')" height="30" class="rounded-circle border" />
     <span class="right">
       <span class="name">{{ user.fullName }}</span>
-      <time-ago class="time" :time="time" v-if="time" />
+      <time-ago v-if="time" class="time" :time="time" />
     </span>
   </div>
 </template>
 <script>
 export default {
-  name: "author-time",
+  name: "AuthorTime",
   props: {
     user: {
       required: true

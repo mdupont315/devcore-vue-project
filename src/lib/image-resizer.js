@@ -38,8 +38,8 @@ export default class ImageResizer {
         }
 
 
-        /*let maxWidth = maxDimensions.width;
-        let maxHeight = maxDimensions.height;*/
+        /* let maxWidth = maxDimensions.width;
+        let maxHeight = maxDimensions.height; */
 
         if (!this.isSupported() || !file.type.match(/image.*/)) {
             callback(file, false);
@@ -55,19 +55,19 @@ export default class ImageResizer {
 
         const image = new Image();
         image.addEventListener('load', () => {
-            let originalWidth = image.width;
-            let originalHeight = image.height;
+            const originalWidth = image.width;
+            const originalHeight = image.height;
             let requestWidth = maxDimensions.width;
             let requestHeight = maxDimensions.height;
-            let noCrop = false;
+            const noCrop = false;
 
             // Calculo relacion de aspecto de la imagen original y la solicitada.
             let rRel = 0;
             if (requestHeight > 0 && requestWidth > 0) {
                 rRel = (requestWidth / requestHeight);
             }
-            let oRel = (originalWidth / originalHeight);
-            let isWide = rRel < oRel;
+            const oRel = (originalWidth / originalHeight);
+            const isWide = rRel < oRel;
 
             if (noCrop) {
                 // Determino el aspecto de la imagen original.
@@ -89,7 +89,7 @@ export default class ImageResizer {
                 // early exit; no need to resize
                 callback(file, false);
                 return;
-            } else if (requestWidth === 0) {
+            } if (requestWidth === 0) {
                 requestWidth = Math.round(originalWidth * (requestHeight / originalHeight));
             } else if (requestHeight === 0) {
                 requestHeight = Math.round(originalHeight * (requestWidth / originalWidth));
@@ -113,14 +113,14 @@ export default class ImageResizer {
                 srcPositionY = (requestHeight - srcHeight) / 5;
             }
 
-            let canvas = document.createElement('canvas');
-            let ctx = canvas.getContext('2d');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
 
             canvas.height = requestHeight;
             canvas.width = requestWidth;
 
-            /*ctx.drawImage(oc, 0, 0, oc.width * 0.5, oc.height * 0.5,
-             0, 0, canvas.width, canvas.height);*/
+            /* ctx.drawImage(oc, 0, 0, oc.width * 0.5, oc.height * 0.5,
+             0, 0, canvas.width, canvas.height); */
 
             ctx.drawImage(image, srcPositionX, srcPositionY, srcWidth, srcHeight);
 
@@ -129,7 +129,7 @@ export default class ImageResizer {
                     callback(blob, true);
                 }, file.type);
             } else {
-                let blob = this._toBlob(canvas, file.type);
+                const blob = this._toBlob(canvas, file.type);
                 callback(blob, true);
             }
 
@@ -149,7 +149,7 @@ export default class ImageResizer {
     _loadImage(image, file, callback = null) {
 
         if (typeof URL === 'undefined') {
-            let reader = new FileReader();
+            const reader = new FileReader();
 
             reader.onload = (evt) => {
 
@@ -172,8 +172,8 @@ export default class ImageResizer {
     }
 
     _toBlob(canvas, type) {
-        let dataURI = canvas.toDataURL(type);
-        let dataURIParts = dataURI.split(',');
+        const dataURI = canvas.toDataURL(type);
+        const dataURIParts = dataURI.split(',');
         let byteString = null;
         if (dataURIParts[0].indexOf('base64') >= 0) {
             // Convert base64 to raw binary data held in a string:
@@ -182,26 +182,26 @@ export default class ImageResizer {
             // Convert base64/URLEncoded data component to raw binary data:
             byteString = decodeURIComponent(dataURIParts[1]);
         }
-        let arrayBuffer = new ArrayBuffer(byteString.length);
-        let intArray = new Uint8Array(arrayBuffer);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const intArray = new Uint8Array(arrayBuffer);
 
         for (let i = 0; i < byteString.length; i += 1) {
             intArray[i] = byteString.charCodeAt(i);
         }
 
-        let mimeString = dataURIParts[0].split(':')[1].split(';')[0];
+        const mimeString = dataURIParts[0].split(':')[1].split(';')[0];
         let blob = null;
 
         blob = new Blob([this.hasArrayBufferViewSupport ? intArray : arrayBuffer], {
             type: mimeString
         });
-        /*if (this.hasBlobConstructor) {
+        /* if (this.hasBlobConstructor) {
             blob = new Blob([this.hasArrayBufferViewSupport ? intArray : arrayBuffer], { type: mimeString });
         } else {
             let bb = new (window.MozBlobBuilder || window.WebKitBlobBuilder || window.BlobBuilder)();
             bb.append(arrayBuffer);
             blob = bb.getBlob(mimeString);
-        }*/
+        } */
 
         return blob;
     }

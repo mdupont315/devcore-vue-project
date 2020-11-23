@@ -1,17 +1,17 @@
 <template>
-  <b-form @submit.prevent="save" @keyup="$validator.validateAll()" class="hide-labels">
+  <b-form class="hide-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
     <b-row>
       <b-col>
         <div class="form-label-group required">
           <b-form-input
             id="name"
-            :disabled="form.busy"
             v-model="form.name"
+            v-validate="'required|min:4'"
+            :disabled="form.busy"
             :placeholder="$t('Role name')"
             type="text"
             name="name"
             :state="$validateState('name', form)"
-            v-validate="'required|min:4'"
             autofocus
           ></b-form-input>
           <label for="name">{{ $t('Name') }}</label>

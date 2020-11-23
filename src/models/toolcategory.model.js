@@ -4,6 +4,7 @@ import CompanyToolModel from "./companytool.model";
 
 export default class ToolCategoryModel extends BaseModel {
     tools = [];
+
     _showDetails = false;
 
     deserialize(input) {
