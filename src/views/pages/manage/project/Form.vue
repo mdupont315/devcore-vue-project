@@ -431,7 +431,6 @@ export default {
         this.ideaDropwDownIntent = Math.random();
         this.$refs.ideasDropDown.$forceUpdate();
       }
-      this.ideas;
     },
     async deleteItem() {
       this.$emit("done");

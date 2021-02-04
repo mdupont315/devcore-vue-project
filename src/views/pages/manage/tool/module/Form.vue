@@ -1,5 +1,9 @@
 <template>
-  <b-form class="hide-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
+  <b-form
+    class="hide-labels"
+    @submit.prevent="save"
+    @keyup="$validator.validateAll()"
+  >
     <b-row>
       <b-col class="col-12">
         <div class="form-label-group required">
@@ -7,17 +11,27 @@
             v-model="form.name"
             class="sm"
             :v-validate="'required'"
-            :options="{debounce:250, inputClass:'form-control form-control-sm', autofocus:true, placeholder:$t('Module Name')}"
+            :options="{
+              debounce: 250,
+              inputClass: 'form-control form-control-sm',
+              autofocus: true,
+              placeholder: $t('Module Name'),
+            }"
             :state="$validateState('toolModule', form)"
             :on-input-change="onToolModuleInputChange"
             :on-item-selected="onToolModuleSelected"
-            :class="{'is-invalid':$validateState('toolModule', form)===false, 'is-valid':$validateState('toolModule', form)===true}"
+            :class="{
+              'is-invalid': $validateState('toolModule', form) === false,
+              'is-valid': $validateState('toolModule', form) === true,
+            }"
           >
             <div slot="item" slot-scope="props" class="single-item">
-              <span class="name">{{props.item.name}}</span>
+              <span class="name">{{ props.item.name }}</span>
             </div>
           </suggestions>
-          <b-form-invalid-feedback>{{ $displayError('toolModule', form) }}</b-form-invalid-feedback>
+          <b-form-invalid-feedback>{{
+            $displayError("toolModule", form)
+          }}</b-form-invalid-feedback>
         </div>
       </b-col>
       <!-- <b-col class="col-12">
@@ -68,15 +82,24 @@
           size="lg"
           block
           type="submit"
-          :disabled="vErrors.any()||form.busy"
+          :disabled="vErrors.any() || form.busy"
           :loading="form.busy"
           variant="primary"
-        >{{ $t('Save changes')}}</loading-button>
-        <div v-if="mode==='edit' && $can('tool/toolModule/delete', input)" class="mt-3 text-center">
+          >{{ $t("Save changes") }} </loading-button
+        >
+        <div
+          v-if="mode === 'edit' && $can('tool/toolModule/delete', input)"
+          class="mt-3 text-center"
+        >
           <hr />
-          <b-button variant="outline-danger" type="button" block @click.prevent="deleteItem">
+          <b-button
+            variant="outline-danger"
+            type="button"
+            block
+            @click.prevent="deleteItem"
+          >
             <i class="mdi mdi-trash-can"></i>
-            {{ $t('Delete') }}
+            {{ $t("Delete") }}
           </b-button>
         </div>
       </b-col>
@@ -91,17 +114,17 @@ export default {
   props: {
     value: {
       type: Object,
-      required: false
+      required: false,
     },
     mode: {
       type: String,
       required: false,
-      default: "create"
+      default: "create",
     },
     companyTool: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data: () => ({
     input: null,
@@ -112,14 +135,14 @@ export default {
       toolId: null,
       // quantity: null,
       yearlyCosts: null,
-      priceModel: null
-    })
+      priceModel: null,
+    }),
   }),
   computed: {
     ...mapGetters({
       currentUser: "auth/user",
-      priceModels: "priceModel/all"
-    })
+      priceModels: "priceModel/all",
+    }),
   },
   async mounted() {
     this.input = this.value;
@@ -127,9 +150,13 @@ export default {
   },
   methods: {
     async initForm() {
-      Object.keys(this.input || {})
-        .filter(key => key in this.form)
-        .forEach(key => (this.form[key] = this.input[key]));
+			console.log("hep");
+			console.log(this.input);
+			console.log(this.form);
+     Object.keys(this.input || {})
+        .filter((key) => key in this.form)
+				.forEach((key) => (this.form[key] = this.input[key]));
+				console.log(this.companyToolId);
       this.form.companyToolId = this.companyTool.id;
     },
     async save() {
@@ -143,6 +170,7 @@ export default {
               this.form
             );
           } else {
+						console.log(this.form);
             this.input = await this.$store.dispatch(
               "companyTool/create",
               this.form
@@ -157,6 +185,7 @@ export default {
       }
     },
     async deleteItem() {
+			console.log("asd");
       if (this.$can("core/tool/delete", this.input)) {
         await this.$swal({
           title: this.$t("Are you sure?"),
@@ -171,7 +200,7 @@ export default {
                 "companyTool/delete",
                 new GQLForm(
                   {
-                    id: this.input.id
+                    id: this.input.id,
                   },
                   null
                 )
@@ -181,7 +210,7 @@ export default {
             } finally {
               this.$swal.close();
             }
-          }
+          },
         });
       }
     },
@@ -200,13 +229,13 @@ export default {
         where: {
           and: [
             { field: "tool_id", op: "eq", value: this.companyTool.toolId },
-            { field: "name", op: "cn", value: query }
-          ]
-        }
+            { field: "name", op: "cn", value: query },
+          ],
+        },
       });
 
       return response;
-    }
-  }
+    },
+  },
 };
 </script>

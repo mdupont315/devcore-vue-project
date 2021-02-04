@@ -100,8 +100,8 @@ export default {
   data: () => ({
     // Create a new form instance
     form: new GQLForm({
-      username: "user1@devcore.test",
-      password: "secret",
+      username: "",
+      password: "",
       remember: false
     })
   }),
@@ -117,7 +117,6 @@ export default {
 
   methods: {
     async onSubmit() {
-			console.log("hi")
       try {
         await this.$store.dispatch("auth/login", this.form);
         blockUi();

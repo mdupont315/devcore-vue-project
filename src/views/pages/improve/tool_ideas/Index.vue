@@ -28,7 +28,7 @@
 								v-if="process.operation"
 								href
 								@click="breadcrumbClick($event, 'stage')"
-							>{{ process.stage.title }}</a>
+							>{{ process.stage.title }} YEAS</a>
 							<span v-else>{{ process.stage.title }}</span>
 						</li>
 						<li
@@ -120,7 +120,7 @@
 			v-if="process.process && process.process.stages.length>0"
 			id="main-content"
 			class="has-top-bar p-3"
-			style="overflow:auto; height: calc(100vh - 105px)"
+			style="overflow:auto; overflow-x:hidden;height: calc(100vh - 105px)"
 		>
 			<component
 				:is="currentComponent"
@@ -365,6 +365,7 @@ export default {
 			}
 		},
 		loadComponent() {
+
 			this.currentComponent = () =>
 			   import(
           "./" +

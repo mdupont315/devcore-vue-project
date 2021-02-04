@@ -3,7 +3,7 @@
     <div
       v-if="currentItem || currentRowDetails"
       class="overlay"
-      :class="{'top-all':this.showInnerOverlayOnTop}"
+      :class="{ 'top-all': this.showInnerOverlayOnTop }"
       @click="overlayClick"
     ></div>
     <div class="container-fluid">
@@ -17,16 +17,18 @@
           primary-key="id"
           hover
           :fields="fields"
-          :items="items"
+          :items="tableItems"
           :show-empty="true"
           :empty-text="$t('There are no records for the given criteria')"
-          :tbody-tr-class="(item,type)=>isRowEditing(item)?'editing':null"
+          :tbody-tr-class="
+            (item, type) => (isRowEditing(item) ? 'editing' : null)
+          "
         >
           <template v-slot:table-colgroup>
-            <col style="width:70%" />
+            <col style="width: 70%" />
             <!-- <col style="width:20%" /> -->
-            <col style="width:10%" />
-            <col style="width:300px" />
+            <col style="width: 10%" />
+            <col style="width: 300px" />
           </template>
           <template v-slot:empty="scope">
             <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -51,21 +53,25 @@
                   v-model="updateForm.name"
                   class="sm"
                   name="tool"
-                  :options="{debounce:250, inputClass:'form-control form-control-sm', autofocus:true}"
+                  :options="{
+                    debounce: 250,
+                    inputClass: 'form-control form-control-sm',
+                    autofocus: true,
+                  }"
                   :state="$validateState('tool', updateForm)"
                   :on-input-change="onToolInputChange"
                   :on-item-selected="onToolSelected"
                 >
                   <div slot="item" slot-scope="props" class="single-item">
-                    <span class="name">{{props.item.name}}</span>
+                    <span class="name">{{ props.item.name }}</span>
                   </div>
                 </suggestions>
-                <b-form-invalid-feedback>{{ $displayError('tool', updateForm) }}</b-form-invalid-feedback>
+                <b-form-invalid-feedback>{{
+                  $displayError("tool", updateForm)
+                }}</b-form-invalid-feedback>
               </template>
             </table-editable-cell>
           </template>
-
-          
 
           <!-- yearly costs -->
           <template v-slot:cell(yearlyCosts)="row">
@@ -77,8 +83,10 @@
               :static-value="$currency(calculateModulesTotal(row.item))"
             >
               <template v-if="isRowEditing(row)" slot="editing">
-                {{$currency(calculateModulesTotal(row.item))}}
-                <b-form-invalid-feedback>{{ $displayError('yearlyCosts', updateForm) }}</b-form-invalid-feedback>
+                {{ $currency(calculateModulesTotal(row.item)) }}
+                <b-form-invalid-feedback>{{
+                  $displayError("yearlyCosts", updateForm)
+                }}</b-form-invalid-feedback>
               </template>
             </table-editable-cell>
           </template>
@@ -89,7 +97,7 @@
               <table-edit-tools-buttons
                 :item="row.item"
                 :show-save-button="$can('core/companyTool/update', row.item)"
-                :disable-save-button="vErrors.any()||updateForm.busy"
+                :disable-save-button="vErrors.any() || updateForm.busy"
                 :loading="updateForm.busy"
                 :show-delete-button="$can('core/companyTool/delete', row.item)"
                 store="companyTool"
@@ -100,12 +108,16 @@
             </div>
             <div v-else class="d-flex">
               <table-tools-buttons
-                style="max-width:100px"
+                style="max-width: 100px"
                 class="flex-grow-1 mr-2"
                 store="companyTool"
                 :item="row.item"
                 :show-delete-button="false"
-                :show-edit-button="$can('core/companyTool/update', row.item) && (!currentRowDetails || currentRowDetails.item.id!=row.item.id)"
+                :show-edit-button="
+                  $can('core/companyTool/update', row.item) &&
+                  (!currentRowDetails ||
+                    currentRowDetails.item.id != row.item.id)
+                "
                 @editItem="toggleItem"
               ></table-tools-buttons>
               <div class="flex-grow-1">
@@ -113,11 +125,21 @@
                   size="xs"
                   v-if="$can('core/companyTool/manage')"
                   variant="action"
-                  style="font-size: 1.2rem;padding: 3px;"
+                  style="font-size: 1.2rem; padding: 3px"
                   class="btn-primary btn-expand btn-block text-uppercase"
-                  :class="{'expanded':currentRowDetails &&currentRowDetails.item.id === row.item.id}"
+                  :class="{
+                    expanded:
+                      currentRowDetails &&
+                      currentRowDetails.item.id === row.item.id,
+                  }"
                   @click="showDetails(row)"
-                >{{ (currentRowDetails && currentRowDetails.item.id === row.item.id? $t('Close') : $t('Details')) }}</b-button>
+                  >{{
+                    currentRowDetails &&
+                    currentRowDetails.item.id === row.item.id
+                      ? $t("Close")
+                      : $t("Details")
+                  }}</b-button
+                >
               </div>
             </div>
           </template>
@@ -150,7 +172,7 @@ import GQLForm from "@/lib/gqlform";
 export default {
   components: {
     // "tool-form": Form,
-    "modules-table": ModulesTable
+    "modules-table": ModulesTable,
   },
   data: () => {
     return {
@@ -161,17 +183,31 @@ export default {
       currentDetailsItem: null,
       loadingItem: false,
       filter: {
-        busy: false
+        busy: false,
       },
-      toolOptions: null
+      toolOptions: null,
     };
   },
   computed: {
     ...mapGetters({
       items: "companyTool/filteredItems",
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
-      priceModels: "priceModel/all"
+      priceModels: "priceModel/all",
     }),
+    getModules: {
+      get() {
+        console.log("YEAHHHHHH");
+        console.log(this.row);
+        return this.row.item.modules;
+      },
+    },
+    tableItems: {
+      get() {
+        console.log("YEAHHHHHH");
+        console.log(this.items);
+        return this.items.filter((item) => item.type === "TOOL");
+      },
+    },
     fields: {
       get() {
         return [
@@ -180,20 +216,21 @@ export default {
           {
             key: "yearlyCosts",
             label: this.$t("Yearly costs"),
-            sortable: true
+            sortable: true,
           },
-          { key: "actions", label: this.$t("Manage"), class: "actions" }
+          { key: "actions", label: this.$t("Manage"), class: "actions" },
         ];
-      }
-    }
+      },
+    },
   },
-  async mounted() {
+  async created() {
+		console.log("toolselector");
+
     // this.$store.dispatch("priceModel/findAll");
     this.$store.dispatch("companyTool/findAll", {
       filter: this.filter,
-      force: true
+      force: true,
     });
-    console.log(this.items);
     // this.$store.dispatch("toolArea/findAll");
   },
   methods: {
@@ -205,23 +242,22 @@ export default {
       );
     },
     calculateModulesTotal(item) {
-        if (item.modules && item.modules.length > 0) {
-          let sum = 0;
+      if (item.modules && item.modules.length > 0) {
+        let sum = 0;
 
-          item.modules.map((moduleObj) => {
+        item.modules.map((moduleObj) => {
+          moduleObj.prices.map((priceObj) => {
+            sum += priceObj.price / 100;
+          });
+        });
 
-             moduleObj.prices.map( (priceObj) => {
-                sum += (priceObj.price / 100)
-            });
-
-          })
-         
-
-          return sum;
-        }
-        return 0;
+        return sum;
+      }
+      return 0;
     },
     overlayClick() {
+      console.log("HI");
+      console.log(this.currentItem);
       if (this.currentItem) {
         this.toggleItem(null);
       } else {
@@ -229,44 +265,59 @@ export default {
       }
     },
     async saveItem(form) {
-    
+      console.log("FORM");
+      console.log(form);
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         await this.$validator.reset();
         await this.$store.dispatch("companyTool/update", form);
+
         this.toggleItem(null);
       }
     },
 
     async loadItem(item) {
+
       try {
         if (!item.products) {
           this.loadingItem = true;
         }
+        console.log(this.currentRowDetails);
         const openModule = this.currentRowDetails.item.modules.find(
-          f => f._showDetails
+          (f) => f._showDetails
         );
+        console.log("Module open ");
+        console.log(openModule);
         if (openModule) {
           openModule._showDetails = false;
         }
-        this.currentRowDetails.item = await this.$store.dispatch(
+        console.log(item);
+           this.currentRowDetails.item = await this.$store.dispatch(
           "companyTool/findById",
           {
-            id: item.id
+            id: item.id,
           }
-        );
+				);
+
+     // this.currentRowDetails.item = item;
+
         if (openModule) {
           const newModule = this.currentRowDetails.item.modules.find(
-            f => f.id === openModule.id
+            (f) => f.id === openModule.id
           );
           newModule._showDetails = true;
         }
-        this.$refs.modulesTable.$forceUpdate();
+        console.log("this.$refs.modulesTable");
+        console.log(this.$refs.modulesTable);
+        if (this.$refs.modulesTable) this.$refs.modulesTable.$forceUpdate();
       } finally {
         this.loadingItem = false;
       }
     },
+
     async showDetails(row) {
+      console.log("SHOW DETS");
+      console.log(row);
       if (this.currentRowDetails) {
         this.currentRowDetails.item._showDetails = false;
       }
@@ -285,6 +336,7 @@ export default {
       }
     },
     toggleItem(item) {
+      console.log(item);
       this.$validator.pause();
       this.$validator.reset();
       if (!item || (this.currentItem && this.currentItem.id === item.id)) {
@@ -297,7 +349,7 @@ export default {
           name: item.name,
           yearlyCosts: item.yearlyCosts,
           priceModel: item.priceModel ? item.priceModel.id : null,
-          toolId: item.toolId
+          toolId: item.toolId,
         });
         this.currentItem = item;
         this.$validator.reset();
@@ -310,20 +362,22 @@ export default {
       this.updateForm.name = item.name;
     },
     async onToolInputChange(query) {
+      console.log(query);
       this.updateForm.tool = null;
 
       if (query.trim().length <= 3) {
         return [];
       }
 
+      console.log(query);
       const response = await this.$store.dispatch("tool/findAll", {
         where: {
           field: "name",
           op: "cn",
-          value: query
-        }
+          value: query,
+        },
       });
-
+      console.log(response);
       return response;
     },
     async itemChanged() {
@@ -335,7 +389,7 @@ export default {
       this.loadItem(this.currentRowDetails.item);
       // // this.currentRowDetails.toggleDetails();
       // // this.currentRowDetails.item._showDetails=true;
-    }
-  }
+    },
+  },
 };
 </script>

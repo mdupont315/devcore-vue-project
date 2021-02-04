@@ -66,7 +66,7 @@
             :disabled="form.busy"
             menu-class="w-100"
             :date-format-options="{
-              'year': 'numeric', 'month': 'numeric', 'day': 'numeric', 'weekday': undefined 
+              'year': 'numeric', 'month': 'numeric', 'day': 'numeric', 'weekday': undefined
             }"
             reset-button
             :placeholder="$t('Expiration')"
@@ -112,7 +112,7 @@
           :disabled="vErrors.any()||form.busy"
           :loading="form.busy"
           variant="primary"
-        >{{ $t('Save changes')}}</loading-button>
+        >{{ $t('Save changes')}} </loading-button>
         <div v-if="mode==='edit' && $can('tool/toolModule/delete', input)" class="mt-3 text-center">
           <hr />
           <b-button variant="outline-danger" type="button" block @click.prevent="deleteItem">
@@ -182,11 +182,12 @@ export default {
       this.form.price = value * 100;
     },
     async save() {
+			console.log("sadjiasdjsadsad")
       try {
         await this.$validator.validateAll();
         if (!this.vErrors.any()) {
           await this.$validator.reset();
-          
+
           if (this.mode === "edit") {
             console.log(`this.mode === "edit"`)
             console.log(this.form)

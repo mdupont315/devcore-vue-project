@@ -3,10 +3,10 @@
     <div
       v-if="currentItem || currentRowDetails"
       class="overlay"
-      :class="{'top-all':this.showInnerOverlayOnTop}"
+      :class="{ 'top-all': this.showInnerOverlayOnTop }"
       @click="overlayClick"
     ></div>
-    <div class="table-responsive" style="overflow:visible">
+    <div class="table-responsive" style="overflow: visible">
       <b-table
         sort-icon-left
         sort-by="name"
@@ -18,13 +18,15 @@
         :items="tableItems"
         :show-empty="true"
         :empty-text="$t('There are no records for the given criteria')"
-        :tbody-tr-class="(item,type)=>isRowEditing(item)?'editing':null"
+        :tbody-tr-class="
+          (item, type) => (isRowEditing(item) ? 'editing' : null)
+        "
       >
         <template v-slot:table-colgroup>
-          <col style="width:45%" />
-          <col style="width:20%" />
-          <col style="width:10%" />
-          <col style="width:300px" />
+          <col style="width: 45%" />
+          <col style="width: 20%" />
+          <col style="width: 10%" />
+          <col style="width: 300px" />
         </template>
         <template v-slot:empty="scope">
           <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -36,26 +38,27 @@
         </template>
 
         <template v-slot:head(actions)>
-          <div class="text-right" style="position:relative">
+          <div class="text-right" style="position: relative">
             <b-button
               ref="btnNewProduct"
               v-show="!currentItem && $can('core/companyTool/create')"
               variant="primary btn-action"
               size="xs"
               class="px-3"
-              style="position:absolute;top:-14px;right:0"
+              style="position: absolute; top: -14px; right: 0"
               @click="togglePopOver"
-            >+ {{ $t('New') }}</b-button>
+              > {{ $t("New") }}</b-button
+            >
           </div>
           <b-popover
             ref="popover"
-            :target="()=>$refs.btnNewProduct"
+            :target="() => $refs.btnNewProduct"
             :show.sync="showPopOver"
             class="form-popover"
             placement="bottom"
             boundary="viewport"
           >
-            <b-card no-body style="max-width:300px">
+            <b-card no-body style="max-width: 300px">
               <b-card-body>
                 <module-form
                   v-if="newItem"
@@ -82,17 +85,28 @@
                 v-model="updateForm.name"
                 class="sm"
                 :v-validate="'required'"
-                :options="{debounce:250, inputClass:'form-control form-control-sm', autofocus:true, placeholder:$t('Name')}"
+                :options="{
+                  debounce: 250,
+                  inputClass: 'form-control form-control-sm',
+                  autofocus: true,
+                  placeholder: $t('Name'),
+                }"
                 :state="$validateState('toolModule', updateForm)"
                 :on-input-change="onToolModuleInputChange"
                 :on-item-selected="onToolModuleSelected"
-                :class="{'is-invalid':$validateState('toolModule', updateForm)===false, 'is-valid':$validateState('toolModule', updateForm)===true}"
+                :class="{
+                  'is-invalid':
+                    $validateState('toolModule', updateForm) === false,
+                  'is-valid': $validateState('toolModule', updateForm) === true,
+                }"
               >
                 <div slot="item" slot-scope="props" class="single-item">
-                  <span class="name">{{props.item.name}}</span>
+                  <span class="name">{{ props.item.name }}</span>
                 </div>
               </suggestions>
-              <b-form-invalid-feedback>{{ $displayError('toolModule', updateForm) }}</b-form-invalid-feedback>
+              <b-form-invalid-feedback>{{
+                $displayError("toolModule", updateForm)
+              }}</b-form-invalid-feedback>
             </template>
           </table-editable-cell>
         </template>
@@ -103,30 +117,37 @@
             <b-button
               variant="outline-danger"
               class="outline-none"
-              :class="{'active':row.item.info.status==='INACTIVE'}"
+              :class="{ active: row.item.info.status === 'INACTIVE' }"
               @click="changeStatus(row.item.info, 'INACTIVE')"
-            >{{ $t('INACTIVE')}}</b-button>
+              >{{ $t("INACTIVE") }}</b-button
+            >
             <b-button
               variant="outline-primary"
               class="outline-none"
-              :class="{'active':row.item.info.status==='ACTIVE'}"
+              :class="{ active: row.item.info.status === 'ACTIVE' }"
               @click="changeStatus(row.item.info, 'ACTIVE')"
-            >{{ $t('ACTIVE')}}</b-button>
+              >{{ $t("ACTIVE") }}</b-button
+            >
           </b-button-group>
         </template>
 
         <!-- yearlyCosts -->
-        <template v-slot:cell(yearlyCosts)="row">{{$currency(calculateModulesTotal(row.item))}}</template>
+        <template v-slot:cell(yearlyCosts)="row">{{
+          $currency(calculateModulesTotal(row.item))
+        }}</template>
 
         <!-- actions -->
         <template v-slot:cell(actions)="row" class="actions">
           <!-- when the row is editing -->
-          <div v-if="isRowEditing(row)" class="text-right d-flex justify-content-end">
+          <div
+            v-if="isRowEditing(row)"
+            class="text-right d-flex justify-content-end"
+          >
             <table-edit-tools-buttons
               ref="editButtons"
               :item="row.item"
               :show-save-button="$can('core/companyTool/update', row.item)"
-              :disable-save-button="vErrors.any()||updateForm.busy"
+              :disable-save-button="vErrors.any() || updateForm.busy"
               :loading="updateForm.busy"
               :show-delete-button="$can('core/companyTool/delete', row.item)"
               store="companyTool"
@@ -138,9 +159,12 @@
           </div>
           <!-- when the row is not editing -->
           <div v-else class="d-flex">
-            <div class="flex-grow-1 mr-2" style="width:50%">
+            <div class="flex-grow-1 mr-2" style="width: 50%">
               <table-tools-buttons
-                v-if="(!currentRowDetails)  || currentRowDetails.item.id !== row.item.id"
+                v-if="
+                  !currentRowDetails ||
+                  currentRowDetails.item.id !== row.item.id
+                "
                 :item="row.item"
                 :show-edit-button="$can('core/companyTool/update', row.item)"
                 :btn-edit-class="'btn-white btn-sm border-0 text-primary'"
@@ -150,16 +174,25 @@
                 @delete="itemDeleted"
               ></table-tools-buttons>
             </div>
-            <div class="flex-grow-1" style="width:50%">
+            <div class="flex-grow-1" style="width: 50%">
               <b-button
                 size="xs"
                 v-if="$can('core/companyTool/manage')"
                 variant="action"
-                style="font-size: 1.2rem;padding: 3px;"
+                style="font-size: 1.2rem; padding: 3px"
                 class="btn-primary btn-expand btn-block text-uppercase"
-                :class="{'expanded':currentRowDetails &&currentRowDetails.item.id === row.item.id}"
+                :class="{
+                  expanded:
+                    currentRowDetails &&
+                    currentRowDetails.item.id === row.item.id,
+                }"
                 @click="showDetails(row)"
-              >{{ (currentRowDetails && currentRowDetails.item.id === row.item.id? $t('Close') : $t('Prices')) }}</b-button>
+                >{{
+                  currentRowDetails && currentRowDetails.item.id === row.item.id
+                    ? $t("Close")
+                    : $t("Prices")
+                }}</b-button
+              >
             </div>
           </div>
         </template>
@@ -167,7 +200,10 @@
         <!-- details -->
         <template v-slot:row-details="row">
           <div class="row-details">
-            <price-table :tool-module="row.item.info" @itemChanged="priceChanged"></price-table>
+            <price-table
+              :tool-module="row.item.info"
+              @itemChanged="priceChanged"
+            ></price-table>
           </div>
         </template>
       </b-table>
@@ -185,7 +221,7 @@ export default {
   name: "ToolsTable",
   components: {
     "module-form": Form,
-    "price-table": PriceTable
+    "price-table": PriceTable,
   },
   props: {
     // categoryId: {
@@ -194,18 +230,18 @@ export default {
     // },
     companyTool: {
       type: Object,
-      required: true
+      required: true,
     },
     items: {
       type: Array,
       required: false,
-      default: () => []
+      default: () => [],
     },
     busy: {
       type: Boolean,
       required: false,
-      default: () => false
-    }
+      default: () => false,
+    },
   },
   data: () => {
     return {
@@ -216,18 +252,26 @@ export default {
       updateForm: null,
       currentRowDetails: null,
       currentDetailsItem: null,
-      deleting: false
+      deleting: false,
     };
+  },
+  watch: {
+    companyTool: {
+      handler(n) {
+        if (n) console.log(n);
+      },
+    },
   },
   computed: {
     ...mapGetters({
-      priceModels: "priceModel/all"
+      priceModels: "priceModel/all",
     }),
     tableItems: {
       get() {
         const items = [];
 
-        this.items.forEach(item => {
+        console.log(this.items);
+        this.items.forEach((item) => {
           let showDetails = false;
           if (
             this.currentRowDetails &&
@@ -237,9 +281,9 @@ export default {
           }
           items.push({ info: item, id: item.id, _showDetails: showDetails });
         });
-
+        console.log(items);
         return items;
-      }
+      },
     },
     fields: {
       get() {
@@ -249,31 +293,26 @@ export default {
           {
             key: "yearlyCosts",
             label: this.$t("Yearly costs"),
-            sortable: true
+            sortable: true,
           },
           { key: "status", label: this.$t("Status"), sortable: false },
-          { key: "actions", label: "" }
+          { key: "actions", label: "" },
         ];
-      }
-    }
+      },
+    },
   },
-  async mounted() {},
   methods: {
-     calculateModulesTotal(item) {
-       
-        if (item.info.prices && item.info.prices.length > 0) {
-          let sum = 0;
+    calculateModulesTotal(item) {
+      if (item.info.prices && item.info.prices.length > 0) {
+        let sum = 0;
 
-         
-            item.info.prices.map( (priceObj) => {
-                sum += (priceObj.price / 100)
-            });
+        item.info.prices.map((priceObj) => {
+          sum += priceObj.price / 100;
+        });
 
-         
-
-          return sum;
-        }
-        return 0;
+        return sum;
+      }
+      return 0;
     },
     isRowEditing(row) {
       return (
@@ -283,15 +322,18 @@ export default {
       );
     },
     togglePopOver() {
+      console.log("this.newItem");
+      console.log(this.companyTool.id);
+
       this.showPopOver = !this.showPopOver;
       this.$store.dispatch("app/showOverlay", {
         show: this.showPopOver,
-        onClick: this.togglePopOver
+        onClick: this.togglePopOver,
       });
 
       if (this.showPopOver) {
         this.newItem = new CompanyToolModule().deserialize({
-          companyTool: this.companyTool.id
+          companyTool: this.companyTool.id,
         });
       }
     },
@@ -321,13 +363,12 @@ export default {
         this.currentItem = null;
         this.updateForm = null;
       } else {
-        console.log("Tools/Modules/Table/Toggle Item");
         this.currentItem = item || null;
         this.updateForm = new GQLForm({
           id: item.id,
           name: item.name,
           companyToolId: item.companyToolId,
-          toolId: null
+          toolId: null,
         });
         this.$nextTick(() => {
           this.$validator.reset();
@@ -336,6 +377,8 @@ export default {
       }
     },
     async saveItem(form) {
+      console.log("form");
+      console.log(form);
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         await this.$validator.reset();
@@ -352,12 +395,13 @@ export default {
           "companyTool/changeStatus",
           new GQLForm({
             id: item.id,
-            status
+            status,
           })
         );
       }
     },
     overlayClick() {
+      console.log("HEP");
       this.toggleItem(null);
       this.showDetails();
     },
@@ -390,16 +434,16 @@ export default {
         where: {
           and: [
             { field: "tool_id", op: "eq", value: this.companyTool.toolId },
-            { field: "name", op: "cn", value: query }
-          ]
-        }
+            { field: "name", op: "cn", value: query },
+          ],
+        },
       });
 
       return response;
     },
     async priceChanged() {
       this.$emit("priceChanged");
-    }
-  }
+    },
+  },
 };
 </script>

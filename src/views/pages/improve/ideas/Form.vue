@@ -198,28 +198,29 @@ export default {
       tools: "companyTool/all",
     }),
     process: {
-      get () {
+      get() {
         return this.currentProcess(this.section);
       },
     },
     stages: {
-      get () {
+      get() {
         return this.process.process.stages || [];
       },
     },
     operations: {
-      get () {
+      get() {
         if (!this.form.stageId || !this.stages) {
           return [];
-				}
-				console.log(this.form.stageId);
-        return (
-          this.stages.find((i) => i.id == this.form.stageId).operations || []
-        );
+        }
+        console.log(this.form.stageId);
+        console.log(this.stages);
+        const stageWithId = this.stages.find((i) => i.id == this.form.stageId);
+
+        return stageWithId?.operations || [];
       },
     },
     phases: {
-      get () {
+      get() {
         if (!this.form.operationId || !this.operations) {
           return [];
         }
@@ -231,7 +232,7 @@ export default {
       },
     },
     currentProcessSection: {
-      get () {
+      get() {
         return (
           this.process.phase ||
           this.process.operation ||
@@ -241,7 +242,7 @@ export default {
       },
     },
     currentProcessSectionName: {
-      get () {
+      get() {
         if (this.process.phase) {
           return "phase";
         }
@@ -258,14 +259,21 @@ export default {
       },
     },
     mode: {
-      get () {
+      get() {
         return this.item.id ? "edit" : "create";
       },
     },
   },
   async mounted() {
+    console.log("formOPEN");
     this.input = this.item;
     this.currentFile = this.item.file;
+    console.log(this.mode);
+    if (this.mode === "create") {
+			console.log(this.form);
+      this.form.companyToolId = this.currentTool("toolIdeas").id;
+    }
+
     if (this.process) {
       await this.$store.dispatch("process/findById", {
         id: this.process.process.id,
@@ -323,7 +331,7 @@ export default {
 
       if (!this.vErrors.any()) {
         console.log("asd");
-          this.$validator.reset();
+        this.$validator.reset();
 
         if (this.mode === "edit") {
           await this.$store.dispatch(`${this.storeName}/update`, this.form);
