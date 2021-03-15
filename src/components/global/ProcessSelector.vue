@@ -290,6 +290,7 @@ export default {
     }),
     current: {
       get() {
+				console.log(this.section);
         return this.currentProcess(this.section);
       }
     },
@@ -311,6 +312,7 @@ export default {
   async mounted() {
     try {
       this.loading.process = true;
+			console.log(this.section);
       this.$store.dispatch("process/setCurrentSection", this.section);
       await this.$store.dispatch("process/findAll", {
         filter: null,
@@ -327,7 +329,7 @@ export default {
       this.loading.phase = true;
       if (this.current.process) {
         if (this.selectedProcess) {
-         
+
           if (this.onSelection) {
             await this.onSelection("process", this.current.process);
           }
@@ -402,6 +404,7 @@ export default {
       return "";
     },
     async toggleSection(name) {
+			console.log(name);
       if (this.expandedSection === name) {
         this.expandedSection = null;
       } else {

@@ -95,6 +95,7 @@ export default {
 		},
     testingIdeas: {
       get() {
+				console.log(this.currentProcessSection)
         if (this.currentProcessSection) {
           return this.$store.getters[
             `toolIdea/by${this.currentProcessSectionName.capitalize()}`

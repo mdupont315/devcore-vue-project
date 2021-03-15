@@ -67,21 +67,6 @@ function getErrorMessage(vue, ref, form = null) {
 Vue.use({
   install(Vue) {
     Vue.prototype.$validateState = function(ref, form = null) {
-      // if (this.vFields[ref]) {
-      //     if (
-      //         this.vFields[ref] &&
-      //         (this.vFields[ref].dirty && this.vFields[ref].validated) || (form && form.hasErrors && (!this.vFields[ref].changed))
-      //     ) {
-      //         let result = !this.vErrors.has(ref);
-      //         if (result && form && (!this.vFields[ref].changed)) {
-      //             result = !form.getError(ref);
-      //         }
-      //         return result;
-      //     }
-      // } else {
-      //     return form && (!form.getError(ref))
-      // }
-      // return null;
       const message = getErrorMessage(this, ref, form);
       const ret =
         message === null || message.message === null || message.message === "";

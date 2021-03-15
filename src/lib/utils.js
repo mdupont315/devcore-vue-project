@@ -9,6 +9,10 @@ String.prototype.capitalize = function() {
   return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
+export function setLang(lang) {
+  window.vm.$i18n.locale = lang || window.vm.$i18n.locale;
+}
+
 export function addClass(el, className) {
   el.classList.add(className);
 }
@@ -110,6 +114,7 @@ export function queryToPromise(
   return new Promise((resolve, reject) => {
     try {
       const subscription = query.subscribe(o => {
+        console.log(o);
         if (options.onChangeStatus) {
           options.onChangeStatus(o);
         }
@@ -144,14 +149,15 @@ export async function loadApp() {
   // init the session store
   try {
     await store.dispatch("auth/init");
-    await store.dispatch("auth/getSession");
+    var getsession = await store.dispatch("auth/getSession");
+      console.log(getsession);
     try {
       if (store.getters["auth/user"]) {
         console.log("User logged in!");
         await store.dispatch("app/load");
         store.dispatch("app/asyncLoad");
-
         if (store.getters["auth/user"].mustChangePassword) {
+
           await router.replace(
             {
               name: "change-password",
@@ -189,26 +195,6 @@ export async function loadApp() {
     unblockUi();
   }
 
-  /* try {
-        await store.dispatch("auth/login", {
-            username: 'user01@devcore.test',
-            password: 'test'
-        });
-    } catch (ex) {
-        console.log(processGraphQLErrors(ex).message);
-    } */
-
-  /*
-        const response = await store.dispatch("testQuery");
-        const subscription = response.subscribe(async o => {
-            if (!o.loading) {
-
-                router.replace('/');
-                addClass(document.body, 'loaded');
-                store.dispatch("app/loaded");
-                subscription.unsubscribe();
-            }
-        }) */
 }
 
 export function getSupportedLocales() {
@@ -223,9 +209,6 @@ export function getSupportedLocales() {
 }
 
 export function isSuperUser() {
-  console.log(store.state.auth.session);
-  console.log(store.state);
-  // return false;
   if (
     store.state.auth.session &&
     store.state.auth.session.user.can("core/company/manage")

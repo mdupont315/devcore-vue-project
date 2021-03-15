@@ -11,31 +11,40 @@ export default async ({ store, next, to }) => {
 
   try {
     session = await store.dispatch("auth/getSession");
+    console.log("session: ");
+    console.log(session);
+
+
+
   } catch (ex) {
     console.log(ex);
   }
-  if (!session) {
-    return next({
+  if (!session || session.user == null) {
+    console.log(session);
+    console.log("NO SESSION");
+  /*   return next({
       name: "login"
-    });
-  }
-  if (session.user.mustChangePassword && to.name !== "change-password") {
+    }); */
     await router.replace(
       {
-        name: "change-password",
-        query: {
-          i: new Date().getTime()
-        }
+        name: "login"
       },
       () => {},
       () => {}
     );
     return;
-    // return next({
-    //     name: 'change-password'
-    // })
+
+/*     await router.replace(
+      {
+        name: "home"
+      },
+      () => {},
+      () => {}
+    );
+    return; */
   }
-  if (!session.user.mustChangePassword && to.name === "change-password") {
+
+  if (!session.user?.mustChangePassword && to.name === "change-password") {
     await router.replace(
       {
         name: "home"
@@ -47,10 +56,13 @@ export default async ({ store, next, to }) => {
   }
   if (to.meta.permissions) {
     const { permissions } = to.meta;
-    if (session.user.can(permissions)) {
+    if (session.user?.can(permissions)) {
+      console.log(session.user);
+      console.log(to.meta.permissions);
+
       return next();
     }
-    await router.replace(
+    /*    await router.replace(
       {
         name: "home",
         query: {
@@ -59,8 +71,12 @@ export default async ({ store, next, to }) => {
       },
       () => {},
       () => {}
-    );
-    return;
+    ); */
+
+    return next({
+      name: "home"
+    });
+    //return;
   }
 
   return next();

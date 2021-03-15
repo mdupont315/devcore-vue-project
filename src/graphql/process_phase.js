@@ -14,7 +14,7 @@ export const PROCESS_PHASE_FRAGMENT = gql `
           projects
           ideas
           toolIdeas
-      }
+      },
       companyRoles{
           id,
           name,

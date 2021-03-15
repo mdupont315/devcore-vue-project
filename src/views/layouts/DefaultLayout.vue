@@ -29,6 +29,7 @@ export default {
       layers: "layers/layers"
     })
   },
+
   mounted() {
     this.$store.dispatch("app/showNavbar", false);
   }

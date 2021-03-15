@@ -41,11 +41,10 @@ export default class UserModel extends BaseModel {
     if (entity && entity._metadata && entity._metadata.permissions) {
       return entity._metadata.permissions.find(p => p === permissions) !== null;
     }
-
     // return true;
     this.permissions = this.permissions || [];
     const permission = this.permissions.find(p => p.name === permissions);
-    return undefined !== permission && permission !== null;
+    return permission !== undefined && permission !== null;
   }
 
   deserialize(input) {
@@ -61,6 +60,7 @@ export default class UserModel extends BaseModel {
       });
     }
     if (input.permissions) {
+
       input.permissions = input.permissions.map(p => {
         return new PermissionModel().deserialize(p);
       });

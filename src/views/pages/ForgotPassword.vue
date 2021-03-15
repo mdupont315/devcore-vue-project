@@ -150,8 +150,7 @@ export default {
           this.showResend = true;
         }, 30000);
       } catch (ex) {
-        
-        // console.log(processGraphQLErrors(ex));
+				console.log(ex);
       } finally {
         this.$validator.reset();
       }

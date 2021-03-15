@@ -25,8 +25,6 @@ const getters = {
 
 }
 
-
-
 const actions = {
 
     async findAll(context, filter = null) {

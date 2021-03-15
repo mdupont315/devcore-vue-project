@@ -424,16 +424,17 @@ export default {
       this.$emit("open", event);
     },
     isSelected(item) {
+
       if (this.isSelectedFn) {
         return this.isSelectedFn(item);
       }
       const itemValue = this.getItemValue(item);
       if (this.mode === "single") {
         return itemValue === this.dataValue;
-      } 
+      }
         this.dataValue = this.dataValue || [];
         return this.dataValue.some((i) => i === itemValue);
-      
+
     },
     isItemDisabled(item) {
       if (this.isItemDisabledFn) {

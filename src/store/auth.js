@@ -1,4 +1,5 @@
 import EventBus from "@/lib/eventbus";
+import { setLang } from "../lib/utils";
 import { blockUi, unblockUi, showMessageFromResponse } from "@/lib/utils";
 import { Session, User } from "@/models";
 import { apolloClient } from "@/plugins/apollo/client";
@@ -16,9 +17,12 @@ elector.awaitLeadership().then(() => {
   leader = true;
 });
 channel.onmessage = msg => {
+  console.log("CHANNEL RECEIVED MESSAGE : ");
+  console.log(msg);
   if (!msg || !msg.type) {
     return;
   }
+  console.log("reload");
   location.reload();
 };
 
@@ -51,6 +55,7 @@ const getters = {
 const actions = {
   async init() {},
   // update profile
+
   async updateProfile(context, form) {
     try {
       const result = await form.mutate({
@@ -66,6 +71,7 @@ const actions = {
         type: "SET_USER",
         data: user
       });
+
       return user;
     } catch (ex) {
       throw ex;
@@ -143,6 +149,7 @@ const actions = {
         type: "SET_SESSION",
         data: session
       });
+      console.log(data);
       context.commit("SET_CHECKED", true);
       EventBus.$emit("auth/LOGIN", {
         context,
@@ -216,6 +223,8 @@ const actions = {
   },
   // login user
   async login(context, form) {
+    console.log(form);
+    console.log("1");
     context.commit("SET_CHECKED", false);
     context.commit("SET_SESSION", null);
 
@@ -237,17 +246,20 @@ const actions = {
         }
       }
     );
+    console.log("2");
     const session = new Session().deserialize(data.login);
     context.commit("SET_SESSION", session);
+    console.log(session);
     channel.postMessage({
       type: "SET_SESSION",
       data: session
     });
+    console.log("3");
     context.commit("SET_CHECKED", true);
     context.commit("SET_TOKEN", {
       token: data.login.accessToken
     });
-
+    console.log("4");
     EventBus.$emit("auth/LOGIN", {
       context,
       data: {
@@ -255,9 +267,11 @@ const actions = {
         fromLocal: false
       }
     });
+    console.log(data);
     return data;
   },
   async logout(context) {
+    console.log("User Logged out!");
     try {
       blockUi();
       EventBus.$emit("auth/LOGOUT", {
@@ -279,16 +293,21 @@ const actions = {
     }
   },
   async getSession(context) {
-    console.log(context);
     if (!context.getters.checked) {
       try {
         blockUi();
+        console.log("try get data");
         const { data } = await apolloClient.query({
           query: AUTH.session,
-          fetchPolicy: "network-only"
+          fetchPolicy: "default"
         });
+
+        console.log(data);
+
         if (data && data.session) {
           const session = new Session().deserialize(data.session);
+          console.log(session);
+
           context.commit("SET_SESSION", session);
           if (leader) {
             channel.postMessage({
@@ -296,12 +315,14 @@ const actions = {
               data: session
             });
           }
+
           EventBus.$emit("auth/LOGIN", {
             context,
             data: session
           });
         }
       } catch (ex) {
+        console.log(ex);
         context.commit("SET_SESSION", null);
         if (leader) {
           channel.postMessage({
@@ -315,6 +336,7 @@ const actions = {
         context.commit("SET_CHECKED", true);
       }
     }
+    console.log(context.getters.session);
 
     return context.getters.session;
   },
@@ -345,12 +367,15 @@ const mutations = {
     return state;
   },
   SET_SESSION(state, session) {
+    console.log(state);
+    console.log(session);
     state.session = session;
   },
   SET_USER(state, user) {
     state.session.user = user;
   },
   SET_TOKEN(state, token) {
+    console.log(token);
     state.token = token;
   },
 

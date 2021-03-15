@@ -150,10 +150,10 @@ export default {
           this.showResend = true;
         }, 30000);
       } catch (ex) {
+				console.log(ex);
         if (ex.code === 'USER_ALREADY_VERIFIED'){
           this.$router.push({ name:'login' });
         }
-        // console.log(processGraphQLErrors(ex));
       } finally {
         // this.$validator.reset();
       }

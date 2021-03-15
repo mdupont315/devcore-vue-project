@@ -4,20 +4,18 @@ import Pusher from "pusher-js";
 import Echo from "laravel-echo";
 import config from "./config";
 import store from "../../store/index";
-
+console.log("HI");
 class EchoLink extends ApolloLink {
   constructor() {
     super();
     this.subscriptions = [];
-    // this.initEcho();
+   // this.initEcho();
   }
 
   initEcho() {
     try {
-      console.log(config.wsEndpoint);
       const token = store.getters["auth/access_token"];
-      // console.log(store);
-      // const token = "eyJpdiI6IlI2T3ZWTjZ5dGppRlI4TEpzeEpCaUE9PSIsInZhbHVlIjoiOFhiaEpHdzZOU1M4MnVlQW52QXNPODhvWlwvVXhKSVF2R3pTVzRqSTFYRnBCUkxcL3A5cHRkc3hUcThoMHd3VVY5TjdFanBYZWFDY21Ydm0zQnlFV0wwVHN2MDVwQ2tIblp3ZWI4VGVvSFZQejlOajJZMzVad0w3cXM2XC9laVpRXC9TXC9OdFpQanM4QWVJTFNYQjRPdkdraURzTEs1bFVjeVZuT3ZlUTB2cnlrN0c2QlwvQkphRHg5ZnB3SitUVzdNWHMzSUY4bDB1OXl4c3RPN3ZUeDArR3lyVFRGYUdiOTR6eGpNSFMrS1JDdm42U3NLZWxqTTBlcVlzdDhsTnRDMmY1M2ZaTVMyK1FtS2hXdjMrUzFXMGt5a3J3SFI5YTZBaGRTb1wvTFBRNUc0UmxJR2VYY1NuTVQxSkgxdXJtVjQxd0lHRGxERGpMeEErak1wUTd0a2U3V2t1eHZxaEg1MTkzM3c3S0NqbVN5N1JkR21IMEdNTzd1MmdnR09HejFFbmh4VTZvRVZDNGR1Z2ZjS0liTzU2WFpmUkk5bHN3MDlBeTVmR0ZqTks1MEg5YnRcL0cwYzVvZTVUZGdOODViVk5ST0FnWUt6OU5vSG56YVByWHU5Y0RwS1U3RXpCRFlhYWUxVUJmVVV4NXNta05JTT0iLCJtYWMiOiIxNmExNzQ0MzMxNDFkMzBkNDg1NDUzYzgzNzI2ZTQxYzU4NmMyOThiZmM3OWYxZGFkZjdlMmM0ZmI3NzI0NDEwIn0%3D";
+      //const token = "eyJpdiI6IlI2T3ZWTjZ5dGppRlI4TEpzeEpCaUE9PSIsInZhbHVlIjoiOFhiaEpHdzZOU1M4MnVlQW52QXNPODhvWlwvVXhKSVF2R3pTVzRqSTFYRnBCUkxcL3A5cHRkc3hUcThoMHd3VVY5TjdFanBYZWFDY21Ydm0zQnlFV0wwVHN2MDVwQ2tIblp3ZWI4VGVvSFZQejlOajJZMzVad0w3cXM2XC9laVpRXC9TXC9OdFpQanM4QWVJTFNYQjRPdkdraURzTEs1bFVjeVZuT3ZlUTB2cnlrN0c2QlwvQkphRHg5ZnB3SitUVzdNWHMzSUY4bDB1OXl4c3RPN3ZUeDArR3lyVFRGYUdiOTR6eGpNSFMrS1JDdm42U3NLZWxqTTBlcVlzdDhsTnRDMmY1M2ZaTVMyK1FtS2hXdjMrUzFXMGt5a3J3SFI5YTZBaGRTb1wvTFBRNUc0UmxJR2VYY1NuTVQxSkgxdXJtVjQxd0lHRGxERGpMeEErak1wUTd0a2U3V2t1eHZxaEg1MTkzM3c3S0NqbVN5N1JkR21IMEdNTzd1MmdnR09HejFFbmh4VTZvRVZDNGR1Z2ZjS0liTzU2WFpmUkk5bHN3MDlBeTVmR0ZqTks1MEg5YnRcL0cwYzVvZTVUZGdOODViVk5ST0FnWUt6OU5vSG56YVByWHU5Y0RwS1U3RXpCRFlhYWUxVUJmVVV4NXNta05JTT0iLCJtYWMiOiIxNmExNzQ0MzMxNDFkMzBkNDg1NDUzYzgzNzI2ZTQxYzU4NmMyOThiZmM3OWYxZGFkZjdlMmM0ZmI3NzI0NDEwIn0%3D";
       this.echo = new Echo({
         broadcaster: "pusher",
         key: "devcore-pusher-app-key",

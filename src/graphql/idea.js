@@ -57,7 +57,7 @@ export const IDEA_FRAGMENT = gql `
               dOrder,
               description
               processId
-              
+
           }
           ... on ProcessOperation{
             id,
@@ -66,7 +66,7 @@ export const IDEA_FRAGMENT = gql `
             description,
             processId
             stageId
-            stage{
+              stage{
                 id
                title
             }

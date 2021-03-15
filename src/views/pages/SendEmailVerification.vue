@@ -153,7 +153,7 @@ export default {
         if (ex.code === 'USER_ALREADY_VERIFIED'){
           this.$router.push({ name:'login' });
         }
-        // console.log(processGraphQLErrors(ex));
+        console.log(ex);
       } finally {
         // this.$validator.reset();
       }

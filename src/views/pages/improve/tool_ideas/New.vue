@@ -4,7 +4,7 @@
       <b-col cols="6" class="mx-auto">
         <div class="h4 text-white text-uppercase clearfix">
           <h3 class="h4 float-left" style="padding-top: 9px">
-            {{ $t("New ideas") }}
+           {{ $t("New ideas") }}
             <span class="h4 text-gray-lighter">{{ newIdeas.length }}</span>
           </h3>
           &nbsp;

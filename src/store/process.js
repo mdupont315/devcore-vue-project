@@ -41,8 +41,6 @@ function loadCurrent(state, section) {
     }
     state.storage[section] = state.storage[section] || {};
 
-    // state.current[section] = state.current[section] || {};
-    // console.log(state.storage[section])
 
     if (state.storage[section].processId) {
         current.process = state.all.find(p => p.id === state.storage[section].processId);
@@ -55,25 +53,13 @@ function loadCurrent(state, section) {
         if (state.storage[section].stageId) {
             current.stage = current.process.stages.find(i => i.id === state.storage[section].stageId);
         }
-        if (!current.stage) {
-            // current.stage = current.process.stages[0];
-        }
-
         if (state.storage[section].operationId) {
             current.operation = current.stage ? current.stage.operations.find(i => i.id === state.storage[section].operationId) : null;
         }
-
-        if (!current.operation) {
-            // current.operation = current.stage ? current.stage.operations[0] : null;
-        }
-
         if (state.storage[section].phaseId) {
             current.phase = current.operation ? current.operation.phases.find(i => i.id === state.storage[section].phaseId) : null;
         }
 
-        if (!current.phase) {
-            // current.phase = current.operation ? current.operation.phases[0] : null;
-        }
     } else {
         current.stage = null;
         current.operation = null;
@@ -83,8 +69,6 @@ function loadCurrent(state, section) {
 }
 
 const state = initialState();
-
-
 
 const getters = {
     loading: state => state.loading,
@@ -233,6 +217,7 @@ const actions = {
     },
 
     async setCurrentSection(context, section) {
+      console.log(section);
         context.commit('SET_CURRENT_SECTION', section);
     },
 
@@ -281,6 +266,7 @@ const mutations = {
 
     },
     SET_ITEM(state, value) {
+      console.log(value);
         const index = state.all.findIndex(el => el.id === value.id);
         if (index > -1) {
             // const copy = { ...state.all[index] };

@@ -1,7 +1,13 @@
 <template>
   <div>
-    <b-modal v-model="showInviteModal" :title="$t('Invite to Devcore')" header-bg-variant="primary" header-text-variant="white" :hide-footer="true">
-      <user-form @done="showInviteModal=false"></user-form>
+    <b-modal
+      v-model="showInviteModal"
+      :title="$t('Invite to Devcore')"
+      header-bg-variant="primary"
+      header-text-variant="white"
+      :hide-footer="true"
+    >
+      <user-form @done="showInviteModal = false"></user-form>
     </b-modal>
     <div class="nav-overlay" @click="toggleNav"></div>
     <nav class="main-nav">
@@ -19,16 +25,23 @@
       <div class="menu-wrapper">
         <navigation :items="nav" />
       </div>
-      <div v-if="$can('auth/user/create')== true && $can('core/company/manage') == false" class="text-center p-3">
-        <small
-          class="px-3 text-center d-block mb-3"
-        >{{ $t('Invite your team and start collaborating now!')}}</small>
+      <div
+        v-if="
+          $can('auth/user/create') == true &&
+          $can('core/company/manage') == false
+        "
+        class="text-center p-3"
+      >
+        <small class="px-3 text-center d-block mb-3">{{
+          $t("Invite your team and start collaborating now!")
+        }}</small>
         <b-button
           size="lg"
           block
           variant="outline-primary"
           @click="showInviteModal = !showInviteModal"
-        >{{ $t('Invite to Devcore') }}</b-button>
+          >{{ $t("Invite to Devcore") }}</b-button
+        >
       </div>
     </nav>
   </div>
@@ -43,20 +56,20 @@ export default {
   name: "TopNav",
   components: {
     "user-form": UserForm,
-    navigation: Navigation
+    navigation: Navigation,
   },
   data() {
     return {
       nav: nav(this.$store.getters["auth/user"]),
-      showInviteModal: false
+      showInviteModal: false,
     };
   },
   computed: {
     ...mapGetters({
-      user: "auth/user"
-    })
+      user: "auth/user",
+    }),
   },
-  mounted() {},
+
   methods: {
     async logout() {
       try {
@@ -67,7 +80,7 @@ export default {
     },
     async toggleNav() {
       await this.$store.dispatch("app/toggleNav");
-    }
-  }
+    },
+  },
 };
 </script>

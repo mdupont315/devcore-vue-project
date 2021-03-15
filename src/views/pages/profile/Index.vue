@@ -1,5 +1,5 @@
 <template>
-  
+
   <div class="spcustom-container">
     <div class="page bg-white">
       <div class="container">
@@ -163,7 +163,7 @@
         </b-form>
       </div>
     </div>
-  </div>  
+  </div>
 </template>
 <script>
 import { /* mapState, */ mapGetters } from "vuex";
@@ -206,18 +206,6 @@ export default {
         this.initForm();
       }
 
-      /* try {
-        this.form.errors = null;
-        await this.$store.dispatch("auth/login", this.form);
-        console.log(this.$store.getters["app/intented_route"]);
-        await this.$router.replace(
-          this.$store.getters["app/intented_route"] || "/"
-        );
-      } catch (ex) {
-        //console.log(processGraphQLErrors(ex));
-      } finally {
-        //this.$validator.reset();
-      } */
     }
   }
 };

@@ -51,7 +51,7 @@ export const PROJECT_FRAGMENT = gql `
             totalEvaluations
         }
     }
-     
+
       _metadata{
           ...metaFields
       }
@@ -68,6 +68,11 @@ export const PROJECT_FULL_FRAGMENT = gql `
         users{
             id
         }
+        tools{
+          id,
+          toolId,
+          stageId
+        }
         ideas{
             id,
             ideaId,
@@ -79,7 +84,6 @@ export const PROJECT_FULL_FRAGMENT = gql `
             totalLosses,
             consolidatedValue,
             totalEvaluations
-
         }
         issues{
             id
@@ -105,6 +109,7 @@ export const PROJECT_FULL_FRAGMENT = gql `
                 ideaId
                 title
             }
+
       }
     }
     ${PROJECT_FRAGMENT}
@@ -154,7 +159,7 @@ export const PROJECT = {
             ${PROJECT_FULL_FRAGMENT}
         `,
     completeStage: gql `
-        mutation projectCompleteStage($id:ID!, $stageId:ID!){
+        mutation projectCompleteStage($id:ID!, $stageId:[ID!]){
             projectCompleteStage(id:$id, stageId:$stageId){
                     ...projectFullFields
                 }

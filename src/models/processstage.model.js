@@ -5,7 +5,6 @@ import ProcessModel from "./process.model";
 import ProcessOperationModel from "./processoperation.model";
 
 export default class ProcessStageModel extends BaseModel {
-    tite = null;
 
     dOrder = 1;
 
@@ -16,6 +15,8 @@ export default class ProcessStageModel extends BaseModel {
     processId = null;
 
     ideas = [];
+
+    tools = [];
 
     operations = [];
 

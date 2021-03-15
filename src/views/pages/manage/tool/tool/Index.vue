@@ -196,15 +196,11 @@ export default {
     }),
     getModules: {
       get() {
-        console.log("YEAHHHHHH");
-        console.log(this.row);
         return this.row.item.modules;
       },
     },
     tableItems: {
       get() {
-        console.log("YEAHHHHHH");
-        console.log(this.items);
         return this.items.filter((item) => item.type === "TOOL");
       },
     },
@@ -224,8 +220,6 @@ export default {
     },
   },
   async created() {
-		console.log("toolselector");
-
     // this.$store.dispatch("priceModel/findAll");
     this.$store.dispatch("companyTool/findAll", {
       filter: this.filter,
@@ -256,8 +250,6 @@ export default {
       return 0;
     },
     overlayClick() {
-      console.log("HI");
-      console.log(this.currentItem);
       if (this.currentItem) {
         this.toggleItem(null);
       } else {
@@ -265,8 +257,6 @@ export default {
       }
     },
     async saveItem(form) {
-      console.log("FORM");
-      console.log(form);
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         await this.$validator.reset();
@@ -282,16 +272,12 @@ export default {
         if (!item.products) {
           this.loadingItem = true;
         }
-        console.log(this.currentRowDetails);
         const openModule = this.currentRowDetails.item.modules.find(
           (f) => f._showDetails
         );
-        console.log("Module open ");
-        console.log(openModule);
         if (openModule) {
           openModule._showDetails = false;
         }
-        console.log(item);
            this.currentRowDetails.item = await this.$store.dispatch(
           "companyTool/findById",
           {
@@ -307,7 +293,6 @@ export default {
           );
           newModule._showDetails = true;
         }
-        console.log("this.$refs.modulesTable");
         console.log(this.$refs.modulesTable);
         if (this.$refs.modulesTable) this.$refs.modulesTable.$forceUpdate();
       } finally {

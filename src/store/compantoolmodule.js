@@ -73,6 +73,7 @@ const actions = {
     },
 
     async update(context, form) {
+
         const result = await form.mutate({
             mutation: COMPANY_TOOL_MODULE.update,
             variables: {

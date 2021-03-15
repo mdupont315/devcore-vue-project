@@ -45,8 +45,10 @@
         <template v-slot:cell(value)="row">
           <span
             :class="{'text-danger':row.item.consolidatedValue<0,'text-success':row.item.consolidatedValue>=0}"
-          >{{ (row.item.consolidatedValue*100/project.budget) | numberFormat('0.00') }} %</span>
-        </template>
+          > {{ (row.item.consolidatedValue*100/project.budget) | numberFormat('0.00') }} %</span>
+
+
+				</template>
       </b-table>
     </div>
   </div>
@@ -67,6 +69,7 @@ export default {
       type: Array
     }
   },
+
   computed: {
     fields: {
       get() {
@@ -89,3 +92,4 @@ export default {
   }
 };
 </script>
+

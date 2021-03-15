@@ -13,7 +13,7 @@
       :empty-text="$t('There are no records for the given criteria')"
       :tbody-tr-class="(item,type)=>false?'editing':null"
     >
-      
+
       <slot name="default" />
     </b-table>
   </div>

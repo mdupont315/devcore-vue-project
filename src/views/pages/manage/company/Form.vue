@@ -53,15 +53,36 @@
                     :value="item.code"
                   >{{ item.name }} | {{ item.symbol }} ({{ item.code }})</option>
                 </b-form-select>
-          
+
           <label for="currencyCode">{{ $t('Currency Code') }}</label>
           <b-form-invalid-feedback>{{ $displayError('currencyCode', form) }}</b-form-invalid-feedback>
         </div>
       </b-col>
-     
-     
- 
-    
+       <b-col class="col-12">
+        <div class="form-label-group select required">
+          <v-select
+            v-model="form.lang"
+            v-validate="'required'"
+            label="text"
+            data-vv-name="value"
+            :placeholder="$t('Language')"
+            :options="getAssignableLanguages"
+						:reduce="(lang) => lang.value"
+            :disabled="form.busy"
+            :class="{
+              'is-invalid': $validateState('lang', form) === false,
+              'is-valid': $validateState('lang', form) === true,
+            }"
+          ></v-select>
+          <label for="lang">{{ $t("Language") }}</label>
+          <b-form-invalid-feedback>{{
+            $displayError("lang", form)
+          }}</b-form-invalid-feedback>
+        </div>
+      </b-col>
+
+
+
     </b-row>
     <b-row>
       <b-col>
@@ -92,6 +113,7 @@
 import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
 import { User } from "@/models";
+import { getSupportedLocales } from "@/lib/utils";
 
 export default {
   props: {
@@ -113,6 +135,7 @@ export default {
       name: null,
       currencyCode: null,
       adminEmail: null,
+			lang: null,
       // email: null,
       // phone: null,
       // avatar: null,
@@ -127,7 +150,19 @@ export default {
       companyRoles: "companyRole/all",
       currentUser: "auth/user",
       currencies: "currency/all",
-    })
+    }),
+		   getAssignableLanguages() {
+      const items = [];
+      const annotedLabels = getSupportedLocales();
+      annotedLabels.forEach((element) => {
+        items.push({
+          text: element.name,
+          value: element.code,
+        });
+      });
+			console.log(items);
+      return items;
+    },
   },
   async mounted() {
     this.input = this.value;
@@ -150,7 +185,7 @@ export default {
         await this.$validator.validateAll();
         if (!this.vErrors.any()) {
           await this.$validator.reset();
-         
+
           if (this.mode === "edit") {
             this.input = await this.$store.dispatch("company/update", this.form);
           } else {
@@ -165,7 +200,7 @@ export default {
       }
     },
 
-   
+
   }
 };
 </script>

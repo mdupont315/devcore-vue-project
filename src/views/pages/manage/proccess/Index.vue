@@ -13,7 +13,7 @@
       <i class="mdi mdi-keyboard-backspace"></i>
       {{ $t('Back To Process')}}
     </b-button>
-   
+
       <br/><br/>
     </div>
     <div v-if="!showStages && process && process.loaded && allProcess.length > 0">
@@ -38,7 +38,7 @@
         <draggable
           v-model="stages"
           class="sortable-wrapper t01 horizontal"
-          v-bind="{disabled:busy||editingCard, draggable:'.enable-drag', animation:200, filter:'.busy .newItem'}"
+          v-bind="{disabled:busy||editingCard||show_inner_overlay, draggable:'.enable-drag', animation:200, filter:'.busy .newItem'}"
           @change="changeOrder"
         >
           <stage-card
@@ -117,7 +117,8 @@ export default {
       allProcess: "process/all",
       filter: "process/filter",
       filteredProcess: "process/filteredItems",
-      loadingProcess: "process/loading"
+      loadingProcess: "process/loading",
+      show_inner_overlay: "app/show_inner_overlay"
     }),
     currentProcess: {
       get() {
@@ -231,6 +232,7 @@ export default {
       this.$refs.newStageCard.changeMode(null);
     },
     editing(editing) {
+			console.log(editing);
       this.editingCard = editing;
     },
     editingProcess(editing) {

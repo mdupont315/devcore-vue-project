@@ -255,13 +255,6 @@ export default {
       deleting: false,
     };
   },
-  watch: {
-    companyTool: {
-      handler(n) {
-        if (n) console.log(n);
-      },
-    },
-  },
   computed: {
     ...mapGetters({
       priceModels: "priceModel/all",
@@ -270,7 +263,6 @@ export default {
       get() {
         const items = [];
 
-        console.log(this.items);
         this.items.forEach((item) => {
           let showDetails = false;
           if (
@@ -281,7 +273,6 @@ export default {
           }
           items.push({ info: item, id: item.id, _showDetails: showDetails });
         });
-        console.log(items);
         return items;
       },
     },
@@ -322,8 +313,6 @@ export default {
       );
     },
     togglePopOver() {
-      console.log("this.newItem");
-      console.log(this.companyTool.id);
 
       this.showPopOver = !this.showPopOver;
       this.$store.dispatch("app/showOverlay", {
@@ -377,8 +366,6 @@ export default {
       }
     },
     async saveItem(form) {
-      console.log("form");
-      console.log(form);
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         await this.$validator.reset();
@@ -401,7 +388,6 @@ export default {
       }
     },
     overlayClick() {
-      console.log("HEP");
       this.toggleItem(null);
       this.showDetails();
     },

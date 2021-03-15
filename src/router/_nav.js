@@ -1,6 +1,7 @@
 import i18n from '@/i18n'
 
 export default function getItems(user) {
+  console.log(user);
     if (!user) {
         return [];
     }
@@ -28,7 +29,7 @@ export default function getItems(user) {
                     url: {
                         name: 'ideas'
                     },
-                    // permissions: 'process/process/manage',
+                    permissions: 'process/process/manage',
                 },
                 {
                     title: i18n.t('Tool Ideas'),
@@ -37,7 +38,7 @@ export default function getItems(user) {
                     url: {
                         name: 'tool-ideas'
                     },
-                    // permissions: 'process/process/manage',
+                     permissions: 'process/process/manage',
                 }
             ]
         },

@@ -458,10 +458,6 @@ const routes = [
       import(
         /* webpackChunkName: "home" */ "@/views/pages/manage/proccess/Index"
       )
-    // import ( /* webpackChunkName: "home" */ '@/views/Home'),
-    // meta: {
-    //   middleware: [auth],
-    // }
   }
 
   // {

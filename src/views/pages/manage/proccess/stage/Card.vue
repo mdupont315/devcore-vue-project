@@ -29,24 +29,14 @@
           </div>
           <hr class="m-0 mt-2" />
           <div class="companyRoles">
-            <!-- <ul class="list-inline break mb-0" v-if="item.companyRoles && item.companyRoles.length>0">
-              <li class="list-inline-item my-1 mx-1" v-for="role in item.companyRoles" :key="role.id">
-                <img
-                  :src="role.getAvatarUrl('50x50')"
-                  class="rounded rounded-circle border"
-                  height="30"
-                  v-b-tooltip.hover
-                  :title="role.name"
-                />
-              </li>
-            </ul>-->
             <div v-if="item.companyRoles && item.companyRoles.length>0">
-              <div class="stacked-avatars left">
+              <div class="stacked-avatars left" style="display:block">
                 <div
                   v-for="role in item.companyRoles"
                   :key="role.id"
                   v-b-tooltip="{  placement: 'top', boundary:'viewport' }"
                   class="avatar-item"
+									style="max-width:20px;max-height:20px"
                   :title="role.name"
                 >
                   <img :src="role.getAvatarUrl('50x50')" height="20" />
@@ -62,7 +52,7 @@
             v-model="operations"
             class="sortable-wrapper"
             group="operations"
-            v-bind="{disabled:orderBusy||editingCard, draggable:'.enable-drag', animation:200, filter:'.busy'}"
+            v-bind="{disabled:orderBusy||editingCard||show_inner_overlay, draggable:'.enable-drag', animation:200, filter:'.busy'}"
             @change="onOperationDrag"
           >
             <operation-card
@@ -244,7 +234,8 @@ export default {
   }),
   computed: {
     ...mapGetters({
-      companyRoles: "companyRole/all"
+      companyRoles: "companyRole/all",
+			show_inner_overlay: "app/show_inner_overlay"
     }),
     selectedRoles: {
       get() {

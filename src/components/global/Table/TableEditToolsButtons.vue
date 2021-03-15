@@ -125,6 +125,7 @@ export default {
   }),
   methods: {
     async save() {
+			console.log(this.item);
       this.$emit("save", this.item);
     },
     async cancel() {

@@ -32,7 +32,7 @@
         <portal-target name="topbar-right"></portal-target>
       </b-nav-item>
       <div class="nav__end">
-          <locales-switcher />
+          <locales-switcher :input="user"/>
         </div>
       <div class="profile">
 
@@ -116,7 +116,7 @@ export default {
     }
   },
   mounted() {
-
+			console.log(this.user);
   },
   methods: {
     async logout() {

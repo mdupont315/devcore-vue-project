@@ -1,7 +1,9 @@
 <template>
   <div class="page animated fadeIn">
     <div
-      v-if="process && (!loading || items.length>0 && process.stages.length>0)"
+      v-if="
+        process && (!loading || (items.length > 0 && process.stages.length > 0))
+      "
       class="editable-dashboard"
     >
       <div class="sortable-wrapper t01 horizontal">
@@ -17,17 +19,25 @@
                 <div class="title">
                   <h2
                     class="h5 m-0 text-capitalize text-center text-overflow text-bold"
-                  >{{ stage.title }}</h2>
+                  >
+                    {{ stage.title }}
+                  </h2>
                 </div>
               </div>
-              <div v-if="getProjectFromStage(stage).length>0" class="card-body">
+              <div
+                v-if="getProjectFromStage(stage).length > 0"
+                class="card-body"
+              >
                 <project-card
                   v-for="project in getProjectFromStage(stage)"
                   :key="constructRefForItem(project, stage)"
                   :ref="constructRefForItem(project, stage)"
                   :item="project"
                   :stage="project.getStage(stage.id)"
-                  :expanded="currentItem && currentItem.id===project.getStage(stage.id).id"
+                  :expanded="
+                    currentItem &&
+                    currentItem.id === project.getStage(stage.id).id
+                  "
                   @itemChanged="itemChanged"
                   @toggled="itemToggled"
                   @itemDetailsToggled="itemDetailsToggled"
@@ -41,8 +51,10 @@
         </div>
       </div>
     </div>
-    <page-loader v-if="loading && items.length==0"></page-loader>
-    <empty-page v-if="!loading && (!process || process.stages.length === 0)"></empty-page>
+    <page-loader v-if="loading && items.length == 0"></page-loader>
+    <empty-page
+      v-if="!loading && (!process || process.stages.length === 0)"
+    ></empty-page>
   </div>
 </template>
 <script>
@@ -53,7 +65,7 @@ import { scrollLeftToElement } from "@/lib/utils";
 
 export default {
   components: {
-    "project-card": ProjectCard
+    "project-card": ProjectCard,
   },
   data: () => {
     return {
@@ -62,61 +74,69 @@ export default {
       currentItem: null,
       loadingItem: false,
       filter: {
-        busy: false
+        busy: false,
       },
-      toolOptions: null
+      toolOptions: null,
     };
   },
   computed: {
     ...mapGetters({
+      filteredItems: "project/filteredItems",
       loading: "project/loading",
       currentProcess: "process/current",
-      showInnerOverlayOnTop: "app/show_inner_overlay_on_top"
+      showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
     }),
     process: {
       get() {
         return this.currentProcess("projects").process;
-      }
+      },
     },
     items: {
       get() {
         if (!this.process) {
           return [];
         }
-        return this.$store.getters["project/filteredByprocess"](
+
+        const result = this.$store.getters["project/filteredByprocess"](
           this.process.id
         );
-      }
-    }
+        return result;
+      },
+    },
   },
   async mounted() {
     if (this.process) {
       await this.$store.dispatch("process/findById", {
         id: this.process.id,
-        force: true
+        force: true,
       });
       await this.$store.dispatch("project/findByProcess", {
         id: this.process.id,
-        force: true
+        force: true,
       });
     }
   },
   methods: {
     getProjectFromStage(stage) {
-      const it = this.items
+
+      const it = this.$store.getters["project/filteredByprocess"](
+        this.process.id
+      )
         .filter(
-          o =>
+          (o) =>
             o.getStage(stage.id) && o.getStage(stage.id).status != "NOT_STARTED"
         )
         .sort((a, b) => {
           const stageA = a.getStage(stage.id);
           const stageB = b.getStage(stage.id);
+
           if (stageA.status != stageB.status) {
             return stageA.status === "STARTED" ? -1 : 1;
           }
           return a.name < b.name ? -1 : 1;
         });
-        return it;
+
+      return it;
     },
     isRowEditing(row) {
       return (
@@ -148,7 +168,7 @@ export default {
         this.currentRowDetails.item = await this.$store.dispatch(
           "toolCategory/findById",
           {
-            id: item.id
+            id: item.id,
           }
         );
       } finally {
@@ -183,7 +203,7 @@ export default {
       } else {
         this.updateForm = new GQLForm({
           id: item.id,
-          name: item.name
+          name: item.name,
         });
         this.currentItem = item;
         this.$validator.reset();
@@ -206,8 +226,8 @@ export default {
         where: {
           field: "name",
           op: "like",
-          value: query
-        }
+          value: query,
+        },
       });
 
       return response;
@@ -231,10 +251,11 @@ export default {
       }
     },
     itemChanged(item) {
+			console.log(item);
       if (item) {
         this.loadItem(item);
       }
-    }
-  }
+    },
+  },
 };
 </script>

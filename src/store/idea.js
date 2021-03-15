@@ -22,8 +22,6 @@ const initialState = () => {
 
 const state = initialState();
 
-
-
 const getters = {
     loading: state => state.loading,
     all: state => state.all,

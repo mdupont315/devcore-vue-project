@@ -3,7 +3,7 @@
     <div
       v-if="currentItem || currentRowDetails || resetingPassword"
       class="overlay"
-      :class="{'top-all':this.showInnerOverlayOnTop || resetingPassword}"
+      :class="{ 'top-all': this.showInnerOverlayOnTop || resetingPassword }"
       @click="overlayClick"
     ></div>
     <div class="container-fluid">
@@ -20,16 +20,18 @@
           :items="items"
           :show-empty="true"
           :empty-text="$t('There are no records for the given criteria')"
-          :tbody-tr-class="(item,type)=>isRowEditing(item)?'editing':null"
+          :tbody-tr-class="
+            (item, type) => (isRowEditing(item) ? 'editing' : null)
+          "
         >
           <template v-slot:table-colgroup="scope">
-            <col style="width:30%" />
-            <col style="width:15%" />
-            <col style="width:10%" />
-            <col style="width:10%" />
-            <col style="width:10%" />
-            <col style="width:5%" />
-            <col style="width:250px" />
+            <col style="width: 30%" />
+            <col style="width: 15%" />
+            <col style="width: 10%" />
+            <col style="width: 10%" />
+            <col style="width: 10%" />
+            <col style="width: 5%" />
+            <col style="width: 250px" />
           </template>
           <template v-slot:empty="scope">
             <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -42,53 +44,76 @@
 
           <!-- name -->
           <template v-slot:cell(fullName)="row">
-            <table-editable-cell :row="row" :editing="isRowEditing(row)" :item="updateForm">
+            <table-editable-cell
+              :row="row"
+              :editing="isRowEditing(row)"
+              :item="updateForm"
+            >
               <span>
                 <img
                   :src="row.item.getAvatarUrl('50x50')"
                   class="border rounded-circle"
                   height="25px"
                 />
-                {{ row.item.firstName }} {{row.item.lastName}}
+                {{ row.item.firstName }} {{ row.item.lastName }}
               </span>
               <template v-if="isRowEditing(row)" slot="editing">
                 <div class="d-flex">
-                  <div class="flex-grow-1 mr-1" style="position:relative">
+                  <div class="flex-grow-1 mr-1" style="position: relative">
                     <b-input
                       v-model="updateForm.firstName"
-                      v-validate="'required|min:4'"
+                      v-validate="'required|min:2'"
                       name="firstName"
                       size="sm"
                       :state="$validateState('firstName', updateForm)"
                       :disabled="updateForm.busy"
                     ></b-input>
-                    <b-form-invalid-feedback>{{ $displayError('firstName', updateForm) }}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback>{{
+                      $displayError("firstName", updateForm)
+                    }}</b-form-invalid-feedback>
                   </div>
-                  <div class="flex-grow-1" style="position:relative">
+                  <div class="flex-grow-1" style="position: relative">
                     <b-input
                       v-model="updateForm.lastName"
-                      v-validate="'required|min:4'"
+                      v-validate="'required|min:2'"
                       name="lastName"
                       size="sm"
                       :state="$validateState('lastName', updateForm)"
                       :disabled="updateForm.busy"
                     ></b-input>
-                    <b-form-invalid-feedback>{{ $displayError('lastName', updateForm) }}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback>{{
+                      $displayError("lastName", updateForm)
+                    }}</b-form-invalid-feedback>
                   </div>
                 </div>
-                <div v-if="$can('auth/user/reset_password', row.item)" class="edit-tools-buttons">
+                <div
+                  v-if="$can('auth/user/reset_password', row.item)"
+                  class="edit-tools-buttons"
+                >
                   <confirm-button
                     size="sm"
                     variant="link"
                     btn-class="text-undecorated text-white"
-                    style="margin-left:-10px;margin-top:10px"
+                    style="margin-left: -10px; margin-top: 10px"
                     :show-overlay="false"
                     confirm-class="btn-primary"
-                    :confirm-title=" $t('Reset') + ' ' + row.item.firstName + ' ' +$t('password') +'?'"
-                    :confirm-message="$t('We will send a new password to') + ' ' + row.item.email"
+                    :confirm-title="
+                      $t('Reset') +
+                      ' ' +
+                      row.item.firstName +
+                      ' ' +
+                      $t('password') +
+                      '?'
+                    "
+                    :confirm-message="
+                      $t('We will send a new password to') +
+                      ' ' +
+                      row.item.email
+                    "
                     :confirm-text="$t('Reset password')"
                     @confirm="resetPassword(row.item)"
-                  >{{ $t('Reset password') }}</confirm-button>
+                    >{{ $t("Reset password") }}</confirm-button
+                  >
                 </div>
               </template>
             </table-editable-cell>
@@ -113,7 +138,9 @@
                   :state="$validateState('email', updateForm)"
                   :disabled="updateForm.busy"
                 ></b-input>
-                <b-form-invalid-feedback>{{ $displayError('email', updateForm) }}</b-form-invalid-feedback>
+                <b-form-invalid-feedback>{{
+                  $displayError("email", updateForm)
+                }}</b-form-invalid-feedback>
               </template>
             </table-editable-cell>
           </template>
@@ -125,7 +152,7 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="roleId"
-              :static-value="row.item.role?row.item.role.name:$t('N/A')"
+              :static-value="row.item.role ? row.item.role.name : $t('N/A')"
             >
               <template v-if="isRowEditing(row)" slot="editing">
                 <b-select
@@ -135,9 +162,13 @@
                   :state="$validateState('roleId', updateForm)"
                   :disabled="updateForm.busy"
                 >
-                  <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
+                  <option v-for="role in roles" :key="role.id" :value="role.id">
+                    {{ role.name }}
+                  </option>
                 </b-select>
-                <b-form-invalid-feedback>{{ $displayError('roleId', updateForm) }}</b-form-invalid-feedback>
+                <b-form-invalid-feedback>{{
+                  $displayError("roleId", updateForm)
+                }}</b-form-invalid-feedback>
               </template>
             </table-editable-cell>
           </template>
@@ -149,7 +180,9 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="companyRoleId"
-              :static-value="row.item.companyRole?row.item.companyRole.name:$t('N/A')"
+              :static-value="
+                row.item.companyRole ? row.item.companyRole.name : $t('N/A')
+              "
             >
               <template v-if="isRowEditing(row)" slot="editing">
                 <b-select
@@ -163,9 +196,13 @@
                     v-for="role in companyRoles"
                     :key="role.id"
                     :value="role.id"
-                  >{{ role.name }}</option>
+                  >
+                    {{ role.name }}
+                  </option>
                 </b-select>
-                <b-form-invalid-feedback>{{ $displayError('companyRoleId', updateForm) }}</b-form-invalid-feedback>
+                <b-form-invalid-feedback>{{
+                  $displayError("companyRoleId", updateForm)
+                }}</b-form-invalid-feedback>
               </template>
             </table-editable-cell>
           </template>
@@ -177,19 +214,22 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="yearlyCosts"
-              :static-value="$currency(row.item.yearlyCosts / 100)"
+              :static-value="$currency(row.item.yearlyCosts)"
             >
               <template v-if="isRowEditing(row)" slot="editing">
+
                 <b-input
                   v-model.number="updateForm.yearlyCosts"
-                  v-validate="'required|min:0'"
+                  v-validate="'required|numeric|min_value:1|max_value:2147483647'"
                   name="yearlyCosts"
                   type="number"
                   size="sm"
                   :state="$validateState('yearlyCosts', updateForm)"
                   :disabled="updateForm.busy"
                 ></b-input>
-                <b-form-invalid-feedback>{{ $displayError('yearlyCosts', updateForm) }}</b-form-invalid-feedback>
+                <b-form-invalid-feedback>{{
+                  $displayError("yearlyCosts", updateForm)
+                }}</b-form-invalid-feedback>
               </template>
             </table-editable-cell>
           </template>
@@ -201,7 +241,7 @@
               <table-edit-tools-buttons
                 :item="row.item"
                 :show-save-button="$can('auth/user/update', row.item)"
-                :disable-save-button="vErrors.any()||updateForm.busy"
+                :disable-save-button="vErrors.any() || updateForm.busy"
                 :show-delete-button="$can('auth/user/delete', row.item)"
                 :loading="updateForm.busy"
                 store="user"
@@ -238,8 +278,8 @@ export default {
       resetingPassword: false,
       updateForm: null,
       filter: {
-        busy: false
-      }
+        busy: false,
+      },
     };
   },
   computed: {
@@ -247,7 +287,7 @@ export default {
       items: "user/filteredItems",
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
       companyRoles: "companyRole/all",
-      roles: "role/all"
+      roles: "role/all",
     }),
     fields: {
       get() {
@@ -258,19 +298,19 @@ export default {
           {
             key: "yearlyCosts",
             label: this.$t("Yearly Costs"),
-            sortable: true
+            sortable: true,
           },
           { key: "role", label: this.$t("Permissions"), sortable: true },
           { key: "lang", label: this.$t("Lang"), sortable: true },
-          { key: "actions", label: this.$t("Manage"), class: "actions" }
+          { key: "actions", label: this.$t("Manage"), class: "actions" },
         ];
-      }
-    }
+      },
+    },
   },
   async mounted() {
     this.$store.dispatch("user/findAll", {
       force: true,
-      filter: this.filter
+      filter: this.filter,
     });
     this.$store.dispatch("companyRole/findAll");
     this.$store.dispatch("role/findAll");
@@ -289,6 +329,7 @@ export default {
       }
     },
     toggleItem(item) {
+			console.log(item);
       this.$validator.pause();
       this.$validator.reset();
       if (!item || (this.currentItem && this.currentItem.id === item.id)) {
@@ -302,8 +343,8 @@ export default {
           email: item.email,
           roleId: item.role ? item.role.id : null,
           companyRoleId: item.companyRole ? item.companyRole.id : null,
-          yearlyCosts: item.formattedYearlyCosts,
-          avatar: item.avatar
+          yearlyCosts: item.yearlyCosts,
+          avatar: item.avatar,
         });
         this.currentItem = item;
         this.$validator.reset();
@@ -312,10 +353,11 @@ export default {
       this.$store.dispatch("app/toggleInnerOverlay");
     },
     async saveItem(form) {
+			console.log(form);
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         await this.$validator.reset();
-        form.yearlyCosts *= 100;
+        //form.yearlyCosts *= 100;
         await this.$store.dispatch("user/update", form);
         this.toggleItem(null);
       }
@@ -335,7 +377,7 @@ export default {
       } finally {
         this.cancelResetPassword();
       }
-    }
-  }
+    },
+  },
 };
 </script>

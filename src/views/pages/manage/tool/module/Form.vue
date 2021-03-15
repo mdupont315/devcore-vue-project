@@ -150,13 +150,10 @@ export default {
   },
   methods: {
     async initForm() {
-			console.log("hep");
-			console.log(this.input);
-			console.log(this.form);
+
      Object.keys(this.input || {})
         .filter((key) => key in this.form)
 				.forEach((key) => (this.form[key] = this.input[key]));
-				console.log(this.companyToolId);
       this.form.companyToolId = this.companyTool.id;
     },
     async save() {
@@ -185,7 +182,6 @@ export default {
       }
     },
     async deleteItem() {
-			console.log("asd");
       if (this.$can("core/tool/delete", this.input)) {
         await this.$swal({
           title: this.$t("Are you sure?"),

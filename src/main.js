@@ -9,7 +9,8 @@ import i18n from "./i18n";
 import DefaultLayout from "./views/layouts/DefaultLayout";
 import ExternalLayout from "./views/layouts/ExternalLayout";
 import AppComponent from "./App.vue";
-
+/* import wysiwyg from 'vue-wysiwyg';
+ */
 import "@/lib/functions";
 
 import "./components/global";
@@ -36,6 +37,8 @@ import "@/middlewares";
 // filters
 import "@/filters";
 
+
+
 import { apolloProvider } from "@/plugins/apollo/client";
 
 // set the apollo client
@@ -44,12 +47,15 @@ import gqlform from "./lib/gqlform";
 gqlform.apolloClients = apolloProvider.clients;
 Vue.use(VueApollo);
 Vue.use(BootstrapVue);
+/* Vue.use(wysiwyg, {}) */
 
 Vue.config.productionTip = false;
-console.log(process.env);
 // layout
 Vue.component("default-layout", DefaultLayout);
 Vue.component("external-layout", ExternalLayout);
+
+//Set language
+
 
 window.vm = new Vue({
   router,

@@ -87,7 +87,6 @@ export default {
           await this.initForm();
 
           console.log("Company Role Added.")
-          console.log(this.input)
           
           this.$emit("input", this.input);
           this.$emit("done");

@@ -85,6 +85,7 @@ export default {
 		},
 		adoptedIdeas: {
 			get() {
+
 				if (this.currentProcessSectionName) {
 					return this.$store.getters[
 						`toolIdea/by${this.currentProcessSectionName.capitalize()}`

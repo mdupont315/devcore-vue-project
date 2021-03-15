@@ -326,9 +326,6 @@ export default {
       this.$validator.pause();
       this.$validator.reset();
      
-      console.log("Check Toggle Items")
-      console.log((this.currentItem && this.currentItem.id === item.id))
-      console.log(item)
 
       if (item == null || (this.currentItem && this.currentItem.id === item.id)) {
         this.currentItem = null;

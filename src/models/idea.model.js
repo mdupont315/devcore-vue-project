@@ -51,6 +51,7 @@ export default class IdeaModel extends BaseModel {
             this._parentStructure = {};
             this._parentStructure.processId = this.processId;
             if (this.parent) {
+
                 if (this.parent.__typename === 'ProcessPhase') {
                     this._parentStructure.stageId = this.parent.operation.stageId;
                     this._parentStructure.operationId = this.parent.operation.id;
@@ -83,6 +84,7 @@ export default class IdeaModel extends BaseModel {
     }
 
     get hasReviews() {
+      console.log(this.evaluationsCount > 0)
         return this.evaluationsCount > 0;
     }
 
@@ -105,8 +107,8 @@ export default class IdeaModel extends BaseModel {
         if (input.improvements) {
             input.improvements = input.improvements.map(o => new IdeaIssueModel().deserialize(o));
         }
-
         Object.assign(this, input);
+
         return this;
     }
 

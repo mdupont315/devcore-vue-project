@@ -39,7 +39,7 @@ export default {
         username: this.$route.query.username,
         code: this.$route.query.code
       };
-      await this.send();
+			await this.send();
     } else {
       await this.$router.replace("/");
     }
@@ -48,7 +48,7 @@ export default {
     async send() {
       try {
         await this.$store.dispatch("auth/verifyAccount", this.form);
-        await this.$router.replace("/");
+		 await this.$router.replace("/");
       } catch (ex) {
         if (ex.code === 'TOKEN_EXPIRED'){
           this.resend();
@@ -59,7 +59,7 @@ export default {
           this.$router.replace({ name: "send-email-verification" });
         }
       } finally {
-        // this.$validator.reset();
+         this.$validator.reset();
       }
     }
   }

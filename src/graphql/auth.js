@@ -25,6 +25,7 @@ const USER_FRAGMENT = gql `
         phone,
         createdAt,
         updatedAt,
+        lang,
         status,
         companyId,
         avatar,
@@ -105,7 +106,7 @@ export const AUTH = {
             updateProfile(input:$input){
                 ...currentUserFields
             }
-            
+
         }
         ${USER_FRAGMENT}
     `,
@@ -115,7 +116,7 @@ export const AUTH = {
             upateMyCompany(input:$input){
                 ...companyFields
             }
-            
+
         }
         ${COMPANY_FRAGMENT}
         `,
@@ -135,3 +136,5 @@ export const AUTH = {
         ${SESSION_FRAGMENT}
     `
 }
+
+

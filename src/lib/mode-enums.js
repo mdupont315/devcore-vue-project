@@ -11,3 +11,15 @@ export const tabLabels = Object.freeze({
   operationbenefits: "Operation benefits",
   operationvalue: "Operation value"
 });
+
+
+export const roleNames = Object.freeze({
+  superadmin: "Super Admin",
+  companyadmin: "Company Admin",
+  companymanager: "Company Manager",
+  companyuser: "Company User"
+});
+
+
+
+

@@ -64,9 +64,9 @@
                     ></b-input>
                     <b-form-invalid-feedback>{{ $displayError('name', updateForm) }}</b-form-invalid-feedback>
                   </div>
-                 
+
                 </div>
-             
+
               </template>
             </table-editable-cell>
           </template>
@@ -98,7 +98,7 @@
                     :value="item.code"
                   >{{ item.name }} | {{ item.symbol }} ({{ item.code }})</option>
                 </b-form-select>
-             
+
                 <b-form-invalid-feedback>{{ $displayError('currencyCode', updateForm) }}</b-form-invalid-feedback>
               </template>
             </table-editable-cell>
@@ -158,9 +158,6 @@ export default {
       items: "company/filteredItems",
       currencies: "currency/all",
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
-      companyRoles: "companyRole/all", // need to remove
-      roles: "role/all", // need to remove
-      
     }),
     fields: {
       get() {
@@ -214,6 +211,7 @@ export default {
       this.$store.dispatch("app/toggleInnerOverlay");
     },
     async saveItem(form) {
+			console.log(form);
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         await this.$validator.reset();
@@ -222,8 +220,8 @@ export default {
         this.toggleItem(null);
       }
     },
-   
- 
+
+
   }
 };
 </script>

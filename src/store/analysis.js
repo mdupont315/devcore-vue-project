@@ -1,6 +1,7 @@
 const initialState = () => {
   return {
     activeTab: "general",
+    analysisReady: false,
     selectedTabView: "savings",
     chartTimespan: [
       "Q3 2017",
@@ -40,12 +41,16 @@ const state = initialState();
 
 const getters = {
   activeTab: state => state.activeTab,
+  analysisReady: state => state.analysisReady,
   selectedTabView: state => state.selectedTabView,
   chartTimespan: state => state.chartTimespan,
   chartDatasets: state => state.chartDatasets,
 };
 
 const mutations = {
+  SET_ANALYSIS_READY(state, readiness){
+    state.analysisReady = readiness
+  },
   SET_ACTIVE_TAB(state, activeTab) {
     state.activeTab = activeTab;
   },

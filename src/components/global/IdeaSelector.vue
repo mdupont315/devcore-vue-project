@@ -56,7 +56,7 @@
       <ul v-if="props.items" class="list-unstyled">
         <li v-for="item in selectedItems" :key="item.id" class="my-1 row">
           <span class="col-10 text-overflow"
-            >{{ item.title }} {{ item.status }}</span
+            >  {{ item.title }}  {{ item.status }}</span
           >
           <b-button
             class="col-2 btn-white btn-outline-danger btn-xs border-0 text-danger"
@@ -110,11 +110,7 @@ export default {
       return this.value;
     },
   },
-  // watch:{
-  //   ideas:function(oldValue, newValue){
-  //     console.log("Changed", newValue);
-  //   }
-  // },
+
   data: () => ({
     showPopOver: false,
     dataValue: [],
@@ -127,11 +123,7 @@ export default {
     }),
     ideas: {
       get() {
-        console.log(
-          (this.items || this.allIdeas).sort((a, b) =>
-            a.title > b.title ? 1 : -1
-          )
-        );
+
         return (this.items || this.allIdeas).sort((a, b) =>
           a.title > b.title ? 1 : -1
         );
@@ -139,6 +131,7 @@ export default {
     },
     selectedItems: {
       get() {
+
         return this.ideas
           .filter((r) => this.dataValue.includes(r.id))
           .sort((a, b) => (a.title > b.title ? 1 : -1));
@@ -147,9 +140,11 @@ export default {
   },
   async mounted() {
     if (!this.items) {
-      await this.$store.dispatch("idea/findAll");
+      var result = await this.$store.dispatch("idea/findAll");
+			console.log(result);
     }
     if (this.value) {
+			console.log(this.value);
       this.dataValue = this.value.filter(
         (o) => this.ideas.find((u) => u.id === o) != null
       );

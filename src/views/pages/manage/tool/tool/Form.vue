@@ -20,45 +20,7 @@
           <b-form-invalid-feedback>{{ $displayError('tool_id', form) }}</b-form-invalid-feedback>
         </div>
       </b-col>
-      <!-- <b-col class="col-12">
-        <div class="form-label-group select required">
-          <v-select
-            label="name"
-            v-validate="'required'"
-            data-vv-name="priceModel"
-            v-model="form.priceModel"
-            :placeholder="$t('Price model')"
-            :reduce="priceModel => priceModel.id"
-            :options="priceModels"
-            :class="{'is-invalid':$validateState('priceModel', form)===false, 'is-valid':$validateState('priceModel', form)===true}"
-          >
-            <template v-slot:selected-option="option">{{ $t('priceModel.'+option.name) }}</template>
-            <template v-slot:option="option">{{ $t('priceModel.'+option.name) }}</template>
-          </v-select>
-          <label for="priceModel">{{ $t('Price model') }}</label>
-          <b-form-invalid-feedback>{{ $displayError('priceModel', form) }}</b-form-invalid-feedback>
-        </div>
-      </b-col>
-      <b-col class="col-12">
-        <div class="form-label-group required">
-          <b-form-input
-            id="yearlyCosts"
-            step="1"
-            min="0"
-            :disabled="form.busy"
-            v-model.number="form.yearlyCosts"
-            :placeholder="$t('Yearly Costs')"
-            type="number"
-            name="yearlyCosts"
-            :state="$validateState('yearlyCosts', form)"
-            v-validate="'required|numeric|min:0'"
-          ></b-form-input>
-          <label
-            for="yearlyCosts"
-          >{{ $t('Yearly Costs') + ((currentUser && currentUser.company)?' (' + currentUser.company.currencyCode + ')':'')}}</label>
-          <b-form-invalid-feedback>{{ $displayError('yearlyCosts', form) }}</b-form-invalid-feedback>
-        </div>
-      </b-col> -->
+
     </b-row>
 
     <b-row>
@@ -155,7 +117,7 @@ export default {
           this.$emit("done");
         }
       } catch (ex) {
-        
+
         console.error(ex.message);
       }
     },

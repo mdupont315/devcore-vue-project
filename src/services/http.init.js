@@ -22,6 +22,8 @@ export class Http {
   init () {
     if (this.isAuth) {
       this.instance.interceptors.request.use(request => {
+        console.log("______________________");
+        console.log("this.isAuth");
         request.headers.authorization = AuthService.getBearer()
         // if access token expired and refreshToken is exist >> go to API and get new access token
         if (AuthService.isAccessTokenExpired() && AuthService.hasRefreshToken()) {
@@ -31,9 +33,9 @@ export class Http {
               request.headers.authorization = AuthService.getBearer()
               return request
             }).catch(error => Promise.reject(error))
-        } 
+        }
           return request
-        
+
       }, error => {
         return Promise.reject(error)
       })

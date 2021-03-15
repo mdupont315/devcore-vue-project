@@ -1,3 +1,4 @@
+
 <template>
   <div>
     <b-form v-if="form" class="hide-labels" @submit.prevent="saveItem">
@@ -110,7 +111,20 @@
             }}</b-form-invalid-feedback>
           </div>
           <div class="form-label-group select required">
-            <b-form-textarea
+           <!--  <wysiwyg
+              id="description"
+              class="wysiwyg_editor"
+              style="max-height: 440px"
+              :disabled="form.busy"
+              v-model="form.description"
+              v-autoresize
+              :placeholder="$t('Idea description')"
+              name="description"
+              :state="$validateState('description', form)"
+              v-validate="''"
+            /> -->
+
+              <b-form-textarea
               id="description"
               v-model="form.description"
               v-autoresize
@@ -170,6 +184,7 @@ export default {
       default: () => "PROCESS",
     },
   },
+
   data: () => ({
     input: null,
     currentFile: null,
@@ -197,8 +212,10 @@ export default {
       currentTool: "companyTool/current",
       tools: "companyTool/all",
     }),
+
     process: {
       get() {
+        console.log(this.currentProcess(this.section));
         return this.currentProcess(this.section);
       },
     },
@@ -212,8 +229,7 @@ export default {
         if (!this.form.stageId || !this.stages) {
           return [];
         }
-        console.log(this.form.stageId);
-        console.log(this.stages);
+
         const stageWithId = this.stages.find((i) => i.id == this.form.stageId);
 
         return stageWithId?.operations || [];
@@ -265,12 +281,10 @@ export default {
     },
   },
   async mounted() {
-    console.log("formOPEN");
     this.input = this.item;
     this.currentFile = this.item.file;
-    console.log(this.mode);
-    if (this.mode === "create") {
-			console.log(this.form);
+
+    if (this.mode === "create" && this.currentTool("toolIdeas")) {
       this.form.companyToolId = this.currentTool("toolIdeas").id;
     }
 
@@ -284,21 +298,53 @@ export default {
     }
     this.initForm();
     this.storeName = this.form.type === "PROCESS" ? "idea" : "toolIdea";
+/*
+    document
+      .querySelector(".editr--content")
+      .addEventListener("click", (event) => {
+        this.increaseIcon(event);
+      }); */
+
+ /*    document
+      .querySelector(".editr--content")
+      .addEventListener("contextmenu", (event) => {
+        this.decreaseIcon(event);
+      }); */
   },
+/*   beforeDestroy() {
+    document
+      .querySelector(".editr--content")
+      .removeEventListener("click", this.increaseIcon, true);
+    document
+      .querySelector(".editr--content")
+      .removeEventListener("contextmenu", this.decreaseIcon, true);
+  }, */
   methods: {
+    increaseIcon(event) {
+      event.target.width = event.target.width * 0.9;
+      event.target.height = event.target.height * 0.9;
+    },
+    decreaseIcon(event) {
+      event.target.width = event.target.width * 1.1;
+      event.target.height = event.target.height * 1.1;
+    },
+
     initForm() {
       if (!this.input.id) {
         this.input.type = this.input.type || "PROCESS";
         this.input.processId = this.input.processId || this.process.process.id;
         this.input.stageId =
-          this.input.stageId ||
-          (this.process.stage ? this.process.stage.id : null);
+          this.input.stageId || this.process.stage
+            ? this.process.stage.id
+            : null;
         this.input.operationId =
-          this.input.operationId ||
-          (this.process.operation ? this.process.operation.id : null);
+          this.input.operationId || this.process.operation
+            ? this.process.operation.id
+            : null;
         this.input.phaseId =
-          this.input.phaseId ||
-          (this.process.phase ? this.process.phase.id : null);
+          this.input.phaseId || this.process.phase
+            ? this.process.phase.id
+            : null;
       }
       Object.keys(this.input || {})
         .filter((key) => key in this.form)
@@ -329,8 +375,8 @@ export default {
     async saveItem() {
       await this.$validator.validateAll();
 
+      console.log(this.form);
       if (!this.vErrors.any()) {
-        console.log("asd");
         this.$validator.reset();
 
         if (this.mode === "edit") {
@@ -347,6 +393,16 @@ export default {
           id: this.form.processId,
           force: true,
         });
+        /*
+				const processPath = {
+					section: 'ideas',
+					process: this.selectedProcess,
+          stage: this.selectedStage,
+          operation: this.selectedOperation,
+          phase: this.selectedPhase
+				} */
+      } else {
+        console.log(this.vErrors());
       }
     },
   },

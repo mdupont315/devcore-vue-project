@@ -6,7 +6,7 @@
     <b-card no-body class="stage-card" >
       <div v-if="item" >
         <b-card-header class="header">
-         
+
           <layer v-if="editing" @closed="initEdit">
             <div class="edit" style="width:300px; left:0">
               <label class="label">{{ $t('Name of process') }}</label>
@@ -51,7 +51,7 @@
             <span
                     class="btn-action"
                     @click="toggleEdit"
-                    
+
                   >
                     <i class="mdi mdi-pencil"></i>
                   </span>
@@ -65,9 +65,9 @@
           </div>
           <hr class="m-0 mt-2" />
         </b-card-header>
-     
+
       </div>
-      
+
     </b-card>
     <div v-if="editForm" class="form">
       <layer :key="intent" style="width:100%" @closed="cancelEdit">
@@ -112,7 +112,7 @@
             :target="()=>$refs.editRolesPlaceholder"
             custom-class="no-arrow transparent"
           >
-        
+
           </b-popover>
         </b-form>
       </layer>
@@ -217,7 +217,7 @@ export default {
     closeRolesPopover() {
       this.showRolesPopover = false;
     },
-  
+
     async onOperationDrag(event) {
       try {
         this.orderBusy = true;
@@ -270,10 +270,6 @@ export default {
           this.$refs.newOperationCard.$el.offsetTop - 150;
       });
     },
-    closeOperationForm() {
-      this.$store.dispatch("app/showInnerOverlay", false);
-      this.$refs.newOperationCard.changeMode(null);
-    },
     changeProcess() {
       this.$emit("selectProcess", this.item)
     },
@@ -308,7 +304,7 @@ export default {
       if (!this.vErrors.any()) {
         this.$nextTick(async () => {
           await this.$store.dispatch("process/update", this.editForm);
-        
+
           this.initEdit();
         });
       }

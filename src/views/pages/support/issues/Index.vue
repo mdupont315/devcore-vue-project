@@ -3,7 +3,7 @@
     <div
       v-if="currentItem || currentRowDetails"
       class="overlay"
-      :class="{'top-all':this.showInnerOverlayOnTop}"
+      :class="{ 'top-all': this.showInnerOverlayOnTop }"
       @click="overlayClick"
     ></div>
 
@@ -21,14 +21,16 @@
           :items="items"
           :show-empty="true"
           :empty-text="$t('There are no records for the given criteria')"
-          :tbody-tr-class="(item)=>item&&item._isActive?'editing':'not-editing'"
+          :tbody-tr-class="
+            (item) => (item && item._isActive ? 'editing' : 'not-editing')
+          "
         >
           <template v-slot:table-colgroup>
-            <col style="width:35%" />
-            <col style="width:20%" />
-            <col style="width:10%" />
-            <col style="width:10%" />
-            <col style="width:300px" />
+            <col style="width: 35%" />
+            <col style="width: 20%" />
+            <col style="width: 10%" />
+            <col style="width: 10%" />
+            <col style="width: 300px" />
           </template>
           <template v-slot:empty="scope">
             <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -40,44 +42,53 @@
           </template>
 
           <!-- name -->
-          <template v-slot:cell(name)="row">{{ row.item.title }}</template>
+          <template v-slot:cell(name)="row"> {{ row.item.title }}</template>
 
-          <!-- companyRol -->
-          <template v-slot:cell(companyRole)="row">{{ row.item.companyRole.name }}</template>
+          <!-- companyRole -->
+          <template v-slot:cell(companyRole)="row">{{
+            row.item.companyRole.name
+          }}</template>
 
           <!-- loss -->
-          <template v-slot:cell(issues)="row">{{ row.item.issues.length }}</template>
+          <template v-slot:cell(issues)="row">{{
+            row.item.issues.length
+          }}</template>
 
           <!-- loss -->
           <template v-slot:cell(loss)="row">
-            <span
-              :class="{'text-danger':row.item.totalLoss!=0}"
-            >{{ $currency(row.item.totalLoss/100 || 0) }}</span>
+            <span :class="{ 'text-danger': row.item.totalLoss != 0 }">{{
+              $currency(row.item.totalLoss / 100 || 0)
+            }}</span>
           </template>
 
           <!-- actions -->
           <template v-slot:cell(actions)="row" class="actions">
             <div v-if="isRowEditing(row)" class="text-right buttons">
-              <div class="d-flex" style="margin-top:2px">
+              <div class="d-flex" style="margin-top: 2px">
                 <b-button
                   :ref="`btnNewIdea${row.item.rowId}`"
                   size="xs"
                   variant="action"
                   class="btn-primary btn-block text-uppercase text-bold"
-                  style="font-size:1.2rem;padding:3px"
+                  style="font-size: 1.2rem; padding: 3px"
                   @click="newIdea(row)"
-                >{{ $t('New idea') }}</b-button>
+                  >{{ $t("New idea") }}</b-button
+                >
 
                 <b-popover
                   ref="popover"
-                  :target="()=>$refs[`btnNewIdea${row.item.rowId}`]"
+                  :target="() => $refs[`btnNewIdea${row.item.rowId}`]"
                   :show.sync="showIdeaPopover"
                   placement="bottom"
                   class="form-popover"
                 >
-                  <b-card no-body style="width:300px">
+                  <b-card no-body style="width: 300px">
                     <b-card-body>
-                      <idea-form section="issues" :item="idea" @done="closeIdeaForm"></idea-form>
+                      <idea-form
+                        section="issues"
+                        :item="idea"
+                        @done="closeIdeaForm"
+                      ></idea-form>
                     </b-card-body>
                   </b-card>
                 </b-popover>
@@ -85,9 +96,10 @@
                   size="xs"
                   variant="transparent"
                   class="btn-link text-gray btn-block text-uppercase text-bold shadow-0"
-                  style="font-size:1rem;padding:3px;margin:0"
+                  style="font-size: 1rem; padding: 3px; margin: 0"
                   @click="toggleItem(null)"
-                >{{ $t('Cancel') }}</b-button>
+                  >{{ $t("Cancel") }}</b-button
+                >
               </div>
             </div>
             <div v-else class="buttons">
@@ -95,24 +107,32 @@
                 size="xs"
                 variant="action"
                 class="btn-primary btn-block text-uppercase text-bold"
-                style="font-size:1.2rem;padding:3px"
+                style="font-size: 1.2rem; padding: 3px"
                 @click="newIdea(row)"
-              >{{ $t('New idea') }}</b-button>
+                >{{ $t("New idea") }}</b-button
+              >
               <b-button
                 v-if="$can('process/process/manage')"
                 size="xs"
                 variant="action"
                 class="btn-light btn-expand btn-block text-uppercase text-bold m-0"
-                style="font-size:1.2rem;padding:3px"
+                style="font-size: 1.2rem; padding: 3px"
                 @click="showDetails(row)"
-              >{{ (row.item._showDetails)?$t('Close'):$t('Details') }}</b-button>
+                >{{
+                  row.item._showDetails ? $t("Close") : $t("Details")
+                }}</b-button
+              >
             </div>
           </template>
 
           <!-- details -->
           <template v-slot:row-details="row">
             <div class="row-details">
-              <issues-table :items="row.item.issues" :item="row.item" :loading="loadingItem"></issues-table>
+              <issues-table
+                :items="row.item.issues"
+                :item="row.item"
+                :loading="loadingItem"
+              ></issues-table>
             </div>
           </template>
         </b-table>
@@ -129,7 +149,7 @@ import IssuesTable from "./IssuesTable";
 export default {
   components: {
     "idea-form": IdeaForm,
-    "issues-table": IssuesTable
+    "issues-table": IssuesTable,
   },
   data: () => {
     return {
@@ -143,9 +163,9 @@ export default {
       loadingItem: false,
       showIdeaPopover: false,
       filter: {
-        busy: false
+        busy: false,
       },
-      toolOptions: null
+      toolOptions: null,
     };
   },
   computed: {
@@ -154,34 +174,32 @@ export default {
       issues: "issue/filteredItems",
       filterValue: "issue/filter",
       currentProcess: "process/current",
-      showInnerOverlayOnTop: "app/show_inner_overlay_on_top"
+      showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
     }),
     process: {
       get() {
         return this.currentProcess("issues").process;
-      }
+      },
     },
     items: {
       get() {
         let items = [];
-        
-        if (this.process) {
 
-          this.process.stages.map(s => {
-            s.companyRolesWithChild.map(o => {
+        if (this.process) {
+          this.process.stages.map((s) => {
+            s.companyRolesWithChild.map((o) => {
               const id = `${s.id}_${o.id}`;
               const it = { ...s };
               it.companyRole = o;
               it.rowId = id;
               it.totalLoss = 0;
-              it.issues = this.issues.filter(is => {
+              it.issues = this.issues.filter((is) => {
                 return is.stageId == s.id && is.author.companyRoleId == o.id;
               });
 
-              console.log("*** Support Issues ***")
-              console.log(it.issues);
+              console.log("*** Support Issues ***");
 
-              it.issues.map(is => {
+              it.issues.map((is) => {
                 it.totalLoss += is.totalValue;
               });
 
@@ -200,7 +218,7 @@ export default {
         }
 
         if (this.filterValue) {
-          items = items.filter(is => {
+          items = items.filter((is) => {
             return (
               is.title.toLowerCase().includes(this.filterValue.toLowerCase()) ||
               is.companyRole.name
@@ -210,8 +228,8 @@ export default {
           });
         }
 
-        return items.filter(it => it.issues.length > 0);
-      }
+        return items.filter((it) => it.issues.length > 0);
+      },
     },
     issues: {
       get() {
@@ -219,41 +237,41 @@ export default {
           return this.$store.getters["issue/byProcess"](this.process.id);
         }
         return [];
-      }
+      },
     },
     fields: {
       get() {
         return [
-          { key: "name", label: this.$t("Stage"), sortable: true },
+          { key: "name", label: this.$t("Process Part"), sortable: true },
           {
             key: "companyRole",
             label: this.$t("Role"),
-            sortable: true
+            sortable: true,
           },
           {
             key: "issues",
             label: this.$t("Issues"),
-            sortable: true
+            sortable: true,
           },
           {
             key: "loss",
             label: this.$t("Loss"),
-            sortable: true
+            sortable: true,
           },
-          { key: "actions", label: this.$t("Manage"), class: "actions" }
+          { key: "actions", label: this.$t("Manage"), class: "actions" },
         ];
-      }
-    }
+      },
+    },
   },
   async mounted() {
     if (this.process) {
       await this.$store.dispatch("process/findById", {
         id: this.process.id,
-        force: true
+        force: true,
       });
       await this.$store.dispatch("issue/findByProcess", {
         id: this.process.id,
-        force: true
+        force: true,
       });
     }
   },
@@ -269,7 +287,7 @@ export default {
     newIdea(row) {
       this.idea = {
         procesId: row.item.processId,
-        stageId: row.item.id
+        stageId: row.item.id,
       };
       this.currentItem = row.item;
       this.currentItem._isActive = true;
@@ -304,7 +322,7 @@ export default {
           this.loadingItem = true;
         }
         await this.$store.dispatch("issue/findByStage", {
-          id: item.id
+          id: item.id,
         });
       } finally {
         this.loadingItem = false;
@@ -346,7 +364,7 @@ export default {
           name: item.name,
           yearlyCosts: item.yearlyCosts,
           priceModel: item.priceModel ? item.priceModel.id : null,
-          tool: item.toolId
+          tool: item.toolId,
         });
         this.currentItem = item;
         this.$validator.reset();
@@ -358,7 +376,7 @@ export default {
       if (item) {
         this.loadItem(item);
       }
-    }
-  }
+    },
+  },
 };
 </script>

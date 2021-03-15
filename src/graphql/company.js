@@ -19,7 +19,7 @@ const COMPANY_FRAGMENT = gql `
 const COMPANY_FULL_FRAGMENT = gql `
     fragment companyFullFields on Company{
         ...companyFields,
-      
+
     }
     ${COMPANY_FRAGMENT}
 `;
