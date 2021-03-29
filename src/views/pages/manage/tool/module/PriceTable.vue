@@ -261,7 +261,7 @@ export default {
       get() {
         return [
           { key: "name", label: this.$t("Name"), sortable: true },
-          { key: "priceModel", label: this.$t("Price model"), sortable: true },
+          { key: "priceModel", label: this.$t("Price models"), sortable: true },
           {
             key: "yearlyCosts",
             label: this.$t("Yearly costs"),
@@ -325,7 +325,7 @@ export default {
       this.deleting = false;
       this.$validator.pause();
       this.$validator.reset();
-     
+
 
       if (item == null || (this.currentItem && this.currentItem.id === item.id)) {
         this.currentItem = null;

@@ -40342,8 +40342,9 @@
     background-color: transparent!important;
   }
 
+
   .pg-ideas .idea-card .card-header {
-    height: 70px;
+		/* height: 70px;*/
     position: relative;
   }
 

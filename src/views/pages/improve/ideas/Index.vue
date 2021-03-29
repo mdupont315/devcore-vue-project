@@ -130,12 +130,14 @@ export default {
   data: () => ({
     currentComponent: null,
   }),
+
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
       user: "auth/user",
       loading: "process/loading",
     }),
+
     process: {
       get() {
         return this.currentProcess("ideas");
@@ -273,6 +275,13 @@ export default {
         });
       }
     });
+    EventBus.$on("idea/currentTab", (data) => {
+      if (this.$route.path !== "/improve/ideas") {
+        this.$router.push({ name: "ideas", params: {} });
+      }
+
+      this.currentComponent = () => import("./New.vue");
+    });
   },
   methods: {
     filterByProcessSection(item, status) {
@@ -297,7 +306,7 @@ export default {
     },
     isActive(name) {
       return (
-        this.$route.params.type === name ||
+        this.$route.params.type === name.toLowerCase() ||
         (name === "new" && !this.$route.params.type)
       );
     },

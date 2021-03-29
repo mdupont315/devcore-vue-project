@@ -163,26 +163,27 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import EventBus from "@/lib/eventbus";
 
 export default {
   data: () => ({
     currentComponent: null,
   }),
+
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
       tools: "companyTool/all",
       currentTool: "companyTool/current",
+      tab: "toolIdea/currentTab",
     }),
     process: {
       get() {
-        console.log(this.currentProcess("toolIdeas"));
         return this.currentProcess("toolIdeas");
       },
     },
     tool: {
       get() {
-        console.log(this.currentTool("toolIdeas"));
         return this.currentTool("toolIdeas");
       },
       set(toolId) {
@@ -324,6 +325,13 @@ export default {
         force: true,
       });
     }
+    EventBus.$on("tool_idea/currentTab", (data) => {
+
+      if (this.$route.path !== "/improve/tool-ideas") {
+        this.$router.push({ name: "tool-ideas", params: {} });
+      }
+      this.currentComponent = () => import("./New.vue");
+    });
   },
   methods: {
     getAllIdeasLength(option) {

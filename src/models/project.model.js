@@ -51,6 +51,7 @@ export default class ProjectModel extends BaseModel {
   }
 
   getIdeasByStage(stageId) {
+
     return this.ideas.filter(o => o.stageId == stageId);
   }
 

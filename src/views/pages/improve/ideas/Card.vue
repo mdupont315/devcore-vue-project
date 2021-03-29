@@ -69,10 +69,9 @@
       </div>
     </b-card-header>
     <b-card-body>
-      <p
-        class="text-gray mb-0 text-justify description"
-      >{{ idea.description || $t('No description') }}</p>
-
+      <p class="text-gray mb-0 text-justify description">
+        {{ idea.description || $t("No description") }}
+      </p>
     </b-card-body>
     <b-card-footer class="bg-white border-0">
       <hr />

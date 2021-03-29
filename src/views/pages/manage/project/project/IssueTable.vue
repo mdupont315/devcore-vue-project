@@ -40,7 +40,7 @@
         </template>
 
         <template v-slot:cell(issue)="row">
-          {{row.item.title}}
+          {{row.item.description}}
         </template>
         <template v-slot:cell(value)="row">
           <span

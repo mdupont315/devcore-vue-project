@@ -84,7 +84,6 @@ export default class IdeaModel extends BaseModel {
     }
 
     get hasReviews() {
-      console.log(this.evaluationsCount > 0)
         return this.evaluationsCount > 0;
     }
 

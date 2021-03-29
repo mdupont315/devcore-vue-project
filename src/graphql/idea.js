@@ -1,30 +1,26 @@
-import gql from 'graphql-tag';
-import {
-    RESOURCE_FRAGMENT
-} from './resource';
-import {
-    META_FRAGMENT
-} from './meta';
+import gql from "graphql-tag";
+import { RESOURCE_FRAGMENT } from "./resource";
+import { META_FRAGMENT } from "./meta";
 // eslint-disable-next-line
-export const IDEA_FRAGMENT = gql `
-    fragment ideaFields on Idea{
-      id,
-      title,
-      description,
-      status,
-      processId,
-      parentId,
-      parentType,
-      version,
-      type,
-      totalEvaluations,
-      evaluationSum,
+export const IDEA_FRAGMENT = gql`
+  fragment ideaFields on Idea {
+    id
+    title
+    description
+    status
+    processId
+    parentId
+    parentType
+    version
+    type
+    totalEvaluations
+    evaluationSum
     #   stageId,
     #   operationId,
     #   phaseId,
     #   toolId,
-      createdAt,
-      updatedAt,
+    createdAt
+    updatedAt
     #   gains,
     #   losses,
     #   hasReviews,
@@ -33,153 +29,154 @@ export const IDEA_FRAGMENT = gql `
     #       id,
     #       name
     #   }
-    stats{
-        problems
-        improvements
-        evaluations
+    stats {
+      problems
+      improvements
+      evaluations
     }
-    companyToolId,
-      tool{
-          id,
-          name
-      }
-      author{
-          id,
-          firstName,
-          lastName,
-          avatarUrl
-      },
-      parent{
-          __typename,
-          ... on ProcessStage{
-              id,
-              title,
-              dOrder,
-              description
-              processId
-
-          }
-          ... on ProcessOperation{
-            id,
-            title,
-            dOrder
-            description,
-            processId
-            stageId
-              stage{
-                id
-               title
-            }
-          }
-          ... on ProcessPhase{
-            id,
-            title,
-            dOrder
-            description,
-            processId
-            operationId
-            operation{
-                id
-                title
-                stageId
-                stage{
-                    id
-                    title
-                }
-            }
-          }
-      }
-      files {
-          ...resourceFields
-      },
-      _metadata{
-          ...metaFields
-      }
+    companyToolId
+    tool {
+      id
+      name
     }
-    ${META_FRAGMENT}
-    ${RESOURCE_FRAGMENT}
-`;
-
-export const IDEA_FULL_FRAGMENT = gql `
-    fragment ideaFullFields on Idea{
-        ...ideaFields,
-        problems{
+    author {
+      id
+      firstName
+      lastName
+      avatarUrl
+    }
+    parent {
+      __typename
+      ... on ProcessStage {
+        id
+        title
+        dOrder
+        description
+        processId
+      }
+      ... on ProcessOperation {
+        id
+        title
+        dOrder
+        description
+        processId
+        stageId
+        stage {
+          id
+          title
+        }
+      }
+      ... on ProcessPhase {
+        id
+        title
+        dOrder
+        description
+        processId
+        operationId
+        operation {
+          id
+          title
+          stageId
+          stage {
             id
             title
-            description
-            createdAt
-            updatedAt
-            author{
-                id,
-                firstName,
-                lastName,
-                avatarUrl
-            }
+          }
         }
-        improvements{
-            id
-            title
-            description
-            createdAt
-            updatedAt
-            author{
-                id,
-                firstName,
-                lastName,
-                avatarUrl
-            }
-        }
+      }
     }
-    ${IDEA_FRAGMENT}
+    files {
+      ...resourceFields
+    }
+    _metadata {
+      ...metaFields
+    }
+  }
+  ${META_FRAGMENT}
+  ${RESOURCE_FRAGMENT}
 `;
 
-
+export const IDEA_FULL_FRAGMENT = gql`
+  fragment ideaFullFields on Idea {
+    ...ideaFields
+    problems {
+      id
+      title
+      description
+      createdAt
+      updatedAt
+      author {
+        id
+        firstName
+        lastName
+        avatarUrl
+      }
+    }
+    improvements {
+      id
+      title
+      description
+      createdAt
+      updatedAt
+      author {
+        id
+        firstName
+        lastName
+        avatarUrl
+      }
+    }
+  }
+  ${IDEA_FRAGMENT}
+`;
 
 export const IDEA = {
-
-    findAll: gql `
-        query ideaFindAll($filter:Filter){
-            ideaFindAll(filter:$filter){
-                ...ideaFields
-            }
-        }
-        ${IDEA_FRAGMENT}
-    `,
-    findById: gql `
-      query ideaFindById($id:ID!){
-        ideaFindById(id:$id){
-                ...ideaFullFields
-            }
-        }
-        ${IDEA_FULL_FRAGMENT}
-    `,
-    create: gql `
-        mutation ideaCreate($input:IdeaCreateInput!){
-            ideaCreate(input:$input){
-                ...ideaFullFields
-            }
-        }
-        ${IDEA_FULL_FRAGMENT}
-    `,
-    update: gql `
-        mutation ideaUpdate($id:ID!, $input:IdeaUpdateInput!){
-            ideaUpdate(id:$id, input:$input){
-                ...ideaFullFields
-            }
-        }
-        ${IDEA_FULL_FRAGMENT}
-    `,
-    changeStatus: gql `
-        mutation ideaChangeStatus($input:IdeaChangeStatusInput!){
-            ideaChangeStatus(input:$input){
-                    ...ideaFullFields
-                }
-            }
-            ${IDEA_FULL_FRAGMENT}
-        `,
-    delete: gql `
-        mutation ideaDelete($id:ID!){
-            ideaDelete(id:$id)
-        }
-    `,
-}
+  findAll: gql`
+    query ideaFindAll($filter: Filter) {
+      ideaFindAll(filter: $filter) {
+        ...ideaFields
+      }
+    }
+    ${IDEA_FRAGMENT}
+  `,
+  findById: gql`
+    query ideaFindById($id: ID!) {
+      ideaFindById(id: $id) {
+        ...ideaFullFields
+      }
+    }
+    ${IDEA_FULL_FRAGMENT}
+  `,
+  create: gql`
+    mutation ideaCreate($input: IdeaCreateInput!) {
+      ideaCreate(input: $input) {
+        ...ideaFullFields
+      }
+    }
+    ${IDEA_FULL_FRAGMENT}
+  `,
+  update: gql`
+    mutation ideaUpdate($id: ID!, $input: IdeaUpdateInput!) {
+      ideaUpdate(id: $id, input: $input) {
+        ...ideaFullFields
+      }
+    }
+    ${IDEA_FULL_FRAGMENT}
+  `,
+  changeStatus: gql`
+    mutation ideaChangeStatus($input: IdeaChangeStatusInput!) {
+      ideaChangeStatus(input: $input) {
+        ...ideaFullFields
+      }
+    }
+    ${IDEA_FULL_FRAGMENT}
+  `,
+  delete: gql`
+    mutation ideaDelete($id: ID!) {
+      ideaDelete(id: $id)
+    }
+  `,
+  deleteImprovement: gql`
+    mutation ideaImprovementDelete($id: ID!) {
+      ideaImprovementDelete(id: $id)
+    }
+  `
+};

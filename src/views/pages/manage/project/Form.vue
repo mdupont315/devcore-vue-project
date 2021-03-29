@@ -546,9 +546,6 @@ export default {
       }
 
       //include all stages if ON_GOING project
-      console.log(this.input);
-      console.log(this.form);
-      console.log("__________________");
       if (this.mode === "edit") {
         if (this.input.type === "ON_GOING") {
           const currentProj = this.getAvailableOrAllStages.find(
@@ -592,7 +589,7 @@ export default {
           this.$emit("done");
         }
       } catch (ex) {
-        this.budget = this.budget / 100;
+        this.budget = this.form.budget / 100;
         console.log(ex);
       }
     },

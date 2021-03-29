@@ -1,5 +1,9 @@
 <template>
-  <b-form class="hide-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
+  <b-form
+    class="hide-labels"
+    @submit.prevent="save"
+    @keyup="$validator.validateAll()"
+  >
     <b-row>
       <b-col class="col-12">
         <div class="form-label-group select required">
@@ -10,18 +14,28 @@
             label="name"
             data-vv-name="priceModel"
             :placeholder="$t('Price model')"
-            :reduce="priceModel => priceModel.id"
+            :reduce="(priceModel) => priceModel.id"
             :options="priceModels"
-            :class="{'is-invalid':$validateState('priceModel', form)===false, 'is-valid':$validateState('priceModel', form)===true}"
+						:state="$validateState('priceModel', form)"
+            :class="{
+              'is-invalid': $validateState('priceModel', form) === false,
+              'is-valid': $validateState('priceModel', form) === true,
+            }"
           >
-            <template v-slot:selected-option="option">{{ $t('priceModel.'+option.name) }}</template>
-            <template v-slot:option="option">{{ $t('priceModel.'+option.name) }}</template>
+            <template v-slot:selected-option="option">{{
+              $t("priceModel." + option.name)
+            }}</template>
+            <template v-slot:option="option">{{
+              $t("priceModel." + option.name)
+            }}</template>
           </v-select>
-          <label for="priceModel">{{ $t('Price model') }}</label>
-          <b-form-invalid-feedback>{{ $displayError('priceModel', form) }}</b-form-invalid-feedback>
+          <label for="priceModel">{{ $t("Price model") }}</label>
+          <b-form-invalid-feedback>{{
+            $displayError("priceModels")
+          }}</b-form-invalid-feedback>
         </div>
       </b-col>
-      <b-col v-if="form.priceModel!=='PROJECT'" class="col-12">
+      <b-col v-if="form.priceModel !== 'PROJECT'" class="col-12">
         <div class="form-label-group required">
           <b-form-input
             id="name"
@@ -33,11 +47,13 @@
             name="name"
             :state="$validateState('name', form)"
           ></b-form-input>
-          <label for="name">{{ $t('Name') }}</label>
-          <b-form-invalid-feedback>{{ $displayError('name', form) }}</b-form-invalid-feedback>
+          <label for="name">{{ $t("Name") }}</label>
+          <b-form-invalid-feedback>{{
+            $displayError("name", form)
+          }}</b-form-invalid-feedback>
         </div>
       </b-col>
-      <b-col v-if="form.priceModel==='PROJECT'" class="col-12">
+      <b-col v-if="form.priceModel === 'PROJECT'" class="col-12">
         <div class="form-label-group select required">
           <v-select
             v-model="form.parentId"
@@ -45,18 +61,25 @@
             label="name"
             data-vv-name="project"
             :placeholder="$t('Project')"
-            :reduce="project => project.id"
+            :reduce="(project) => project.id"
             :options="projects"
-            :class="{'is-invalid':$validateState('project', form)===false, 'is-valid':$validateState('project', form)===true}"
+            :class="{
+              'is-invalid': $validateState('project', form) === false,
+              'is-valid': $validateState('project', form) === true,
+            }"
           >
-            <template v-slot:selected-option="option">{{ option.name }}</template>
+            <template v-slot:selected-option="option">{{
+              option.name
+            }}</template>
             <template v-slot:option="option">{{ option.name }}</template>
           </v-select>
-          <label for="project">{{ $t('Project') }}</label>
-          <b-form-invalid-feedback>{{ $displayError('project', form) }}</b-form-invalid-feedback>
+          <label for="project">{{ $t("Project") }}</label>
+          <b-form-invalid-feedback>{{
+            $displayError("project", form)
+          }}</b-form-invalid-feedback>
         </div>
       </b-col>
-      <b-col v-if="form.priceModel==='LICENSE'" class="col-12">
+      <b-col v-if="form.priceModel === 'LICENSE'" class="col-12">
         <div class="form-label-group required">
           <b-form-datepicker
             id="expiration"
@@ -66,17 +89,25 @@
             :disabled="form.busy"
             menu-class="w-100"
             :date-format-options="{
-              'year': 'numeric', 'month': 'numeric', 'day': 'numeric', 'weekday': undefined
+              year: 'numeric',
+              month: 'numeric',
+              day: 'numeric',
+              weekday: undefined,
             }"
             reset-button
             :placeholder="$t('Expiration')"
             calendar-width="100%"
             @input="dateChanged"
           ></b-form-datepicker>
-          <label
-            for="expiration"
-          >{{ $t('Yearly Costs') + ((currentUser && currentUser.company)?' (' + currentUser.company.currencyCode + ')':'')}}</label>
-          <b-form-invalid-feedback>{{ $displayError('expiration', form) }}</b-form-invalid-feedback>
+          <label for="expiration">{{
+            $t("Yearly Costs") +
+            (currentUser && currentUser.company
+              ? " (" + currentUser.company.currencyCode + ")"
+              : "")
+          }}</label>
+          <b-form-invalid-feedback>{{
+            $displayError("expiration", form)
+          }}</b-form-invalid-feedback>
         </div>
       </b-col>
       <b-col class="col-12">
@@ -94,10 +125,15 @@
             :state="$validateState('price', form)"
             @change="changePrice"
           ></b-form-input>
-          <label
-            for="price"
-          >{{ $t('Yearly Costs') + ((currentUser && currentUser.company)?' (' + currentUser.company.currencyCode + ')':'')}}</label>
-          <b-form-invalid-feedback>{{ $displayError('price', form) }}</b-form-invalid-feedback>
+          <label for="price">{{
+            $t("Yearly Costs") +
+            (currentUser && currentUser.company
+              ? " (" + currentUser.company.currencyCode + ")"
+              : "")
+          }}</label>
+          <b-form-invalid-feedback>{{
+            $displayError("price", form)
+          }}</b-form-invalid-feedback>
         </div>
       </b-col>
     </b-row>
@@ -109,15 +145,24 @@
           size="lg"
           block
           type="submit"
-          :disabled="vErrors.any()||form.busy"
+          :disabled="vErrors.any() || form.busy"
           :loading="form.busy"
           variant="primary"
-        >{{ $t('Save changes')}} </loading-button>
-        <div v-if="mode==='edit' && $can('tool/toolModule/delete', input)" class="mt-3 text-center">
+          >{{ $t("Save changes") }}
+        </loading-button>
+        <div
+          v-if="mode === 'edit' && $can('tool/toolModule/delete', input)"
+          class="mt-3 text-center"
+        >
           <hr />
-          <b-button variant="outline-danger" type="button" block @click.prevent="deleteItem">
+          <b-button
+            variant="outline-danger"
+            type="button"
+            block
+            @click.prevent="deleteItem"
+          >
             <i class="mdi mdi-trash-can"></i>
-            {{ $t('Delete') }}
+            {{ $t("Delete") }}
           </b-button>
         </div>
       </b-col>
@@ -132,17 +177,17 @@ export default {
   props: {
     value: {
       type: Object,
-      required: false
+      required: false,
     },
     mode: {
       type: String,
       required: false,
-      default: "create"
+      default: "create",
     },
     companyTool: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data: () => ({
     input: null,
@@ -155,15 +200,15 @@ export default {
       parentId: null,
       price: null,
       priceModel: null,
-      expiration: null
-    })
+      expiration: null,
+    }),
   }),
   computed: {
     ...mapGetters({
       currentUser: "auth/user",
       priceModels: "priceModel/all",
-      projects: "project/all"
-    })
+      projects: "project/all",
+    }),
   },
   async mounted() {
     this.input = this.value;
@@ -173,8 +218,8 @@ export default {
   methods: {
     async initForm() {
       Object.keys(this.input || {})
-        .filter(key => key in this.form)
-        .forEach(key => (this.form[key] = this.input[key]));
+        .filter((key) => key in this.form)
+        .forEach((key) => (this.form[key] = this.input[key]));
       this.form.companyToolId = this.companyTool.id;
       this.price = this.form.price / 100;
     },
@@ -221,7 +266,7 @@ export default {
                 "companyToolPrice/delete",
                 new GQLForm(
                   {
-                    id: this.input.id
+                    id: this.input.id,
                   },
                   null
                 )
@@ -231,7 +276,7 @@ export default {
             } finally {
               this.$swal.close();
             }
-          }
+          },
         });
       }
     },
@@ -253,13 +298,13 @@ export default {
         where: {
           and: [
             { field: "tool_id", op: "eq", value: this.companyTool.toolId },
-            { field: "name", op: "cn", value: query }
-          ]
-        }
+            { field: "name", op: "cn", value: query },
+          ],
+        },
       });
 
       return response;
-    }
-  }
+    },
+  },
 };
 </script>

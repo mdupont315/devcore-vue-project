@@ -111,7 +111,7 @@
             }}</b-form-invalid-feedback>
           </div>
           <div class="form-label-group select required">
-           <!--  <wysiwyg
+            <!--  <wysiwyg
               id="description"
               class="wysiwyg_editor"
               style="max-height: 440px"
@@ -124,7 +124,7 @@
               v-validate="''"
             /> -->
 
-              <b-form-textarea
+            <b-form-textarea
               id="description"
               v-model="form.description"
               v-autoresize
@@ -177,6 +177,11 @@ export default {
       required: false,
       type: String,
       default: () => "ideas",
+    },
+    formFrom: {
+      required: false,
+      type: String,
+      default: () => "idea",
     },
     type: {
       required: false,
@@ -284,68 +289,46 @@ export default {
     this.input = this.item;
     this.currentFile = this.item.file;
 
-    if (this.mode === "create" && this.currentTool("toolIdeas")) {
+    if (
+      this.mode === "create" &&
+      this.currentTool("toolIdeas") &&
+      this.section == "toolIdeas"
+    ) {
       this.form.companyToolId = this.currentTool("toolIdeas").id;
     }
 
     if (this.process) {
+      console.log("find process");
       await this.$store.dispatch("process/findById", {
         id: this.process.process.id,
       });
-      //  await this.$store.dispatch(this.storeName + "/findByProcess", {
-      //   id: this.process.process.id
-      // });
     }
     this.initForm();
     this.storeName = this.form.type === "PROCESS" ? "idea" : "toolIdea";
-/*
-    document
-      .querySelector(".editr--content")
-      .addEventListener("click", (event) => {
-        this.increaseIcon(event);
-      }); */
-
- /*    document
-      .querySelector(".editr--content")
-      .addEventListener("contextmenu", (event) => {
-        this.decreaseIcon(event);
-      }); */
   },
-/*   beforeDestroy() {
-    document
-      .querySelector(".editr--content")
-      .removeEventListener("click", this.increaseIcon, true);
-    document
-      .querySelector(".editr--content")
-      .removeEventListener("contextmenu", this.decreaseIcon, true);
-  }, */
-  methods: {
-    increaseIcon(event) {
-      event.target.width = event.target.width * 0.9;
-      event.target.height = event.target.height * 0.9;
-    },
-    decreaseIcon(event) {
-      event.target.width = event.target.width * 1.1;
-      event.target.height = event.target.height * 1.1;
-    },
 
+  methods: {
     initForm() {
+      console.log(this.input.id);
+      console.log(this.process);
+
       if (!this.input.id) {
         this.input.type = this.input.type || "PROCESS";
         this.input.processId = this.input.processId || this.process.process.id;
         this.input.stageId =
           this.input.stageId || this.process.stage
-            ? this.process.stage.id
+            ? this.process.stage?.id
             : null;
         this.input.operationId =
           this.input.operationId || this.process.operation
-            ? this.process.operation.id
+            ? this.process.operation?.id
             : null;
         this.input.phaseId =
           this.input.phaseId || this.process.phase
-            ? this.process.phase.id
+            ? this.process.phase?.id
             : null;
       }
+
       Object.keys(this.input || {})
         .filter((key) => key in this.form)
         .forEach((key) => (this.form[key] = this.input[key]));
@@ -353,6 +336,21 @@ export default {
       this.form.stageId = this.input.stageId;
       this.form.operationId = this.input.operationId;
       this.form.phaseId = this.input.phaseId;
+
+      //Improve Idea
+      if (this.input.sourceType && this.input.sourceType === "idea_issue") {
+        const typeName = this.input.parent.__typename;
+        if (typeName === "ProcessPhase") {
+          this.form.stageId = this.input.parent.operation.stageId;
+          this.form.phaseId = this.input.parent.id;
+          this.form.operationId = this.input.parent.operationId;
+        } else if (typeName === "ProcessOperation") {
+          this.form.operationId = this.input.parent.id;
+          this.form.stageId = this.input.parent.stageId;
+        } else {
+          this.form.stageId = this.input.parent.id;
+        }
+      }
     },
     changeStage() {
       this.form.operationId = null;
@@ -373,6 +371,7 @@ export default {
       }
     },
     async saveItem() {
+      console.log("save Item");
       await this.$validator.validateAll();
 
       console.log(this.form);
@@ -381,26 +380,41 @@ export default {
 
         if (this.mode === "edit") {
           await this.$store.dispatch(`${this.storeName}/update`, this.form);
+          console.log(`${this.storeName}/setTab`);
         } else {
+          await this.$store.dispatch(`${this.storeName}/setTab`, {
+            tab: "New",
+          });
           await this.$store.dispatch(`${this.storeName}/create`, this.form);
         }
+
         this.$emit("done");
-        this.$store.dispatch("process/findById", {
+        if (this.formFrom === "improveIdea") {
+          //reload details page
+          this.$emit("reload");
+        }
+
+        await this.$store.dispatch("process/setCurrentProcess", {
+          section: this.section,
+          process: this.process.process,
+          stage: this.stages?.filter((x) => x.id === this.form.stageId)[0],
+          operation: this.operations?.filter(
+            (x) => x.id === this.form.operationId
+          )[0],
+          phase: this.phases?.filter((x) => x.id === this.form.phaseId)[0],
+        });
+
+        //Find created idea to UI
+        await this.$store.dispatch("process/findById", {
           id: this.form.processId,
           force: true,
         });
-        this.$store.dispatch(`${this.storeName}/findByProcess`, {
+        await this.$store.dispatch(`${this.storeName}/findByProcess`, {
           id: this.form.processId,
           force: true,
         });
-        /*
-				const processPath = {
-					section: 'ideas',
-					process: this.selectedProcess,
-          stage: this.selectedStage,
-          operation: this.selectedOperation,
-          phase: this.selectedPhase
-				} */
+
+        //Set Process path to created IDEAs path
       } else {
         console.log(this.vErrors());
       }

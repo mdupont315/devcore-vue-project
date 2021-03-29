@@ -161,6 +161,7 @@ export default class GQLForm {
         ? this._errors.details.validation[key][0]
         : this._errors.details.validation[key];
       // console.log(ret);
+      console.log(message);
       if (message) {
         const ret = {
           message

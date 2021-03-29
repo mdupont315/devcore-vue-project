@@ -32,9 +32,9 @@
         "
         class="text-center p-3"
       >
-        <small class="px-3 text-center d-block mb-3">{{
+   <!--      <small class="px-3 text-center d-block mb-3">{{
           $t("Invite your team and start collaborating now!")
-        }}</small>
+        }}</small> -->
         <b-button
           size="lg"
           block

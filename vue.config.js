@@ -3,7 +3,7 @@ const { argv } = require("yargs");
 const webpack = require("webpack");
 
 const appUrls = {
-  dev: "http://local.test/graphql",
+  dev: "http://homestead.test/graphql",
   proxy: "https://devcore.app/graphql",
   prod: "https://devcore.app/graphql"
 };
@@ -12,7 +12,7 @@ module.exports = {
   publicPath: process.env.VUE_APP_SUBFOLDER || "/",
   lintOnSave: false,
   devServer: {
-    proxy: "http://local.test",
+    proxy: "http://homestead.test",
     watchOptions: {
       clientLogLevel: "warning"
     }

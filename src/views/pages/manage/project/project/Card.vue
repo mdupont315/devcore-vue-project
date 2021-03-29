@@ -120,7 +120,23 @@
         <div v-else class="text-center p-3">
           <b-spinner variant="primary"></b-spinner>
         </div>
-        <div v-if="stage.status === 'EVALUATIONS_PENDING'" class="mt-3">
+        <div
+          v-if="
+            stage.status === 'EVALUATIONS_PENDING' &&
+            item.evaluationType === 'PERIODIC' &&
+            item.type === 'NORMAL'
+          "
+          class="mt-3"
+        >
+          <loading-button
+            size="lg"
+            block
+            :loading="form.busy"
+            @click="nextStage"
+            >{{ $t("action.next", { name: $t("Stage") }) }}</loading-button
+          >
+        </div>
+        <div v-else-if="stage.status === 'EVALUATIONS_PENDING'" class="mt-3">
           <loading-button
             size="lg"
             block

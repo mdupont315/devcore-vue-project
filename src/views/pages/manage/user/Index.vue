@@ -302,7 +302,7 @@ export default {
           },
           { key: "role", label: this.$t("Permissions"), sortable: true },
           { key: "lang", label: this.$t("Lang"), sortable: true },
-          { key: "actions", label: this.$t("Manage"), class: "actions" },
+					{ key: "actions", label: this.$t("Manage"), class: "actions" },
         ];
       },
     },

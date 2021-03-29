@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const fs = require('fs');
 
-fetch("http://local.test/graphql", {
+fetch("http://homestead.test/graphql", {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({

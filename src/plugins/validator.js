@@ -1,7 +1,14 @@
 import VeeValidate from "vee-validate";
 import Vue from "vue";
-//import validationMessages from 'vee-validate/dist/locale/en';
+import validationMessagesEn from "vee-validate/dist/locale/en";
+import validationMessagesFi from "vee-validate/dist/locale/fi";
 import i18n from "../i18n";
+import store from "../store";
+
+const fiValidationMessages = require("../locales/fi.json");
+const enValidationMessages = require("../locales/en.json");
+
+//VeeValidate.Validator.locale = `${language}`
 
 export const maxArrayCountRule = {
   getMessage(field, maxCount, data) {
@@ -39,6 +46,14 @@ export const minArrayCountRule = {
 
 VeeValidate.Validator.extend("minlength", minArrayCountRule);
 VeeValidate.Validator.extend("maxlength", maxArrayCountRule);
+/* VeeValidate.configure({
+  // this will be used to generate messages.
+  defaultMessage: (field, values) => {
+    console.log(field);
+    values._field_ = i18n.t(`fields.${field}`);
+    return i18n.t(`validations.messages.${values._rule_}`, values);
+  }
+}); */
 
 Vue.use(VeeValidate, {
   i18nRootKey: "validation", // customize the root path for validation messages.
@@ -46,21 +61,40 @@ Vue.use(VeeValidate, {
   errorBagName: "vErrors",
   fieldsBagName: "vFields",
   dictionary: {
-    // en: validationMessages
+    en: validationMessagesEn,
+    fi: validationMessagesFi
   }
 });
 
+//VeeValidate.Validator.localize(fiValidationMessages);
+
 function getErrorMessage(vue, ref, form = null) {
+  const userLanguage = store.getters["auth/user"]?.lang ?? "en";
+  let errorMessage = "";
   if (vue.vFields[ref]) {
-    return vue.vErrors.first(ref)
+
+    errorMessage = vue.vErrors.first(ref)
       ? vue.vErrors.first(ref)
       : form &&
         form.getError(ref) &&
-        vue.vFields[ref] && !vue.vFields[ref].changed
+        vue.vFields[ref] &&
+        !vue.vFields[ref].changed
       ? form.getError(ref).message
       : null;
   }
-  return form && form.getError(ref) ? form.getError(ref).message : null;
+
+  if (errorMessage) {
+
+    const validationlocales = require(`../locales/${userLanguage}.json`);
+    if (errorMessage.includes(ref)) {
+      const re = new RegExp(`\\b${ref}\\b`, "gi");
+      return errorMessage.replace(re, validationlocales[ref]);
+    }
+
+    return errorMessage;
+  } else {
+    return form && form.getError(ref) ? form.getError(ref).message : null;
+  }
 }
 
 // function for check the field states

@@ -157,7 +157,7 @@ export default {
             sortable: false
           },
           { key: "value", label: this.$t("Value"), sortable: true },
-          { key: "actions", label: this.$t("Manage"), class: "actions" }
+          { key: "actions", label: this.$t("Analytics"), class: "actions" }
         ];
       }
     }

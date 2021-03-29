@@ -66,10 +66,15 @@
       </div>
 
       <perfect-scrollbar style="max-height: 500px">
-        <b-card-body class="p-5" :class="{ 'bg-gray': !idea.hasReviews }" style="overflow:scroll;">
-        <h3 class="h6 text-uppercase">{{ $t('Idea description') }}</h3>
-          <p class="text-gray text-justify">{{ idea.description || $t('No description') }}</p>
-
+        <b-card-body
+          class="p-5"
+          :class="{ 'bg-gray': !idea.hasReviews }"
+          style="overflow: scroll"
+        >
+          <h3 class="h6 text-uppercase">{{ $t("Idea description") }}</h3>
+          <p class="text-gray text-justify" style="max-height: 400px;overflow:scroll">
+            {{ idea.description || $t("No description") }}
+          </p>
         </b-card-body>
       </perfect-scrollbar>
       <b-card-footer class="p-3 pb-5">
@@ -163,6 +168,8 @@
                 :key="item.id"
                 :item="item"
                 :idea="idea"
+                @reload="reloadDetail($event)"
+                @confirm="deleteImprovement($event)"
               ></improvement-card>
             </div>
             <div v-else class="mx-auto text-center">
@@ -186,6 +193,8 @@
                 :key="item.id"
                 :item="item"
                 :idea="idea"
+                @reload="reloadDetail($event)"
+                @confirm="deleteImprovement($event)"
               ></improvement-card>
             </div>
             <div v-else class="mx-auto text-center">
@@ -204,6 +213,7 @@
       >
         <idea-form
           v-if="editing"
+          :formFrom="'editIdea'"
           class="idea-card v2 p-0"
           :item="idea"
           @cancel="toggleEdit"
@@ -231,11 +241,7 @@ export default {
       required: false,
     },
   },
-  watch: {
-    idea(newVal) {
-      console.log(newVal);
-    },
-  },
+
   data: () => ({
     editing: false,
     editForm: null,
@@ -285,6 +291,23 @@ export default {
     closed() {
       this.$emit("closed");
     },
+    async deleteImprovement(improvement) {
+      const editForm = new GQLForm({
+        id: this.idea.id,
+        improvement_id: improvement.id,
+      });
+      await this.$store.dispatch(
+        `${this.storeName}/deleteImprovement`,
+        editForm
+      );
+      await this.$store.dispatch(`${this.storeName}/findById`, {
+        id: this.idea.id,
+        force: true,
+      });
+    },
+    reloadDetail() {
+      this.closed();
+    },
     toggleEdit() {
       this.editing = !this.editing;
     },
@@ -316,7 +339,7 @@ export default {
         id: this.idea.processId,
         force: true,
       });
-      this.closed();
+      // this.closed();
     },
     async setCurrentTool(event, toolId) {
       event.preventDefault();

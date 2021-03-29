@@ -114,7 +114,6 @@ export function queryToPromise(
   return new Promise((resolve, reject) => {
     try {
       const subscription = query.subscribe(o => {
-        console.log(o);
         if (options.onChangeStatus) {
           options.onChangeStatus(o);
         }
