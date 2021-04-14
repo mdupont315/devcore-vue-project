@@ -14,8 +14,6 @@ export default async ({ store, next, to }) => {
     console.log("session: ");
     console.log(session);
 
-
-
   } catch (ex) {
     console.log(ex);
   }

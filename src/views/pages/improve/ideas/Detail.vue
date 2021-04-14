@@ -72,7 +72,10 @@
           style="overflow: scroll"
         >
           <h3 class="h6 text-uppercase">{{ $t("Idea description") }}</h3>
-          <p class="text-gray text-justify" style="max-height: 400px;overflow:scroll">
+          <p
+            class="text-gray text-justify"
+            style="max-height: 400px; overflow: scroll"
+          >
             {{ idea.description || $t("No description") }}
           </p>
         </b-card-body>
@@ -88,7 +91,6 @@
                 class="list-item font-13x text-gray"
               >
                 <a class="text-gray" :href="file.downloadUrl" target="_blank">
-                  <i class="mdi mdi-folder-open-outline"></i>
                   {{ $t("Download") }}
                 </a>
               </li>
@@ -101,6 +103,7 @@
             </h4>
             <author-time
               :user="idea.author"
+              :anonymous="idea.anonymous"
               :time="idea.createdAt"
               class="d-inline-block"
             ></author-time>

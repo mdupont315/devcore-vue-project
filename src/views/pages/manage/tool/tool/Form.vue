@@ -6,7 +6,7 @@
           <suggestions
             v-model="form.name"
             class="sm"
-            :v-validate="'required'"
+            :v-validate="'required|min:2'"
             :options="{debounce:250, inputClass:'form-control form-control-sm', autofocus:true, placeholder:$t('Name')}"
             :state="$validateState('tool_id', form)"
             :on-input-change="onToolInputChange"

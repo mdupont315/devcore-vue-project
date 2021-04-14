@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-bottom: 400px">
+  <div style="padding-bottom: 400px" id="newToolIdeas__container">
     <b-row v-if="currentProcessSection">
       <b-col cols="6" class="mx-auto">
         <div class="h4 text-white text-uppercase clearfix">
@@ -100,6 +100,16 @@ export default {
         return [];
       },
     },
+  },
+  mounted() {
+    if (this.$router.currentRoute.params) {
+      if (this.$router.currentRoute.params?.type) {
+        this.$nextTick(() => {
+          let element = document.getElementById("newToolIdeas__container");
+          element.scrollIntoView({ behavior: "smooth", block: "end" });
+        });
+      }
+    }
   },
   methods: {
     filterByProcessSection(item, status) {

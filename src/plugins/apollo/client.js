@@ -10,14 +10,8 @@ import config from "./config";
 import EchoLink from "./echolink";
 import store from "@/store";
 import introspectionQueryResultData from "@/fragmentTypes.json";
-import {
-  showGraphqlErrorFromResponse
-} from '../../lib/utils';
-import {
-  onError
-} from "apollo-link-error";
-
-
+import { showGraphqlErrorFromResponse } from "../../lib/utils";
+import { onError } from "apollo-link-error";
 
 const fragmentMatcher = new IntrospectionFragmentMatcher({
   introspectionQueryResultData
@@ -27,16 +21,12 @@ const cache = new InMemoryCache({
   fragmentMatcher
 });
 
-
 // eslint-disable-next-line
-const errorLink = onError(({
-  networkError
-}) => {
+const errorLink = onError(({ networkError }) => {
   if (networkError) {
-      showGraphqlErrorFromResponse(networkError);
+    showGraphqlErrorFromResponse(networkError);
   }
 });
-
 
 // allow file uploads (it's a terminating link, so it cannot be mixed)
 // eslint-disable-next-line
@@ -49,7 +39,6 @@ const fileUploadLink = new createUploadLink({
       const token = store.getters["auth/access_token"];
 
       if (token) {
-
         options.headers.Authorization = `Bearer ${token}`;
       }
       const response = await fetch(uri, options);

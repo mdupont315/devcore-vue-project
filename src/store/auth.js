@@ -301,7 +301,6 @@ const actions = {
           query: AUTH.session,
           fetchPolicy: "default"
         });
-
         console.log(data);
 
         if (data && data.session) {

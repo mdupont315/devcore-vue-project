@@ -1,18 +1,13 @@
 <template>
-  <div style="padding-bottom: 400px">
+  <div style="padding-bottom: 400px" id="newIdeas__container">
     <b-row v-if="currentProcessSection">
-      <b-col cols="6" class="mx-auto" id="newIdeas__container">
+      <b-col cols="6" class="mx-auto">
         <div class="h4 text-white text-uppercase clearfix">
           <h3 class="h4 float-left" style="padding-top: 9px">
             {{ $t("New ideas") }}
             <span class="h4 text-gray-lighter">{{ newIdeas.length }}</span>
           </h3>
           &nbsp;
-          <!-- <b-button
-            size="md"
-            class="ml-2 text-uppercase float-left"
-            style="padding:5px 15px;line-height:1.3em;font-size:18px"
-					>+ {{ $t('Add new')}}</b-button>-->
         </div>
         <idea-card
           v-for="item in newIdeas"
@@ -36,6 +31,22 @@ import IdeaCard from "./Card";
 export default {
   components: {
     "idea-card": IdeaCard,
+  },
+  mounted() {
+    if (this.$router.currentRoute.params) {
+      if (this.$router.currentRoute.params?.type) {
+        console.log("hep");
+        //var container = this.$el.querySelector("#newIdeas__container");
+        //container.scrollTop = container.scrollHeight;
+        this.$nextTick(() => {
+          // var ideaContainer = this.$refs.newIdeas__container__ref;
+          // ideaContainer.scrollTop = ideaContainer.scrollHeight;
+          let element = document.getElementById("newIdeas__container");
+          console.log("hephep");
+          element.scrollIntoView({ behavior: "smooth", block: "end" });
+        });
+      }
+    }
   },
   computed: {
     ...mapGetters({

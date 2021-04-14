@@ -18,6 +18,7 @@ export const ISSUE_FRAGMENT = gql `
       type
       timeUnit
       timeValue
+      anonymous
       moneyUnit
       moneyValue
       totalValue
@@ -40,7 +41,7 @@ export const ISSUE_FRAGMENT = gql `
               dOrder,
               description
               processId
-              
+
           }
           ... on ProcessOperation{
             id,
@@ -86,7 +87,7 @@ export const ISSUE_FRAGMENT = gql `
 export const ISSUE_FULL_FRAGMENT = gql `
     fragment issueFullFields on Issue{
         ...issueFields,
-        
+
     }
     ${ISSUE_FRAGMENT}
 `;

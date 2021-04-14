@@ -138,7 +138,7 @@
             v-model="form.lang"
             v-validate="'required'"
             label="text"
-            data-vv-name="value"
+            data-vv-name="lang"
             :placeholder="$t('Language')"
             :options="getAssignableLanguages"
 						:reduce="(lang) => lang.value"

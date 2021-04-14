@@ -378,14 +378,17 @@ export default {
       if (!this.vErrors.any()) {
         this.$validator.reset();
 
-        if (this.mode === "edit") {
-          await this.$store.dispatch(`${this.storeName}/update`, this.form);
-          console.log(`${this.storeName}/setTab`);
-        } else {
-          await this.$store.dispatch(`${this.storeName}/setTab`, {
-            tab: "New",
-          });
-          await this.$store.dispatch(`${this.storeName}/create`, this.form);
+        try {
+          if (this.mode === "edit") {
+            await this.$store.dispatch(`${this.storeName}/update`, this.form);
+          } else {
+            await this.$store.dispatch(`${this.storeName}/create`, this.form);
+            await this.$store.dispatch(`${this.storeName}/setTab`, {
+              tab: "New",
+            });
+          }
+        } catch (e) {
+          console.log(e);
         }
 
         this.$emit("done");

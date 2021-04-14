@@ -56,7 +56,9 @@
         <b-button
           :variant="isActive('new') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'tool-ideas' }"
-          class="text-uppercase mr-1"
+          class="text-uppercase mr-1 tool_ideas__routerLink"
+          ref="toolideas_new__innerView__new"
+          id="ideas_new__innerView__new"
           size="md"
           @click="loadComponent"
           >{{ $t("New") }} ({{ newIdeas.length }})</b-button
@@ -64,7 +66,7 @@
         <b-button
           :variant="isActive('review') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'tool-ideas', params: { type: 'review' } }"
-          class="text-uppercase mr-1"
+          class="text-uppercase mr-1 tool_ideas__routerLink"
           size="md"
           @click="loadComponent"
           >{{ $t("Review") }} ({{ reviewIdeas.length }})</b-button
@@ -72,7 +74,7 @@
         <b-button
           :variant="isActive('adopted') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'tool-ideas', params: { type: 'adopted' } }"
-          class="text-uppercase mr-1"
+          class="text-uppercase mr-1 tool_ideas__routerLink"
           size="md"
           @click="loadComponent"
           >{{ $t("Adopted") }} ({{ adoptedIdeas.length }})</b-button
@@ -81,7 +83,7 @@
           v-if="$can('improve/idea/viewTrashed')"
           :variant="isActive('archived') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'tool-ideas', params: { type: 'archived' } }"
-          class="text-uppercase mr-1"
+          class="text-uppercase mr-1 tool_ideas__routerLink"
           size="md"
           @click="loadComponent"
           >{{ $t("Archived") }} ({{ archivedIdeas.length }})</b-button
@@ -325,11 +327,17 @@ export default {
         force: true,
       });
     }
-    EventBus.$on("tool_idea/currentTab", (data) => {
 
-      if (this.$route.path !== "/improve/tool-ideas") {
-        this.$router.push({ name: "tool-ideas", params: {} });
+    EventBus.$on("tool_idea/currentTab", (data) => {
+      if (
+        this.$route.path !== "/improve/tool-ideas" &&
+        this.$route.path.includes("/tool-ideas/")
+      ) {
+        if (this.$refs.toolideas_new__innerView__new) {
+          this.$refs.toolideas_new__innerView__new.$el.click();
+        }
       }
+
       this.currentComponent = () => import("./New.vue");
     });
   },

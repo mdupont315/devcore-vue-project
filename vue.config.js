@@ -13,10 +13,12 @@ module.exports = {
   lintOnSave: false,
   devServer: {
     proxy: "http://homestead.test",
+    headers: { "Access-Control-Allow-Origin": "*" },
     watchOptions: {
       clientLogLevel: "warning"
     }
   },
+
   outputDir: "../devcore_server_lavarel/public/frontend",
   pluginOptions: {
     i18n: {

@@ -77,6 +77,7 @@
       <hr />
       <author-time
         :user="idea.author"
+				:anonymous="idea.anonymous"
         :time="idea.createdAt"
         class="d-inline-block"
       ></author-time>
@@ -142,6 +143,7 @@ export default {
     ...mapGetters({
       allProcess: "process/all",
     }),
+
     process: {
       get() {
         return this.allProcess.find((p) => p.id === this.idea.processId);

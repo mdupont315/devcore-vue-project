@@ -149,14 +149,13 @@ export async function loadApp() {
   try {
     await store.dispatch("auth/init");
     var getsession = await store.dispatch("auth/getSession");
-      console.log(getsession);
+    console.log(getsession);
     try {
       if (store.getters["auth/user"]) {
         console.log("User logged in!");
         await store.dispatch("app/load");
         store.dispatch("app/asyncLoad");
         if (store.getters["auth/user"].mustChangePassword) {
-
           await router.replace(
             {
               name: "change-password",
@@ -193,7 +192,6 @@ export async function loadApp() {
 
     unblockUi();
   }
-
 }
 
 export function getSupportedLocales() {

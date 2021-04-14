@@ -10,6 +10,14 @@ export default class UserModel extends BaseModel {
 
   avatarUrl = null;
 
+  getAnonAvatarUrl(lang = "en") {
+    if (lang === "en") {
+      return require("../assets/anonUserEn.png");
+    } else {
+      return require("../assets/anonUserFi.png");
+    }
+  }
+
   getAvatarUrl(size = "0x0") {
     if (this.avatarUrl) {
       return imageResolver(this.avatarUrl, size);
@@ -60,7 +68,6 @@ export default class UserModel extends BaseModel {
       });
     }
     if (input.permissions) {
-
       input.permissions = input.permissions.map(p => {
         return new PermissionModel().deserialize(p);
       });

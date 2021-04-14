@@ -55,7 +55,9 @@
         <b-button
           :variant="isActive('new') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'ideas' }"
-          class="text-uppercase mr-1"
+          id="ideas_new__innerView__new"
+          ref="ideas_new__innerView__new"
+          class="text-uppercase mr-1 ideas__routerLink"
           size="md"
           @click="loadComponent"
           >{{ $t("New") }} ({{ newIdeas.length }})</b-button
@@ -63,7 +65,7 @@
         <b-button
           :variant="isActive('review') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'ideas', params: { type: 'review' } }"
-          class="text-uppercase mr-1"
+          class="text-uppercase mr-1 ideas__routerLink"
           size="md"
           @click="loadComponent"
           >{{ $t("Review") }} ({{ reviewIdeas.length }})</b-button
@@ -71,7 +73,7 @@
         <b-button
           :variant="isActive('adopted') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'ideas', params: { type: 'adopted' } }"
-          class="text-uppercase mr-1"
+          class="text-uppercase mr-1 ideas__routerLink"
           size="md"
           @click="loadComponent"
           >{{ $t("Adopted") }} ({{ adoptedIdeas.length }})</b-button
@@ -80,7 +82,7 @@
           v-if="$can('improve/idea/viewTrashed')"
           :variant="isActive('archived') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'ideas', params: { type: 'archived' } }"
-          class="text-uppercase mr-1"
+          class="text-uppercase mr-1 ideas__routerLink"
           size="md"
           @click="loadComponent"
           >{{ $t("Archived") }} ({{ archivedIdeas.length }})</b-button
@@ -276,8 +278,13 @@ export default {
       }
     });
     EventBus.$on("idea/currentTab", (data) => {
-      if (this.$route.path !== "/improve/ideas") {
-        this.$router.push({ name: "ideas", params: {} });
+      if (
+        this.$route.path !== "/improve/ideas" &&
+        this.$route.path.includes("/ideas/")
+      ) {
+        if (this.$refs.ideas_new__innerView__new) {
+          this.$refs.ideas_new__innerView__new.$el.click();
+        }
       }
 
       this.currentComponent = () => import("./New.vue");

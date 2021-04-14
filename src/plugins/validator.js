@@ -5,11 +5,6 @@ import validationMessagesFi from "vee-validate/dist/locale/fi";
 import i18n from "../i18n";
 import store from "../store";
 
-const fiValidationMessages = require("../locales/fi.json");
-const enValidationMessages = require("../locales/en.json");
-
-//VeeValidate.Validator.locale = `${language}`
-
 export const maxArrayCountRule = {
   getMessage(field, maxCount, data) {
     return (
@@ -46,14 +41,6 @@ export const minArrayCountRule = {
 
 VeeValidate.Validator.extend("minlength", minArrayCountRule);
 VeeValidate.Validator.extend("maxlength", maxArrayCountRule);
-/* VeeValidate.configure({
-  // this will be used to generate messages.
-  defaultMessage: (field, values) => {
-    console.log(field);
-    values._field_ = i18n.t(`fields.${field}`);
-    return i18n.t(`validations.messages.${values._rule_}`, values);
-  }
-}); */
 
 Vue.use(VeeValidate, {
   i18nRootKey: "validation", // customize the root path for validation messages.
@@ -65,8 +52,6 @@ Vue.use(VeeValidate, {
     fi: validationMessagesFi
   }
 });
-
-//VeeValidate.Validator.localize(fiValidationMessages);
 
 function getErrorMessage(vue, ref, form = null) {
   const userLanguage = store.getters["auth/user"]?.lang ?? "en";
@@ -90,6 +75,9 @@ function getErrorMessage(vue, ref, form = null) {
       const re = new RegExp(`\\b${ref}\\b`, "gi");
       return errorMessage.replace(re, validationlocales[ref]);
     }
+
+    console.log(errorMessage);
+    console.log(ref);
 
     return errorMessage;
   } else {

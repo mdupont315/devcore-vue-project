@@ -45,9 +45,9 @@
           <template v-slot:cell(name)="row"> {{ row.item.title }}</template>
 
           <!-- companyRole -->
-          <template v-slot:cell(companyRole)="row">{{
+  <!--         <template v-slot:cell(companyRole)="row">{{
             row.item.companyRole.name
-          }}</template>
+          }}</template> -->
 
           <!-- loss -->
           <template v-slot:cell(issues)="row">{{
@@ -243,11 +243,11 @@ export default {
       get() {
         return [
           { key: "name", label: this.$t("Process Part"), sortable: true },
-          {
+        /*   {
             key: "companyRole",
             label: this.$t("Role"),
             sortable: true,
-          },
+          }, */
           {
             key: "issues",
             label: this.$t("Issues"),

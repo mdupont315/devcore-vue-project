@@ -15,6 +15,7 @@
       <b-card-footer class="bg-white pl-0 border-0">
         <author-time
           :user="item.author"
+          :anonymous="item.anonymous"
           :time="item.createdAt"
           class="d-inline-block"
         ></author-time>
@@ -98,7 +99,7 @@ export default {
     },
 
     async loadIdea() {
-			console.log("LOAD");
+      console.log("LOAD");
       await this.$store.dispatch("idea/findById", {
         id: this.idea.id,
         force: true,

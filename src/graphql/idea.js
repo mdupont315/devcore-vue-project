@@ -15,6 +15,7 @@ export const IDEA_FRAGMENT = gql`
     type
     totalEvaluations
     evaluationSum
+    anonymous
     #   stageId,
     #   operationId,
     #   phaseId,
@@ -104,6 +105,7 @@ export const IDEA_FULL_FRAGMENT = gql`
       description
       createdAt
       updatedAt
+      anonymous
       author {
         id
         firstName
@@ -117,6 +119,7 @@ export const IDEA_FULL_FRAGMENT = gql`
       description
       createdAt
       updatedAt
+      anonymous
       author {
         id
         firstName

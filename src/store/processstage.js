@@ -27,6 +27,10 @@ const state = initialState();
 const getters = {
     loading: state => state.loading,
     all: state => state.all,
+    byStage: state => stageId => state.all.filter(o => o.stageId === stageId),
+    byOperation: state => operationId =>
+    state.all.filter(o => o.operationId === operationId),
+  byPhase: state => phaseId => state.all.filter(o => o.phaseId === phaseId),
     filter: state => state.filter,
     current: state => state.current,
     filteredItems: state => state.filter && state.filter.length > 3 ? state.all.filter(i => i.name.toLowerCase().includes(state.filter.toLowerCase())) : state.all,
