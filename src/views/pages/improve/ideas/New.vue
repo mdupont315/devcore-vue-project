@@ -35,14 +35,8 @@ export default {
   mounted() {
     if (this.$router.currentRoute.params) {
       if (this.$router.currentRoute.params?.type) {
-        console.log("hep");
-        //var container = this.$el.querySelector("#newIdeas__container");
-        //container.scrollTop = container.scrollHeight;
         this.$nextTick(() => {
-          // var ideaContainer = this.$refs.newIdeas__container__ref;
-          // ideaContainer.scrollTop = ideaContainer.scrollHeight;
           let element = document.getElementById("newIdeas__container");
-          console.log("hephep");
           element.scrollIntoView({ behavior: "smooth", block: "end" });
         });
       }

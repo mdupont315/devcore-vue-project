@@ -9,18 +9,19 @@ export default async ({ store, next, to }) => {
     return;
   }
 
+
+
   try {
     session = await store.dispatch("auth/getSession");
     console.log("session: ");
     console.log(session);
-
   } catch (ex) {
     console.log(ex);
   }
   if (!session || session.user == null) {
     console.log(session);
     console.log("NO SESSION");
-  /*   return next({
+    /*   return next({
       name: "login"
     }); */
     await router.replace(
@@ -32,7 +33,7 @@ export default async ({ store, next, to }) => {
     );
     return;
 
-/*     await router.replace(
+    /*     await router.replace(
       {
         name: "home"
       },

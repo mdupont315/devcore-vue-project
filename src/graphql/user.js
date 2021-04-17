@@ -12,6 +12,7 @@ const USER_FRAGMENT = gql `
       yearlyCosts,
       avatarUrl,
       status,
+      notifications,
       avatar,
       companyId,
       createdAt,

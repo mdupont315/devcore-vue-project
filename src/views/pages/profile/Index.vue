@@ -1,10 +1,13 @@
 <template>
-
   <div class="spcustom-container">
     <div class="page bg-white">
       <div class="container">
         <h2 class="h1 border-bottom">{{ user.fullName }}</h2>
-        <b-form class="floating-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
+        <b-form
+          class="floating-labels"
+          @submit.prevent="save"
+          @keyup="$validator.validateAll()"
+        >
           <div class="text-center">
             <image-upload
               ref="uploader"
@@ -12,9 +15,11 @@
               :uploading="form.busy"
               class="rounded"
               :current-image="user.getAvatarUrl('200x200')"
-              @remove="()=>form.deleteAvatar=true"
+              @remove="() => (form.deleteAvatar = true)"
             />
-            <b-form-invalid-feedback>{{ $displayError('avatar', form) }}</b-form-invalid-feedback>
+            <b-form-invalid-feedback>{{
+              $displayError("avatar", form)
+            }}</b-form-invalid-feedback>
           </div>
           <hr />
           <b-row>
@@ -32,9 +37,11 @@
                 ></b-form-input>
                 <label for="firstName">
                   <i class="mdi mdi-account"></i>
-                  {{ $t('First name') }}
+                  {{ $t("First name") }}
                 </label>
-                <b-form-invalid-feedback>{{ $displayError('firstName', form) }}</b-form-invalid-feedback>
+                <b-form-invalid-feedback>{{
+                  $displayError("firstName", form)
+                }}</b-form-invalid-feedback>
               </div>
             </b-col>
             <b-col class="col-12 col-lg-6">
@@ -51,9 +58,11 @@
                 ></b-form-input>
                 <label for="lastName">
                   <i class="mdi mdi-account"></i>
-                  {{ $t('Last name') }}
+                  {{ $t("Last name") }}
                 </label>
-                <b-form-invalid-feedback>{{ $displayError('lastName', form) }}</b-form-invalid-feedback>
+                <b-form-invalid-feedback>{{
+                  $displayError("lastName", form)
+                }}</b-form-invalid-feedback>
               </div>
             </b-col>
           </b-row>
@@ -72,15 +81,34 @@
                 ></b-form-input>
                 <label for="email">
                   <i class="mdi mdi-email"></i>
-                  {{ $t('Email') }}
+                  {{ $t("Email") }}
                 </label>
-                <b-form-invalid-feedback>{{ $displayError('email', form) }}</b-form-invalid-feedback>
+                <b-form-invalid-feedback>{{
+                  $displayError("email", form)
+                }}</b-form-invalid-feedback>
               </div>
+            </b-col>
+            <b-col class="col-12 col-lg-6">
+              <b-card class="p-0 border" style="overflow: hidden" no-body>
+                <b-card-header>
+                  <div>
+                    <b-form-checkbox
+                      id="manageNotifications"
+                      v-model="form.notifications"
+                      name="manageNotifications"
+											checked
+                      :value="true"
+                      :unchecked-value="false"
+                      >{{ form.notifications ? $t("Notifications allowed") : $t("Notifications disallowed") }}</b-form-checkbox
+                    >
+                  </div>
+                </b-card-header>
+              </b-card>
             </b-col>
           </b-row>
           <b-row>
             <b-col>
-              <b-card class="p-0 border" style="overflow:hidden" no-body>
+              <b-card class="p-0 border" style="overflow: hidden" no-body>
                 <slot>
                   <b-card-header>
                     <div>
@@ -90,10 +118,14 @@
                         name="changePassword"
                         :value="true"
                         :unchecked-value="false"
-                      >{{ $t('Change my password') }}</b-form-checkbox>
+                        >{{ $t("Change my password") }}</b-form-checkbox
+                      >
                     </div>
                   </b-card-header>
-                  <b-collapse id="changePasswordCollapse" :visible="form.changePassword">
+                  <b-collapse
+                    id="changePasswordCollapse"
+                    :visible="form.changePassword"
+                  >
                     <b-card-body>
                       <b-row>
                         <b-col class="col-12 col-lg-6">
@@ -102,7 +134,10 @@
                               id="password"
                               ref="password"
                               v-model="form.password"
-                              v-validate="{ required: this.form.changePassword, min:4 }"
+                              v-validate="{
+                                required: this.form.changePassword,
+                                min: 4,
+                              }"
                               class="shadow-sm"
                               :state="$validateState('password')"
                               :disabled="form.busy"
@@ -113,9 +148,11 @@
                             ></b-form-input>
                             <label for="password">
                               <i class="mdi mdi-lock-question"></i>
-                              {{ $t('Password') }}
+                              {{ $t("Password") }}
                             </label>
-                            <b-form-invalid-feedback>{{ $displayError('password', form) }}</b-form-invalid-feedback>
+                            <b-form-invalid-feedback>{{
+                              $displayError("password", form)
+                            }}</b-form-invalid-feedback>
                           </div>
                         </b-col>
                         <b-col class="col-12 col-lg-6">
@@ -123,9 +160,16 @@
                             <b-form-input
                               id="passwordConfirmation"
                               v-model="form.passwordConfirmation"
-                              v-validate="{ required: this.form.changePassword, min:4, confirmed:'password' }"
+                              v-validate="{
+                                required: this.form.changePassword,
+                                min: 4,
+                                confirmed: 'password',
+                              }"
                               class="shadow-sm"
-                              :state="$validateState('passwordConfirmation')  && !form.hasError('passwordConfirmation')"
+                              :state="
+                                $validateState('passwordConfirmation') &&
+                                !form.hasError('passwordConfirmation')
+                              "
                               :disabled="form.busy"
                               :placeholder="$t('Password confirm')"
                               type="password"
@@ -134,9 +178,11 @@
                             ></b-form-input>
                             <label for="passwordConfirmation">
                               <i class="mdi mdi-lock-question"></i>
-                              {{ $t('Password confirm') }}
+                              {{ $t("Password confirm") }}
                             </label>
-                            <b-form-invalid-feedback>{{ $displayError('passwordConfirmation', form) }}</b-form-invalid-feedback>
+                            <b-form-invalid-feedback>{{
+                              $displayError("passwordConfirmation", form)
+                            }}</b-form-invalid-feedback>
                           </div>
                         </b-col>
                       </b-row>
@@ -157,7 +203,8 @@
                 :loading="form.busy"
                 :block="true"
                 variant="primary"
-              >{{ $t('Save changes') }}</loading-button>
+                >{{ $t("Save changes") }}</loading-button
+              >
             </b-col>
           </b-row>
         </b-form>
@@ -179,13 +226,14 @@ export default {
       changePassword: false,
       password: null,
       passwordConfirmation: null,
-      deleteAvatar: null
-    })
+      deleteAvatar: null,
+			notifications: true,
+    }),
   }),
   computed: {
     ...mapGetters({
-      user: "auth/user"
-    })
+      user: "auth/user",
+    }),
   },
   mounted() {
     this.initForm();
@@ -193,8 +241,8 @@ export default {
   methods: {
     async initForm() {
       Object.keys(this.user)
-        .filter(key => key in this.form)
-        .forEach(key => (this.form[key] = this.user[key]));
+        .filter((key) => key in this.form)
+        .forEach((key) => (this.form[key] = this.user[key]));
       // set the image
       this.$refs.uploader.image = this.user.getAvatarUrl("200x200");
     },
@@ -205,8 +253,7 @@ export default {
         await this.$store.dispatch("auth/updateProfile", this.form);
         this.initForm();
       }
-
-    }
-  }
+    },
+  },
 };
 </script>

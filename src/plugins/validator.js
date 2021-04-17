@@ -73,11 +73,11 @@ function getErrorMessage(vue, ref, form = null) {
     const validationlocales = require(`../locales/${userLanguage}.json`);
     if (errorMessage.includes(ref)) {
       const re = new RegExp(`\\b${ref}\\b`, "gi");
-      return errorMessage.replace(re, validationlocales[ref]);
-    }
+      const replaceText = validationlocales[ref]
+      ? validationlocales[ref] : validationlocales[ref.charAt(0).toUpperCase() + ref.slice(1)];
 
-    console.log(errorMessage);
-    console.log(ref);
+      return errorMessage.replace(re, replaceText);
+    }
 
     return errorMessage;
   } else {
