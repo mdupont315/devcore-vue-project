@@ -107,7 +107,7 @@
                 size="xs"
                 variant="action"
                 class="btn-primary btn-block text-uppercase text-bold"
-                style="font-size: 1.2rem; padding: 3px"
+                style="font-size: 1.2rem; 3px 10px;white-space: nowrap"
                 @click="newIdea(row)"
                 >{{ $t("New idea") }}</b-button
               >
@@ -116,7 +116,7 @@
                 size="xs"
                 variant="action"
                 class="btn-light btn-expand btn-block text-uppercase text-bold m-0"
-                style="font-size: 1.2rem; padding: 3px"
+                style="font-size: 1.2rem; 3px 10px;white-space: nowrap"
                 @click="showDetails(row)"
                 >{{
                   row.item._showDetails ? $t("Close") : $t("Details")
