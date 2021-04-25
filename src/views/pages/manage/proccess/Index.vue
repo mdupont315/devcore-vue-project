@@ -1,30 +1,35 @@
 <template>
   <div class="page animated fadeIn fast pg-process">
-    <div v-if="showStages" class="ml-3" >
-     <b-button
-      id="btnNew2"
-      v-b-tooltip.hover
-      size="sm"
-      class="text-uppercase"
-      variant="primary"
-      :title="$t('Back To Process')"
-      @click="backToProcess"
-    >
-      <i class="mdi mdi-keyboard-backspace"></i>
-      {{ $t('Back To Process')}}
-    </b-button>
+    <div v-if="showStages" class="ml-3">
+      <b-button
+        id="btnNew2"
+        size="sm"
+        class="text-uppercase"
+        variant="primary"
+        :title="$t('Back To Process')"
+        @click="backToProcess"
+      >
+        <i class="mdi mdi-keyboard-backspace"></i>
+        {{ $t("Back To Process") }}
+      </b-button>
 
-      <br/><br/>
+      <br /><br />
     </div>
-    <div v-if="!showStages && process && process.loaded && allProcess.length > 0">
+    <div
+      v-if="!showStages && process && process.loaded && allProcess.length > 0"
+    >
       <unblock-loader v-if="busy" position="bottom"></unblock-loader>
       <div v-if="process" id="process-page-content" class="editable-dashboard">
-        <div class="sortable-wrapper t01 horizontal">
+        <div
+          class="sortable-wrapper t01 horizontal"
+          :style="!showStages ? 'flex-wrap: wrap;' : ''"
+        >
           <process-card
             v-for="item in filteredProcess"
             :key="item.id"
             class="item sortable-item"
-            :class="{'busy':busy}"
+            :class="{ busy: busy }"
+            :ref="'process_card___' + item.id"
             :item="item"
             @editing="editingProcess"
             @selectProcess="selectProcess"
@@ -32,20 +37,25 @@
         </div>
       </div>
     </div>
-    <div v-if="showStages">
+    <div v-show="showStages">
       <unblock-loader v-if="busy" position="bottom"></unblock-loader>
       <div v-if="process" id="process-page-content" class="editable-dashboard">
         <draggable
           v-model="stages"
           class="sortable-wrapper t01 horizontal"
-          v-bind="{disabled:busy||editingCard||show_inner_overlay, draggable:'.enable-drag', animation:200, filter:'.busy .newItem'}"
+          v-bind="{
+            disabled: busy || editingCard || show_inner_overlay,
+            draggable: '.enable-drag',
+            animation: 200,
+            filter: '.busy .newItem',
+          }"
           @change="changeOrder"
         >
           <stage-card
             v-for="item in stages"
             :key="item.id"
             class="item sortable-item"
-            :class="{'busy':busy}"
+            :class="{ busy: busy }"
             :item="item"
             @editing="editing"
           ></stage-card>
@@ -59,7 +69,7 @@
             <template slot="placeholder">
               <b-button block size="lg" variant="dark-ligth">
                 <i class="mdi mdi-plus"></i>
-                {{ $t('Add stage')}}
+                {{ $t("Add stage") }}
               </b-button>
             </template>
 
@@ -68,7 +78,9 @@
         </draggable>
       </div>
     </div>
-    <page-loader v-if="loadingProcess || process && !process.loaded"></page-loader>
+    <page-loader
+      v-if="loadingProcess || (process && !process.loaded)"
+    ></page-loader>
     <empty-page v-if="allProcess.length === 0"></empty-page>
   </div>
 </template>
@@ -87,19 +99,19 @@ export default {
     "stage-card": StageCard,
     "stage-form": StageForm,
     "process-card": ProcessCard,
-    draggable
+    draggable,
   },
   props: {
     detail: {
       required: false,
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     defaultDetailFields: {
       withStages: false,
       withStagesFull: false,
-      withIdeas: false
-    }
+      withIdeas: false,
+    },
   },
   data: () => ({
     busy: false,
@@ -109,7 +121,7 @@ export default {
     editingCard: false,
     selectedProcess: null,
     showStages: false,
-    lastFilter: null
+    lastFilter: null,
   }),
   computed: {
     ...mapGetters({
@@ -118,19 +130,19 @@ export default {
       filter: "process/filter",
       filteredProcess: "process/filteredItems",
       loadingProcess: "process/loading",
-      show_inner_overlay: "app/show_inner_overlay"
+      show_inner_overlay: "app/show_inner_overlay",
     }),
     currentProcess: {
       get() {
         return this.current("process");
-      }
+      },
     },
     process: {
       get() {
         return this.currentProcess && this.currentProcess.process
           ? this.currentProcess.process
           : null;
-      }
+      },
     },
     stages: {
       get() {
@@ -142,8 +154,8 @@ export default {
         this.process.stages = value.sort((a, b) => {
           return a.dOrder > b.dOrder ? 1 : -1;
         });
-      }
-    }
+      },
+    },
   },
   async mounted() {
     this.load();
@@ -192,14 +204,14 @@ export default {
             new GQLForm({
               id: event.moved.element.id,
               dOrder: newOrder,
-              processId: this.currentProcess.process.id
+              processId: this.currentProcess.process.id,
             })
           );
 
           await this.$store.dispatch("process/findById", {
             id: this.process.id,
             withStagesFull: true,
-            force: true
+            force: true,
           });
           // eslint-disable-next-line
         } catch (ex) {
@@ -212,14 +224,23 @@ export default {
       }
     },
     prepareStage() {
+      console.log(this.$refs);
       this.newStage = new ProcessStage().deserialize({
         processId: this.process.id,
-        companyRoles: []
+        companyRoles: [],
       });
     },
     addStage() {
       this.$refs.newStageCard.changeMode("create");
-      scrollLeftToElement(this.$refs.newStageCard.$el);
+      const currentProcess = this.currentProcess.process;
+      console.log(this.$refs);
+      if (!this.showStages) {
+        const [element] = this.$refs[`process_card___${currentProcess.id}`];
+        console.log(element);
+        element.changeProcess(currentProcess);
+      }
+
+      // scrollLeftToElement(this.$refs.newStageCard.$el);
     },
     processFilterChange() {
       this.showStages = false;
@@ -232,7 +253,7 @@ export default {
       this.$refs.newStageCard.changeMode(null);
     },
     editing(editing) {
-			console.log(editing);
+      console.log(editing);
       this.editingCard = editing;
     },
     editingProcess(editing) {
@@ -246,15 +267,15 @@ export default {
         process: this.selectedProcess,
         stage: null,
         operation: null,
-        phase: null
+        phase: null,
       });
 
       this.selectedProcess = await this.$store.dispatch("process/findById", {
         id: process.id,
-        ...Object.assign({}, this.defaultDetailFields, this.detail)
+        ...Object.assign({}, this.defaultDetailFields, this.detail),
       });
       this.selectedProcess = this.$store.getters["process/all"].find(
-        o => o.id === process.id
+        (o) => o.id === process.id
       );
       // this.stages = this.selectedProcess.stages
 
@@ -262,7 +283,7 @@ export default {
     },
     backToProcess() {
       this.showStages = false;
-    }
-  }
+    },
+  },
 };
 </script>

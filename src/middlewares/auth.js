@@ -33,14 +33,6 @@ export default async ({ store, next, to }) => {
     );
     return;
 
-    /*     await router.replace(
-      {
-        name: "home"
-      },
-      () => {},
-      () => {}
-    );
-    return; */
   }
 
   if (!session.user?.mustChangePassword && to.name === "change-password") {
@@ -53,6 +45,21 @@ export default async ({ store, next, to }) => {
     );
     return;
   }
+
+console.log(session.user);
+console.log(to.name);
+  if (session.user && to.name === "forgot-password") {
+
+  /*   await router.replace(
+      {
+        name: "home"
+      },
+      () => {},
+      () => {}
+    );
+    return; */
+  }
+
   if (to.meta.permissions) {
     const { permissions } = to.meta;
     if (session.user?.can(permissions)) {

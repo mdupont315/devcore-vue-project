@@ -114,6 +114,7 @@
 <script>
 import { mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
+import { blockUi, unblockUi } from "@/lib/utils";
 
 export default {
   data: () => ({
@@ -163,16 +164,17 @@ export default {
         }
         this.$validator.reset();
         await this.$store.dispatch("auth/resetPassword", this.form);
-        
-        // await this.$router.replace("/");
-        window.location.reload();
+				blockUi()
+       await this.$router.push("/profile");
+        //  window.location.reload();
       } catch (ex) {
         if (ex.code === 'TOKEN_EXPIRED'){
           this.resend();
         }
-       
+
       } finally {
         // this.$validator.reset();
+				unblockUi();
       }
     },
     resend() {

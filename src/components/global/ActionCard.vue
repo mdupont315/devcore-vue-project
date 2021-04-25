@@ -31,6 +31,7 @@ export default {
   },
   methods: {
     changeMode(mode) {
+			console.log(mode);
       if (mode) {
         this.dataMode = `mode-${mode}`;
       } else {

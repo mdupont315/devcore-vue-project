@@ -1,15 +1,22 @@
 <template>
   <div
     class="process-stage"
-    :class="{'enable-drag':!editing, 'active':editing, 'collapsed':collapsed}"
+    style="
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -o-user-select: none;
+      user-select: none;
+    "
+    :class="{ 'enable-drag': !editing, active: editing, collapsed: collapsed }"
   >
-    <b-card no-body class="stage-card" >
-      <div v-if="item" >
+    <b-card no-body class="stage-card">
+      <div v-if="item">
         <b-card-header class="header">
-
           <layer v-if="editing" @closed="initEdit">
-            <div class="edit" style="width:300px; left:0">
-              <label class="label">{{ $t('Name of process') }}</label>
+            <div class="edit" style="width: 300px; left: 0">
+              <label class="label">{{ $t("Name of process") }}</label>
               <div class="d-flex flex-row">
                 <div class="flex-grow-1 position-relative">
                   <b-input
@@ -20,10 +27,12 @@
                     name="title"
                     :disabled="editForm.busy"
                     class="no-focus-style"
-                    style="margin:0!important"
+                    style="margin: 0 !important"
                     :state="$validateState('title', editForm)"
                   />
-                  <b-form-invalid-feedback>{{ $displayError('title', editForm) }}</b-form-invalid-feedback>
+                  <b-form-invalid-feedback>{{
+                    $displayError("title", editForm)
+                  }}</b-form-invalid-feedback>
                 </div>
                 <b-button
                   :disabled="vErrors.any()"
@@ -44,40 +53,49 @@
             </div>
           </layer>
 
-          <div >
-          <div class="title">
-            <h2 class="h4 m-0 text-capitalize text-center text-overflow text-bold pointer-selection" @click="changeProcess" >{{ item.title }}</h2>
-            <div class="tools">
-            <span
-                    class="btn-action"
-                    @click="toggleEdit"
-
-                  >
-                    <i class="mdi mdi-pencil"></i>
-                  </span>
-             </div>
-          </div>
-          <div class="card-body pointer-selection" @click="changeProcess">
-                <div class="h3 text-center">
-                  <i class="mdi mdi-flask-empty-outline text-gray-light" style="font-size:80px;font-weight:100"></i>
-                </div>
-          </div>
+          <div>
+            <div class="title">
+              <h2
+                class="h4 m-0 text-capitalize text-center text-overflow text-bold pointer-selection"
+                @click="changeProcess"
+              >
+                {{ item.title }}
+              </h2>
+              <div class="tools">
+                <span class="btn-action" @click="toggleEdit">
+                  <i class="mdi mdi-pencil"></i>
+                </span>
+              </div>
+            </div>
+            <div class="card-body pointer-selection" @click="changeProcess">
+              <div class="h3 text-center">
+                <i
+                  class="mdi mdi-flask-empty-outline text-gray-light"
+                  style="font-size: 80px; font-weight: 100"
+                ></i>
+              </div>
+            </div>
           </div>
           <hr class="m-0 mt-2" />
         </b-card-header>
-
       </div>
-
     </b-card>
     <div v-if="editForm" class="form">
-      <layer :key="intent" style="width:100%" @closed="cancelEdit">
-        <div v-if="showRolesPopover" class="overlay transparent" @click="closeRolesPopover" />
+      <layer :key="intent" style="width: 100%" @closed="cancelEdit">
+        <div
+          v-if="showRolesPopover"
+          class="overlay transparent"
+          @click="closeRolesPopover"
+        />
         <b-form @submit.prevent="saveItem">
           <div>
             <b-row>
               <b-col>
                 <b-card class="bg-white shadow-sm" no-body>
-                  <div ref="editRolesPlaceholder" style="height:1px;position:absolute;width:100%"></div>
+                  <div
+                    ref="editRolesPlaceholder"
+                    style="height: 1px; position: absolute; width: 100%"
+                  ></div>
                   <div class="form-group my-0">
                     <b-textarea
                       :key="intent"
@@ -86,21 +104,24 @@
                       v-autoresize
                       v-validate="'required|min:4'"
                       class="no-style my-0"
-                      style="min-height:70px; overflow:hidden"
+                      style="min-height: 70px; overflow: hidden"
                       :state="$validateState('title', editForm)"
                       name="title"
                     ></b-textarea>
-                    <b-form-invalid-feedback>{{ $displayError('title', editForm) }}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback>{{
+                      $displayError("title", editForm)
+                    }}</b-form-invalid-feedback>
                   </div>
                 </b-card>
                 <div class="mt-3">
                   <loading-button
                     :loading="editForm.busy"
-                    :disabled="vErrors.any()||editForm.busy"
+                    :disabled="vErrors.any() || editForm.busy"
                     size="md"
                     type="submit"
                     class="padding shadow-sm"
-                  >{{ $t('Save') }}</loading-button>
+                    >{{ $t("Save") }}</loading-button
+                  >
                 </div>
               </b-col>
             </b-row>
@@ -109,10 +130,9 @@
             :key="intent"
             placement="right"
             :show="true"
-            :target="()=>$refs.editRolesPlaceholder"
+            :target="() => $refs.editRolesPlaceholder"
             custom-class="no-arrow transparent"
           >
-
           </b-popover>
         </b-form>
       </layer>
@@ -128,11 +148,11 @@ import { ProcessStage, ProcessOperation } from "@/models";
 export default {
   props: {
     item: {
-      required: false
+      required: false,
     },
     mode: {
-      required: false
-    }
+      required: false,
+    },
   },
   data: () => ({
     showOverlay: false,
@@ -145,18 +165,18 @@ export default {
     intent: 0,
     showRolesPopover: false,
     orderBusy: false,
-    newOperation: null
+    newOperation: null,
   }),
   computed: {
     ...mapGetters({
-      companyRoles: "companyRole/all"
+      companyRoles: "companyRole/all",
     }),
     selectedRoles: {
       get() {
         return this.companyRoles
-          .filter(r => this.editForm.companyRoles.includes(r.id))
+          .filter((r) => this.editForm.companyRoles.includes(r.id))
           .sort((a, b) => (a.name > b.name ? 1 : -1));
-      }
+      },
     },
     operations: {
       get() {
@@ -168,8 +188,8 @@ export default {
         this.item.operations = value.sort((a, b) => {
           return a.dOrder > b.dOrder ? 1 : -1;
         });
-      }
-    }
+      },
+    },
   },
   async mounted() {
     await this.$store.dispatch("companyRole/findAll");
@@ -242,9 +262,9 @@ export default {
               id: event.added.element.id,
               stageId: this.item.id,
               dOrder: newOrder,
-              companyRoles: event.added.element.companyRoles.map(i => i.id),
+              companyRoles: event.added.element.companyRoles.map((i) => i.id),
               title: event.added.element.title,
-              description: event.added.element.description
+              description: event.added.element.description,
             })
           );
         }
@@ -263,7 +283,7 @@ export default {
     prepareOperation() {
       this.newOperation = new ProcessOperation().deserialize({
         stageId: this.item.id,
-        companyRoles: []
+        companyRoles: [],
       });
       this.$nextTick(() => {
         document.getElementById("main").scrollTop =
@@ -271,7 +291,7 @@ export default {
       });
     },
     changeProcess() {
-      this.$emit("selectProcess", this.item)
+      this.$emit("selectProcess", this.item);
     },
     initEdit() {
       if (!this.editing) {
@@ -281,7 +301,7 @@ export default {
           this.intent++;
           this.editForm = new GQLForm({
             id: this.item.id,
-            title: this.item.title
+            title: this.item.title,
           });
           this.expanded = false;
           this.editing = true;
@@ -297,7 +317,6 @@ export default {
       }
 
       this.$store.dispatch("app/showTopNavOnTop", this.editing);
-
     },
     async saveItem() {
       await this.$validator.validateAll();
@@ -312,6 +331,6 @@ export default {
     cancelEdit() {
       this.initEdit();
     },
-  }
+  },
 };
 </script>

@@ -9,7 +9,7 @@
         <div class="form-label-group required">
           <b-form-input
             id="name"
-            v-model="form.title"
+            v-model.trim="form.title"
             v-validate="'required|min:4'"
             :disabled="form.busy"
             :placeholder="$t('Name of process')"

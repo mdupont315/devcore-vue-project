@@ -8,7 +8,7 @@
             <div class="form-group">
               <b-form-input
                 id="title"
-                v-model="form.title"
+                v-model.trim="form.title"
                 v-autofocus
                 v-validate="'required|min:4'"
                 :disabled="form.busy"

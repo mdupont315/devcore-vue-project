@@ -9,7 +9,7 @@
         <div class="form-label-group required">
           <b-form-input
             id="firstName"
-            v-model="form.firstName"
+            v-model.trim="form.firstName"
             v-validate="'required'"
             :disabled="form.busy"
             :placeholder="$t('First name')"

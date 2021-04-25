@@ -11,7 +11,7 @@
           <div class="form-label-group required">
             <b-form-input
               id="name"
-              v-model="form.name"
+              v-model.trim="form.name"
               v-validate="'required|min:4'"
               v-autofocus
               :disabled="form.busy"

@@ -4,7 +4,7 @@ export default async ({
 }) => {
 
     let session = null;
-
+    
     if (!store.getters['auth/checked']) {
       console.log("IT WAS CHECKED!")
         return next();

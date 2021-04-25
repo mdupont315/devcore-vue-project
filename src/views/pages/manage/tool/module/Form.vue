@@ -8,7 +8,7 @@
       <b-col class="col-12">
         <div class="form-label-group required">
           <suggestions
-            v-model="form.name"
+            v-model.trim="form.name"
             class="sm"
             v-validate="'required|min:1'"
             :options="{
