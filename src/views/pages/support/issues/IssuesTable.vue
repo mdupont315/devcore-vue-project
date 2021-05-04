@@ -49,11 +49,11 @@
       }}</template>
 
       <!-- Process path -->
-      <template v-slot:cell(processPath)="row"
+      <!--    <template v-slot:cell(processPath)="row"
         ><div v-for="(path, index) in formatProcessPath(row.item.parent)" :key="index">
          <span style="font-size:8px" v-if="index !== 0">></span> {{ path }}
         </div></template
-      >
+      > -->
       <!-- description -->
       <template v-slot:cell(description)="row">{{
         row.item.description
@@ -118,19 +118,20 @@ export default {
             label: this.$t("Project"),
             sortable: true,
           },
-          {
+          /*    {
             key: "processPath",
             label: this.$t("Process path"),
+            sortable: true,
+          }, */
+
+          {
+            key: "loss",
+            label: this.$t("Estimated loss"),
             sortable: true,
           },
           {
             key: "description",
             label: this.$t("Description"),
-            sortable: true,
-          },
-          {
-            key: "loss",
-            label: this.$t("Estimated loss"),
             sortable: true,
           },
 

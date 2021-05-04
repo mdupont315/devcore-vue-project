@@ -34,7 +34,20 @@ export default class UserModel extends BaseModel {
   }
 
   get formattedYearlyCosts() {
-    return this.yearlyCosts / 100;
+    console.log(this.yearlyCosts)
+    if (this.yearlyCosts > 0) {
+      return this.yearlyCosts;
+    }
+    return 0;
+  }
+
+    get formattedHourlyCosts() {
+    console.log(this.yearlyCosts);
+    if (this.yearlyCosts > 0) {
+      const yearlyCost = this.yearlyCosts
+      return yearlyCost / 1724
+    }
+    return 0;
   }
 
   set formattedYearlyCosts(value) {

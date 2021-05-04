@@ -366,14 +366,8 @@ export default {
       return response;
     },
     async itemChanged() {
-      // const copy = { ...this.currentRowDetails };
-      // this.showDetails(null);
-      // this.showDetails(copy);
-      // this.currentRowDetails.toggleDetails();
-      // this.currentRowDetails.item._showDetails=true;
       this.loadItem(this.currentRowDetails.item);
-      // // this.currentRowDetails.toggleDetails();
-      // // this.currentRowDetails.item._showDetails=true;
+
     },
   },
 };

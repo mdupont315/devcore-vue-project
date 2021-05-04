@@ -88,8 +88,11 @@
           <div class="form-label-group required">
             <b-form-input
               id="budget"
-              v-model.number="budget"
-              v-validate="'required|numeric|min_value:0'"
+              v-model="getBudget"
+              :max-length="15"
+              v-validate="
+                'required|numeric|min_value:0|max_value:999999999999999'
+              "
               :disabled="form.busy"
               :placeholder="$t('Budget')"
               type="number"
@@ -323,6 +326,14 @@ export default {
     }),
   }),
   computed: {
+    getBudget: {
+      get() {
+        return this.budget;
+      },
+      set(val) {
+        if (val.length < 15) this.budget = val;
+      },
+    },
     ifEditAndFinished: {
       get() {
         if (this.stage) {

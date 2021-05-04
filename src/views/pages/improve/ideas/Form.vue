@@ -363,6 +363,7 @@ export default {
       this.$emit("cancel");
     },
     fileChanged() {
+			console.log(this.form);
       if (!this.form.file) {
         this.form.removeFile = true;
         this.currentFile = null;

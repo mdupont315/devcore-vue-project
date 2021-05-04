@@ -31,7 +31,8 @@ export const ISSUE_FRAGMENT = gql `
           firstName,
           lastName,
           companyRoleId
-          avatarUrl
+          avatarUrl,
+          yearlyCosts
       },
       parent{
           __typename,

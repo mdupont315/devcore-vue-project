@@ -1,33 +1,7 @@
 import gql from "graphql-tag";
 
 // eslint-disable-next-line
-/* export const COMPANY_TOOL_FRAGMENT = gql `
-    fragment companyToolFields on CompanyTool{
-      id,
-      name,
-      yearlyCosts,
-      type,
-    #   priceModel{
-    #       id,
-    #       name
-    #   },
-      modulesCount
-      toolId,
-      createdAt,
-      updatedAt,
-    #  modules{
-    #      name,
-    #      prices{
-    #        name,
-    #        priceModel,
-    #        yearlyCosts,
-    #        price,
-    #        priceInterval
-    #        }
-     #  }
-    }
-`;
-   ...companyToolFields,*/
+
 
 export const COMPANY_TOOL_FRAGMENT = gql`
   fragment companyToolFields on CompanyTool {

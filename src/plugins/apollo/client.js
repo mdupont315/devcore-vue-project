@@ -34,6 +34,7 @@ const fileUploadLink = new createUploadLink({
   uri: config.graphqlEndpoint,
   credentials: "include",
   fetch: async (uri, options) => {
+    console.log(uri);
     try {
       // add the auth token to the headers
       const token = store.getters["auth/access_token"];
@@ -67,8 +68,8 @@ console.log(config.allowSubscriptions);
   const echoLink = new EchoLink();
   apolloLinks.push(echoLink);
 } */
-const echoLink = new EchoLink();
-apolloLinks.push(echoLink);
+//const echoLink = new EchoLink();
+//apolloLinks.push(echoLink);
 
 apolloLinks.push(fileUploadLink);
 

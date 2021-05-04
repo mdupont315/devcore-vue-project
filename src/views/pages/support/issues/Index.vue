@@ -18,7 +18,7 @@
           primary-key="rowId"
           hover
           :fields="fields"
-          :items="items"
+          :items="getUniquePathIssues"
           :show-empty="true"
           :empty-text="$t('There are no records for the given criteria')"
           :tbody-tr-class="
@@ -42,22 +42,42 @@
           </template>
 
           <!-- name -->
-          <template v-slot:cell(name)="row"> {{ row.item.title }}</template>
+          <template v-slot:cell(name)="row">
+            <div style="min-height: 40px" class="issueTable_processPath_title">
+              <div v-if="row.item.stageId" class="issueTable_processPath_title">
+                {{ row.item.pathTitles.stage }}
+              </div>
+              <div
+                v-if="row.item.operationId"
+                class="issueTable_processPath_title"
+              >
+                <div style="font-size: 20px; padding: 5px">/</div>
+                <div>{{ row.item.pathTitles.operation }}</div>
+              </div>
+              <div v-if="row.item.phaseId" class="issueTable_processPath_title">
+                <div style="font-size: 20px; padding: 5px">/</div>
+                <div>{{ row.item.pathTitles.phase }}</div>
+              </div>
+            </div>
+          </template>
 
           <!-- companyRole -->
-  <!--         <template v-slot:cell(companyRole)="row">{{
+          <!--         <template v-slot:cell(companyRole)="row">{{
             row.item.companyRole.name
           }}</template> -->
 
           <!-- loss -->
-          <template v-slot:cell(issues)="row">{{
-            row.item.issues.length
-          }}</template>
+          <template v-slot:cell(issues)="row">
+            <div v-if="row.item.pathIssues">
+              {{ row.item.pathIssues.length }}
+            </div>
+            <div v-else>0</div>
+          </template>
 
           <!-- loss -->
           <template v-slot:cell(loss)="row">
-            <span :class="{ 'text-danger': row.item.totalLoss != 0 }">{{
-              $currency(row.item.totalLoss / 100 || 0)
+            <span :class="{ 'text-danger': row.item.pathStats != 0 }">{{
+              $currency(row.item.pathStats.value / 100 || 0)
             }}</span>
           </template>
 
@@ -129,7 +149,7 @@
           <template v-slot:row-details="row">
             <div class="row-details">
               <issues-table
-                :items="row.item.issues"
+                :items="row.item.pathIssues"
                 :item="row.item"
                 :loading="loadingItem"
               ></issues-table>
@@ -162,6 +182,7 @@ export default {
       currentDetailsItem: null,
       loadingItem: false,
       showIdeaPopover: false,
+      uniquePathIssues: null,
       filter: {
         busy: false,
       },
@@ -176,11 +197,36 @@ export default {
       currentProcess: "process/current",
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
     }),
+    getUniquePathIssues: {
+      get: function () {
+        return this.uniquePathIssues;
+      },
+    },
+    uniqueProcessPathIds: {
+      get: function () {
+        //Deduct all populated paths from ideas
+        const populatedProcessPaths = [];
+        this.issues.map((issue) => {
+          populatedProcessPaths.push(this.issuePathDeducer(issue));
+        });
+
+        const uniquePaths = Array.from(
+          new Set(populatedProcessPaths.map((obj) => JSON.stringify(obj)))
+        ).map((str) => JSON.parse(str));
+
+        //Gets unique Paths
+        return uniquePaths;
+      },
+      set: function (uniqPaths) {
+        this.uniquePathIdeas = uniqPaths;
+      },
+    },
     process: {
       get() {
         return this.currentProcess("issues").process;
       },
     },
+
     items: {
       get() {
         let items = [];
@@ -243,7 +289,7 @@ export default {
       get() {
         return [
           { key: "name", label: this.$t("Process Part"), sortable: true },
-        /*   {
+          /*   {
             key: "companyRole",
             label: this.$t("Role"),
             sortable: true,
@@ -265,6 +311,138 @@ export default {
   },
   async mounted() {
     if (this.process) {
+      await this.loadProcessAndIssues();
+      this.uniquePathIssues = await this.getUniquePaths();
+    }
+  },
+  methods: {
+    async getUniquePaths() {
+      let _uniquePathIssues = [];
+      if (!this.uniquePathIssues) {
+        _uniquePathIssues = this.uniqueProcessPathIds;
+      }
+      await _uniquePathIssues.map(
+        (path) => (path.pathTitles = this.getPathTitles(path))
+      );
+
+      await _uniquePathIssues.map(
+        (path) => (path.pathIssues = this.getIssuesForKnownPath(path))
+      );
+
+      await _uniquePathIssues.map(
+        (path) => (path.pathStats = this.getPathStats(path))
+      );
+
+      return _uniquePathIssues;
+    },
+    issuePathDeducer(_obj) {
+      if (_obj.parent.__typename === "ProcessPhase") {
+        const phaseId = _obj.parent.id;
+        const operationId = _obj.parent.operation.id;
+        const stageId = _obj.parent.operation.stageId;
+        return {
+          phaseId: phaseId,
+          operationId: operationId,
+          stageId: stageId,
+        };
+      }
+      if (_obj.parent.__typename === "ProcessOperation") {
+        const operationId = _obj.parent.id;
+        const stageId = _obj.parent.stageId;
+        return {
+          operationId: operationId,
+          stageId: stageId,
+        };
+      }
+      if (_obj.parent.__typename === "ProcessStage") {
+        const stageId = _obj.parent.id;
+        return {
+          stageId: stageId,
+        };
+      }
+    },
+    getPathTitles(path) {
+      const getTitle = (path) => {
+        console.log(path);
+        this.mappedProcessPaths = {
+          stage: null,
+          operation: null,
+          phase: null,
+        };
+
+        const { stageId } = path;
+        const { operationId } = path;
+        const { phaseId } = path;
+
+        let mappedStage = null;
+        let mappedOperation = null;
+        let mappedPhase = null;
+
+        if (stageId) {
+          mappedStage = this.process.stages.find(
+            (stage) => stage.id == stageId
+          );
+          this.mappedProcessPaths.stage = mappedStage.title;
+        }
+
+        if (operationId) {
+          mappedOperation = mappedStage.operations.find(
+            (operation) => operation.id == operationId
+          );
+          this.mappedProcessPaths.operation = mappedOperation.title;
+        }
+
+        if (phaseId) {
+          mappedPhase = mappedOperation.phases.find(
+            (phase) => phase.id == phaseId
+          );
+          this.mappedProcessPaths.phase = mappedPhase.title;
+        }
+
+        return this.mappedProcessPaths;
+      };
+
+      return getTitle(path);
+    },
+    getPathStats(path) {
+      const pathStats = {
+        value: 0,
+      };
+
+      path.pathIssues.map((i) => (pathStats.value += i.moneyTotalValue));
+      return pathStats;
+    },
+    getIssuesForKnownPath(path) {
+      let selectedIssues = [];
+      if (path) {
+        const { stageId } = path;
+        const { operationId } = path;
+        const { phaseId } = path;
+
+        if (phaseId) {
+          selectedIssues = this.issues.filter(
+            (i) =>
+              i.parent.id == phaseId && i.parent.__typename == "ProcessPhase"
+          );
+        }
+
+        if (operationId && !phaseId) {
+          selectedIssues = this.issues.filter(
+            (i) =>
+              i.parent.id == operationId &&
+              i.parent.__typename == "ProcessOperation"
+          );
+        }
+        if (!operationId && !phaseId) {
+          selectedIssues = this.issues.filter(
+            (i) =>
+              i.parent.id == stageId && i.parent.__typename == "ProcessStage"
+          );
+        }
+      }
+      return selectedIssues;
+    },
+    async loadProcessAndIssues() {
       await this.$store.dispatch("process/findById", {
         id: this.process.id,
         force: true,
@@ -273,9 +451,7 @@ export default {
         id: this.process.id,
         force: true,
       });
-    }
-  },
-  methods: {
+    },
     isRowEditing(row) {
       return (
         row &&
@@ -380,3 +556,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+.issueTable_processPath_title {
+  display: flex;
+  align-items: center;
+}
+</style>

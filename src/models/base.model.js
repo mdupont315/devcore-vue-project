@@ -5,7 +5,7 @@ export default class BaseModel {
     }
 
     deserialize(input) {
-
+        console.log(input);
         return Object.assign(this, input);
     }
 
