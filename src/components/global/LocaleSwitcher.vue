@@ -31,14 +31,6 @@ export default {
   data: () => ({
     form: new GQLForm({
       lang: null,
-      file: null,
-      firstName: null,
-      lastName: null,
-      email: null,
-      changePassword: false,
-      password: null,
-      passwordConfirmation: null,
-      deleteAvatar: null,
     }),
   }),
   watch: {
@@ -57,7 +49,7 @@ export default {
   },
   methods: {
     async setPreferences() {
-      await this.$store.dispatch("auth/updateProfile", this.form);
+      await this.$store.dispatch("user/changeLanguage", this.form);
     },
   },
   computed: {

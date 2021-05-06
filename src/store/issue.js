@@ -74,10 +74,7 @@ const actions = {
     async changeStatus(context, form) {
         const result = await form.mutate({
             mutation: ISSUE.changeStatus,
-            variables: {
-                id: form.id,
-                status: form.status
-            }
+
         });
         const role = new Issue().deserialize(result.data.issueChangeStatus);
         context.dispatch('findAll', {
@@ -86,16 +83,29 @@ const actions = {
         return role;
     },
 
+
     async delete(context, form) {
-        context.commit('REMOVE_ITEM', form);
+      context.commit('REMOVE_ITEM', form);
+      const result = await form.mutate({
+          mutation: ISSUE.delete,
+          variables: {
+              id: form.id
+          }
+      });
+      // await context.dispatch('findAll', { force: true });
+      return result.data.issueDelete;
+  },
+
+    async check(context, form) {
+        console.log(form);
         const result = await form.mutate({
-            mutation: ISSUE.delete,
+            mutation: ISSUE.check,
             variables: {
-                id: form.id
+                checked: form.checked
             }
         });
         // await context.dispatch('findAll', { force: true });
-        return result.data.issueDelete;
+        return result.data.issueCheck;
     },
 
     async deleteMany(context, form) {

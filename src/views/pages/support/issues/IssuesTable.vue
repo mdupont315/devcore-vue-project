@@ -26,8 +26,10 @@
         <col style="width: 15%" />
         <col style="width: 15%" />
         <col style="width: 10%" />
-        <col style="width: 50%" />
-        <col style="width: 100px" />
+        <col style="width: 45%" />
+        <col style="width: 5%" />
+				<col style="width: 10%" />
+				<col style="width: 5%" />
       </template>
       <template v-slot:empty="scope">
         <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -48,21 +50,36 @@
         row.item.project.name
       }}</template>
 
-      <!-- Process path -->
-      <!--    <template v-slot:cell(processPath)="row"
-        ><div v-for="(path, index) in formatProcessPath(row.item.parent)" :key="index">
-         <span style="font-size:8px" v-if="index !== 0">></span> {{ path }}
+      <!--    Created  -->
+      <template v-slot:cell(created)="row"
+        ><div>
+          {{ formatDate(row.item.createdAt) }}
         </div></template
-      > -->
+      >
       <!-- description -->
       <template v-slot:cell(description)="row">{{
         row.item.description
       }}</template>
+
+      <!-- checked -->
+      <template v-slot:cell(checked)="row">
+        <div>
+          <b-form-checkbox
+            v-model="row.item.checked"
+						@input="checkItem(row.item)"
+            checked
+            :value="true"
+            :unchecked-value="false"
+            ></b-form-checkbox
+          >
+        </div>
+      </template>
+
       <!-- loss -->
       <template v-slot:cell(loss)="row">
-        <span :class="{ 'text-danger': row.item.totalValue != 0 }">{{
-          $currency(row.item.totalValue / 100 || 0)
-        }}</span>
+        <span :class="{ 'text-danger': row.item.moneyTotalValue != 0 }">
+          {{ $currency(row.item.moneyTotalValue / 100 || 0) }}</span
+        >
       </template>
       <!-- actions -->
       <template v-slot:cell(actions)="row" class="text-right">
@@ -81,6 +98,7 @@
 </template>
 <script>
 import GQLForm from "@/lib/gqlform";
+import moment from "moment";
 
 export default {
   props: {
@@ -106,6 +124,7 @@ export default {
       currentItem: null,
       currentRowDetails: null,
       currentDetailsItem: null,
+      form: {},
     };
   },
   computed: {
@@ -118,20 +137,25 @@ export default {
             label: this.$t("Project"),
             sortable: true,
           },
-          /*    {
-            key: "processPath",
-            label: this.$t("Process path"),
-            sortable: true,
-          }, */
-
           {
-            key: "loss",
-            label: this.$t("Estimated loss"),
+            key: "created",
+            label: this.$t("Created"),
             sortable: true,
           },
+
           {
             key: "description",
             label: this.$t("Description"),
+            sortable: true,
+          },
+          {
+            key: "checked",
+            label: this.$t("Checked"),
+            sortable: true,
+          },
+          {
+            key: "loss",
+            label: this.$t("Estimated loss"),
             sortable: true,
           },
 
@@ -141,6 +165,9 @@ export default {
     },
   },
   methods: {
+    formatDate(time) {
+      return time ? moment(time).format("DD/MM/YYYY HH:mm:ss") : "N/A";
+    },
     formatProcessPath(path) {
       let stagePath = null;
       let operationPath = null;
@@ -177,6 +204,15 @@ export default {
         id: item.id,
       });
       await this.$store.dispatch("issue/delete", deleteForm);
+    },
+    async checkItem(item) {
+			console.log(item);
+      const checkForm = new GQLForm({
+        id: item.id,
+				checked: item.checked
+      });
+			console.log(checkForm);
+      await this.$store.dispatch("issue/check", checkForm);
     },
   },
 };

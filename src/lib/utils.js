@@ -78,13 +78,16 @@ export function showGraphqlErrorFromResponse(networkError) {
 }
 
 export function showMessageFromResponse(response) {
-  const { message } = response;
-  const status = response.statusCode;
-
-  if (status > 300) {
-    window.vm.$snotify.error(window.vm.$t(message));
+  if (!response.data) return;
+  console.log(response);
+  const translationKey = `responses.${Object.keys(response.data)[0]}`;
+  if (window.vm.$t(translationKey) == translationKey) {
+    return;
+  }
+  if (response.statusCode > 300) {
+    window.vm.$snotify.error(window.vm.$t(`${translationKey}Fail`));
   } else {
-    window.vm.$snotify.success(window.vm.$t(message));
+    window.vm.$snotify.success(window.vm.$t(`${translationKey}`));
   }
 }
 
