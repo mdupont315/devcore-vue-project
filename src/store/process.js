@@ -252,13 +252,8 @@ const mutations = {
     state.sectionsLoaded[value.section] = value.loaded;
   },
   SET_ITEM(state, value) {
-    console.log(value);
     const index = state.all.findIndex(el => el.id === value.id);
     if (index > -1) {
-      // const copy = { ...state.all[index] };
-      // value._showDetails = copy._showDetails;
-      // value.ideas = value.ideas || copy.ideas;
-      // value.stages = value.stages || copy.stages;
       state.all[index] = value;
       state.all = [...state.all];
     } else {

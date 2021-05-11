@@ -47,14 +47,6 @@ const actions = {
     return user;
   },
 
-  async changeLanguage(context, form) {
-    console.log(form);
-    const result = await form.mutate({
-      mutation: USER.changeLanguage
-    });
-    // await context.dispatch('findAll', { force: true });
-    return result.data.issueCheck;
-  },
 
   async update(context, form) {
     const result = await form.mutate({
@@ -66,6 +58,7 @@ const actions = {
     await context.dispatch("findAll", {
       force: true
     });
+    console.log(result.data.userUpdate);
     const user = new User().deserialize(result.data.userUpdate);
     return user;
   },

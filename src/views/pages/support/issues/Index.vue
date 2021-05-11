@@ -15,10 +15,9 @@
           sort-by="name"
           :busy="filter.busy"
           class="t01"
-          primary-key="rowId"
           hover
           :fields="fields"
-          :items="getUniquePathIssues"
+          :items="uniqueProcessPathIds"
           :show-empty="true"
           :empty-text="$t('There are no records for the given criteria')"
           :tbody-tr-class="
@@ -52,7 +51,7 @@
                 class="issueTable_processPath_title"
               >
                 <div style="font-size: 20px; padding: 5px">/</div>
-                <div>{{ row.item.pathTitles.operation }}</div>
+                {{ row.item.pathTitles.operation }}
               </div>
               <div v-if="row.item.phaseId" class="issueTable_processPath_title">
                 <div style="font-size: 20px; padding: 5px">/</div>
@@ -60,11 +59,6 @@
               </div>
             </div>
           </template>
-
-          <!-- companyRole -->
-          <!--         <template v-slot:cell(companyRole)="row">{{
-            row.item.companyRole.name
-          }}</template> -->
 
           <!-- loss -->
           <template v-slot:cell(issues)="row">
@@ -76,9 +70,13 @@
 
           <!-- loss -->
           <template v-slot:cell(loss)="row">
-            <span :class="{ 'text-danger': row.item.pathStats != 0 }">{{
+            <!--  <span :class="{ 'text-danger': row.item.pathStats != 0 }">{{
               $currency(row.item.pathStats.value / 100 || 0)
-            }}</span>
+							path.pathIssues.map((i) => (pathStats.value += i.moneyTotalValue));
+            }}</span> -->
+            <span :class="{ 'text-danger': row.item.pathStats != 0 }">
+              {{ $currency(getTotalIssueLoss(row.item)) }}
+            </span>
           </template>
 
           <!-- actions -->
@@ -90,7 +88,11 @@
                   size="xs"
                   variant="action"
                   class="btn-primary btn-block text-uppercase text-bold"
-                  style="font-size: 1.2rem; padding: 3px"
+                  style="
+                    font-size: 1.2rem;
+                    padding: 3px;
+                    min-width: min-content;
+                  "
                   @click="newIdea(row)"
                   >{{ $t("New idea") }}</b-button
                 >
@@ -102,11 +104,20 @@
                   placement="bottom"
                   class="form-popover"
                 >
-                  <b-card no-body style="width: 300px">
+                  <b-card
+                    no-body
+                    style="width: 300px"
+                    v-if="showIdeaPopover && row.item"
+                  >
                     <b-card-body>
                       <idea-form
                         section="issues"
-                        :item="idea"
+                        :issueIdea="{
+                          processId: process.id,
+                          stageId: row.item.stageId,
+                          operationId: row.item.operationId,
+                          phaseId: row.item.phaseId,
+                        }"
                         @done="closeIdeaForm"
                       ></idea-form>
                     </b-card-body>
@@ -116,7 +127,12 @@
                   size="xs"
                   variant="transparent"
                   class="btn-link text-gray btn-block text-uppercase text-bold shadow-0"
-                  style="font-size: 1rem; padding: 3px; margin: 0"
+                  style="
+                    font-size: 1rem;
+                    padding: 3px;
+                    margin: 0;
+                    min-width: min-content;
+                  "
                   @click="toggleItem(null)"
                   >{{ $t("Cancel") }}</b-button
                 >
@@ -127,7 +143,7 @@
                 size="xs"
                 variant="action"
                 class="btn-primary btn-block text-uppercase text-bold"
-                style="font-size: 1.2rem; 3px 10px;white-space: nowrap"
+                style="font-size: 1.2rem; 3px 10px;white-space: nowrap;min-width: min-content;"
                 @click="newIdea(row)"
                 >{{ $t("New idea") }}</b-button
               >
@@ -136,7 +152,7 @@
                 size="xs"
                 variant="action"
                 class="btn-light btn-expand btn-block text-uppercase text-bold m-0"
-                style="font-size: 1.2rem; 3px 10px;white-space: nowrap"
+                style="font-size: 1.2rem; 3px 10px;white-space: nowrap;min-width: min-content;"
                 @click="showDetails(row)"
                 >{{
                   row.item._showDetails ? $t("Close") : $t("Details")
@@ -146,11 +162,11 @@
           </template>
 
           <!-- details -->
-          <template v-slot:row-details="row">
-            <div class="row-details">
+          <template v-slot:row-details="currentRowDetails">
+            <div class="row-details" v-if="currentRowDetails">
               <issues-table
-                :items="row.item.pathIssues"
-                :item="row.item"
+                :items="currentRowDetails.item.pathIssues"
+                :item="currentRowDetails.item"
                 :loading="loadingItem"
               ></issues-table>
             </div>
@@ -173,7 +189,7 @@ export default {
   },
   data: () => {
     return {
-      idea: {},
+      ideaFromIssue: {},
       deleting: false,
       updateForm: null,
       currentItems: [],
@@ -197,11 +213,12 @@ export default {
       currentProcess: "process/current",
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
     }),
-    getUniquePathIssues: {
+    getIssues: {
       get: function () {
-        return this.uniquePathIssues;
+        return this.issues;
       },
     },
+
     uniqueProcessPathIds: {
       get: function () {
         //Deduct all populated paths from ideas
@@ -214,11 +231,10 @@ export default {
           new Set(populatedProcessPaths.map((obj) => JSON.stringify(obj)))
         ).map((str) => JSON.parse(str));
 
-        //Gets unique Paths
-        return uniquePaths;
+        return this.getUniquePaths(uniquePaths);
       },
       set: function (uniqPaths) {
-        this.uniquePathIdeas = uniqPaths;
+        this.uniquePathIssues = uniqPaths;
       },
     },
     process: {
@@ -227,56 +243,6 @@ export default {
       },
     },
 
-    items: {
-      get() {
-        let items = [];
-
-        if (this.process) {
-          this.process.stages.map((s) => {
-            s.companyRolesWithChild.map((o) => {
-              const id = `${s.id}_${o.id}`;
-              const it = { ...s };
-              it.companyRole = o;
-              it.rowId = id;
-              it.totalLoss = 0;
-              it.issues = this.issues.filter((is) => {
-                return is.stageId == s.id && is.author.companyRoleId == o.id;
-              });
-
-              console.log("*** Support Issues ***");
-
-              it.issues.map((is) => {
-                it.totalLoss += is.totalValue;
-              });
-
-              if (this.currentItem) {
-                it._isActive = this.currentItem.rowId === it.rowId;
-              }
-
-              if (this.currentRowDetails) {
-                it._showDetails =
-                  this.currentRowDetails.item.rowId === it.rowId;
-              }
-
-              items.push(it);
-            });
-          });
-        }
-
-        if (this.filterValue) {
-          items = items.filter((is) => {
-            return (
-              is.title.toLowerCase().includes(this.filterValue.toLowerCase()) ||
-              is.companyRole.name
-                .toLowerCase()
-                .includes(this.filterValue.toLowerCase())
-            );
-          });
-        }
-
-        return items.filter((it) => it.issues.length > 0);
-      },
-    },
     issues: {
       get() {
         if (this.process) {
@@ -289,11 +255,6 @@ export default {
       get() {
         return [
           { key: "name", label: this.$t("Process Part"), sortable: true },
-          /*   {
-            key: "companyRole",
-            label: this.$t("Role"),
-            sortable: true,
-          }, */
           {
             key: "issues",
             label: this.$t("Issues"),
@@ -312,28 +273,58 @@ export default {
   async mounted() {
     if (this.process) {
       await this.loadProcessAndIssues();
-      this.uniquePathIssues = await this.getUniquePaths();
     }
   },
+
   methods: {
-    async getUniquePaths() {
-      let _uniquePathIssues = [];
-      if (!this.uniquePathIssues) {
-        _uniquePathIssues = this.uniqueProcessPathIds;
+
+    getTotalIssueLoss(item) {
+      let total = 0;
+      if (item.pathIssues) {
+        item.pathIssues.map((i) => (total += i.moneyTotalValue));
       }
-      await _uniquePathIssues.map(
-        (path) => (path.pathTitles = this.getPathTitles(path))
-      );
 
-      await _uniquePathIssues.map(
-        (path) => (path.pathIssues = this.getIssuesForKnownPath(path))
-      );
+      return total > 0 ? total / 100 : 0;
+    },
 
-      await _uniquePathIssues.map(
-        (path) => (path.pathStats = this.getPathStats(path))
-      );
+    getUniquePaths(paths = []) {
+      if (paths.length < 1) return [];
+      let modified = paths.map((path, index) => ({
+        id: index,
+        stageId: path.stageId,
+        operationId: path.operationId,
+        phaseId: path.phaseId,
+        rowId: this.getRowId(path),
+        pathIssues: this.getIssuesForKnownPath(path),
+        pathTitles: this.getPathTitles(path),
+        _showDetails: this.isRowOpen(index),
+      }));
 
-      return _uniquePathIssues;
+      if (this.currentRowDetails) {
+        if (!modified.some((i) => i.id == this.currentRowDetails.index)) {
+          this.currentRowDetails = null;
+        }
+      }
+
+      return modified.filter((issuePaths) => issuePaths.pathIssues.length > 0);
+    },
+    isRowOpen(index) {
+      if (this.currentRowDetails) {
+        if (
+          index === this.currentRowDetails.index &&
+          this.currentRowDetails.item.pathIssues.length > 0
+        ) {
+          return true;
+        }
+      }
+      return false;
+    },
+    getRowId(path) {
+      const stageId = path.stageId;
+      const operationId = path.operationId ?? 0;
+      const phaseId = path.phaseId ?? 0;
+
+      return `${stageId}${operationId}${phaseId}`;
     },
     issuePathDeducer(_obj) {
       if (_obj.parent.__typename === "ProcessPhase") {
@@ -363,7 +354,6 @@ export default {
     },
     getPathTitles(path) {
       const getTitle = (path) => {
-        console.log(path);
         this.mappedProcessPaths = {
           stage: null,
           operation: null,
@@ -404,15 +394,8 @@ export default {
 
       return getTitle(path);
     },
-    getPathStats(path) {
-      const pathStats = {
-        value: 0,
-      };
-
-      path.pathIssues.map((i) => (pathStats.value += i.moneyTotalValue));
-      return pathStats;
-    },
     getIssuesForKnownPath(path) {
+      console.log(path);
       let selectedIssues = [];
       if (path) {
         const { stageId } = path;
@@ -440,6 +423,7 @@ export default {
           );
         }
       }
+      console.log(selectedIssues);
       return selectedIssues;
     },
     async loadProcessAndIssues() {
@@ -453,6 +437,12 @@ export default {
       });
     },
     isRowEditing(row) {
+      console.log(
+        row &&
+          this.currentItem &&
+          row.item &&
+          row.item.rowId == this.currentItem.rowId
+      );
       return (
         row &&
         this.currentItem &&
@@ -461,10 +451,18 @@ export default {
       );
     },
     newIdea(row) {
-      this.idea = {
-        procesId: row.item.processId,
-        stageId: row.item.id,
+   /*    this.idea = {};
+      const { stageId, operationId, phaseId } = this.uniqueProcessPathIds[
+        row.index
+      ];
+      console.log(stageId, operationId, phaseId);
+      this.ideaFromIssue = {
+        processId: row.item.processId,
+        stageId: stageId,
+        operationId: operationId,
+        phaseId: phaseId,
       };
+ */
       this.currentItem = row.item;
       this.currentItem._isActive = true;
       this.showIdeaPopover = true;
@@ -483,27 +481,7 @@ export default {
         this.showDetails(null);
       }
     },
-    async saveItem(form) {
-      await this.$validator.validateAll();
-      if (!this.vErrors.any()) {
-        await this.$validator.reset();
-        await this.$store.dispatch("companyTool/update", form);
-        this.toggleItem(null);
-      }
-    },
 
-    async loadItem(item) {
-      try {
-        if (!item.issues) {
-          this.loadingItem = true;
-        }
-        await this.$store.dispatch("issue/findByStage", {
-          id: item.id,
-        });
-      } finally {
-        this.loadingItem = false;
-      }
-    },
     async showDetails(row) {
       if (this.currentRowDetails && this.currentRowDetails.item) {
         this.currentRowDetails.item._showDetails = false;
@@ -516,7 +494,7 @@ export default {
       ) {
         this.currentRowDetails = row;
         this.currentRowDetails.toggleDetails();
-        await this.loadItem(row.item);
+        console.log(this.currentRowDetails);
         this.currentRowDetails.item._showDetails = true;
       } else {
         this.currentRowDetails = null;
@@ -547,11 +525,6 @@ export default {
         this.$validator.resume();
       }
       this.$store.dispatch("app/toggleInnerOverlay");
-    },
-    itemChanged(item) {
-      if (item) {
-        this.loadItem(item);
-      }
     },
   },
 };

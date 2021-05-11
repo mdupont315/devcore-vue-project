@@ -96,10 +96,14 @@
                       id="manageNotifications"
                       v-model="form.notifications"
                       name="manageNotifications"
-											checked
+                      checked
                       :value="true"
                       :unchecked-value="false"
-                      >{{ form.notifications ? $t("Notifications allowed") : $t("Notifications disallowed") }}</b-form-checkbox
+                      >{{
+                        form.notifications
+                          ? $t("Notifications allowed")
+                          : $t("Notifications disallowed")
+                      }}</b-form-checkbox
                     >
                   </div>
                 </b-card-header>
@@ -108,7 +112,13 @@
           </b-row>
           <b-row>
             <b-col>
-              <b-card class="p-0 border" style="overflow: hidden" no-body>
+              <b-card
+                :key="intent"
+                :class="user.mustChangePassword ? 'shake' : ''"
+                class="p-0 border"
+                style="overflow: hidden"
+                no-body
+              >
                 <slot>
                   <b-card-header>
                     <div>
@@ -124,7 +134,8 @@
                   </b-card-header>
                   <b-collapse
                     id="changePasswordCollapse"
-                    :visible="form.changePassword"
+                    :visible="form.changePassword || user.mustChangePassword"
+                    class="shake"
                   >
                     <b-card-body>
                       <b-row>
@@ -215,9 +226,12 @@
 <script>
 import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
+import { blockUi, unblockUi } from "@/lib/utils";
 
 export default {
   data: () => ({
+    route: null,
+    intent: Math.random(),
     form: new GQLForm({
       file: null,
       firstName: null,
@@ -227,7 +241,7 @@ export default {
       password: null,
       passwordConfirmation: null,
       deleteAvatar: null,
-			notifications: true,
+      notifications: true,
     }),
   }),
   computed: {
@@ -235,8 +249,20 @@ export default {
       user: "auth/user",
     }),
   },
+  watch: {
+    $route: {
+      handler(route) {
+				console.log(route);
+        if (route.query.i) {
+          this.intent = Math.random();
+        }
+      },
+    },
+  },
   mounted() {
     this.initForm();
+    console.log(this.$route.query.i);
+    console.log(this.user);
   },
   methods: {
     async initForm() {
@@ -257,3 +283,37 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.shake {
+  animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  transform: translate3d(0, 0, 0);
+}
+@keyframes shake {
+  10%,
+  90% {
+    opacity: 0.5;
+    background: #4494d1;
+    transform: translate3d(-1px, 0, 0);
+  }
+  20%,
+  80% {
+    opacity: 0.4;
+    background: #4494d1;
+    transform: translate3d(2px, 0, 0);
+  }
+  30%,
+  50%,
+  70% {
+    opacity: 0.3;
+    background: #4494d1;
+    transform: translate3d(-4px, 0, 0);
+  }
+  40%,
+  60% {
+    opacity: 0.2;
+    background: #4494d1;
+    transform: translate3d(4px, 0, 0);
+  }
+}
+</style>

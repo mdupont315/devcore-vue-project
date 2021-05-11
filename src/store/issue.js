@@ -33,7 +33,7 @@ const getters = {
     byStage: state => stageId => state.all.filter(o => o.stageId === stageId),
     byOperation: state => operationId => state.all.filter(o => o.operationId === operationId),
     byPhase: state => phaseId => state.all.filter(o => o.phaseId === phaseId),
-    filteredItems: state => state.filter && state.filter.length > 3 ? state.all.filter(i => i.title.toLowerCase().includes(state.filter.toLowerCase())) : state.all,
+    filteredItems: state => state.filter && state.filter.length > 3 ? state.all.filter(i => i.description.toLowerCase().includes(state.filter.toLowerCase())) : state.all,
 }
 
 
@@ -92,7 +92,11 @@ const actions = {
               id: form.id
           }
       });
+      context.dispatch('findAll', {
+        force: true
+    });
       // await context.dispatch('findAll', { force: true });
+      console.log(result.data);
       return result.data.issueDelete;
   },
 
@@ -121,6 +125,9 @@ const actions = {
                 ids: form.ids
             }
         });
+        context.dispatch('findAll', {
+          force: true
+      });
         // await context.dispatch('findAll', { force: true });
         return result.data.issueDeleteMany;
     },
@@ -191,7 +198,7 @@ const actions = {
         if (context.getters.all.length === 0 || force) {
             filter = filter || {
                 data: {
-                    orderBy: ["title"],
+                    orderBy: ["createdAt"],
                     where: {
                         and: [
 
@@ -216,6 +223,7 @@ const actions = {
                 const {
                     result
                 } = await queryToPromise(query);
+                console.log(result)
                 const results = result.data.issueFindAll.map(cr => {
                     return new Issue().deserialize(cr);
                 })

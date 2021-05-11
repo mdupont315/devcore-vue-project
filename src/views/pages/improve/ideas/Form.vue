@@ -47,7 +47,7 @@
           <div class="form-label-group select required">
             <v-select
               v-model="form.stageId"
-              v-validate="''"
+              v-validate="'required'"
               label="title"
               :disabled="form.status != 'NEW'"
               data-vv-name="stage_id"
@@ -170,9 +170,7 @@ import GQLForm from "@/lib/gqlform";
 
 export default {
   props: {
-    item: {
-      required: true,
-    },
+    item: null,
     section: {
       required: false,
       type: String,
@@ -187,6 +185,10 @@ export default {
       required: false,
       type: String,
       default: () => "PROCESS",
+    },
+		  issueIdea: {
+      required: false,
+      type: Object,
     },
   },
 
@@ -211,6 +213,7 @@ export default {
       type: "PROCESS",
     }),
   }),
+
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
@@ -281,13 +284,19 @@ export default {
     },
     mode: {
       get() {
-        return this.item.id ? "edit" : "create";
+        if (this.item && this.item.id) {
+          return "edit";
+        } else {
+          return "create";
+        }
       },
     },
   },
   async mounted() {
+		console.log(this.section)
     this.input = this.item;
-    this.currentFile = this.item.file;
+		console.log(this.item);
+    if (this.item && this.item.file) this.currentFile = this.item.file;
 
     if (
       this.mode === "create" &&
@@ -309,9 +318,14 @@ export default {
 
   methods: {
     initForm() {
-      console.log(this.input.id);
-      console.log(this.process);
-
+			  if (this.section === "issues") {
+				console.log(this.issueIdea);
+        this.form.stageId = this.issueIdea.stageId;
+        this.form.operationId = this.issueIdea.operationId;
+        this.form.phaseId = this.issueIdea.phaseId;
+				return;
+      }
+			console.log(this.input)
       if (!this.input.id) {
         this.input.type = this.input.type || "PROCESS";
         this.input.processId = this.input.processId || this.process.process.id;
@@ -337,6 +351,14 @@ export default {
       this.form.operationId = this.input.operationId;
       this.form.phaseId = this.input.phaseId;
 
+      //Issues
+      if (this.section === "issues") {
+        console.log("wtf");
+				console.log(this.input);
+        this.form.stageId = this.input.stageId;
+        this.form.operationId = this.input.operationId;
+        this.form.phaseId = this.input.phaseId;
+      }
       //Improve Idea
       if (this.input.sourceType && this.input.sourceType === "idea_issue") {
         const typeName = this.input.parent.__typename;
@@ -351,6 +373,7 @@ export default {
           this.form.stageId = this.input.parent.id;
         }
       }
+      console.log(this.form);
     },
     changeStage() {
       this.form.operationId = null;
@@ -363,7 +386,7 @@ export default {
       this.$emit("cancel");
     },
     fileChanged() {
-			console.log(this.form);
+      console.log(this.form);
       if (!this.form.file) {
         this.form.removeFile = true;
         this.currentFile = null;
@@ -397,6 +420,9 @@ export default {
           //reload details page
           this.$emit("reload");
         }
+        if (this.section == "issues") {
+          return;
+        }
 
         await this.$store.dispatch("process/setCurrentProcess", {
           section: this.section,
@@ -417,10 +443,6 @@ export default {
           id: this.form.processId,
           force: true,
         });
-
-        //Set Process path to created IDEAs path
-      } else {
-        console.log(this.vErrors());
       }
     },
   },

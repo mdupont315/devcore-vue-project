@@ -84,10 +84,5 @@ export const USER = {
     mutation userResetPassword($id: ID!) {
       userResetPassword(id: $id)
     }
-  `,
-  changeLanguage: gql`
-    mutation userLanguageUpdate($input: UserLanguageInput!) {
-      userLanguageUpdate(input: $input)
-    }
   `
 };

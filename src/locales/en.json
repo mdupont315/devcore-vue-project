@@ -189,10 +189,9 @@
     "issueChangeStatusFail": "Changing issue status failed!",
     "issueDelete": "Deleted issue succesfully!",
     "issueDeleteFail": "Deleting issue failed!",
-    "issueCheck": "Issue checked succesfully!",
     "issueCheckFail": "Checking issue failed!",
-    "deleteMany": "Issues deleted succesfully!",
-    "deleteManyFail": "Deleting issues failed!",
+    "issueDeleteMany": "Issues deleted succesfully!",
+    "issueDeleteManyFail": "Deleting issues failed!",
 
     "ideaCreate": "Idea created succesfully!",
     "ideaCreateFail": "Creating idea failed!",
@@ -209,6 +208,7 @@
     "toolCreated": "Tool created succesfully!",
     "toolCreatedFail": "Creating tool failed!"
   },
+  "pleaseChangePassword": "Please, change password from given!",
   "title": "title",
   "name": "name",
   "username": "username",

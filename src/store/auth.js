@@ -54,8 +54,17 @@ const getters = {
 
 const actions = {
   async init() {},
-  // update profile
 
+  async changeLanguage(context, form) {
+    console.log(form);
+    const result = await form.mutate({
+      mutation: AUTH.changeLanguage
+    });
+
+    await context.commit("SET_USER_LANG", result.data.userLanguageUpdate.lang);
+    return result.data.UserLanguageInput;
+  },
+  // update profile
   async updateProfile(context, form) {
     try {
       const result = await form.mutate({
@@ -364,6 +373,12 @@ const mutations = {
   RESET_STATE(state) {
     Object.assign(state, initialState());
     return state;
+  },
+  SET_USER_LANG(state, value){
+    console.log(state.session.user);
+    console.log(value);
+    state.session.user.lang = value;
+    console.log(state.session.user);
   },
   SET_SESSION(state, session) {
     console.log(state);

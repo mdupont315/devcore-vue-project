@@ -78,6 +78,12 @@ export function showGraphqlErrorFromResponse(networkError) {
 }
 
 export function showMessageFromResponse(response) {
+  console.log(response.statusCode);
+
+  if (response.statusCode == 401) {
+    window.vm.$snotify.error(window.vm.$t(response.message));
+    return;
+  }
   if (!response.data) return;
   console.log(response);
   const translationKey = `responses.${Object.keys(response.data)[0]}`;

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :key="refreshKey">
     <div class="text-right float-right">
       <confirm-button
         variant="transparent text-danger"
@@ -28,8 +28,8 @@
         <col style="width: 10%" />
         <col style="width: 45%" />
         <col style="width: 5%" />
-				<col style="width: 10%" />
-				<col style="width: 5%" />
+        <col style="width: 10%" />
+        <col style="width: 5%" />
       </template>
       <template v-slot:empty="scope">
         <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -66,12 +66,11 @@
         <div>
           <b-form-checkbox
             v-model="row.item.checked"
-						@input="checkItem(row.item)"
+            @input="checkItem(row.item)"
             checked
             :value="true"
             :unchecked-value="false"
-            ></b-form-checkbox
-          >
+          ></b-form-checkbox>
         </div>
       </template>
 
@@ -118,6 +117,9 @@ export default {
       default: () => false,
     },
   },
+/* 	mounted(){
+		this.setIssues();
+	}, */
   data: () => {
     return {
       deleting: false,
@@ -125,9 +127,12 @@ export default {
       currentRowDetails: null,
       currentDetailsItem: null,
       form: {},
+			issues: [],
+			refreshKey: Math.random(),
     };
   },
   computed: {
+
     fields: {
       get() {
         return [
@@ -165,27 +170,11 @@ export default {
     },
   },
   methods: {
+
     formatDate(time) {
       return time ? moment(time).format("DD/MM/YYYY HH:mm:ss") : "N/A";
     },
-    formatProcessPath(path) {
-      let stagePath = null;
-      let operationPath = null;
-      let phasePath = null;
-      if (path.__typename === "ProcessPhase") {
-        phasePath = path.title;
-        operationPath = path.operation.title;
-        stagePath = path.operation.stage.title;
-        return [stagePath, operationPath, phasePath];
-      } else if (path.__typename === "ProcessOperation") {
-        operationPath = path.title;
-        stagePath = path.stage.title;
-        return [stagePath, operationPath];
-      } else {
-        stagePath = path.title;
-        return [stagePath];
-      }
-    },
+
     isRowEditing(row) {
       return (
         this.currentItem &&
@@ -197,21 +186,29 @@ export default {
       const deleteForm = new GQLForm({
         ids: this.items.map((i) => i.id),
       });
-      await this.$store.dispatch("issue/deleteMany", deleteForm);
+     await this.$store.dispatch(
+        "issue/deleteMany",
+        deleteForm
+      );
+      this.$parent.$emit("deletedAll", {});
     },
     async deleteItem(item) {
+			console.log(item);
       const deleteForm = new GQLForm({
         id: item.id,
       });
       await this.$store.dispatch("issue/delete", deleteForm);
+			console.log(item);
+			//this.refreshKey = Math.random();
+		 this.$parent.$emit("deleted", item);
     },
     async checkItem(item) {
-			console.log(item);
+      console.log(item);
       const checkForm = new GQLForm({
         id: item.id,
-				checked: item.checked
+        checked: item.checked,
       });
-			console.log(checkForm);
+      console.log(checkForm);
       await this.$store.dispatch("issue/check", checkForm);
     },
   },

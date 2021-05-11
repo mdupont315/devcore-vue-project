@@ -24,10 +24,10 @@ export default class IssueModel extends BaseModel {
   get moneyTotalValue() {
     let total = 0;
     if (this.timeValue !== 0) {
-      total += Math.round(this.author.formattedHourlyCosts * this.timeValue);
+      total -= Math.round(this.author.formattedHourlyCosts * this.timeValue);
     }
     if (this.moneyValue !== 0) {
-      total += this.moneyValue;
+      total -= this.moneyValue;
     }
     return total;
   }

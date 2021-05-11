@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     async setPreferences() {
-      await this.$store.dispatch("user/changeLanguage", this.form);
+      await this.$store.dispatch("auth/changeLanguage", this.form);
     },
   },
   computed: {
