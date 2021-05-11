@@ -318,7 +318,7 @@ export default {
 
   methods: {
     initForm() {
-			  if (this.section === "issues") {
+			  if (this.section === "issues" && this.issueIdea) {
 				console.log(this.issueIdea);
         this.form.stageId = this.issueIdea.stageId;
         this.form.operationId = this.issueIdea.operationId;
