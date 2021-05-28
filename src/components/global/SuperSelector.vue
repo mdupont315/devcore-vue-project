@@ -13,7 +13,9 @@
         ref="input"
         v-model="filterValue"
         type="text"
-        name="input"
+        name="form_input"
+				id="form_input"
+				autocomplete="form_input"
         class="field"
         :placeholder="
           expanded

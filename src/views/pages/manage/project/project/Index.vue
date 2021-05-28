@@ -28,20 +28,20 @@
                 v-if="getProjectFromStage(stage).length > 0"
                 class="card-body"
               >
-                <project-card
-                  v-for="project in getProjectFromStage(stage)"
-                  :key="constructRefForItem(project, stage)"
-                  :ref="constructRefForItem(project, stage)"
-                  :item="project"
-                  :stage="project.getStage(stage.id)"
-                  :expanded="
-                    currentItem &&
-                    currentItem.id === project.getStage(stage.id).id
-                  "
-                  @itemChanged="itemChanged"
-                  @toggled="itemToggled"
-                  @itemDetailsToggled="itemDetailsToggled"
-                ></project-card>
+                  <project-card
+                    v-for="project in getProjectFromStage(stage)"
+                    :key="constructRefForItem(project, stage)"
+                    :ref="constructRefForItem(project, stage)"
+                    :item="project"
+                    :stage="project.getStage(stage.id)"
+                    :expanded="
+                      currentItem &&
+                      currentItem.id === project.getStage(stage.id).id
+                    "
+                    @itemChanged="itemChanged"
+                    @toggled="itemToggled"
+                    @itemDetailsToggled="itemDetailsToggled"
+                  ></project-card>
               </div>
               <div v-else class="card-body">
                 <empty-slot></empty-slot>
@@ -117,8 +117,14 @@ export default {
     }
   },
   methods: {
+    overlayClick() {
+      if (this.currentItem) {
+        this.toggleItem(null);
+      } else {
+        this.showDetails(null);
+      }
+    },
     getProjectFromStage(stage) {
-
       const it = this.$store.getters["project/filteredByprocess"](
         this.process.id
       )
@@ -144,13 +150,6 @@ export default {
         row &&
         this.currentItem.id === (row.item ? row.item.id : row.id)
       );
-    },
-    overlayClick() {
-      if (this.currentItem) {
-        this.toggleItem(null);
-      } else {
-        this.showDetails(null);
-      }
     },
     async saveItem(form) {
       await this.$validator.validateAll();
@@ -221,7 +220,7 @@ export default {
       if (query.trim().length <= 3) {
         return [];
       }
-
+      console.log(query);
       const response = await this.$store.dispatch("tool/findAll", {
         where: {
           field: "name",
@@ -251,7 +250,7 @@ export default {
       }
     },
     itemChanged(item) {
-			console.log(item);
+      console.log(item);
       if (item) {
         this.loadItem(item);
       }

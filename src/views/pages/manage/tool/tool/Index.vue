@@ -194,11 +194,7 @@ export default {
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
       priceModels: "priceModel/all",
     }),
-    getModules: {
-      get() {
-        return this.row.item.modules;
-      },
-    },
+
     tableItems: {
       get() {
         return this.items.filter((item) => item.type === "TOOL");

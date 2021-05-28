@@ -121,7 +121,6 @@ export default {
     }),
     users: {
       get() {
-				console.log(this.allUsers);
         return (this.items || this.allUsers).sort((a, b) =>
           a.firstName > b.firstName ? 1 : -1
         );

@@ -320,6 +320,8 @@ export default {
     initForm() {
 			  if (this.section === "issues" && this.issueIdea) {
 				console.log(this.issueIdea);
+				console.log(this.process.process.id);
+				this.form.processId = this.issueIdea.processId;
         this.form.stageId = this.issueIdea.stageId;
         this.form.operationId = this.issueIdea.operationId;
         this.form.phaseId = this.issueIdea.phaseId;

@@ -10,14 +10,15 @@
         <b-col class="col-12">
           <div class="form-label-group required">
             <b-form-input
-              id="name"
+              id="project_name"
+              name="project_name"
               v-model.trim="form.name"
               v-validate="'required|min:4'"
               v-autofocus
               :disabled="form.busy"
               :placeholder="$t('Project name')"
               type="text"
-              name="name"
+              autocomplete="project_name"
               :state="$validateState('name', form)"
             ></b-form-input>
             <label for="name">{{ $t("Name") }}</label>
@@ -29,10 +30,12 @@
         <b-col cols="12">
           <div class="form-group">
             <user-selector
+              name="project_users"
+              id="project_users"
+              autocomplete="project_users"
               v-model="form.userIds"
               v-validate="'required|minlength:1'"
               :show-field="true"
-              name="users"
               style="z-index: 1; position: relative"
               :state="$validateState('users', form)"
               :items="users"
@@ -45,9 +48,12 @@
         </b-col>
         <b-col cols="12">
           <div class="form-group">
+            <!--    :key="toolDropwDownIntent" -->
             <tool-selector
               ref="toolsDropDown"
-              :key="toolDropwDownIntent"
+              autocomplete="off"
+              id="project_tools"
+              name="project_tools"
               :show-field="true"
               :items="toolsForStage"
               :place-holder-text="$t('Test Tools')"
@@ -55,7 +61,6 @@
               :show-add-btn="false"
               v-model="form.companyToolIds"
               @input="refreshIdeas('tools')"
-              name="tools"
               style="z-index: 1; position: relative"
             ></tool-selector>
 
@@ -72,6 +77,7 @@
               :show-field="true"
               :place-holder-text="$t('Test Ideas')"
               :items="concatedTestingIdeas"
+              autocomplete="off"
               :state="$validateState('ideas', form)"
               :show-add-btn="false"
               v-model="selectedProjectIdeas"
@@ -90,6 +96,7 @@
               id="budget"
               v-model="getBudget"
               :max-length="15"
+              autocomplete="off"
               v-validate="
                 'required|numeric|min_value:0|max_value:999999999999999'
               "
@@ -202,6 +209,70 @@
             </b-col>
           </b-row>
         </b-col>
+
+        <b-col class="col-12" style="height: 40px">
+          <b-row>
+            <b-col>
+              <div
+                class="form-label-group required"
+                style="justify-content: center; display: flex"
+              >
+                <div class="actions" style="z-index: 2">
+                  <b-btn
+                    ref="projectAdvancedFormBtn"
+                    variant="primary btn-action"
+                    size="xs"
+                    class="px-3"
+                    @click="toggleAdvanced"
+                    style="display: flex; max-height: 30px; align-items: center"
+                  >
+                    Advanced settings<span
+                      ><i
+                        class="mdi mdi-chevron-right animated fadeIn"
+                        style="font-size: 20px"
+                        v-if="showAdvanced"
+                      ></i>
+                      <i
+                        v-else
+                        class="mdi mdi-chevron-down animated fadeIn"
+                        style="font-size: 20px"
+                      ></i>
+                    </span>
+                  </b-btn>
+                </div>
+              </div>
+              <inner-overlay
+                v-if="showAdvanced"
+                @click="toggleAdvanced"
+                :class="{
+                  'inner-overlay-create': mode === 'create',
+                  'inner-overlay-edit': mode === 'edit',
+                }"
+              >
+              </inner-overlay>
+              <b-card
+                v-if="showAdvanced"
+                no-body
+                style="
+                  z-index: 2;
+                  left: 220px;
+                  bottom: 120px;
+                  height: 150px;
+                  width: 250px;
+                "
+              >
+                <b-card-body>
+                  <advanced-form
+                    v-model="advancedForm"
+                    @done="toggleAdvanced"
+                    :users="users"
+                    :form="form"
+                  ></advanced-form>
+                </b-card-body>
+              </b-card>
+            </b-col>
+          </b-row>
+        </b-col>
       </b-row>
       <b-row>
         <b-col class="col-12">
@@ -238,6 +309,7 @@
         </b-col>
       </b-row>
     </b-form>
+
     <div v-else class="text-center p-5">
       <b-spinner></b-spinner>
     </div>
@@ -246,6 +318,7 @@
 <script>
 import { mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
+import AdvancedForm from "./AdvancedForm.vue";
 
 export default {
   props: {
@@ -263,7 +336,11 @@ export default {
       required: false,
     },
   },
+  components: {
+    "advanced-form": AdvancedForm,
+  },
   data: () => ({
+    showAdvanced: false,
     selectedProjectIdeas: [],
     intent: Math.random(),
     ideaDropwDownIntent: Math.random(),
@@ -310,6 +387,7 @@ export default {
     input: null,
     toolsForStage: null,
     budget: null,
+    advancedForm: null,
     form: new GQLForm({
       id: null,
       name: null,
@@ -323,6 +401,7 @@ export default {
       evaluationIntervalUnit: "WEEKS",
       evaluationIntervalAmount: 1,
       budget: 0,
+      issueEvaluationUsers: null,
     }),
   }),
   computed: {
@@ -345,10 +424,6 @@ export default {
     },
     getAvailableOrAllStages: {
       get() {
-        console.log(
-          this.filteredProjects.filter((proj) => proj.id === this.input.id)
-        );
-        console.log(this.filteredProjects);
         return this.filteredProjects.filter(
           (proj) => proj.id === this.input.id
         );
@@ -360,7 +435,6 @@ export default {
           ? this.currentProcess("projects").process
           : null;
 
-        console.log(result);
         return result;
       },
     },
@@ -440,7 +514,6 @@ export default {
           .concat(this.availableToolIdeas)
           .filter((idea) => idea.status === "TESTING");
 
-        console.log(result);
         return result;
       },
     },
@@ -466,6 +539,9 @@ export default {
   },
 
   methods: {
+    toggleAdvanced() {
+      this.showAdvanced = !this.showAdvanced;
+    },
     async loadIdeas() {
       const result = await this.$store.dispatch("idea/findByProcess", {
         id: this.process.id,
@@ -491,7 +567,6 @@ export default {
         .filter((key) => key in this.form)
         .forEach((key) => (this.form[key] = this.input[key]));
 
-      console.log(this.input);
       this.form.processId = this.process.id;
 
       if (this.input) {
@@ -548,7 +623,15 @@ export default {
       this.form.ideaIds = [...this.selectedProjectIdeas];
       this.form.budget = this.budget * 100;
 
-      console.log(this.form.budget);
+      //Concat advancedform properties
+      if (this.advancedForm && Object.keys(this.advancedForm).length > 0) {
+        Object.entries(this.advancedForm).forEach((entry) => {
+          const [key, value] = entry;
+          this.form[key] = value;
+        });
+      }
+      console.log(this.form);
+
       //Add adopted Ideas Silently
       if (this.concatedAdoptedIdeas.length > 0) {
         this.concatedAdoptedIdeas.map((i) => {
@@ -569,8 +652,6 @@ export default {
         }
       } else {
         /*     if (this.form.type === "ON_GOING") { */
-        console.log("__________________");
-        console.log(this.process.stages);
         this.form.processStageId = [
           ...new Set(this.process.stages.map((x) => x.id)),
         ];
@@ -589,7 +670,6 @@ export default {
               this.form
             );
           } else {
-            console.log(this.form);
             this.input = await this.$store.dispatch(
               "project/create",
               this.form
@@ -648,3 +728,35 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.project-form-advanced {
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-align: center;
+}
+
+.project-form-advanced:hover {
+  font-size: 13px;
+  text-decoration: underline;
+  letter-spacing: 1.5px;
+}
+
+.inner-overlay-create {
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  position: fixed;
+  top: -52px;
+  left: -245px;
+}
+
+.inner-overlay-edit {
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  position: fixed;
+}
+</style>

@@ -92,7 +92,6 @@ import StageCard from "./stage/Card";
 import ProcessCard from "./process/Card";
 import StageForm from "./stage/Form";
 import { ProcessStage } from "@/models";
-import { scrollLeftToElement } from "@/lib/utils";
 
 export default {
   components: {
@@ -239,8 +238,6 @@ export default {
         console.log(element);
         element.changeProcess(currentProcess);
       }
-
-      // scrollLeftToElement(this.$refs.newStageCard.$el);
     },
     processFilterChange() {
       this.showStages = false;

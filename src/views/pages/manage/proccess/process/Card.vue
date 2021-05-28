@@ -55,12 +55,12 @@
 
           <div>
             <div class="title">
-              <h2
+              <div
                 class="h4 m-0 text-capitalize text-center text-overflow text-bold pointer-selection"
                 @click="changeProcess"
               >
                 {{ item.title }}
-              </h2>
+              </div>
               <div class="tools">
                 <span class="btn-action" @click="toggleEdit">
                   <i class="mdi mdi-pencil"></i>

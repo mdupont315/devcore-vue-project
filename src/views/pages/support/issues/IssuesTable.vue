@@ -23,12 +23,14 @@
       :tbody-tr-class="(item, type) => (isRowEditing(item) ? 'editing' : '')"
     >
       <template v-slot:table-colgroup>
-        <col style="width: 15%" />
-        <col style="width: 15%" />
         <col style="width: 10%" />
-        <col style="width: 45%" />
+        <col style="width: 10%" />
+        <col style="width: 10%" />
+				<col style="width: 55%" />
+     <!--    <col style="width: 35%" />
+        <col style="width: 25%" /> -->
         <col style="width: 5%" />
-        <col style="width: 10%" />
+        <col style="width: 15%" />
         <col style="width: 5%" />
       </template>
       <template v-slot:empty="scope">
@@ -61,6 +63,27 @@
         row.item.description
       }}</template>
 
+      <!-- effect -->
+    <!--   <template v-slot:cell(effect)="row" class="actions">
+        <div class="buttons">
+          <b-button
+            size="xs"
+            variant="action"
+            class="btn-primary btn-block text-uppercase text-bold"
+            style="font-size: 1.2rem; 3px 10px;white-space: nowrap;min-width: min-content;"
+            >Notes</b-button
+          >
+          <b-button
+            v-if="$can('process/process/manage')"
+            size="xs"
+            variant="action"
+            class="btn-light btn-expand btn-block text-uppercase text-bold m-0"
+            style="font-size: 1.2rem; 3px 10px;white-space: nowrap;min-width: min-content;"
+            >Not Checked
+          </b-button>
+        </div>
+      </template> -->
+
       <!-- checked -->
       <template v-slot:cell(checked)="row">
         <div>
@@ -92,6 +115,8 @@
           </confirm-button>
         </div>
       </template>
+
+
     </b-table>
   </div>
 </template>
@@ -117,7 +142,7 @@ export default {
       default: () => false,
     },
   },
-/* 	mounted(){
+  /* 	mounted(){
 		this.setIssues();
 	}, */
   data: () => {
@@ -127,12 +152,11 @@ export default {
       currentRowDetails: null,
       currentDetailsItem: null,
       form: {},
-			issues: [],
-			refreshKey: Math.random(),
+      issues: [],
+      refreshKey: Math.random(),
     };
   },
   computed: {
-
     fields: {
       get() {
         return [
@@ -153,6 +177,11 @@ export default {
             label: this.$t("Description"),
             sortable: true,
           },
+     /*      {
+            key: "effect",
+            label: this.$t("Issue effect"),
+            sortable: true,
+          }, */
           {
             key: "checked",
             label: this.$t("Checked"),
@@ -170,7 +199,6 @@ export default {
     },
   },
   methods: {
-
     formatDate(time) {
       return time ? moment(time).format("DD/MM/YYYY HH:mm:ss") : "N/A";
     },
@@ -186,21 +214,18 @@ export default {
       const deleteForm = new GQLForm({
         ids: this.items.map((i) => i.id),
       });
-     await this.$store.dispatch(
-        "issue/deleteMany",
-        deleteForm
-      );
+      await this.$store.dispatch("issue/deleteMany", deleteForm);
       this.$parent.$emit("deletedAll", {});
     },
     async deleteItem(item) {
-			console.log(item);
+      console.log(item);
       const deleteForm = new GQLForm({
         id: item.id,
       });
       await this.$store.dispatch("issue/delete", deleteForm);
-			console.log(item);
-			//this.refreshKey = Math.random();
-		 this.$parent.$emit("deleted", item);
+      console.log(item);
+      //this.refreshKey = Math.random();
+      this.$parent.$emit("deleted", item);
     },
     async checkItem(item) {
       console.log(item);
