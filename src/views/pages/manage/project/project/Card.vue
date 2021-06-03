@@ -232,6 +232,7 @@ export default {
         process: this.item.process ? this.item.process.id : this.item.processId,
         stage: this.stage.processStageId,
         type: this.item.type,
+				issueEvaluationRoles: this.item.issueEvaluationRoles,
         //	allStages: [...new Set(this.item.stages.map((i) => i.ideaId))],
       };
     },

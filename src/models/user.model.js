@@ -20,6 +20,7 @@ export default class UserModel extends BaseModel {
 
   getAvatarUrl(size = "0x0") {
     if (this.avatarUrl) {
+      console.log(this.avatarUrl);
       return imageResolver(this.avatarUrl, size);
     }
     return null;

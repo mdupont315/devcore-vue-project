@@ -235,6 +235,24 @@ const routes = [
               /* webpackChunkName: "manage" */ "@/views/pages/support/issues/CentralBar"
             )
         }
+      },
+      {
+        path: "engage",
+        name: "support-engage",
+        component: () =>
+          import(
+            /* webpackChunkName: "manage" */ "@/views/pages/support/engage/Index"
+          ),
+        meta: {
+          middleware: [auth],
+          title: "Engage",
+          permissions: "process/process/manage",
+          // titleButton: () => import(/* webpackChunkName: "manage" */'@/views/pages/manage/proccess/TitleButton'),
+         // topCentral: () =>
+          //  import(
+          //    /* webpackChunkName: "manage" */ "@/views/pages/support/engage/CentralBar"
+          //  )
+        }
       }
     ]
   },

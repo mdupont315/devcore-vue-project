@@ -20,7 +20,7 @@ export const PROJECT_FRAGMENT = gql `
       totalGains,
       consolidatedValue,
       processId,
-      issueEvaluationUsers
+      issueEvaluationRoles
       stages{
             id
             status

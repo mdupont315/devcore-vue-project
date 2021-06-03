@@ -22,7 +22,6 @@ channel.onmessage = msg => {
   if (!msg || !msg.type) {
     return;
   }
-  console.log("reload");
   location.reload();
 };
 
@@ -56,7 +55,6 @@ const actions = {
   async init() {},
 
   async changeLanguage(context, form) {
-    console.log(form);
     const result = await form.mutate({
       mutation: AUTH.changeLanguage
     });
@@ -158,7 +156,6 @@ const actions = {
         type: "SET_SESSION",
         data: session
       });
-      console.log(data);
       context.commit("SET_CHECKED", true);
       EventBus.$emit("auth/LOGIN", {
         context,
@@ -232,8 +229,6 @@ const actions = {
   },
   // login user
   async login(context, form) {
-    console.log(form);
-    console.log("1");
     context.commit("SET_CHECKED", false);
     context.commit("SET_SESSION", null);
 
@@ -255,20 +250,16 @@ const actions = {
         }
       }
     );
-    console.log("2");
     const session = new Session().deserialize(data.login);
     context.commit("SET_SESSION", session);
-    console.log(session);
     channel.postMessage({
       type: "SET_SESSION",
       data: session
     });
-    console.log("3");
     context.commit("SET_CHECKED", true);
     context.commit("SET_TOKEN", {
       token: data.login.accessToken
     });
-    console.log("4");
     EventBus.$emit("auth/LOGIN", {
       context,
       data: {
@@ -276,11 +267,9 @@ const actions = {
         fromLocal: false
       }
     });
-    console.log(data);
     return data;
   },
   async logout(context) {
-    console.log("User Logged out!");
     try {
       blockUi();
       EventBus.$emit("auth/LOGOUT", {
@@ -305,16 +294,13 @@ const actions = {
     if (!context.getters.checked) {
       try {
         blockUi();
-        console.log("try get data");
         const { data } = await apolloClient.query({
           query: AUTH.session,
           fetchPolicy: "default"
         });
-        console.log(data);
 
         if (data && data.session) {
           const session = new Session().deserialize(data.session);
-          console.log(session);
 
           context.commit("SET_SESSION", session);
           if (leader) {
@@ -330,7 +316,6 @@ const actions = {
           });
         }
       } catch (ex) {
-        console.log(ex);
         context.commit("SET_SESSION", null);
         if (leader) {
           channel.postMessage({
@@ -344,7 +329,6 @@ const actions = {
         context.commit("SET_CHECKED", true);
       }
     }
-    console.log(context.getters.session);
 
     return context.getters.session;
   },
@@ -374,22 +358,16 @@ const mutations = {
     Object.assign(state, initialState());
     return state;
   },
-  SET_USER_LANG(state, value){
-    console.log(state.session.user);
-    console.log(value);
+  SET_USER_LANG(state, value) {
     state.session.user.lang = value;
-    console.log(state.session.user);
   },
   SET_SESSION(state, session) {
-    console.log(state);
-    console.log(session);
     state.session = session;
   },
   SET_USER(state, user) {
     state.session.user = user;
   },
   SET_TOKEN(state, token) {
-    console.log(token);
     state.token = token;
   },
 

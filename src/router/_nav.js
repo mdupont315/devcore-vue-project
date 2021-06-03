@@ -65,6 +65,15 @@ export default function getItems(user) {
             name: "support-issues"
           },
           permissions: "process/process/manage"
+        },
+        {
+          title: i18n.t("Engage"),
+          name: "support-engage",
+          icon: "mdi-settings",
+          url: {
+            name: "support-engage"
+          },
+          permissions: "process/process/manage"
         }
       ]
     },

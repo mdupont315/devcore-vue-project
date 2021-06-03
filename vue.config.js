@@ -1,5 +1,6 @@
 // https://cli.vuejs.org/guide/css.html#passing-options-to-pre-processor-loaders
 const { argv } = require("yargs");
+const path = require("path");
 const webpack = require("webpack");
 
 const appUrls = {
@@ -57,9 +58,28 @@ module.exports = {
   },
 
   chainWebpack: config => {
-    console.log(process.env.NODE_ENV);
+    config.resolve.alias.set("@", path.join(__dirname, "./src"));
+
+    config.module
+      .rule("vue")
+      .use("vue-loader")
+      .loader("vue-loader")
+      .tap(options => {
+        options.transformAssetUrls = {
+          img: "src",
+          image: "xlink:href",
+          "b-avatar": "src",
+          "b-img": "src",
+          "b-img-lazy": ["src", "blank-src"],
+          "b-card": "img-src",
+          "b-card-img": "src",
+          "b-embed": "src"
+        };
+        return options;
+      });
 
     if (process.env.NODE_ENV !== "production") {
+      console.log("Development");
       config.plugin("define").tap(options => {
         // mutate for development...
         if (argv.mode === "proxy") {
@@ -74,7 +94,6 @@ module.exports = {
           ].VUE_APP_GRAPHQL_ENDPOINT = `'${appUrls.dev}'`;
           return options;
         }
-
       });
     } else {
       // mutate for production...

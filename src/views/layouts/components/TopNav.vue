@@ -115,9 +115,7 @@ export default {
       },
     }
   },
-  mounted() {
-			console.log(this.user);
-  },
+
   methods: {
     async logout() {
       try {

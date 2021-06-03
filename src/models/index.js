@@ -106,3 +106,8 @@ export {
     default as UserProjectReport
 }
 from './userprojectreport.model';
+
+export {
+  default as Milestone
+}
+from './milestone.model';

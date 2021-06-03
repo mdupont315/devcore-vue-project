@@ -84,5 +84,5 @@ export const USER = {
     mutation userResetPassword($id: ID!) {
       userResetPassword(id: $id)
     }
-  `
+  `,
 };

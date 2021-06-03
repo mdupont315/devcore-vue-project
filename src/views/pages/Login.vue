@@ -108,16 +108,9 @@ export default {
       session: "auth/access_token",
     }),
   },
-  mounted() {
-    console.log("session: ");
-    console.log(this.session);
-    console.log("user: ");
-    console.log(this.user);
-  },
   methods: {
     async onSubmit() {
       try {
-        console.log("Login");
         await this.$store.dispatch("auth/login", this.form);
 
         blockUi();
@@ -131,27 +124,17 @@ export default {
         if (this.user && this.user.roles[0].name === "User") {
           window.location.replace(process.env.VUE_APP_MOBILE_URL);
         }
-        console.log("route:");
-        console.log(this.$store.getters["app/intented_route"]);
-        console.log(defaultRoute);
+
         await this.$router.replace(this.$store.getters["app/intented_route"] || defaultRoute);
-        console.log("3");
       } catch (ex) {
-        console.log(ex);
-        console.log("EXCEPTION");
         if (ex.code && ex.code === "MUST_VERIFY_EMAIL") {
           await this.$router.push({
             name: "send-email-verification",
             query: { email: this.form.username },
           });
-        } /* else {
-          await this.$router.push({
-            name: "login",
-          });
-        } */
+        }
       } finally {
         console.log("UNBLOCK");
-        // this.$validator.reset();
         unblockUi();
       }
     },

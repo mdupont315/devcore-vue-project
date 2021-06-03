@@ -33,6 +33,7 @@ import layers from "./layers";
 import people from "./people";
 import report from "./report";
 import analysis from "./analysis";
+import milestone from "./milestone";
 
 import EventBus from "@/lib/eventbus";
 
@@ -100,7 +101,8 @@ const store = new Vuex.Store({
     project,
     people,
     report,
-    analysis
+    analysis,
+    milestone
   }
 });
 

@@ -100,7 +100,8 @@
                 <b-popover
                   ref="popover"
                   :target="() => $refs[`btnNewIdea${row.item.rowId}`]"
-                  :show.sync="showIdeaPopover"
+                  triggers="click"
+									:show.sync="showIdeaPopover"
                   placement="bottom"
                   class="form-popover"
                 >

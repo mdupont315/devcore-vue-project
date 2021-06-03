@@ -32,3 +32,4 @@ export * from './toolmodule';
 export * from './companytoolmodule';
 export * from './companytoolprice';
 export * from './reports';
+export * from './milestone';

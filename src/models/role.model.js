@@ -26,6 +26,7 @@ export default class RoleModel extends BaseModel {
             })
         }
         Object.assign(this, input);
+        console.log(this);
         return this;
     }
 }

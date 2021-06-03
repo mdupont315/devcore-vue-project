@@ -207,9 +207,8 @@
                 }}</b-form-invalid-feedback>
               </div>
             </b-col>
-          </b-row>
-        </b-col>
-
+          </b-row> </b-col
+        >
         <b-col class="col-12" style="height: 40px">
           <b-row>
             <b-col>
@@ -226,7 +225,9 @@
                     @click="toggleAdvanced"
                     style="display: flex; max-height: 30px; align-items: center"
                   >
-                    Advanced settings<span
+                    Advanced settings
+
+                    <span
                       ><i
                         class="mdi mdi-chevron-right animated fadeIn"
                         style="font-size: 20px"
@@ -340,6 +341,7 @@ export default {
     "advanced-form": AdvancedForm,
   },
   data: () => ({
+    checked: false,
     showAdvanced: false,
     selectedProjectIdeas: [],
     intent: Math.random(),
@@ -401,7 +403,7 @@ export default {
       evaluationIntervalUnit: "WEEKS",
       evaluationIntervalAmount: 1,
       budget: 0,
-      issueEvaluationUsers: null,
+      issueEvaluationRoles: null,
     }),
   }),
   computed: {
@@ -630,7 +632,6 @@ export default {
           this.form[key] = value;
         });
       }
-      console.log(this.form);
 
       //Add adopted Ideas Silently
       if (this.concatedAdoptedIdeas.length > 0) {
