@@ -390,8 +390,8 @@ export default {
         if (val && this.advancedForm) {
           this.form.issueEvaluationRoles = this.advancedForm.issueEvaluationRoles;
         } else {
-					this.form.issueEvaluationRoles = [];
-				}
+          this.form.issueEvaluationRoles = [];
+        }
       },
     },
     getBudget: {
@@ -621,10 +621,10 @@ export default {
           this.input.issueEvaluationRoles.length > 0
         ) {
           this.advancedSettingsSet = true;
-					this.form.issueEvaluationRoles = this.input.issueEvaluationRoles;
-        }else{
-					this.advancedSettingsSet = false;
-				}
+          this.form.issueEvaluationRoles = this.input.issueEvaluationRoles;
+        } else {
+          this.advancedSettingsSet = false;
+        }
       }
     },
 
