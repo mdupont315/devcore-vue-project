@@ -208,6 +208,8 @@
     "toolCreated": "Työkalun luonti onnistui!",
     "toolCreatedFail": "Työkalun luonti epäonnistui"
   },
+  "Evaluation Restriction": "Arviointi rajoitukset",
+  "Project Advanced": "Lisäasetukset",
   "Engage": "Sitouta",
   "Milestone title": "nimi",
   "requiredScore": "vaaditut pisteet",

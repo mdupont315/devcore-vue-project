@@ -1,14 +1,13 @@
 <template>
-  <div>
+  <div ref="projectForm">
     <b-form
       v-if="ready"
-      class="hide-labels"
       @submit.prevent="save"
       @keyup="$validator.validateAll()"
     >
       <b-row>
         <b-col class="col-12">
-          <div class="form-label-group required">
+          <div class="form-label-group required form-group">
             <b-form-input
               id="project_name"
               name="project_name"
@@ -21,7 +20,6 @@
               autocomplete="project_name"
               :state="$validateState('name', form)"
             ></b-form-input>
-            <label for="name">{{ $t("Name") }}</label>
             <b-form-invalid-feedback>{{
               $displayError("name", form)
             }}</b-form-invalid-feedback>
@@ -91,7 +89,7 @@
           </div>
         </b-col>
         <b-col class="col-12">
-          <div class="form-label-group required">
+          <div class="form-label-group required form-group">
             <b-form-input
               id="budget"
               v-model="getBudget"
@@ -106,14 +104,13 @@
               name="budget"
               :state="$validateState('budget', form)"
             ></b-form-input>
-            <label for="budget">{{ $t("Budget") }}</label>
             <b-form-invalid-feedback>{{
               $displayError("budget", form)
             }}</b-form-invalid-feedback>
           </div>
         </b-col>
         <b-col class="col-12" v-if="mode === 'create'">
-          <div class="form-label-group required">
+          <div class="form-label-group required form-group">
             <v-select
               v-model="form.type"
               v-validate="'required'"
@@ -128,14 +125,13 @@
                 'is-valid': $validateState('type', form) === true,
               }"
             ></v-select>
-            <label for="type">{{ $t("Project type") }}</label>
             <b-form-invalid-feedback>{{
               $displayError("type", form)
             }}</b-form-invalid-feedback>
           </div>
         </b-col>
         <b-col class="col-12" v-if="mode === 'create'">
-          <div class="form-label-group required">
+          <div class="form-label-group required form-group">
             <v-select
               v-model="form.evaluationType"
               v-validate="'required'"
@@ -151,7 +147,6 @@
                 'is-valid': $validateState('evaluation_type', form) === true,
               }"
             ></v-select>
-            <label for="evaluation_type">{{ $t("Evaluation type") }}</label>
             <b-form-invalid-feedback>{{
               $displayError("evaluation_type", form)
             }}</b-form-invalid-feedback>
@@ -174,9 +169,7 @@
                   name="evaluation_interval_amount"
                   :state="$validateState('evaluation_interval_amount', form)"
                 ></b-form-input>
-                <label for="evaluation_interval_amount">{{
-                  $t("Evaluation interval")
-                }}</label>
+
                 <b-form-invalid-feedback>{{
                   $displayError("evaluation_interval_amount", form)
                 }}</b-form-invalid-feedback>
@@ -199,47 +192,32 @@
                     'is-valid': $validateState('role', form) === true,
                   }"
                 ></v-select>
-                <label for="evaluation_interval_unit">{{
-                  $t("Evaluation interval")
-                }}</label>
+
                 <b-form-invalid-feedback>{{
                   $displayError("evaluation_interval_unit", form)
                 }}</b-form-invalid-feedback>
               </div>
             </b-col>
-          </b-row> </b-col
-        >
-        <b-col class="col-12" style="height: 40px">
-          <b-row>
-            <b-col>
-              <div
-                class="form-label-group required"
-                style="justify-content: center; display: flex"
-              >
-                <div class="actions" style="z-index: 2">
-                  <b-btn
-                    ref="projectAdvancedFormBtn"
-                    variant="primary btn-action"
-                    size="xs"
-                    class="px-3"
-                    @click="toggleAdvanced"
-                    style="display: flex; max-height: 30px; align-items: center"
-                  >
-                    Advanced settings
+          </b-row>
+        </b-col>
 
-                    <span
-                      ><i
-                        class="mdi mdi-chevron-right animated fadeIn"
-                        style="font-size: 20px"
-                        v-if="showAdvanced"
-                      ></i>
-                      <i
-                        v-else
-                        class="mdi mdi-chevron-down animated fadeIn"
-                        style="font-size: 20px"
-                      ></i>
-                    </span>
-                  </b-btn>
+        <b-col class="col-12" style="height: 40px">
+          <b-row style="height: 100%; margin: auto; align-items: center">
+            <b-col>
+              <div @click="toggleAdvanced" class="form-label-group required">
+                <div class="project_advaced_actions">
+                  <div>
+                    {{ this.$t("Project Advanced") }}
+                  </div>
+                  <div class="advanced-form-advanced-switch">
+                    <b-form-checkbox
+                      v-model="advancedSettingsSet"
+                      name="check-button"
+                      size="lg"
+                      switch
+                    >
+                    </b-form-checkbox>
+                  </div>
                 </div>
               </div>
               <inner-overlay
@@ -251,25 +229,22 @@
                 }"
               >
               </inner-overlay>
-              <b-card
-                v-if="showAdvanced"
-                no-body
-                style="
-                  z-index: 2;
-                  left: 220px;
-                  bottom: 120px;
-                  height: 150px;
-                  width: 250px;
-                "
-              >
-                <b-card-body>
+              <b-card v-if="showAdvanced" no-body>
+                <b-popover
+                  ref="popover"
+                  :target="() => $refs.projectForm"
+                  :show.sync="showAdvanced"
+                  placement="right"
+                  class="form-popover"
+                >
                   <advanced-form
                     v-model="advancedForm"
+                    @input="setAdvancedForm"
                     @done="toggleAdvanced"
                     :users="users"
                     :form="form"
                   ></advanced-form>
-                </b-card-body>
+                </b-popover>
               </b-card>
             </b-col>
           </b-row>
@@ -341,7 +316,6 @@ export default {
     "advanced-form": AdvancedForm,
   },
   data: () => ({
-    checked: false,
     showAdvanced: false,
     selectedProjectIdeas: [],
     intent: Math.random(),
@@ -389,6 +363,7 @@ export default {
     input: null,
     toolsForStage: null,
     budget: null,
+    checked: false,
     advancedForm: null,
     form: new GQLForm({
       id: null,
@@ -407,6 +382,18 @@ export default {
     }),
   }),
   computed: {
+    advancedSettingsSet: {
+      get() {
+        return this.form.issueEvaluationRoles?.length > 0 ?? false;
+      },
+      set(val) {
+        if (val && this.advancedForm) {
+          this.form.issueEvaluationRoles = this.advancedForm.issueEvaluationRoles;
+        } else {
+					this.form.issueEvaluationRoles = [];
+				}
+      },
+    },
     getBudget: {
       get() {
         return this.budget;
@@ -527,7 +514,11 @@ export default {
       allTools: "companyTool/all",
     }),
   },
-
+  watch: {
+    advancedForm(newVal) {
+      console.log(newVal);
+    },
+  },
   async mounted() {
     this.intent = Math.random();
     this.input = this.value;
@@ -541,6 +532,12 @@ export default {
   },
 
   methods: {
+    setAdvancedForm() {
+      console.log(this.advancedForm.issueEvaluationRoles);
+      this.form.issueEvaluationRoles = this.advancedForm.issueEvaluationRoles;
+      this.advancedSettingsSet = this.form.issueEvaluationRoles.length > 0;
+      console.log(this.advancedSettingsSet);
+    },
     toggleAdvanced() {
       this.showAdvanced = !this.showAdvanced;
     },
@@ -618,20 +615,22 @@ export default {
         if (this.input.budget) {
           this.budget = this.input.budget / 100;
         }
+
+        if (
+          this.input.issueEvaluationRoles &&
+          this.input.issueEvaluationRoles.length > 0
+        ) {
+          this.advancedSettingsSet = true;
+					this.form.issueEvaluationRoles = this.input.issueEvaluationRoles;
+        }else{
+					this.advancedSettingsSet = false;
+				}
       }
     },
 
     async save() {
       this.form.ideaIds = [...this.selectedProjectIdeas];
       this.form.budget = this.budget * 100;
-
-      //Concat advancedform properties
-      if (this.advancedForm && Object.keys(this.advancedForm).length > 0) {
-        Object.entries(this.advancedForm).forEach((entry) => {
-          const [key, value] = entry;
-          this.form[key] = value;
-        });
-      }
 
       //Add adopted Ideas Silently
       if (this.concatedAdoptedIdeas.length > 0) {
@@ -731,6 +730,17 @@ export default {
 </script>
 
 <style scoped>
+.project_advaced_actions {
+  font-size: 15px;
+  justify-content: space-between;
+  display: flex;
+}
+
+.advanced-form-advanced-switch .active {
+  color: #fff !important;
+  background-color: #28a745 !important;
+  border-color: #28a745 !important;
+}
 .project-form-advanced {
   justify-content: center;
   cursor: pointer;

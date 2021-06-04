@@ -208,6 +208,8 @@
     "toolCreated": "Tool created succesfully!",
     "toolCreatedFail": "Creating tool failed!"
   },
+  "Evaluation Restriction": "Evaluation Restriction",
+  "Project Advanced": "Advanced settings",
   "Engage": "Engage",
   "Milestone title": "title",
   "requiredScore": "required score",
