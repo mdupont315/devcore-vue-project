@@ -39,12 +39,10 @@ const actions = {
     return role;
   },
 
-  async update(context, form) {
+  async updateOrDeleteMany(context, form) {
+    console.log(form);
     const result = await form.mutate({
-      mutation: MILESTONE.update,
-      variables: {
-        id: form.id
-      }
+      mutation: MILESTONE.updateOrDeleteMany
     });
     const role = new Milestone().deserialize(result.data.milestoneUpdate);
     await context.dispatch("findAll", {
@@ -68,18 +66,8 @@ const actions = {
 
   async delete(context, form) {
     context.commit("REMOVE_ITEM", form);
-    const result = await form.mutate({
-      mutation: MILESTONE.delete,
-      variables: {
-        id: form.id
-      }
-    });
-    context.dispatch("findAll", {
-      force: true
-    });
-    // await context.dispatch('findAll', { force: true });
-    console.log(result.data);
-    return result.data.milestoneDelete;
+
+    return form;
   },
 
   async findAll(context, { filter = null, force = false } = {}) {
@@ -125,6 +113,7 @@ const mutations = {
     state.all = value;
   },
   REMOVE_ITEM(state, value) {
+    console.log(value);
     const index = state.all.findIndex(el => el.id === value.id);
     if (index > -1) {
       state.all.splice(index, 1);

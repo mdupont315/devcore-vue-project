@@ -1,8 +1,5 @@
 <template>
-  <b-form
-    class="hide-labels"
-    @submit.prevent="saveItem"
-  >
+  <b-form class="hide-labels" @submit.prevent="saveItem">
     <b-col class="col-12">
       <div class="form-label-group required">
         <div class="form-group">
@@ -11,7 +8,7 @@
             v-model.trim="form.title"
             v-validate="'required|min:4'"
             v-autofocus
-						autocomplete="off"
+            autocomplete="off"
             :disabled="form.busy"
             :placeholder="$t('Milestone title')"
             type="text"
@@ -23,14 +20,31 @@
             $displayError("title", form)
           }}</b-form-invalid-feedback>
         </div>
-
+        <div class="form-group">
+          <b-form-input
+            id="reward"
+            v-model.trim="form.reward"
+            v-validate="'required|min:4'"
+            v-autofocus
+            autocomplete="off"
+            :disabled="form.busy"
+            :placeholder="$t('Milestone reward')"
+            type="text"
+            name="reward"
+            :state="$validateState('reward', form)"
+          ></b-form-input>
+          <label for="reward">{{ $t("Milestone reward") }}</label>
+          <b-form-invalid-feedback>{{
+            $displayError("reward", form)
+          }}</b-form-invalid-feedback>
+        </div>
         <b-form-input
           id="requiredScore"
           v-model="form.requiredScore"
           :max-length="15"
           autocomplete="off"
           :disabled="form.busy"
-          v-validate="'required|numeric|min_value:0|max_value:999999999999999'"
+          v-validate="getScoreValidator"
           :placeholder="$t('requiredScore')"
           type="number"
           name="requiredScore"
@@ -76,17 +90,68 @@ import GQLForm from "@/lib/gqlform";
 
 export default {
   data: () => ({
+    prevScore: 0,
+    nextScore: 0,
     form: new GQLForm({
       id: null,
       title: null,
       description: null,
       requiredScore: null,
-      reward: "fanboy",
+      reward: null,
     }),
   }),
+  computed: {
+    getScoreValidator: {
+      get() {
+        if (this.nextScore) {
+          return `required|numeric|between:${this.prevScore},${this.nextScore}`;
+        } else {
+          return `required|numeric|min_value:${this.prevScore}`;
+        }
+      },
+    },
+  },
+  props: {
+    itemMeta: {
+      type: Object,
+      required: false,
+      default: () => {},
+    },
+    item: {
+      type: Object,
+      required: false,
+      default: () => {},
+    },
+  },
+  mounted() {
+    if (this.item) this.setScoresAround();
+  },
   methods: {
-    saveItem() {
-      this.$emit("input", this.form);
+    setScoresAround() {
+      const getIndex = () => {
+        if (!this.item) return;
+        return this.itemMeta.scores.findIndex((i) => i.id === this.item.id);
+      };
+      const prevItem = this.itemMeta.scores[getIndex() - 1] ?? null;
+      const nextItem = this.itemMeta.scores[getIndex() + 1] ?? null;
+
+			this.prevScore = prevItem?.requiredScore ?? 0;
+			this.nextScore = nextItem?.requiredScore ?? null;
+/*
+      this.prevScore =
+        prevItem?.requiredScore ??
+        this.itemMeta.scores[getIndex()].requiredScore; */
+     // this.nextScore = nextItem?.requiredScore ?? null;
+    },
+    async saveItem() {
+      console.log(this.form);
+      const createForm = new GQLForm({
+        title: this.form.title,
+        description: this.form.description,
+        requiredScore: this.form.requiredScore,
+        reward: this.form.reward,
+      });
+      await this.$store.dispatch("milestone/create", createForm);
     },
   },
 };

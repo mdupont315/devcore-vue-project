@@ -3,23 +3,23 @@ import { META_FRAGMENT } from "./meta";
 // eslint-disable-next-line
 export const MILESTONE_FRAGMENT = gql`
   fragment milestoneFields on Milestone {
-    id,
+    id
     reward
     title
     requiredScore
     userCount
     description
-    users{
+    users {
       milestoneId
       rewarded
       userId
       engageScore
       user {
-          id
-          firstName
-          lastName
-        }
+        id
+        firstName
+        lastName
       }
+    }
     _metadata {
       ...metaFields
     }
@@ -51,7 +51,7 @@ export const MILESTONE = {
     }
     ${MILESTONE_FULL_FRAGMENT}
   `,
-  /*   create: gql`
+  create: gql`
     mutation milestoneCreate($input: MilestoneCreateInput!) {
       milestoneCreate(input: $input) {
         ...milestoneFullFields
@@ -59,15 +59,15 @@ export const MILESTONE = {
     }
     ${MILESTONE_FULL_FRAGMENT}
   `,
-  update: gql`
-    mutation milestoneUpdate($id: ID!, $input: MilestoneUpdateInput!) {
-      milestoneUpdate(id: $id, input: $input) {
+  updateOrDeleteMany: gql`
+    mutation milestoneUpdateOrDeleteMany($input: [MilestoneUpdateInput!]) {
+      milestoneUpdateOrDeleteMany(input: $input) {
         ...milestoneFullFields
       }
     }
     ${MILESTONE_FULL_FRAGMENT}
   `,
-  delete: gql`
+  /*delete: gql`
     mutation milestoneDelete($id: ID!) {
       milestoneDelete(id: $id)
     }

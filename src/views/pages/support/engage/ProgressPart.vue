@@ -1,33 +1,33 @@
 <template>
-  <div class="engage_progress_part_container">
-    <div class="engage_progress_part_container-icons">
+  <div class="engage_progress_item_container">
+    <div class="engage_progress_item_container-icons">
       <b-badge
         variant="primary"
-        class="engage_progress_part_container-usercount"
+        class="engage_progress_item_container-usercount"
       >
         <b-avatar
           variant="primary"
-          class="engage_progress_part_container-usercount-badge"
+          class="engage_progress_item_container-usercount-badge"
         ></b-avatar>
-        <span class="engage_progress_part_container-usercount-text"
-          >{{ part.userCount }}
+        <span class="engage_progress_item_container-usercount-text"
+          >{{ item.userCount }}
         </span>
       </b-badge>
-      <div class="engage_progress_part_container-icons-milestone">
+      <div class="engage_progress_item_container-icons-milestone">
         <div
-          class="engage_progress_part_container-icons-milestone-line"
+          class="engage_progress_item_container-icons-milestone-line"
           :class="{ 'milestone-line-active': itemMeta.itemIndex !== 1 }"
         ></div>
-        <div class="engage_progress_part_container-icons-milestone-container">
+        <div class="engage_progress_item_container-icons-milestone-container">
           <div :class="`milestone_rank_${itemMeta.itemIndex}`"></div>
         </div>
         <div
           v-if="itemMeta.itemIndex !== itemMeta.count"
-          class="engage_progress_part_container-icons-milestone-line milestone-line-active"
+          class="engage_progress_item_container-icons-milestone-line milestone-line-active"
         ></div>
         <div
           v-else
-          class="engage_progress_part_container-icons-milestone-line line-last"
+          class="engage_progress_item_container-icons-milestone-line line-last"
         >
           <div class="milestone-line line-last-container">
             <div class="milestone-line line-last-container-line"></div>
@@ -42,7 +42,7 @@
 <script>
 export default {
   props: {
-    part: {
+    item: {
       type: Object,
       required: false,
       default: () => {},
@@ -198,7 +198,7 @@ export default {
 }
 </style>
 <style scoped>
-.engage_progress_part_container {
+.engage_progress_item_container {
   height: 100%;
   width: 100%;
   display: flex;
@@ -206,7 +206,7 @@ export default {
   justify-content: space-between;
   padding: 0 0 20px 0px;
 }
-.engage_progress_part_container-usercount {
+.engage_progress_item_container-usercount {
   width: 40px;
   height: 25px;
   display: flex;
@@ -214,7 +214,7 @@ export default {
   transform: translate(0px, 5px);
 }
 
-.engage_progress_part_container-icons-milestone {
+.engage_progress_item_container-icons-milestone {
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -222,7 +222,7 @@ export default {
   flex-grow: 1;
 }
 
-.engage_progress_part_container-icons-milestone-container {
+.engage_progress_item_container-icons-milestone-container {
   box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
   border-radius: 50%;
   text-align: center;
@@ -232,12 +232,12 @@ export default {
   flex-grow: 1;
 }
 
-.engage_progress_part_container-icons-milestone-line {
+.engage_progress_item_container-icons-milestone-line {
   align-self: center;
   flex-grow: 2;
 }
 
-.engage_progress_part_container-icons-milestone-line.line-last {
+.engage_progress_item_container-icons-milestone-line.line-last {
   flex-grow: 2;
   justify-content: flex-end;
 }
@@ -248,11 +248,11 @@ export default {
   place-items: center;
 }
 
-.engage_progress_part_container-usercount-text {
+.engage_progress_item_container-usercount-text {
   align-self: center;
 }
 
-.engage_progress_part_container-usercount-badge {
+.engage_progress_item_container-usercount-badge {
   width: 25px;
   height: 20px;
 }
@@ -260,14 +260,14 @@ export default {
   cursor: pointer;
 } */
 
-.engage_progress_part_container-icons {
+.engage_progress_item_container-icons {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.engage_progress_part_container-icon {
+.engage_progress_item_container-icon {
   transform: scale(0.8) translate(0px, 10px);
 }
 </style>

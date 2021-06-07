@@ -1,9 +1,14 @@
 <template>
   <div class="engage_progress_container">
-    <div class="engage_progress_container-header">
-      <div class="engage_progress_container-header-edit">
+    <!--   <div class="engage_progress_container-header"> -->
+    <div
+      class="engage_progress_container-header-edit"
+      :class="{ 'is-elevated-layer': isEditing }"
+    >
+      <div class="engage_progress_container_header-action">
         <div
-          class="engage_progress_container_header-action"
+          class="engage_progress_container_header-action-edit"
+          v-if="!isEditing"
           @click="toggleEdit"
         >
           <i class="mdi mdi-pencil engage-header-edit-icon"></i
@@ -11,101 +16,131 @@
             $t("Edit")
           }}</span>
         </div>
+        <div
+          v-else
+          @click="saveEdits"
+          class="engage_progress_container_header-action-edit"
+        >
+          <i class="mdi mdi-pencil engage-header-edit-icon"></i
+          ><span class="engage_progress_container-header-edit-text">{{
+            $t("Save")
+          }}</span>
+        </div>
       </div>
+      <!--  </div> -->
     </div>
+    <inner-overlay
+      v-if="
+        items.some((x) => x._clickedIndex) ||
+        isEditing ||
+        editItems.some((x) => x._clickedIndex)
+      "
+      style="z-index: 1"
+      @click="toggleCreateForm"
+    ></inner-overlay>
     <div
       class="engage_progress_container-body"
       style="display: flex; flex-direction: row"
     >
-      <inner-overlay
-        v-if="showMilestonePopover"
-        style="z-index: 1"
-        @click="toggleCreateForm"
-      ></inner-overlay>
       <div
         v-for="(part, index) in getProgressPart"
         :key="index"
         class="engage_progress_container_body_item"
       >
         <progress-part
-          :part="part"
-          :itemMeta="{ itemIndex: index + 1, count: getProgressPart.length }"
+          :item="part"
+          :itemMeta="{
+            itemIndex: index + 1,
+            count: getProgressPart.length,
+          }"
         >
-          <div class="engage_progress_container-body-score">
+          <!-- Delete -->
+
+          <div
+            v-if="isEditing"
+            @click="removeItem(part)"
+            class="deleteIcon engage_progress_container_body_item-delete is-elevated-layer"
+          >
+            <i class="mdi mdi-trash-can" />
+          </div>
+
+          <div
+            class="engage_progress_container-body-score"
+            :class="{ 'is-elevated-layer': isEditing }"
+          >
             <span class="engage_progress_container-body-score-text">
               {{ $t("requiredScore") }}
             </span>
-            <span class="engage_progress_container-body-score-value">{{
-              part.requiredScore
-            }}</span>
+            <div v-if="!isEditing">
+              <span class="engage_progress_container-body-score-value"
+                >{{ part.requiredScore }}
+              </span>
+            </div>
+            <div v-else>
+              <input
+                type="text"
+                style="border-radius: 20px"
+                class="form-control engage_progress_container-edit-input"
+                :placeholder="part.requiredScore"
+                v-model="editItems[index].requiredScore"
+              />
+            </div>
           </div>
-          <div class="engage_progress_container-body-text">
-            <b-card :title="part.title">
+          <div
+            class="engage_progress_container-body-reward"
+            :class="{ 'is-elevated-layer': isEditing }"
+          >
+            <div v-if="!isEditing">{{ part.reward }}</div>
+            <div v-else>
+              <input
+                type="text"
+                class="form-control engage_progress_container-edit-input"
+                :placeholder="part.reward"
+                v-model="editItems[index].reward"
+              />
+            </div>
+          </div>
+
+          <div
+            class="engage_progress_container-body-text"
+            :class="{ 'is-elevated-layer': isEditing }"
+          >
+            <b-card :title="part.title" style="padding: 10px" v-if="!isEditing">
               <b-card-text>
                 {{ part.description }}
               </b-card-text>
             </b-card>
+
+            <b-card style="padding: 10px" v-else>
+              <b-card-title>
+                <input
+                  type="text"
+                  class="form-control engage_progress_container-edit-input"
+                  v-model="editItems[index].title"
+                  :placeholder="part.title"
+              /></b-card-title>
+
+              <div class="form-group">
+                <textarea
+                  :placeholder="part.description"
+                  v-model="editItems[index].description"
+                  class="form-control rounded-0"
+                  rows="3"
+                ></textarea>
+              </div>
+            </b-card>
           </div>
         </progress-part>
-        <div @click="toggleCreateForm(part)" style="cursor: pointer">
-          <div
-            class="engage_progress_container_body_item-action-center"
-            v-if="index + 1 !== getProgressPart.length"
-          >
-            <b-button
-              class="milestone-line line-center-container-icon"
-              style="align-items: center; font-size: 20px"
-              pill
-              variant="outline-primary"
-              :id="`btnMilestone-${part.id}`"
-              :style="
-                part.id === clickedIndex
-                  ? 'z-index: 1;align-items: center;font-size: 20px;color: white;background: #4294d0'
-                  : ''
-              "
-            >
-              <i class="mdi mdi-plus"></i>
-            </b-button>
-          </div>
-          <div
-            class="engage_progress_container_body_item-action-last"
-            style="margin-top: 15px"
-            v-else
-          >
-            <b-button
-              class="milestone-line line-last-container-icon line-center-container-icon"
-              pill
-              variant="outline-primary"
-              :id="`btnMilestone-${part.id}`"
-              :style="
-                part.id === clickedIndex
-                  ? 'z-index: 1;align-items: center;font-size: 20px;color: white;background: #4294d0'
-                  : ''
-              "
-            >
-              <i class="mdi mdi-plus" style="color: #fff"></i>
-            </b-button>
-          </div>
-          <b-popover
-            ref="popover"
-            :target="`btnMilestone-${part.id}`"
-            :show.sync="showMilestonePopover"
-            placement="bottom"
-            class="form-popover"
-            v-if="part && part.id == clickedIndex"
-          >
-            <b-card
-              no-body
-              style="width: 300px"
-              v-if="part && part.id == clickedIndex"
-            >
-              <b-card-body
-                ><milestone-form
-                  @input="createPart"
-                ></milestone-form> </b-card-body
-            ></b-card>
-          </b-popover>
-        </div>
+        <progress-button
+          :item="part"
+          :itemMeta="{
+            itemIndex: index + 1,
+            count: getProgressPart.length,
+            scores: getRequiredScores,
+          }"
+          @toggle="toggleCreateForm"
+        >
+        </progress-button>
       </div>
     </div>
   </div>
@@ -113,12 +148,14 @@
 
 <script>
 import ProgressPart from "./ProgressPart.vue";
-import MilestoneForm from "./Form.vue";
+import ProgressButton from "./ProgressButton.vue";
+import MilestoneModel from "@/models/milestone.model";
+import GQLForm from "@/lib/gqlform";
 
 export default {
   components: {
     "progress-part": ProgressPart,
-    "milestone-form": MilestoneForm,
+    "progress-button": ProgressButton,
   },
   props: {
     items: {
@@ -127,116 +164,140 @@ export default {
       default: () => [],
     },
   },
-  computed: {
-    getProgressPart() {
-      return this.items;
-    },
-  },
   data: () => {
     return {
-      clickedIndex: null,
-      showMilestonePopover: false,
+      editItems: [
+        {
+          description: null,
+          id: "1",
+          reward: null,
+          title: "default",
+          requiredScore: 0,
+          userCount: 0,
+          users: [],
+          _clickedIndex: null,
+        },
+      ],
+      isEditing: false,
     };
   },
+  computed: {
+    getProgressPart() {
+      if (this.items.length == 0) {
+        const model = new MilestoneModel().deserialize(this.editItems[0]);
+
+        return [model];
+      } else {
+        return this.items;
+      }
+    },
+    getRequiredScores() {
+      if (this.items.length > 0) {
+        return this.items.map((item) => {
+          return { requiredScore: item.requiredScore, id: item.id };
+        });
+      } else {
+        return [
+          {
+            requiredScore: this.editItems[0].requiredScore,
+            id: this.editItems[0].id,
+          },
+        ];
+      }
+    },
+  },
   methods: {
-    async createPart(item) {
-      console.log(item);
+    removeItem(part) {
+      this.editItems = this.editItems.filter((item) => item.id !== part.id);
+      console.log(part);
+      this.$store.dispatch("milestone/delete", part);
     },
     toggleCreateForm(previous) {
-      if (previous) {
-        this.clickedIndex = previous.id;
-      } else {
-        this.clickedIndex = null;
+      if (this.isEditing) {
+        this.isEditing = !this.isEditing;
       }
-
-      this.showMilestonePopover = !this.showMilestonePopover;
-
-      /*  const checkForm = new GQLForm({
-          id: row.item.userId,
-          rewarded: !row.item.rewarded,
-        });
-
-        await this.$store.dispatch("milestone/reward", checkForm); */
+      console.log(previous);
+      if (this.items.length > 0) {
+        if (previous) {
+          console.log("HI");
+          this.items.forEach((item) => (item._clickedIndex = null));
+          this.items.find((item) => item.id == previous.id)._clickedIndex =
+            previous.id;
+        } else {
+          this.items.forEach((item) => (item._clickedIndex = null));
+        }
+      } else {
+        if (previous) {
+          this.editItems[0]["_clickedIndex"] = previous.id;
+        } else {
+          this.editItems[0]["_clickedIndex"] = null;
+        }
+      }
     },
     async toggleEdit() {
+      if (this.items.length > 0) {
+        this.editItems = this.items.map((item) => {
+          return {
+            id: item.id,
+            requiredScore: item.requiredScore,
+            reward: item.reward,
+            title: item.title,
+            description: item.description,
+          };
+        });
+      }
+
+      this.isEditing = !this.isEditing;
+      console.log("toggle edit!");
+    },
+    async saveEdits() {
+      const updateOrDeleteForm = new GQLForm({
+        ...this.editItems,
+      });
+      await this.$store.dispatch(
+        "milestone/updateOrDeleteMany",
+        updateOrDeleteForm
+      );
+      this.isEditing = !this.isEditing;
       await this.$store.dispatch("milestone/findAll", {
         force: true,
       });
-      console.log("toggle edit!");
     },
   },
 };
 </script>
 
 <style>
-.milestone-line.line-last-container-line {
-  flex-grow: 1;
-  border-bottom: 2px solid lightgray;
+.is-elevated-layer {
+  z-index: 2;
 }
 
-.engage_progress_part_container-icons-milestone-line.milestone-line-active {
-  border-bottom: 2px solid lightgray;
-}
-.engage_progress_container_body_item-action-last
-  > .milestone-line.line-last-container-icon {
-  font-size: 42px;
-  max-height: 50px;
-  cursor: pointer;
-  transform: translate(-50px, 0px);
-  align-items: center;
-  font-size: 20px;
-  transform: translate(-30px, 28px);
-  background: #4294d0;
+.engage_progress_container_body_item-delete {
+  background: #dc3545;
   color: #fff;
-}
-
-.milestone-line.line-center-container-icon:hover {
-  color: #fff;
-}
-
-.milestone-line.line-center-container-icon {
-  content: "\F417";
-  color: #4294d0;
-  box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
-  z-index: 10;
-  height: 32px;
-  width: 32px;
-  cursor: pointer;
-  border-radius: 100%;
-  display: flex;
-  margin-left: 22px;
-  margin: 0;
-  flex-direction: column;
-  align-self: center;
-  justify-content: center;
-}
-
-.engage_progress_container_body_item-action-center,
-.engage_progress_container_body_item-action-last {
-  content: "\F417";
+  width: 1.8rem;
+  height: 1.8rem;
+  display: block;
+  border-radius: 3px;
+  padding: 3px;
+  right: 5px;
   z-index: 1;
-  font-size: 20px;
+  top: 5px;
+  cursor: pointer;
+  align-self: flex-end;
+  align-items: center;
+  transform: translate(0px, -120px);
 }
-.engage_progress_container_body_item-action-last {
-  margin: 30px 20px 0 20px;
-}
-.engage_progress_container_body_item-action-center {
-  display: flex;
-  flex-direction: column;
-  margin-top: 45px;
-  width: 60px;
-  text-align: center;
-}
+
 .engage_progress_container {
   display: flex;
   flex-direction: column;
+  background: #fff;
   height: 100%;
-  width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
-  padding-bottom: 20px;
+  margin-right: 15px;
+  border-radius: 5px;
+  margin-left: 15px;
+  margin-bottom: 20px;
 }
 .engage_progress_container-header {
   background: #fff;
@@ -245,40 +306,58 @@ export default {
   align-items: flex-end;
   flex-direction: column;
   padding: 0 20px;
-  z-index: 1;
 }
 
 .engage_progress_container_body_item {
   height: 100%;
   width: 100%;
+  max-width: 25%;
   background: #fff;
   display: flex;
 }
 
+.engage_progress_container-body-reward {
+  background: white;
+  justify-content: center;
+  color: #4294d0;
+  place-content: center;
+}
+
+.engage_progress_container-body-reward,
 .engage_progress_container-body-score {
   box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
   width: 150px;
+  max-width: 150px;
   align-self: center;
   align-items: center;
   padding: 10px;
+  margin-top: 10px;
   border-radius: 50px;
   display: flex;
   height: 40px;
+}
+.engage_progress_container-body-score {
   justify-content: space-between;
 }
+.engage_progress_container-body-reward-value,
 .engage_progress_container-body-score-value {
   color: #4294d0;
   border: 1px solid #4294d0;
   border-radius: 50px;
   padding: 5px;
   min-width: 45px;
+  background: white;
   display: flex;
   justify-content: center;
 }
 
+.engage_progress_container-body-score-text,
+.engage_progress_container-body-reward-text {
+  width: 100%;
+}
+
 .engage_progress_container-body-text {
   box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
-  padding: 20px;
   margin: 20px;
 }
 
@@ -291,11 +370,20 @@ export default {
   width: 40px;
   height: 40px;
   text-align: center;
+  margin-right: 40px;
+  place-self: flex-end;
   color: #4294d0;
+  background: #fff;
   border-radius: 50%;
   box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
   cursor: pointer;
   transform: translate(0px, 15px);
+}
+
+.engage_progress_container-edit-input {
+  font-size: 12px;
+  outline: none;
+  border: none;
 }
 .engage_progress_container_header-action {
   width: 100%;
@@ -311,10 +399,21 @@ export default {
   align-self: center;
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: flex-start;
+  background: #fff;
 }
 
 .engage-header-edit-icon:before {
   transform: translate(0px, 5px);
+}
+.engage_progress_container_header-action-edit {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.engage-header-edit-item-icon {
+  color: #4294d0;
+  transform: translate(0px, -12px);
 }
 </style>
