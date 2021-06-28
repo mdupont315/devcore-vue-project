@@ -74,6 +74,7 @@
       <b-card-footer>
         <loading-button
           :disabled="vErrors.any() || form.busy"
+					style="cursor:pointer"
           :loading="form.busy"
           size="lg"
           block
@@ -132,19 +133,14 @@ export default {
         if (!this.item) return;
         return this.itemMeta.scores.findIndex((i) => i.id === this.item.id);
       };
-      const prevItem = this.itemMeta.scores[getIndex() - 1] ?? null;
+      const prevItem = this.itemMeta.scores[getIndex()] ?? null;
       const nextItem = this.itemMeta.scores[getIndex() + 1] ?? null;
 
 			this.prevScore = prevItem?.requiredScore ?? 0;
 			this.nextScore = nextItem?.requiredScore ?? null;
-/*
-      this.prevScore =
-        prevItem?.requiredScore ??
-        this.itemMeta.scores[getIndex()].requiredScore; */
-     // this.nextScore = nextItem?.requiredScore ?? null;
     },
     async saveItem() {
-      console.log(this.form);
+			this.form.busy = true;
       const createForm = new GQLForm({
         title: this.form.title,
         description: this.form.description,
@@ -152,6 +148,7 @@ export default {
         reward: this.form.reward,
       });
       await this.$store.dispatch("milestone/create", createForm);
+			this.form.busy = false;
     },
   },
 };

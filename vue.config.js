@@ -4,7 +4,7 @@ const path = require("path");
 const webpack = require("webpack");
 
 const appUrls = {
-  dev: "http://homestead.test/graphql",
+  dev: "https://127.0.0.1/graphql",
   proxy: "https://devcore.app/graphql",
   prod: "https://devcore.app/graphql"
 };
@@ -13,7 +13,7 @@ module.exports = {
   publicPath: process.env.VUE_APP_SUBFOLDER || "/",
   lintOnSave: false,
   devServer: {
-    proxy: "http://homestead.test",
+    proxy: "https://127.0.0.1",
     headers: { "Access-Control-Allow-Origin": "*" },
     watchOptions: {
       clientLogLevel: "warning"
@@ -59,6 +59,28 @@ module.exports = {
 
   chainWebpack: config => {
     config.resolve.alias.set("@", path.join(__dirname, "./src"));
+
+    const svgRule = config.module.rule("svg");
+    svgRule.uses.clear();
+
+    svgRule
+      .oneOf("inline")
+      .resourceQuery(/inline/)
+      .use("vue-svg-loader")
+      .loader("vue-svg-loader")
+      .options({
+        svgo: {
+          plugins: [{ removeDimensions: true }, { removeViewBox: false }]
+        }
+      })
+      .end()
+      .end()
+      .oneOf("external")
+      .use("file-loader")
+      .loader("file-loader")
+      .options({
+        name: "assets/[name].[hash:8].[ext]"
+      });
 
     config.module
       .rule("vue")

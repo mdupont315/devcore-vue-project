@@ -26,12 +26,11 @@
         <col style="width: 10%" />
         <col style="width: 10%" />
         <col style="width: 10%" />
-				<col style="width: 55%" />
-     <!--    <col style="width: 35%" />
-        <col style="width: 25%" /> -->
-        <col style="width: 5%" />
-        <col style="width: 15%" />
-        <col style="width: 5%" />
+        <col style="width: 32%" />
+        <col style="width: 8%" />
+        <col style="width: 8%" />
+        <col style="width: 8%" />
+        <col style="width: 14%" />
       </template>
       <template v-slot:empty="scope">
         <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -63,26 +62,12 @@
         row.item.description
       }}</template>
 
-      <!-- effect -->
-    <!--   <template v-slot:cell(effect)="row" class="actions">
-        <div class="buttons">
-          <b-button
-            size="xs"
-            variant="action"
-            class="btn-primary btn-block text-uppercase text-bold"
-            style="font-size: 1.2rem; 3px 10px;white-space: nowrap;min-width: min-content;"
-            >Notes</b-button
-          >
-          <b-button
-            v-if="$can('process/process/manage')"
-            size="xs"
-            variant="action"
-            class="btn-light btn-expand btn-block text-uppercase text-bold m-0"
-            style="font-size: 1.2rem; 3px 10px;white-space: nowrap;min-width: min-content;"
-            >Not Checked
-          </b-button>
-        </div>
-      </template> -->
+      <!-- loss -->
+      <template v-slot:cell(loss)="row">
+        <span :class="{ 'text-danger': row.item.moneyTotalValue != 0 }">
+          {{ $currency(row.item.moneyTotalValue / 100 || 0) }}</span
+        >
+      </template>
 
       <!-- checked -->
       <template v-slot:cell(checked)="row">
@@ -97,34 +82,111 @@
         </div>
       </template>
 
-      <!-- loss -->
-      <template v-slot:cell(loss)="row">
-        <span :class="{ 'text-danger': row.item.moneyTotalValue != 0 }">
-          {{ $currency(row.item.moneyTotalValue / 100 || 0) }}</span
-        >
-      </template>
-      <!-- actions -->
-      <template v-slot:cell(actions)="row" class="text-right">
-        <div class="text-right float-right p-1 px-0" style="width: 45px">
-          <confirm-button
-            variant="btn-danger btn-white btn-delete"
-            size="md"
-            @confirm="() => deleteItem(row.item)"
+      <!-- effect -->
+      <template v-slot:cell(effect)="row" class="actions">
+        <div class="buttons" style="justify-content: flex-start">
+          <b-button
+            size="xs"
+            variant="action"
+            class="btn-primary btn-block text-uppercase text-bold"
+            style="font-size: 1.2rem; 3px 10px;white-space:nowrap;min-width:min-content;max-width:91px;display:flex;justify-content:center"
+            >ADD</b-button
           >
-            <i class="mdi mdi-trash-can"></i>
-          </confirm-button>
         </div>
       </template>
 
+      <!-- actions -->
+      <template v-slot:cell(actions)="row" class="text-right">
+        <div class="text-right p-1 px-0" style="display: flex">
+          <!-- feedback -->
+          <confirm-button
+            variant="btn-white"
+            size="md"
+            @confirm="() => deleteItem(row.item)"
+          >
+            <div class="text-center">
+              <b-tooltip
+                :target="() => $refs.issueEffectFeedbackIcon"
+                variant="primary"
+                ><span class="issue-effect-tooltip-title">{{
+                  $t("issueEffectFeedback")
+                }}</span></b-tooltip
+              >
+            </div>
+            <icoIssueFeedback
+              ref="issueEffectFeedbackIcon"
+              class="issue-Effect__FeedbackIcon"
+              width="40px"
+              height="40px"
+            ></icoIssueFeedback>
+          </confirm-button>
 
+          <!-- edit -->
+          <confirm-button
+            variant="btn-white"
+            size="md"
+            @confirm="() => deleteItem(row.item)"
+          >
+            <div class="text-center">
+              <b-tooltip
+                :target="() => $refs.issueEffectEditIcon"
+                variant="primary"
+                ><span class="issue-effect-tooltip-title">{{
+                  $t("issueEffectEdit")
+                }}</span></b-tooltip
+              >
+            </div>
+
+            <icoIssueEdit
+              ref="issueEffectEditIcon"
+              class="issue-Effect__EditIcon"
+              width="40px"
+              height="40px"
+            ></icoIssueEdit>
+          </confirm-button>
+
+          <!-- trashcan -->
+          <confirm-button
+            variant="btn-white"
+            size="md"
+            @confirm="() => deleteItem(row.item)"
+          >
+            <div class="text-center">
+              <b-tooltip
+                :target="() => $refs.issueEffectRemoveIcon"
+                variant="primary"
+                ><span class="issue-effect-tooltip-title">{{
+                  $t("issueEffectRemove")
+                }}</span></b-tooltip
+              >
+            </div>
+            <icoIssueTrashcan
+              ref="issueEffectRemoveIcon"
+              class="issue-Effect__RemoveIcon"
+              width="40px"
+              height="40px"
+            ></icoIssueTrashcan>
+          </confirm-button>
+
+          <!--    <i class="mdi mdi-trash-can"></i> -->
+        </div>
+      </template>
     </b-table>
   </div>
 </template>
 <script>
 import GQLForm from "@/lib/gqlform";
 import moment from "moment";
+import icoIssueFeedback from "@/assets/img/icons/svg/ico-issue-feedback.svg?inline";
+import icoIssueEdit from "@/assets/img/icons/svg/ico-issue-edit.svg?inline";
+import icoIssueTrashcan from "@/assets/img/icons/svg/ico-issue-trashcan.svg?inline";
 
 export default {
+  components: {
+    icoIssueFeedback,
+    icoIssueEdit,
+    icoIssueTrashcan,
+  },
   props: {
     items: {
       type: Array,
@@ -177,19 +239,19 @@ export default {
             label: this.$t("Description"),
             sortable: true,
           },
-     /*      {
-            key: "effect",
-            label: this.$t("Issue effect"),
+          {
+            key: "loss",
+            label: this.$t("Estimated loss"),
             sortable: true,
-          }, */
+          },
           {
             key: "checked",
             label: this.$t("Checked"),
             sortable: true,
           },
           {
-            key: "loss",
-            label: this.$t("Estimated loss"),
+            key: "effect",
+            label: this.$t("Issue effect"),
             sortable: true,
           },
 
@@ -239,3 +301,28 @@ export default {
   },
 };
 </script>
+<style scoped>
+.issue-effect-tooltip-title {
+  font-size: 9px;
+  line-height: 11px;
+  letter-spacing: 1.5px;
+  align-content: center;
+  text-transform: uppercase;
+}
+
+.issue-Effect__FeedbackIcon:hover,
+.issue-Effect__EditIcon:hover,
+.issue-Effect__RemoveIcon:hover {
+  background: #4294d0;
+  border-radius: 50%;
+  outline: none;
+}
+
+.issue-Effect__FeedbackIcon,
+.issue-Effect__EditIcon,
+.issue-Effect__RemoveIcon {
+  border-radius: 50%;
+  outline: none;
+  fill: #000;
+}
+</style>

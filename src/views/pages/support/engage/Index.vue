@@ -8,7 +8,10 @@
     ></div>
 
     <page-loader v-if="filter.busy"></page-loader>
-    <engage-progress :items="milestones" v-if="!filter.busy"></engage-progress>
+    <engage-progress
+      :items="getMilestones"
+      v-if="!filter.busy"
+    ></engage-progress>
     <engage-table :items="milestones" v-if="!filter.busy"></engage-table>
   </div>
 </template>
@@ -44,6 +47,12 @@ export default {
     ...mapGetters({
       milestones: "milestone/filteredItems",
     }),
+    getMilestones() {
+      const sorted = [...this.milestones].sort((a, b) =>
+        a.requiredScore > b.requiredScore ? 1 : -1
+      );
+      return sorted;
+    },
   },
 };
 </script>

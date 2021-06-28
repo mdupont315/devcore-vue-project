@@ -31,6 +31,9 @@
     }
   },
   "responses": {
+    "milestoneCreate": "Milestonen luonti onnistui!",
+    "milestoneUpdateOrDeleteMany": "Milestonen päivitys onnistui!",
+
     "projectCreate": "Projektin luonti onnistui!",
     "projectCreatedFail": "Projektin luonti epäonnistui!",
     "projectUpdate": "Projektin päivitys onnistui!",
@@ -208,7 +211,8 @@
     "toolCreated": "Työkalun luonti onnistui!",
     "toolCreatedFail": "Työkalun luonti epäonnistui"
   },
-  "Evaluation Restriction": "Arviointi rajoitukset",
+  "Evaluation Restriction": "Arviointi Rajoitus",
+  "Evaluation Restriction Info": "Valitut roolit eivät pysty asettamaan hukan määrää mobiili jaa ongelma ominaisuudesta.",
   "Project Advanced": "Lisäasetukset",
   "Engage": "Sitouta",
   "Milestone reward": "Palkinto",
@@ -276,6 +280,10 @@
   "Improve idea": "Paranna ohjetta",
   "Share idea": "Jaa kehitysidea",
   "Report issue": "Jaa ongelma",
+  "Issue effect": "Haitan vaikutus",
+  "issueEffectFeedback": "Palaute",
+  "issueEffectEdit": "Kommentoi",
+  "issueEffectRemove": "Poista",
   "Select area": "Valitse kohde",
   "Select stage": "Valitse vaihe",
   "Select operation": "Valitse Tehtävä",

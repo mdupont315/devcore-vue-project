@@ -1,5 +1,5 @@
 <template>
-  <div @click="toggleCreateForm(item)" style="cursor: pointer">
+  <div @click="toggleCreateForm(item)" style="cursor: pointer;max-width:15%;z-index:1">
     <div
       class="engage_progress_container_body_item-action-center"
       v-if="itemMeta.itemIndex !== itemMeta.count"
@@ -97,7 +97,8 @@ export default {
   border-bottom: 2px solid lightgray;
 }
 
-.milestone-line.line-center-container-icon.buttonActivated {
+.milestone-line.line-center-container-icon.buttonActivated,
+.milestone-line.line-last-container-icon.buttonActivated {
   z-index: 1;
   align-items: center;
   font-size: 20px;

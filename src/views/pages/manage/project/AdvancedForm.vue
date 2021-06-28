@@ -1,9 +1,29 @@
  <template>
-  <div class="page animated fadeIn" style="padding-top: 0px; width: 300px">
-    <b-card-header class="header" ref="editRolesPlaceholder">
+  <div class="page" style="width: 300px; min-height: 50px">
+    <b-card-header
+      class="header"
+      ref="editRolesPlaceholder"
+      style="border: none"
+    >
       <div class="advanced_evaluation_restriction" @click="toggleIssueRoleEdit">
         <div class="advanced_evaluation_restriction-text">
           {{ this.$t("Evaluation Restriction") }}
+
+          <b-popover
+            target="advanced_evaluation_restriction-text-info-id"
+            container="advanced_evaluation_restriction-text-info-id"
+            placement="top"
+            triggers="hover focus"
+            :content="this.$t('Evaluation Restriction Info')"
+          >
+          </b-popover>
+
+          <div
+            class="advanced_evaluation_restriction-text-info"
+            id="advanced_evaluation_restriction-text-info-id"
+          >
+            <i class="mdi mdi-information restriction-text-info-icon"></i>
+          </div>
         </div>
 
         <div
@@ -30,8 +50,8 @@
                   <img :src="role.getAvatarUrl('50x50')" height="20" />
                 </div>
               </div>
-              <span v-else class="text-dark advanced-role-noroles"
-                >{{ $t("No") }} {{ $t("roles") }} {{ $t("selected") }}</span
+              <div v-else class="text-dark advanced-role-noroles"
+                >{{ $t("No") }} {{ $t("roles") }} {{ $t("selected") }}</div
               >
             </div>
           </div>
@@ -43,15 +63,16 @@
       :key="intent"
       placement="right"
       :show="true"
+			offset="10"
       :target="() => $refs.editRolesPlaceholder"
       custom-class="no-arrow transparent"
     >
       <b-card
         class="bg-light shadow-sm"
         no-body
-        style="width: 210px; margin-top: 15px"
+        style="width: 210px; top: 20px"
       >
-        <b-card-body>
+        <b-card-body style="min-height:60px">
           <ul
             v-if="advancedForm.issueEvaluationRoles.length > 0"
             class="list-inline break mb-0"
@@ -70,8 +91,8 @@
               />
             </li>
           </ul>
-          <span v-else class="text-dark"
-            >{{ $t("No") }} {{ $t("roles") }} {{ $t("selected") }}</span
+          <div v-else class="text-dark"
+            >{{ $t("No") }} {{ $t("roles") }} {{ $t("selected") }}</div
           >
         </b-card-body>
         <b-card-footer class="mx-2">
@@ -175,7 +196,6 @@ export default {
     },
     save() {
       this.form.busy = true;
-      console.log(this.advancedForm);
       this.$emit("input", this.advancedForm);
       this.$emit("done");
       this.form.busy = false;
@@ -213,5 +233,19 @@ export default {
   font-size: 15px;
   flex-grow: 4;
   align-self: center;
+  align-items: center;
+  display: flex;
+  cursor: pointer;
+}
+
+.advanced_evaluation_restriction-text-info > .restriction-text-info-icon {
+  color: #4294d0;
+  padding-left: 3px;
+  font-size: 20px;
+  padding-right: 3px;
+}
+.advanced_evaluation_restriction-text-info > .popover {
+  padding: 5px;
+  max-width: 250px;
 }
 </style>

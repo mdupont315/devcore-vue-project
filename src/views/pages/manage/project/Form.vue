@@ -1,12 +1,12 @@
 <template>
-  <div ref="projectForm">
+  <div>
     <b-form
       v-if="ready"
       @submit.prevent="save"
       @keyup="$validator.validateAll()"
     >
       <b-row>
-        <b-col class="col-12">
+        <b-col class="col-12" ref="projectFormNameField">
           <div class="form-label-group required form-group">
             <b-form-input
               id="project_name"
@@ -229,12 +229,17 @@
                 }"
               >
               </inner-overlay>
-              <b-card v-if="showAdvanced" no-body>
+              <b-card
+                v-if="showAdvanced"
+                no-body
+              >
                 <b-popover
                   ref="popover"
-                  :target="() => $refs.projectForm"
+                  :target="() => $refs.projectFormNameField"
                   :show.sync="showAdvanced"
                   placement="right"
+									offset="-10%"
+									custom-class="advancedForm-form-popover"
                   class="form-popover"
                 >
                   <advanced-form
@@ -388,7 +393,8 @@ export default {
       },
       set(val) {
         if (val && this.advancedForm) {
-          this.form.issueEvaluationRoles = this.advancedForm.issueEvaluationRoles;
+          this.form.issueEvaluationRoles =
+            this.advancedForm.issueEvaluationRoles;
         } else {
           this.form.issueEvaluationRoles = [];
         }
@@ -464,10 +470,11 @@ export default {
           (o) => o.status === "TESTING" || o.status === "ADOPTED"
         );
 
-        const toolIdeasBySelectedCompanyTools = filteredToolsIdeasByStatus.filter(
-          (toolIdea) =>
-            this.form.companyToolIds.indexOf(toolIdea.companyToolId) > -1
-        );
+        const toolIdeasBySelectedCompanyTools =
+          filteredToolsIdeasByStatus.filter(
+            (toolIdea) =>
+              this.form.companyToolIds.indexOf(toolIdea.companyToolId) > -1
+          );
 
         //Include all in Create
         //Include filter by Staged
@@ -729,6 +736,13 @@ export default {
 };
 </script>
 
+<style>
+.advancedForm-form-popover.popover > .arrow {
+	display: none !important;
+}
+.div.arrow{
+	display: none !important;
+}</style>
 <style scoped>
 .project_advaced_actions {
   font-size: 15px;
@@ -770,4 +784,6 @@ export default {
   z-index: 1;
   position: fixed;
 }
+
+
 </style>

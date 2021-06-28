@@ -48,16 +48,17 @@
         <!-- action -->
         <template v-slot:cell(action)="row">
           <div v-if="row.item">
-            <b-button
-              size="xs"
-              :variant="row.item.rewarded ? 'outline-primary' : 'success'"
-              :style="row.item.rewarded ? 'cursor:not-allowed' : 'cursor:pointer'"
-              :disabled="row.item.rewarded"
-              class="btn-block text-uppercase text-bold"
-              style="font-size: 1.2rem; padding: 3px; min-width: min-content"
+            <loading-button
+              type="submit"
+              size="lg"
               @click="reward(row)"
-              >{{ getRowItemRewarded(row.item) }}
-            </b-button>
+              :variant="row.item.rewarded ? 'outline-primary' : 'success'"
+              :disabled="filter.busy || row.item.rewarded || vErrors.any()"
+              :style="row.item.rewarded ? 'cursor:not-allowed' : 'cursor:pointer'"
+              :loading="filter.busy"
+              :block="true"
+              >{{ getRowItemRewarded(row.item) }}</loading-button
+            >
           </div>
         </template>
       </b-table>
@@ -118,14 +119,16 @@ export default {
       const { engageScore } = item;
 
       const deductedPosition = () => {
-        const scores = sorted.map((obj) => obj.requiredScore);
-        for (let i = 0; i < scores.length; i++) {
-          if (
-            (i === 0 && scores[i] > engageScore) ||
-            (i === scores.length - 1 && scores[i] < engageScore) ||
-            (scores[i] < engageScore && engageScore < scores[i + 1])
-          ) {
-            return scores[i];
+        const scoresMap = sorted.map((obj) => {
+          return {
+            score: obj.requiredScore,
+            id: obj.id,
+          };
+        });
+
+        for (let i = 0; i < scoresMap.length; i++) {
+          if (scoresMap[i].score <= engageScore < scoresMap[i + 1].score) {
+            return scoresMap[i].id;
           }
         }
       };
@@ -133,20 +136,21 @@ export default {
       const sorted = [...this.items].sort((a, b) =>
         a.requiredScore > b.requiredScore ? 1 : -1
       );
-
-      return sorted.find((rank) => rank.requiredScore === deductedPosition())
-        .reward;
+      const milestone = sorted.find((rank) => rank.id === deductedPosition());
+      return milestone.reward;
     },
     overlayClick() {
       console.log("overlayClick");
     },
     async reward(row) {
+      this.filter.busy = true;
       if (!row.item.rewarded) {
         const checkForm = new GQLForm({
           id: row.item.userId,
           rewarded: !row.item.rewarded,
         });
         await this.$store.dispatch("milestone/reward", checkForm);
+        this.filter.busy = false;
       }
     },
   },

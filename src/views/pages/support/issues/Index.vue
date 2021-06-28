@@ -25,11 +25,10 @@
           "
         >
           <template v-slot:table-colgroup>
-            <col style="width: 35%" />
-            <col style="width: 20%" />
-            <col style="width: 10%" />
-            <col style="width: 10%" />
-            <col style="width: 300px" />
+            <col style="width: 25%" />
+            <col style="width: 25%" />
+            <col style="width: 25%" />
+            <col style="width: 25%" />
           </template>
           <template v-slot:empty="scope">
             <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -144,7 +143,7 @@
                 size="xs"
                 variant="action"
                 class="btn-primary btn-block text-uppercase text-bold"
-                style="font-size: 1.2rem; 3px 10px;white-space: nowrap;min-width: min-content;"
+                style="font-size: 1.2rem; 3px 10px;white-space: nowrap;"
                 @click="newIdea(row)"
                 >{{ $t("New idea") }}</b-button
               >
@@ -153,7 +152,7 @@
                 size="xs"
                 variant="action"
                 class="btn-light btn-expand btn-block text-uppercase text-bold m-0"
-                style="font-size: 1.2rem; 3px 10px;white-space: nowrap;min-width: min-content;"
+                style="font-size: 1.2rem; 3px 10px;white-space: nowrap;"
                 @click="showDetails(row)"
                 >{{
                   row.item._showDetails ? $t("Close") : $t("Details")

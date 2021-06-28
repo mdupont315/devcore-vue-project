@@ -31,6 +31,8 @@
     }
   },
   "responses": {
+    "milestoneCreate": "Milestone created succesfully!",
+    "milestoneUpdateOrDeleteMany": "Milestones updated succesfully!",
     "projectCreate": "Project created succesfully!",
     "projectCreatedFail": "Project creation failed!",
     "projectUpdate": "Project updated succesfully!",
@@ -209,6 +211,7 @@
     "toolCreatedFail": "Creating tool failed!"
   },
   "Evaluation Restriction": "Evaluation Restriction",
+  "Evaluation Restriction Info": "Selected roles are restricted to evaluate issue loss amounts in mobile report issue feature.",
   "Project Advanced": "Advanced settings",
   "Milestone reward": "Reward",
   "Engage": "Engage",
@@ -529,6 +532,10 @@
   "Loss Average": "Loss Average",
   "NEW": "NEW",
   "Yearly Costs Per Unit": "Yearly Costs Per Unit",
+  "Issue effect": "Issue effect",
+  "issueEffectFeedback": "Feedback",
+  "issueEffectEdit": "Comment",
+  "issueEffectRemove": "Delete",
   "Search issues": "Search issues",
   "Delete all": "Delete all",
   "Remember me": "Remember me",

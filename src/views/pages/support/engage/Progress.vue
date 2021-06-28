@@ -1,6 +1,7 @@
 <template>
   <div class="engage_progress_container">
     <!--   <div class="engage_progress_container-header"> -->
+    <!-- v-if="items.length > 0 && !isEditing" -->
     <div
       class="engage_progress_container-header-edit"
       :class="{ 'is-elevated-layer': isEditing }"
@@ -19,22 +20,30 @@
         <div
           v-else
           @click="saveEdits"
-          class="engage_progress_container_header-action-edit"
+          style="display: flex; flex-direction: column; height: 100%"
         >
-          <i class="mdi mdi-pencil engage-header-edit-icon"></i
-          ><span class="engage_progress_container-header-edit-text">{{
-            $t("Save")
-          }}</span>
+          <div class="engage_progress_container_header-action-edit">
+            <div
+              v-if="loading"
+              class="engage_progress_container_header-action-edit-spinner"
+            >
+              <b-spinner small></b-spinner>
+            </div>
+            <div v-else class="engage_progress_container_header-action-edit">
+              <i class="mdi mdi-pencil engage-header-edit-icon"></i
+              ><span class="engage_progress_container-header-edit-text">{{
+                $t("Save")
+              }}</span>
+            </div>
+          </div>
         </div>
       </div>
       <!--  </div> -->
     </div>
+    <!--   <div v-else class="engage_progress_container-header"></div> -->
+
     <inner-overlay
-      v-if="
-        items.some((x) => x._clickedIndex) ||
-        isEditing ||
-        editItems.some((x) => x._clickedIndex)
-      "
+      v-if="innerOverlayOpen"
       style="z-index: 1"
       @click="toggleCreateForm"
     ></inner-overlay>
@@ -59,7 +68,11 @@
           <div
             v-if="isEditing"
             @click="removeItem(part)"
-            class="deleteIcon engage_progress_container_body_item-delete is-elevated-layer"
+            class="
+              deleteIcon
+              engage_progress_container_body_item-delete
+              is-elevated-layer
+            "
           >
             <i class="mdi mdi-trash-can" />
           </div>
@@ -101,17 +114,37 @@
             </div>
           </div>
 
-          <div
-            class="engage_progress_container-body-text"
-            :class="{ 'is-elevated-layer': isEditing }"
-          >
-            <b-card :title="part.title" style="padding: 10px" v-if="!isEditing">
-              <b-card-text>
-                {{ part.description }}
+          <div class="engage_progress_container-body-text">
+            <b-card v-if="!isEditing">
+              <b-card-title
+                v-b-tooltip="{
+                  title: part.title ? part.title : '',
+                  placement: 'topright',
+                  variant: 'light',
+                }"
+                :disabled="isTextOverArea(part.id)"
+                :class="{ 'is-elevated-layer': isEditing }"
+                style="
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                "
+                >{{ part.title }}</b-card-title
+              >
+              <b-card-text
+                :id="`engage_progress_container-body-text-area-${part.id}`"
+                v-b-tooltip="{
+                  title: part.description ? part.description : '',
+                  placement: 'topright',
+                  variant: 'light',
+                }"
+                :ref="`engage_progress_container-body-text-area-${part.id}`"
+              >
+                {{ part.description ? part.description : $t("No description") }}
               </b-card-text>
             </b-card>
 
-            <b-card style="padding: 10px" v-else>
+            <b-card style="padding: 10px; height: 150px" v-else>
               <b-card-title>
                 <input
                   type="text"
@@ -122,6 +155,7 @@
 
               <div class="form-group">
                 <textarea
+                  trigger="hover"
                   :placeholder="part.description"
                   v-model="editItems[index].description"
                   class="form-control rounded-0"
@@ -166,12 +200,23 @@ export default {
   },
   data: () => {
     return {
+      loading: false,
+      defaultItem: {
+        description: "description",
+        id: "1",
+        reward: "reward",
+        title: "title",
+        requiredScore: 0,
+        userCount: 0,
+        users: [],
+        _clickedIndex: null,
+      },
       editItems: [
         {
-          description: null,
+          description: "description",
           id: "1",
-          reward: null,
-          title: "default",
+          reward: "reward",
+          title: "title",
           requiredScore: 0,
           userCount: 0,
           users: [],
@@ -182,6 +227,13 @@ export default {
     };
   },
   computed: {
+    innerOverlayOpen() {
+      if (this.items.length > 0) {
+        return this.items.some((x) => x._clickedIndex) || this.isEditing;
+      } else {
+        return this.editItems.some((x) => x._clickedIndex) || this.isEditing;
+      }
+    },
     getProgressPart() {
       if (this.items.length == 0) {
         const model = new MilestoneModel().deserialize(this.editItems[0]);
@@ -207,9 +259,21 @@ export default {
     },
   },
   methods: {
+    isTextOverArea(id) {
+      const el = document.getElementById(
+        `engage_progress_container-body-text-area-${id}`
+      );
+      if (!el) return;
+      console.log(el.clientHeight);
+      return el.clientHeight > 150;
+    },
     removeItem(part) {
       this.editItems = this.editItems.filter((item) => item.id !== part.id);
       console.log(part);
+      if (this.editItems.length === 0) {
+        this.editItems = [{ ...this.defaultItem }];
+      }
+      console.log(this.editItems);
       this.$store.dispatch("milestone/delete", part);
     },
     toggleCreateForm(previous) {
@@ -245,23 +309,51 @@ export default {
             description: item.description,
           };
         });
+      } else {
+        this.editItems = [{ ...this.defaultItem }];
       }
 
       this.isEditing = !this.isEditing;
       console.log("toggle edit!");
     },
     async saveEdits() {
+      console.log(this.editItems);
+      this.loading = true;
+      const editItems = this.editItems.map((item) => {
+        return {
+          id: item.id,
+          requiredScore: item.requiredScore,
+          reward: item.reward,
+          title: item.title,
+          description: item.description,
+        };
+      });
+
       const updateOrDeleteForm = new GQLForm({
-        ...this.editItems,
+        ...editItems,
       });
       await this.$store.dispatch(
         "milestone/updateOrDeleteMany",
         updateOrDeleteForm
       );
-      this.isEditing = !this.isEditing;
+      /* else {
+        //Creating via default object
+        await this.$store.dispatch(
+          "milestone/create",
+          new GQLForm({
+            title: this.editItems[0].title,
+            description: this.editItems[0].description,
+            requiredScore: this.editItems[0].requiredScore,
+            reward: this.editItems[0].reward,
+          })
+        );
+      } */
+
       await this.$store.dispatch("milestone/findAll", {
         force: true,
       });
+      this.isEditing = !this.isEditing;
+      this.loading = false;
     },
   },
 };
@@ -358,7 +450,10 @@ export default {
 
 .engage_progress_container-body-text {
   box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
+  overflow: hidden;
   margin: 20px;
+  min-height: 140px;
+  max-height: 140px;
 }
 
 .engage_progress_container-header-edit-text {
@@ -397,10 +492,10 @@ export default {
   height: 100%;
   margin: auto;
   align-self: center;
-  display: flex;
-  flex-direction: row;
   justify-content: flex-start;
   background: #fff;
+  display: flex;
+  flex-direction: row;
 }
 
 .engage-header-edit-icon:before {
@@ -415,5 +510,13 @@ export default {
 .engage-header-edit-item-icon {
   color: #4294d0;
   transform: translate(0px, -12px);
+}
+
+.engage_progress_container_header-action-edit-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  place-content: center;
+  height: 100%;
 }
 </style>

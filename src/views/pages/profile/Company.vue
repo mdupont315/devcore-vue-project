@@ -21,7 +21,7 @@
                 <b-form-input
                   id="name"
                   v-model="form.name"
-                  v-validate="'required|min:4'"
+                  v-validate="'required|min:2'"
                   :disabled="form.busy"
                   :placeholder="$t('Name')"
                   type="text"

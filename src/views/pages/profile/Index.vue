@@ -28,7 +28,7 @@
                 <b-form-input
                   id="firstName"
                   v-model="form.firstName"
-                  v-validate="'required|min:4'"
+                  v-validate="'required|min:2'"
                   :disabled="form.busy"
                   :placeholder="$t('First name')"
                   type="text"
@@ -49,7 +49,7 @@
                 <b-form-input
                   id="lastName"
                   v-model="form.lastName"
-                  v-validate="'required|min:4'"
+                  v-validate="'required|min:2'"
                   :disabled="form.busy"
                   :placeholder="$t('Last name')"
                   type="text"

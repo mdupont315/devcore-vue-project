@@ -17,6 +17,7 @@
 import { mapGetters } from "vuex";
 import { loadApp } from "@/lib/utils";
 import UpdateFound from "./components/UpdateFound";
+import gql from "graphql-tag";
 
 const defaultLayout = "default-layout";
 export default {
@@ -43,23 +44,23 @@ export default {
     await loadApp();
     this.loaded = true;
   },
-  // apollo: {
-  //   $subscribe: {
-  //     subscribed: {
-  //       query: gql`
-  //         subscription notificationSubscription {
-  //           newNotification{
-  //             type
-  //             payload
-  //           }
-  //         }
-  //       `,
-  //       result({ data }) {
-  //         console.log(data);
-  //       }
-  //     }
-  //   }
-  // },
+  apollo: {
+    $subscribe: {
+      subscribed: {
+        query: gql`
+          subscription notificationSubscription {
+            newNotification{
+              type
+              payload
+            }
+          }
+        `,
+        result({ data }) {
+          console.log(data);
+        }
+      }
+    }
+  },
   methods: {
     overlayClicked($event) {
       this.$store.dispatch("app/overlayClicked", $event);

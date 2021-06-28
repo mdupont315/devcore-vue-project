@@ -201,6 +201,7 @@ export default {
 .engage_progress_item_container {
   height: 100%;
   width: 100%;
+	max-width: 85%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

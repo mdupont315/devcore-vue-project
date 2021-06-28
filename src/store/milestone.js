@@ -29,14 +29,19 @@ const getters = {
 
 const actions = {
   async create(context, form) {
-    const result = await form.mutate({
-      mutation: MILESTONE.create
-    });
-    const role = new Milestone().deserialize(result.data.milestoneCreate);
-    await context.dispatch("findAll", {
-      force: true
-    });
-    return role;
+    form.busy = true;
+    try {
+      const result = await form.mutate({
+        mutation: MILESTONE.create
+      });
+      const role = new Milestone().deserialize(result.data.milestoneCreate);
+      await context.dispatch("findAll", {
+        force: true
+      });
+      return role;
+    } finally {
+      form.busy = false;
+    }
   },
 
   async updateOrDeleteMany(context, form) {
@@ -115,7 +120,7 @@ const mutations = {
   REMOVE_ITEM(state, value) {
     console.log(value);
     const index = state.all.findIndex(el => el.id === value.id);
-    if (index > -1) {
+    if (index > -1 && state.all.length > 0) {
       state.all.splice(index, 1);
       state.all = [...state.all];
     }
