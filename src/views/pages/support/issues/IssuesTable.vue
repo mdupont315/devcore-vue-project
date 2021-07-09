@@ -1,5 +1,17 @@
 <template>
-  <div :key="refreshKey">
+  <div>
+    <div
+      v-if="currentItem"
+      class="overlay"
+      :class="{ 'top-all': this.showInnerOverlayOnTop }"
+      @click="overlayClick"
+    ></div>
+    <inner-overlay
+      v-if="isEditing"
+      @click="toggleOverlay"
+      class="inner-overlay-create"
+    >
+    </inner-overlay>
     <div class="text-right float-right">
       <confirm-button
         variant="transparent text-danger"
@@ -21,16 +33,18 @@
       :show-empty="true"
       :empty-text="$t('There are no records for the given criteria')"
       :tbody-tr-class="(item, type) => (isRowEditing(item) ? 'editing' : '')"
+      @row-unhovered="nullifyHoverRowId"
+      @row-hovered="setHoverRowId(item, $event)"
+      ref="issueEffect_table"
     >
       <template v-slot:table-colgroup>
         <col style="width: 10%" />
         <col style="width: 10%" />
         <col style="width: 10%" />
-        <col style="width: 32%" />
-        <col style="width: 8%" />
-        <col style="width: 8%" />
-        <col style="width: 8%" />
-        <col style="width: 14%" />
+        <col style="width: 35%" />
+        <col style="width: 10%" />
+        <col style="width: 15%" />
+        <col style="width: 10%" />
       </template>
       <template v-slot:empty="scope">
         <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -58,9 +72,11 @@
         </div></template
       >
       <!-- description -->
-      <template v-slot:cell(description)="row">{{
-        row.item.description
-      }}</template>
+      <template v-slot:cell(description)="row">
+        <div>
+          {{ row.item.description }}
+        </div></template
+      >
 
       <!-- loss -->
       <template v-slot:cell(loss)="row">
@@ -69,106 +85,92 @@
         >
       </template>
 
-      <!-- checked -->
-      <template v-slot:cell(checked)="row">
-        <div>
-          <b-form-checkbox
-            v-model="row.item.checked"
-            @input="checkItem(row.item)"
-            checked
-            :value="true"
-            :unchecked-value="false"
-          ></b-form-checkbox>
-        </div>
-      </template>
-
       <!-- effect -->
+
       <template v-slot:cell(effect)="row" class="actions">
-        <div class="buttons" style="justify-content: flex-start">
-          <b-button
-            size="xs"
-            variant="action"
-            class="btn-primary btn-block text-uppercase text-bold"
-            style="font-size: 1.2rem; 3px 10px;white-space:nowrap;min-width:min-content;max-width:91px;display:flex;justify-content:center"
-            >ADD</b-button
+        <div>
+          <div v-if="hoverRowId !== row.item.id">
+            <div v-if="row.item.effectTemplateId">
+              {{ getTemplateName(row.item.effectTemplateId) }}
+            </div>
+            <div v-else>No effect</div>
+          </div>
+          <div
+            v-else
+            class="issueEffect-actions__container"
+            :class="{ 'show-when-hovered': isCurrentRowActive(row.item) }"
           >
+            <issuesEffectAdd
+              :issue="row.item"
+              :items="getIssueEffectTemplates"
+              @selectedTemplate="setTemplate"
+              @toggle="toggleItem"
+              :openState="issueEffectAddOpen"
+            ></issuesEffectAdd>
+          </div>
         </div>
       </template>
 
       <!-- actions -->
       <template v-slot:cell(actions)="row" class="text-right">
-        <div class="text-right p-1 px-0" style="display: flex">
-          <!-- feedback -->
-          <confirm-button
-            variant="btn-white"
-            size="md"
-            @confirm="() => deleteItem(row.item)"
+        <div
+          class="text-right p-1 px-0"
+          style="display: flex; align-items: center"
+        >
+          <!-- Issue Effect Actions -->
+          <div
+            class="issueEffect-actions__container"
+            :class="{ 'show-when-hovered': isCurrentRowActive(row.item) }"
           >
-            <div class="text-center">
-              <b-tooltip
-                :target="() => $refs.issueEffectFeedbackIcon"
-                variant="primary"
-                ><span class="issue-effect-tooltip-title">{{
-                  $t("issueEffectFeedback")
-                }}</span></b-tooltip
-              >
-            </div>
-            <icoIssueFeedback
-              ref="issueEffectFeedbackIcon"
-              class="issue-Effect__FeedbackIcon"
-              width="40px"
-              height="40px"
-            ></icoIssueFeedback>
-          </confirm-button>
+            <!-- feedback -->
+            <issuesEffectFeedback
+              :issue="row.item"
+              @toggle="toggleItem"
+              @save="saveItem"
+              @close="issueEffectFeedbackOpen = false"
+              :openState="issueEffectFeedbackOpen"
+            ></issuesEffectFeedback>
 
-          <!-- edit -->
-          <confirm-button
-            variant="btn-white"
-            size="md"
-            @confirm="() => deleteItem(row.item)"
-          >
-            <div class="text-center">
-              <b-tooltip
-                :target="() => $refs.issueEffectEditIcon"
-                variant="primary"
-                ><span class="issue-effect-tooltip-title">{{
-                  $t("issueEffectEdit")
-                }}</span></b-tooltip
-              >
-            </div>
-
-            <icoIssueEdit
-              ref="issueEffectEditIcon"
-              class="issue-Effect__EditIcon"
-              width="40px"
-              height="40px"
-            ></icoIssueEdit>
-          </confirm-button>
-
+            <!-- edit -->
+            <issuesEffectComment
+              :issue="row.item"
+              @toggle="toggleItem"
+              @save="saveItem"
+              @close="issueEffectCommentOpen = false"
+              :openState="issueEffectCommentOpen"
+            ></issuesEffectComment>
+          </div>
           <!-- trashcan -->
-          <confirm-button
-            variant="btn-white"
-            size="md"
-            @confirm="() => deleteItem(row.item)"
-          >
-            <div class="text-center">
-              <b-tooltip
-                :target="() => $refs.issueEffectRemoveIcon"
-                variant="primary"
-                ><span class="issue-effect-tooltip-title">{{
-                  $t("issueEffectRemove")
-                }}</span></b-tooltip
-              >
-            </div>
-            <icoIssueTrashcan
-              ref="issueEffectRemoveIcon"
-              class="issue-Effect__RemoveIcon"
-              width="40px"
-              height="40px"
-            ></icoIssueTrashcan>
-          </confirm-button>
-
-          <!--    <i class="mdi mdi-trash-can"></i> -->
+          <div class="issueEffect-remove__container">
+            <confirm-button
+              variant="btn-white"
+              size="md"
+              @confirm="() => deleteItem(row.item)"
+              @showConfirm="toggleIssueRemoveOpen"
+              @cancel="overlayClick"
+            >
+              <div class="text-center">
+                <b-tooltip
+                  :target="() => $refs.issueEffectRemoveIcon"
+                  variant="primary"
+                  ><span class="issue-effect-tooltip-title">{{
+                    $t("issueEffectRemove")
+                  }}</span></b-tooltip
+                >
+              </div>
+              <icoIssueTrashcan
+                @click="toggleIssueRemove(row.item)"
+                ref="issueEffectRemoveIcon"
+                :class="{
+                  removeIcon__active:
+                    editType === 'issueRemove' && !isCurrentRowActive(row.item),
+                }"
+                class="issue-Effect__RemoveIcon"
+                width="40px"
+                height="40px"
+              ></icoIssueTrashcan>
+            </confirm-button>
+          </div>
         </div>
       </template>
     </b-table>
@@ -177,15 +179,19 @@
 <script>
 import GQLForm from "@/lib/gqlform";
 import moment from "moment";
-import icoIssueFeedback from "@/assets/img/icons/svg/ico-issue-feedback.svg?inline";
-import icoIssueEdit from "@/assets/img/icons/svg/ico-issue-edit.svg?inline";
 import icoIssueTrashcan from "@/assets/img/icons/svg/ico-issue-trashcan.svg?inline";
+
+import issuesEffectAdd from "./effect/IssuesTemplateAdd.vue";
+import issuesEffectFeedback from "./effect/IssuesTemplateFeedback.vue";
+import issuesEffectComment from "./effect/IssuesTemplateComment.vue";
+import { /* mapState, */ mapGetters } from "vuex";
 
 export default {
   components: {
-    icoIssueFeedback,
-    icoIssueEdit,
     icoIssueTrashcan,
+    issuesEffectAdd,
+    issuesEffectFeedback,
+    issuesEffectComment,
   },
   props: {
     items: {
@@ -204,21 +210,56 @@ export default {
       default: () => false,
     },
   },
-  /* 	mounted(){
-		this.setIssues();
-	}, */
+
   data: () => {
     return {
+      selectedTemplate: null,
+      hoverRowId: null,
+      rewardActiveIndex: 0,
+      issueEffectForm: {
+        id: null,
+        feedback: null,
+        comment: null,
+      },
+      rewardablePoints: [0, 5, 10, 25, 50, 100],
+      editType: null,
+      issueEffectFeedbackOpen: false,
+      issueEffectCommentOpen: false,
+      issueEffectAddOpen: false,
+      issueRemoveOpen: false,
       deleting: false,
       currentItem: null,
-      currentRowDetails: null,
-      currentDetailsItem: null,
       form: {},
       issues: [],
-      refreshKey: Math.random(),
+      issueEffectTemplateActiveIndex: null,
     };
   },
+
   computed: {
+    ...mapGetters({
+      showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
+      user: "auth/user",
+      effectTemplates: "issueEffect/all",
+    }),
+
+    getIssueEffectTemplates: {
+      get() {
+
+        console.log(this.effectTemplates);
+        return this.effectTemplates ?? [];
+      },
+    },
+
+    isEditing() {
+      if (this.editType === "issueFeedback") {
+        return this.issueEffectFeedbackOpen;
+      } else if (this.editType === "issueComment") {
+        return this.issueEffectCommentOpen;
+      } else if (this.editType === "issueAdd") {
+        return this.issueEffectAddOpen;
+      }
+      return false;
+    },
     fields: {
       get() {
         return [
@@ -245,11 +286,6 @@ export default {
             sortable: true,
           },
           {
-            key: "checked",
-            label: this.$t("Checked"),
-            sortable: true,
-          },
-          {
             key: "effect",
             label: this.$t("Issue effect"),
             sortable: true,
@@ -260,7 +296,160 @@ export default {
       },
     },
   },
+  async mounted() {
+    await this.$store.dispatch("issueEffect/findAll");
+  },
   methods: {
+    nullifyHoverRowId() {
+      if (
+        this.issueEffectAddOpen ||
+        this.issueEffectCommentOpen ||
+        this.issueEffectFeedbackOpen
+      ) {
+        return;
+      }
+      this.hoverRowId = null;
+    },
+    setHoverRowId(row, issue) {
+      if (issue && issue.id) {
+        this.hoverRowId = issue.id;
+      }
+    },
+    getTemplateName(id) {
+      const template = this.getIssueEffectTemplates.find((x) => x.id == id);
+
+      if (template) return template.title;
+      return "no effect";
+    },
+    isCurrentRowActive(item) {
+      if (item && this.currentItem) {
+        return item.id !== this.currentItem.id;
+      }
+      return true;
+    },
+
+    toggleIssueRemoveOpen(openState) {
+      if (openState) this.editType = "issueRemove";
+      if (!openState) this.editType = "";
+      this.issueRemoveOpen = openState;
+    },
+    closeOtherIssueEffectModals(type) {
+      this.issueEffectCommentOpen = false;
+      this.issueEffectFeedbackOpen = false;
+      this.issueEffectAddOpen = false;
+      this.issueRemoveOpen = false;
+      switch (type) {
+        case "issueRemove":
+          this.issueRemoveOpen = true;
+          break;
+        case "issueAdd":
+          this.issueEffectAddOpen = true;
+          break;
+        case "issueFeedback":
+          this.issueEffectFeedbackOpen = true;
+          break;
+        case "issueComment":
+          this.issueEffectCommentOpen = true;
+          break;
+      }
+    },
+    toggleOverlay() {
+      console.log("overlay");
+      this.editType === "issueComment"
+        ? this.toggleIssueComment()
+        : this.toggleIssueFeedback();
+    },
+    toggleIssueRemove(item) {
+      console.log(this.issueRemoveOpen);
+      this.editType = !this.issueRemoveOpen ? "issueRemove" : null;
+      if (!this.issueRemoveOpen) this.toggleItem(item, "issueRemove");
+    },
+
+    toggleIssueFeedback(item) {
+      this.editType = !this.issueEffectFeedbackOpen ? "issueFeedback" : null;
+      console.log(this.editType);
+      if (!this.issueEffectFeedbackOpen) this.toggleItem(item, "issueFeedback");
+    },
+
+    toggleIssueComment(item) {
+      console.log(this.editType);
+      this.editType = !this.issueEffectCommentOpen ? "issueComment" : null;
+      if (!this.issueEffectCommentOpen) this.toggleItem(item, "issueComment");
+      console.log(this.editType);
+    },
+    async setTemplate(input) {
+      const templateId = input.id;
+      const { id } = this.currentItem;
+      const newTemplate = new GQLForm({
+        id,
+        templateId,
+      });
+
+      const response = await this.$store.dispatch(
+        "issue/setEffectTemplate",
+        newTemplate
+      );
+      console.log(response);
+    },
+    async saveItem(input) {
+      console.log(input);
+    },
+    async saveIssueFeedback() {
+      /*      const { id } = this.currentItem;
+      const value = rewardablePoints[rewardActiveIndex];
+      const { feedback } = this.issueFeedbackForm;
+      console.log(this.user);
+      const issueFeedbackForm = new GQLForm({
+        id,
+        value,
+        feedback,
+      }); */
+    },
+    async saveIssueComment() {
+      /*    const { comment } = this.issueFeedbackForm;
+      const { id } = this.currentItem;
+
+      const issueCommentForm = new GQLForm({
+        id,
+        comment,
+      }); */
+    },
+    toggleItem(item, type) {
+      this.closeOtherIssueEffectModals(type);
+
+      if (
+        !item ||
+        (this.currentItem &&
+          this.currentItem.id === item.id &&
+          !this.issueEffectAddOpen &&
+          !this.issueEffectFeedbackOpen &&
+          !this.issueEffectCommentOpen &&
+          this.editType !== "issueRemove")
+      ) {
+        this.currentItem = null;
+      } else {
+        this.currentItem = item;
+      }
+    },
+    overlayClick() {
+      if (
+        this.currentItem &&
+        !this.issueEffectCommentOpen &&
+        !this.issueEffectFeedbackOpen &&
+        !this.issueEffectAddOpen &&
+        !this.issueRemoveOpen
+      ) {
+        this.toggleItem(null);
+      } else {
+        this.editType = "";
+				this.hoverRowId = null;
+        this.issueEffectCommentOpen = false;
+        this.issueEffectFeedbackOpen = false;
+        this.issueEffectAddOpen = false;
+        this.issueRemoveOpen = false;
+      }
+    },
+
     formatDate(time) {
       return time ? moment(time).format("DD/MM/YYYY HH:mm:ss") : "N/A";
     },
@@ -280,27 +469,24 @@ export default {
       this.$parent.$emit("deletedAll", {});
     },
     async deleteItem(item) {
-      console.log(item);
       const deleteForm = new GQLForm({
         id: item.id,
       });
       await this.$store.dispatch("issue/delete", deleteForm);
-      console.log(item);
-      //this.refreshKey = Math.random();
       this.$parent.$emit("deleted", item);
     },
     async checkItem(item) {
-      console.log(item);
       const checkForm = new GQLForm({
         id: item.id,
         checked: item.checked,
       });
-      console.log(checkForm);
       await this.$store.dispatch("issue/check", checkForm);
     },
   },
 };
 </script>
+<style>
+</style>
 <style scoped>
 .issue-effect-tooltip-title {
   font-size: 9px;
@@ -310,19 +496,56 @@ export default {
   text-transform: uppercase;
 }
 
-.issue-Effect__FeedbackIcon:hover,
-.issue-Effect__EditIcon:hover,
 .issue-Effect__RemoveIcon:hover {
   background: #4294d0;
   border-radius: 50%;
   outline: none;
+  cursor: pointer;
 }
 
-.issue-Effect__FeedbackIcon,
-.issue-Effect__EditIcon,
 .issue-Effect__RemoveIcon {
   border-radius: 50%;
   outline: none;
   fill: #000;
+}
+
+.issueEffect_add_form_templates_item-edit {
+  flex-grow: 1;
+  font-weight: 400;
+  text-decoration: underline;
+}
+
+.issue-Effect__RemoveIcon:hover path {
+  fill: #fff;
+  background: #4294d0;
+}
+
+.inner-overlay-create {
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  position: fixed;
+}
+
+.issue-Effect__RemoveIcon.removeIcon__active {
+  position: relative;
+  z-index: 999;
+  background: #4294d0;
+}
+.issue-Effect__RemoveIcon.removeIcon__active > path {
+  fill: #fff;
+}
+
+.issueEffect-actions__container {
+  display: flex;
+}
+
+@media (pointer: fine) {
+  .b-table > tbody > tr:not(:hover) .show-when-hovered {
+    visibility: hidden;
+  }
+  .b-table > tbody > tr:hover .show-when-not-hovered {
+    visibility: hidden;
+  }
 }
 </style>

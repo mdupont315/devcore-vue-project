@@ -81,6 +81,12 @@
           <!-- actions -->
           <template v-slot:cell(actions)="row" class="actions">
             <div v-if="isRowEditing(row)" class="text-right buttons">
+							   <inner-overlay
+                  v-if="showIdeaPopover"
+                  @click="showIdeaPopover = !showIdeaPopover"
+									style="z-index:1"
+                >
+                </inner-overlay>
               <div class="d-flex" style="margin-top: 2px">
                 <b-button
                   :ref="`btnNewIdea${row.item.rowId}`"
@@ -100,7 +106,7 @@
                   ref="popover"
                   :target="() => $refs[`btnNewIdea${row.item.rowId}`]"
                   triggers="click"
-									:show.sync="showIdeaPopover"
+                  :show.sync="showIdeaPopover"
                   placement="bottom"
                   class="form-popover"
                 >
@@ -126,7 +132,13 @@
                 <b-button
                   size="xs"
                   variant="transparent"
-                  class="btn-link text-gray btn-block text-uppercase text-bold shadow-0"
+                  class="
+                    btn-link
+                    text-gray
+                    btn-block
+                    text-uppercase text-bold
+                    shadow-0
+                  "
                   style="
                     font-size: 1rem;
                     padding: 3px;
@@ -151,7 +163,11 @@
                 v-if="$can('process/process/manage')"
                 size="xs"
                 variant="action"
-                class="btn-light btn-expand btn-block text-uppercase text-bold m-0"
+                class="
+                  btn-light btn-expand btn-block
+                  text-uppercase text-bold
+                  m-0
+                "
                 style="font-size: 1.2rem; 3px 10px;white-space: nowrap;"
                 @click="showDetails(row)"
                 >{{
@@ -277,7 +293,6 @@ export default {
   },
 
   methods: {
-
     getTotalIssueLoss(item) {
       let total = 0;
       if (item.pathIssues) {
@@ -451,7 +466,7 @@ export default {
       );
     },
     newIdea(row) {
-   /*    this.idea = {};
+      /*    this.idea = {};
       const { stageId, operationId, phaseId } = this.uniqueProcessPathIds[
         row.index
       ];
@@ -534,4 +549,6 @@ export default {
   display: flex;
   align-items: center;
 }
+
+
 </style>

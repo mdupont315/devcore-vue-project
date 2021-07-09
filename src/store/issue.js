@@ -1,5 +1,6 @@
 import { ISSUE } from "@/graphql";
 import { Issue } from "@/models";
+import { IssueTemplate } from "@/models";
 import { queryToPromise } from "../lib/utils";
 import { apolloClient } from "../plugins/apollo/client";
 
@@ -76,6 +77,19 @@ const actions = {
     });
     return role;
   },
+
+  async setEffectTemplate(context, form) {
+    console.log("FORM");
+    const result = await form.mutate({
+      mutation: ISSUE.setEffectTemplate
+    });
+    console.log(result);
+    const issue = new Issue().deserialize(result.data.issueEffectTemplate);
+    context.commit("SET_ITEM", new Issue().deserialize(issue));
+    console.log(issue);
+    return result.data.issueEffectTemplate;
+  },
+
 
   async delete(context, form) {
     context.commit("REMOVE_ITEM", form);

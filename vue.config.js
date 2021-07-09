@@ -4,7 +4,7 @@ const path = require("path");
 const webpack = require("webpack");
 
 const appUrls = {
-  dev: "https://127.0.0.1/graphql",
+  dev: process.env.VUE_APP_GRAPHQL_ENDPOINT,
   proxy: "https://devcore.app/graphql",
   prod: "https://devcore.app/graphql"
 };

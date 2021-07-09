@@ -19,6 +19,7 @@ export const ISSUE_FRAGMENT = gql`
     moneyValue
     totalValue
     checked
+    effectTemplateId
     project {
       id
       name
@@ -138,6 +139,14 @@ export const ISSUE = {
     mutation issueCheck($input: IssueCheckInput!) {
       issueCheck(input: $input)
     }
+  `,
+  setEffectTemplate: gql`
+    mutation issueEffectTemplate($input: IssueTemplateInput) {
+      issueEffectTemplate(input: $input) {
+        ...issueFullFields
+      }
+    }
+    ${ISSUE_FULL_FRAGMENT}
   `,
   deleteMany: gql`
     mutation deleteMany($ids: [ID!]!) {

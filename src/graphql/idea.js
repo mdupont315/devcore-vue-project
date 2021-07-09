@@ -16,20 +16,8 @@ export const IDEA_FRAGMENT = gql`
     totalEvaluations
     evaluationSum
     anonymous
-    #   stageId,
-    #   operationId,
-    #   phaseId,
-    #   toolId,
     createdAt
     updatedAt
-    #   gains,
-    #   losses,
-    #   hasReviews,
-    #   toolId,
-    #   tool{
-    #       id,
-    #       name
-    #   }
     stats {
       problems
       improvements

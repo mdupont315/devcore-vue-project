@@ -9,10 +9,6 @@
     <b-card no-body class="shadow-sm mb-3 bg-white border stage-card">
       <div v-if="item">
         <b-card-header class="header">
-          <!-- <div class="tools">
-              <span class="expander" @click="toggleCollapse"></span>
-            </div>-->
-
           <div
             class="title pl-0"
             style="

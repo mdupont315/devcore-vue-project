@@ -14,6 +14,8 @@
               :placeholder="$t('Idea title')"
               type="text"
               name="title"
+							autocomplete="off"
+							autofocus
               :state="$validateState('title', form)"
             ></b-form-input>
             <label for="title">{{ $t("Idea title") }}</label>
