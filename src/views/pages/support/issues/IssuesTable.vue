@@ -77,23 +77,22 @@
           {{ row.item.description }}
         </div></template
       >
-
       <!-- loss -->
       <template v-slot:cell(loss)="row">
-        <span :class="{ 'text-danger': row.item.moneyTotalValue != 0 }">
-          {{ $currency(row.item.moneyTotalValue / 100 || 0) }}</span
+        <span :class="{ 'text-danger': row.item.effectedMoneyTotalValue != 0 }">
+          {{ getEffectedMoneyTotal(row.item) }}</span
         >
       </template>
 
       <!-- effect -->
-
-      <template v-slot:cell(effect)="row" class="actions">
-        <div>
+      <template v-slot:cell(effect)="row" class="actions" v-if="$can('support/issueEffect/manage')">
+        <b-spinner v-if="isLoading" />
+        <div v-else>
           <div v-if="hoverRowId !== row.item.id">
-            <div v-if="row.item.effectTemplateId">
-              {{ getTemplateName(row.item.effectTemplateId) }}
+            <div v-if="row.item.effect">
+              {{ getEffectTitle(row.item.effect) }}
             </div>
-            <div v-else>No effect</div>
+            <div v-else>{{ $t("No Issue Effect") }}</div>
           </div>
           <div
             v-else
@@ -103,9 +102,11 @@
             <issuesEffectAdd
               :issue="row.item"
               :items="getIssueEffectTemplates"
-              @selectedTemplate="setTemplate"
+              @setTemplate="setTemplate"
+              @unsetTemplate="unsetTemplate"
               @toggle="toggleItem"
               :openState="issueEffectAddOpen"
+              :tableWidth="tableWidth"
             ></issuesEffectAdd>
           </div>
         </div>
@@ -214,6 +215,7 @@ export default {
   data: () => {
     return {
       selectedTemplate: null,
+      isLoading: false,
       hoverRowId: null,
       rewardActiveIndex: 0,
       issueEffectForm: {
@@ -226,12 +228,14 @@ export default {
       issueEffectFeedbackOpen: false,
       issueEffectCommentOpen: false,
       issueEffectAddOpen: false,
+      issueEffectAdd: false,
       issueRemoveOpen: false,
       deleting: false,
       currentItem: null,
       form: {},
       issues: [],
       issueEffectTemplateActiveIndex: null,
+      tableWidth: null,
     };
   },
 
@@ -244,7 +248,6 @@ export default {
 
     getIssueEffectTemplates: {
       get() {
-
         console.log(this.effectTemplates);
         return this.effectTemplates ?? [];
       },
@@ -297,9 +300,24 @@ export default {
     },
   },
   async mounted() {
+    this.isLoading = true;
+    console.log("MOUNTED");
     await this.$store.dispatch("issueEffect/findAll");
+    await this.$store.dispatch("companyRole/findAll");
+
+    this.tableWidth = this.$refs.issueEffect_table?.$el.clientWidth ?? 1582;
+    this.isLoading = false;
   },
   methods: {
+    getEffectedMoneyTotal(item) {
+      return this.$currency(item.effectedMoneyTotalValue / 100 || 0);
+    },
+    getEffectTitle(item) {
+      if (item && item.title) {
+        return item.title;
+      }
+      return this.$t("No Issue Effect");
+    },
     nullifyHoverRowId() {
       if (
         this.issueEffectAddOpen ||
@@ -314,12 +332,6 @@ export default {
       if (issue && issue.id) {
         this.hoverRowId = issue.id;
       }
-    },
-    getTemplateName(id) {
-      const template = this.getIssueEffectTemplates.find((x) => x.id == id);
-
-      if (template) return template.title;
-      return "no effect";
     },
     isCurrentRowActive(item) {
       if (item && this.currentItem) {
@@ -377,8 +389,19 @@ export default {
       if (!this.issueEffectCommentOpen) this.toggleItem(item, "issueComment");
       console.log(this.editType);
     },
-    async setTemplate(input) {
-      const templateId = input.id;
+    async setTemplate(templateId) {
+      const { id } = this.currentItem;
+      const newTemplate = new GQLForm({
+        id,
+        templateId,
+      });
+      console.log("newTemplate");
+      console.log(newTemplate);
+
+      await this.$store.dispatch("issue/setEffectTemplate", newTemplate);
+      await this.$store.dispatch("issueEffect/findAll");
+    },
+    async unsetTemplate(templateId) {
       const { id } = this.currentItem;
       const newTemplate = new GQLForm({
         id,
@@ -386,10 +409,11 @@ export default {
       });
 
       const response = await this.$store.dispatch(
-        "issue/setEffectTemplate",
+        "issue/unsetEffectTemplate",
         newTemplate
       );
-      console.log(response);
+      await this.$store.dispatch("issueEffect/findAll");
+      return response;
     },
     async saveItem(input) {
       console.log(input);
@@ -442,7 +466,7 @@ export default {
         this.toggleItem(null);
       } else {
         this.editType = "";
-				this.hoverRowId = null;
+        this.hoverRowId = null;
         this.issueEffectCommentOpen = false;
         this.issueEffectFeedbackOpen = false;
         this.issueEffectAddOpen = false;

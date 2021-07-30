@@ -5,6 +5,7 @@ import BootstrapVue from "bootstrap-vue";
 import router from "./router";
 import store from "./store";
 import i18n from "./i18n";
+import VueTheMask from 'vue-the-mask'
 
 import DefaultLayout from "./views/layouts/DefaultLayout";
 import ExternalLayout from "./views/layouts/ExternalLayout";
@@ -48,7 +49,7 @@ gqlform.apolloClients = apolloProvider.clients;
 Vue.use(VueApollo);
 Vue.use(BootstrapVue);
 /* Vue.use(wysiwyg, {}) */
-
+Vue.use(VueTheMask)
 Vue.config.productionTip = false;
 // layout
 Vue.component("default-layout", DefaultLayout);

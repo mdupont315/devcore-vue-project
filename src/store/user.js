@@ -81,6 +81,7 @@ const actions = {
   },
 
   async findAll(context, { filter = null, force = false } = {}) {
+    console.log("USERFIND ALL");
     if (context.getters.all.length === 0 || force) {
       filter = filter || {
         data: {
@@ -104,6 +105,7 @@ const actions = {
           return new User().deserialize(cr);
         });
         context.commit("SET_ALL", results);
+        console.log(results);
         return results;
       } finally {
         filter.busy = false;

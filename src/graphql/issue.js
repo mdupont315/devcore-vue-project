@@ -1,6 +1,7 @@
 import gql from "graphql-tag";
 import { RESOURCE_FRAGMENT } from "./resource";
 import { META_FRAGMENT } from "./meta";
+import { ISSUE_EFFECT_FRAGMENT } from "./effect";
 // eslint-disable-next-line
 export const ISSUE_FRAGMENT = gql`
   fragment issueFields on Issue {
@@ -71,6 +72,9 @@ export const ISSUE_FRAGMENT = gql`
         }
       }
     }
+    effect {
+      ...issueEffectFields
+    }
     files {
       ...resourceFields
     }
@@ -80,6 +84,7 @@ export const ISSUE_FRAGMENT = gql`
   }
   ${META_FRAGMENT}
   ${RESOURCE_FRAGMENT}
+  ${ISSUE_EFFECT_FRAGMENT}
 `;
 
 export const ISSUE_FULL_FRAGMENT = gql`
@@ -141,12 +146,17 @@ export const ISSUE = {
     }
   `,
   setEffectTemplate: gql`
-    mutation issueEffectTemplate($input: IssueTemplateInput) {
-      issueEffectTemplate(input: $input) {
+    mutation setEffectTemplate($input: IssueTemplateInput) {
+      setEffectTemplate(input: $input) {
         ...issueFullFields
       }
     }
     ${ISSUE_FULL_FRAGMENT}
+  `,
+  unsetEffectTemplate: gql`
+    mutation unsetEffectTemplate($input: IssueTemplateInput) {
+      unsetEffectTemplate(input: $input)
+    }
   `,
   deleteMany: gql`
     mutation deleteMany($ids: [ID!]!) {

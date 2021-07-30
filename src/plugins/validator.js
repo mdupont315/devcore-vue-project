@@ -77,6 +77,7 @@ function getErrorMessage(vue, ref, form = null) {
       return errorMessage.replace(re, replaceText);
     }
 
+    console.log(errorMessage);
     return errorMessage;
   } else {
     return form && form.getError(ref) ? form.getError(ref).message : null;

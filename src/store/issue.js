@@ -79,15 +79,30 @@ const actions = {
   },
 
   async setEffectTemplate(context, form) {
-    console.log("FORM");
     const result = await form.mutate({
-      mutation: ISSUE.setEffectTemplate
+      mutation: ISSUE.setEffectTemplate,
+      variables: {
+        id: form.issueId
+      }
     });
-    console.log(result);
-    const issue = new Issue().deserialize(result.data.issueEffectTemplate);
+    const issue = new Issue().deserialize(result.data.setEffectTemplate);
+    context.dispatch("findAll", {
+      force: true
+    });
     context.commit("SET_ITEM", new Issue().deserialize(issue));
-    console.log(issue);
-    return result.data.issueEffectTemplate;
+    return issue;
+  },
+  async unsetEffectTemplate(context, form) {
+    const result = await form.mutate({
+      mutation: ISSUE.unsetEffectTemplate,
+      variables: {
+        id: form.issueId
+      }
+    });
+    const issue = new Issue().deserialize(result.data.unsetEffectTemplate);
+    context.commit("SET_ITEM", new Issue().deserialize(issue));
+
+    return issue;
   },
 
 
@@ -103,12 +118,10 @@ const actions = {
       force: true
     });
     // await context.dispatch('findAll', { force: true });
-    console.log(result.data);
     return result.data.issueDelete;
   },
 
   async check(context, form) {
-    console.log(form);
     const result = await form.mutate({
       mutation: ISSUE.check,
       variables: {
@@ -157,7 +170,6 @@ const actions = {
         }
       });
       const { result } = await queryToPromise(query);
-      console.log(result);
       result.data.issueFindAll.map(o => {
         context.commit("SET_ITEM", new Issue().deserialize(o));
       });
@@ -216,7 +228,6 @@ const actions = {
           }
         });
         const { result } = await queryToPromise(query);
-        console.log(result);
         const results = result.data.issueFindAll.map(cr => {
           return new Issue().deserialize(cr);
         });

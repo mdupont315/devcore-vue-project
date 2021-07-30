@@ -9,8 +9,27 @@
         style="z-index: 1"
         @click="togglePopOver"
       ></inner-overlay>
-      <b-card-body class="p-0">
-        <p class="text-justify">{{ item.description }}</p>
+      <b-card-body
+        class="card-footer border-0 pl-0"
+        style="display: flex; justify-content: space-between"
+      >
+        <div class="text-justify" style="display: flex">
+          {{ item.description }}
+        </div>
+        <div
+          class="text-justify"
+          style="cursor: pointer;display:flex"
+          v-if="item.files.length > 0"
+        >
+          <i class="mdi mdi-folder-open-outline" style="margin-right: 10px"></i>
+          <a
+            style="line-height: 17px"
+            v-if="item.files[0]"
+            class="link title text-gray"
+            :href="item.files[0].url"
+            >{{ item.files[0].title }}</a
+          >
+        </div>
       </b-card-body>
       <b-card-footer class="bg-white pl-0 border-0">
         <author-time
@@ -87,9 +106,11 @@ export default {
     },
   },
   data: () => ({
+    currentFile: null,
     showPopOver: false,
     newIdea: {},
   }),
+
   methods: {
     async reloadDetail() {
       this.$emit("reload", this.item);
@@ -107,16 +128,12 @@ export default {
     },
     togglePopOver() {
       this.showPopOver = !this.showPopOver;
-      // this.$store.dispatch("app/showOverlay", {
-      //   show: this.showPopOver,
-      //   onClick: this.togglePopOver
-      // });
     },
     async startCreation() {
       this.$nextTick(() => {
         this.newIdea = new Idea();
         this.newIdea.parent = this.idea.parent;
-
+        //this.newIdea.file = this.item.files[0];
         this.newIdea.title = `${this.idea.title}(${this.idea.version + 1})`;
         this.newIdea.description = this.item.description;
         this.newIdea.processId = this.idea.processId;

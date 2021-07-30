@@ -6,12 +6,6 @@ export const COMPANY_TOOL_MODULE_FRAGMENT = gql `
       id,
       name,
       yearlyCosts,
-    #   priceModel{
-    #       id,
-    #       name
-    #   },
-    #     priceModel,
-    #   toolModuleId,
       companyToolId,
       createdAt,
       updatedAt,
@@ -21,7 +15,7 @@ export const COMPANY_TOOL_MODULE_FRAGMENT = gql `
 export const COMPANY_TOOL_MODULE_FULL_FRAGMENT = gql `
     fragment companyToolModuleFullFields on CompanyToolModule{
         ...companyToolModuleFields,
-       
+
     }
     ${COMPANY_TOOL_MODULE_FRAGMENT}
 `;

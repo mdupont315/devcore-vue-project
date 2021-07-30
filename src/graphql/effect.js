@@ -1,17 +1,19 @@
 import gql from "graphql-tag";
 import { META_FRAGMENT } from "./meta";
+import { ISSUE_EFFECT_TEMPLATE_FRAGMENT } from "./effectTemplate";
 // eslint-disable-next-line
 export const ISSUE_EFFECT_FRAGMENT = gql`
   fragment issueEffectFields on IssueEffect {
     id
     title
-    measureUnit
     effectTime
     effectValue
     createdAt
     updatedAt
-    issueActiveIds
+    issueActiveId
     processId
+    effectId
+    status
     author {
       id
       firstName
@@ -20,55 +22,24 @@ export const ISSUE_EFFECT_FRAGMENT = gql`
       avatarUrl
       yearlyCosts
     }
-    parent {
-      __typename
-      ... on ProcessStage {
-        id
-        title
-        dOrder
-        description
-        processId
-      }
-      ... on ProcessOperation {
-        id
-        title
-        dOrder
-        description
-        processId
-        stageId
-        stage {
-          id
-          title
-        }
-      }
-      ... on ProcessPhase {
-        id
-        title
-        dOrder
-        description
-        processId
-        operationId
-        operation {
-          id
-          title
-          stageId
-          stage {
-            id
-            title
-          }
-        }
-      }
+
+    templates {
+      ...issueEffectTemplateFields
     }
     _metadata {
       ...metaFields
     }
   }
   ${META_FRAGMENT}
+  ${ISSUE_EFFECT_TEMPLATE_FRAGMENT}
 `;
 
 export const ISSUE_EFFECT_FULL_FRAGMENT = gql`
   fragment issueEffectFullFields on IssueEffect {
     ...issueEffectFields
+    templates {
+      id
+    }
   }
   ${ISSUE_EFFECT_FRAGMENT}
 `;
@@ -77,17 +48,40 @@ export const ISSUE_EFFECT = {
   findAll: gql`
     query issueEffectFindAll($filter: Filter) {
       issueEffectFindAll(filter: $filter) {
+        ...issueEffectFields
+      }
+    }
+    ${ISSUE_EFFECT_FRAGMENT}
+  `,
+  findById: gql`
+    query issueEffectFindById($id: ID!) {
+      issueEffectFindById(id: $id) {
         ...issueEffectFullFields
       }
     }
     ${ISSUE_EFFECT_FULL_FRAGMENT}
   `,
- create: gql`
-  mutation issueEffectCreate($input: IssueEffectTemplateCreateInput) {
-    issueEffectCreate(input: $input) {
-      ...issueEffectFullFields
+  create: gql`
+    mutation issueEffectCreate($input: IssueEffectCreateInput) {
+      issueEffectCreate(input: $input) {
+        ...issueEffectFields
+      }
     }
-  }
-  ${ISSUE_EFFECT_FULL_FRAGMENT}
-`
+    ${ISSUE_EFFECT_FRAGMENT}
+  `,
+  update: gql`
+    mutation issueEffectUpdate($id: ID!, $input: IssueEffectUpdateInput) {
+      issueEffectUpdate(id: $id, input: $input) {
+        ...issueEffectFields
+      }
+    }
+    ${ISSUE_EFFECT_FRAGMENT}
+  `,
+  delete: gql`
+    mutation issueEffectDelete($id: ID!) {
+      issueEffectDelete(id: $id) {
+        id
+      }
+    }
+  `
 };

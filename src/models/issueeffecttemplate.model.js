@@ -1,12 +1,6 @@
 import BaseModel from "./base.model";
-import EffectTemplateModel from "./issueeffecttemplate.model";
 
-export default class IssueEffect extends BaseModel {
-  get moneyTotalValue() {
-    let total = 0;
-    return total;
-  }
-
+export default class IssueEffectTemplate extends BaseModel {
   get stageId() {
     return this.parentStructure.stageId;
   }
@@ -52,14 +46,8 @@ export default class IssueEffect extends BaseModel {
   }
 
   deserialize(input) {
-    if (input.templates) {
-      input.templates = input.templates.map(t => {
-        return new EffectTemplateModel().deserialize(t);
-      });
-    }
-
+    console.log(input);
     Object.assign(this, input);
-
     return this;
   }
 }

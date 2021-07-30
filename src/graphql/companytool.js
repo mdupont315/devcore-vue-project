@@ -50,36 +50,7 @@ export const COMPANY_TOOL_FULL_FRAGMENT = gql`
     }
   }
 `;
-/*
-export const COMPANY_TOOL_FULL_FRAGMENT = gql `
-    fragment companyToolFullFields on CompanyTool{
-        ...companyToolFields,
-        modules{
-            id
-            name
-            status
-            yearlyCosts
-            prices{
-                id
-                name
-                yearlyCosts
-                priceModel
-                priceInterval
-                price
-                parentType
-                parentId
-                parent{
-                    id
-                    name
-                }
-                expiration
-                createdAt
-                updatedAt
-            }
-        }
 
-    }
- ${COMPANY_TOOL_FRAGMENT} */
 export const COMPANY_TOOL = {
   findAll: gql`
     query companyToolFindAll($filter: Filter) {
@@ -105,14 +76,6 @@ export const COMPANY_TOOL = {
     }
     ${COMPANY_TOOL_FULL_FRAGMENT}
   `,
-  // update: gql`
-  //  mutation companyToolUpdate($id: ID!, $input: CompanyToolUpdateInput!) {
-  //    companyToolUpdate(id: $id, input: $input) {
-  //      ...companyToolFullFields
-  //    }
-  //  }
-  //  ${COMPANY_TOOL_FULL_FRAGMENT}
-  //`,
   update: gql`
     mutation companyToolUpdate($id: ID!, $input: CompanyToolUpdateInput!) {
       companyToolUpdate(id: $id, input: $input) {

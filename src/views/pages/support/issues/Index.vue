@@ -69,10 +69,6 @@
 
           <!-- loss -->
           <template v-slot:cell(loss)="row">
-            <!--  <span :class="{ 'text-danger': row.item.pathStats != 0 }">{{
-              $currency(row.item.pathStats.value / 100 || 0)
-							path.pathIssues.map((i) => (pathStats.value += i.moneyTotalValue));
-            }}</span> -->
             <span :class="{ 'text-danger': row.item.pathStats != 0 }">
               {{ $currency(getTotalIssueLoss(row.item)) }}
             </span>
@@ -81,12 +77,12 @@
           <!-- actions -->
           <template v-slot:cell(actions)="row" class="actions">
             <div v-if="isRowEditing(row)" class="text-right buttons">
-							   <inner-overlay
-                  v-if="showIdeaPopover"
-                  @click="showIdeaPopover = !showIdeaPopover"
-									style="z-index:1"
-                >
-                </inner-overlay>
+              <inner-overlay
+                v-if="showIdeaPopover"
+                @click="showIdeaPopover = !showIdeaPopover"
+                style="z-index: 1"
+              >
+              </inner-overlay>
               <div class="d-flex" style="margin-top: 2px">
                 <b-button
                   :ref="`btnNewIdea${row.item.rowId}`"
@@ -229,6 +225,30 @@ export default {
       currentProcess: "process/current",
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
     }),
+    /*   getAvailablePaths() {
+      const available = {
+        stages: [],
+        operations: [],
+        phases: [],
+      };
+
+      if (this.process.stages.length > 0) {
+        available.stages = this.process.stages.forEach((stage) => {
+          available.stages.push(stage.id);
+
+          if (stage.operations.length > 0) {
+            stage.operations.forEach((operations) => {
+              operations
+            });
+          }
+        });
+      }
+
+      console.log(available);
+      console.log(this.process.stages);
+      this.process.stages;
+      return available;
+    }, */
     getIssues: {
       get: function () {
         return this.issues;
@@ -293,17 +313,55 @@ export default {
   },
 
   methods: {
+    getIndexWithId(arr, id) {
+      console.log(arr, id);
+
+      return arr.findIndex((a) => a.id == id);
+    },
     getTotalIssueLoss(item) {
       let total = 0;
-      if (item.pathIssues) {
-        item.pathIssues.map((i) => (total += i.moneyTotalValue));
+      console.log(item);
+      if (item.pathIssues && item.pathIssues.length > 0) {
+        item.pathIssues.forEach((issue) => {
+          console.log(issue.effectedMoneyTotalValue);
+          total += issue.effectedMoneyTotalValue;
+        });
       }
-
-      return total > 0 ? total / 100 : 0;
+      return total < 0 ? total / 100 : 0;
     },
 
-    getUniquePaths(paths = []) {
-      if (paths.length < 1) return [];
+    getUniquePaths(processPaths = []) {
+      if (processPaths.length < 1) return [];
+      const paths = processPaths.filter((p) => {
+        const { stageId } = p;
+        const { operationId } = p;
+        const { phaseId } = p;
+        if (stageId && !operationId && !phaseId) {
+          const stageIndex = this.getIndexWithId(this.process.stages, stageId);
+          return stageIndex > -1;
+        } else if (stageId && operationId && !phaseId) {
+          const stageIndex = this.getIndexWithId(this.process.stages, stageId);
+          const operationIndex = this.getIndexWithId(
+            this.process.stages[stageIndex].operations,
+            operationId
+          );
+          return operationIndex > -1;
+        } else if (stageId && operationId && phaseId) {
+          const stageIndex = this.getIndexWithId(this.process.stages, stageId);
+          const operationIndex = this.getIndexWithId(
+            this.process.stages[stageIndex].operations,
+            operationId
+          );
+          const phaseIndex = this.getIndexWithId(
+            this.process.stages[stageIndex].operations[operationIndex].phases,
+            stageId
+          );
+          return phaseIndex > -1;
+        } else {
+          return false;
+        }
+      });
+
       let modified = paths.map((path, index) => ({
         id: index,
         stageId: path.stageId,
@@ -369,6 +427,7 @@ export default {
     },
     getPathTitles(path) {
       const getTitle = (path) => {
+        console.log(path);
         this.mappedProcessPaths = {
           stage: null,
           operation: null,
@@ -410,7 +469,6 @@ export default {
       return getTitle(path);
     },
     getIssuesForKnownPath(path) {
-      console.log(path);
       let selectedIssues = [];
       if (path) {
         const { stageId } = path;
@@ -438,7 +496,6 @@ export default {
           );
         }
       }
-      console.log(selectedIssues);
       return selectedIssues;
     },
     async loadProcessAndIssues() {
@@ -452,12 +509,6 @@ export default {
       });
     },
     isRowEditing(row) {
-      console.log(
-        row &&
-          this.currentItem &&
-          row.item &&
-          row.item.rowId == this.currentItem.rowId
-      );
       return (
         row &&
         this.currentItem &&
@@ -466,18 +517,6 @@ export default {
       );
     },
     newIdea(row) {
-      /*    this.idea = {};
-      const { stageId, operationId, phaseId } = this.uniqueProcessPathIds[
-        row.index
-      ];
-      console.log(stageId, operationId, phaseId);
-      this.ideaFromIssue = {
-        processId: row.item.processId,
-        stageId: stageId,
-        operationId: operationId,
-        phaseId: phaseId,
-      };
- */
       this.currentItem = row.item;
       this.currentItem._isActive = true;
       this.showIdeaPopover = true;
@@ -549,6 +588,4 @@ export default {
   display: flex;
   align-items: center;
 }
-
-
 </style>

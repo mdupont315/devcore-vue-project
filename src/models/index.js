@@ -26,4 +26,5 @@ export { default as PeopleReport } from "./peoplereport.model";
 export { default as IdeaReport } from "./ideareport.model";
 export { default as UserProjectReport } from "./userprojectreport.model";
 export { default as Milestone } from "./milestone.model";
-export { default as IssueTemplate } from "./issueEffect.model";
+export { default as IssueEffect } from "./issueeffect.model";
+export { default as IssueEffectTemplate } from "./issueeffecttemplate.model";

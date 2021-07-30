@@ -40,9 +40,9 @@ export default class UserModel extends BaseModel {
     return 0;
   }
 
-    get formattedHourlyCosts() {
+  get formattedHourlyCosts() {
     if (this.yearlyCosts > 0) {
-      const yearlyCost = this.yearlyCosts
+      const yearlyCost = this.yearlyCosts;
       return yearlyCost / 1724
     }
     return 0;
