@@ -28,7 +28,6 @@
         <template v-slot:table-colgroup>
           <col style="width:60%" />
           <col style="width:10%" />
-          <col style="width:300px" />
         </template>
         <template v-slot:empty="scope">
           <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>

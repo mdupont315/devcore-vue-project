@@ -269,7 +269,6 @@ export default {
     }
     EventBus.$on("process/changeCurrent", (data) => {
       if (data.section === "ideas") {
-        console.log(this.process);
         if (!this.process.process) return;
         this.$store.dispatch("idea/findByProcess", {
           id: this.process.process.id,

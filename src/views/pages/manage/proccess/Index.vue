@@ -223,7 +223,6 @@ export default {
       }
     },
     prepareStage() {
-      console.log(this.$refs);
       this.newStage = new ProcessStage().deserialize({
         processId: this.process.id,
         companyRoles: [],
@@ -232,10 +231,8 @@ export default {
     addStage() {
       this.$refs.newStageCard.changeMode("create");
       const currentProcess = this.currentProcess.process;
-      console.log(this.$refs);
       if (!this.showStages) {
         const [element] = this.$refs[`process_card___${currentProcess.id}`];
-        console.log(element);
         element.changeProcess(currentProcess);
       }
     },
@@ -250,7 +247,6 @@ export default {
       this.$refs.newStageCard.changeMode(null);
     },
     editing(editing) {
-      console.log(editing);
       this.editingCard = editing;
     },
     editingProcess(editing) {

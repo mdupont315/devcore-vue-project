@@ -1,10 +1,14 @@
 <template>
-  <div
-    :style="{ width: tableWidth * 0.74 + 'px' }"
-    ref="issuesTemplateCardContainer"
-    class="issues-template-card-container"
-  >
-    <slot></slot>
+  <div ref="issuesTemplateCardContainer" class="issues-template-card-container">
+      <div
+        class="issues-template-card-container-items"
+        id="issues-template-card-container"
+        @click="toggleOverlay"
+        ref="issues-template-card-container"
+        :style="{ width: tableWidth * 0.74 + 'px' }"
+      >
+        <slot></slot></div
+    >
   </div>
 </template>
 
@@ -12,11 +16,15 @@
 <script>
 export default {
   methods: {
-    toggleOverlay() {
-      console.log("toggle");
-    },
-    consoleit(ue) {
-      console.log(ue);
+    toggleOverlay($event) {
+      console.log($event.target);
+      const clickEmpty =
+        $event.target.getAttribute("id") ==
+        this.$el.firstChild.getAttribute("id");
+
+      if (clickEmpty) {
+        this.$emit("toggleOverlay");
+      }
     },
   },
   props: {
@@ -32,18 +40,63 @@ export default {
 };
 </script>
 
+<style>
+.issueEffectAddForm-form-popover[x-placement="bottom"]
+  > .popover-body
+  > .card
+  > div
+  > div
+  > .issues-template-card-container {
+  justify-content: flex-end;
+}
+
+.issueEffectAddForm-form-popover[x-placement="top"]
+  > .popover-body
+  > .card
+  > div
+  > div
+  > .issues-template-card-container {
+  justify-content: flex-start;
+}
+
+.issueEffectAddForm-form-popover[x-placement="bottom"]
+  > .popover-body
+  > .card
+  > div
+  > div
+  > .issues-template-card-container {
+  justify-content: flex-start;
+}
+
+.issueEffectAddForm-form-popover[x-placement="top"]
+  > .popover-body
+  > .card
+  > div
+  > div
+  > .issues-template-card-container {
+  top: -120px;
+  height: 100%;
+  justify-content: flex-end;
+}
+</style>
 <style scoped>
+.issues-template-card-container-items {
+  display: flex;
+  overflow: scroll;
+  flex-direction: row-reverse;
+  height: 100%;
+  flex-wrap: wrap;
+}
 .issues-template-card-container {
   height: 100%;
-  min-height: 565px;
-  position: absolute;
-  top: 0px;
+  overflow: hidden;
   display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap;
+  position: absolute;
+  min-height: 404px;
+	max-height: 404px;
+  top: 0px;
   right: 400px;
   margin: 0px 10px;
-  overflow: scroll;
   border-radius: 5px;
 }
 </style>

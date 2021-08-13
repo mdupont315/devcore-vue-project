@@ -4,7 +4,6 @@ import UserModel from "./user.model";
 export default class SessionModel extends BaseModel {
     constructor(user = null, token = null, expires = null, refresh_token = null, token_type = null) {
         super();
-        console.log(token);
         this.user = user;
         this.access_token = token;
         this.expires_in = expires;
@@ -13,7 +12,6 @@ export default class SessionModel extends BaseModel {
     }
 
     deserialize(input) {
-      console.log(this.input);
         if (input.user) {
             input.user = new UserModel().deserialize(input.user);
         }

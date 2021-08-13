@@ -128,7 +128,6 @@ export default {
               this.form
             );
           } else {
-            console.log(this.form);
             this.input = await this.$store.dispatch(
               "companyTool/create",
               this.form

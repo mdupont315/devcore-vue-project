@@ -160,8 +160,6 @@ export default class GQLForm {
       const message = Array.isArray(this._errors.details.validation[key])
         ? this._errors.details.validation[key][0]
         : this._errors.details.validation[key];
-      // console.log(ret);
-      console.log(message);
       if (message) {
         const ret = {
           message

@@ -19,7 +19,7 @@
         <div
           class="text-justify"
           style="cursor: pointer;display:flex"
-          v-if="item.files.length > 0"
+          v-if="item.files && item.files.length > 0"
         >
           <i class="mdi mdi-folder-open-outline" style="margin-right: 10px"></i>
           <a
@@ -141,7 +141,6 @@ export default {
         this.newIdea.companyToolId = this.idea.companyToolId;
         this.newIdea.type = this.idea.type;
         this.newIdea.sourceType = "idea_issue";
-        console.log(this.newIdea.toolId);
       });
       setTimeout(() => {
         this.showPopOver = true;

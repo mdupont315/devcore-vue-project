@@ -1,7 +1,7 @@
 <template>
   <div class="page animated fadeIn">
     <div
-      v-if="currentItem || currentRowDetails"
+      v-if="currentItem || (currentRowDetails && getIssues.length)"
       class="overlay"
       :class="{ 'top-all': this.showInnerOverlayOnTop }"
       @click="overlayClick"
@@ -76,14 +76,21 @@
 
           <!-- actions -->
           <template v-slot:cell(actions)="row" class="actions">
-            <div v-if="isRowEditing(row)" class="text-right buttons">
+            <div
+              v-if="isRowEditing(row)"
+              class="text-right buttons"
+              style="height: 100%"
+            >
               <inner-overlay
                 v-if="showIdeaPopover"
                 @click="showIdeaPopover = !showIdeaPopover"
                 style="z-index: 1"
               >
               </inner-overlay>
-              <div class="d-flex" style="margin-top: 2px">
+              <div
+                class="d-flex"
+                style="align-items: center; width: 100%; height: 100%"
+              >
                 <b-button
                   :ref="`btnNewIdea${row.item.rowId}`"
                   size="xs"
@@ -93,6 +100,7 @@
                     font-size: 1.2rem;
                     padding: 3px;
                     min-width: min-content;
+                    max-height: 32px;
                   "
                   @click="newIdea(row)"
                   >{{ $t("New idea") }}</b-button
@@ -146,7 +154,7 @@
                 >
               </div>
             </div>
-            <div v-else class="buttons">
+            <div v-else class="buttons" style="height: 100%">
               <b-button
                 size="xs"
                 variant="action"
@@ -177,6 +185,7 @@
           <template v-slot:row-details="currentRowDetails">
             <div class="row-details" v-if="currentRowDetails">
               <issues-table
+                @deleted="deleted"
                 :items="currentRowDetails.item.pathIssues"
                 :item="currentRowDetails.item"
                 :loading="loadingItem"
@@ -225,6 +234,7 @@ export default {
       currentProcess: "process/current",
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
     }),
+
     /*   getAvailablePaths() {
       const available = {
         stages: [],
@@ -250,8 +260,13 @@ export default {
       return available;
     }, */
     getIssues: {
-      get: function () {
-        return this.issues;
+      get() {
+        if (this.process) {
+          return this.$store.getters["issue/byProcess"](this.process.id).filter(
+            (x) => x.parent
+          );
+        }
+        return [];
       },
     },
 
@@ -259,10 +274,19 @@ export default {
       get: function () {
         //Deduct all populated paths from ideas
         const populatedProcessPaths = [];
-        this.issues.map((issue) => {
-          populatedProcessPaths.push(this.issuePathDeducer(issue));
+        this.getIssues.map((_issue) => {
+          const issue = this.issuePathDeducer(_issue);
+          console.log(issue);
+          if (issue) populatedProcessPaths.push(issue);
         });
 
+        console.log(this.getIssues);
+
+        if (!populatedProcessPaths || populatedProcessPaths.length == 0) {
+          return [];
+        }
+
+        console.log(populatedProcessPaths);
         const uniquePaths = Array.from(
           new Set(populatedProcessPaths.map((obj) => JSON.stringify(obj)))
         ).map((str) => JSON.parse(str));
@@ -279,14 +303,6 @@ export default {
       },
     },
 
-    issues: {
-      get() {
-        if (this.process) {
-          return this.$store.getters["issue/byProcess"](this.process.id);
-        }
-        return [];
-      },
-    },
     fields: {
       get() {
         return [
@@ -313,17 +329,58 @@ export default {
   },
 
   methods: {
-    getIndexWithId(arr, id) {
-      console.log(arr, id);
+    deleted(item) {
+      console.log("item");
+      console.log("item");
+      console.log("item");
+      console.log("item");
+      console.log("item");
+      console.log("item");
+      console.log(item);
+      if (
+        this.currentRowDetails &&
+        this.currentRowDetails.item &&
+        this.currentRowDetails.item.pathIssues
+      ) {
+        if (this.currentRowDetails.item.pathIssues.length > 0) {
+          this.currentRowDetails.item.pathIssues =
+            this.currentRowDetails.item.pathIssues.filter(
+              (x) => x.id !== item.id
+            );
+        }
+      }
+    },
+    doesProcessPathExist(path) {
+      const { stageId } = path;
+      const { operationId } = path;
+      const { phaseId } = path;
 
-      return arr.findIndex((a) => a.id == id);
+      if (!!stageId && !!operationId && !!phaseId) {
+        const stage = this.process.stages.find((s) => s.id == stageId);
+        const operation =
+          stage?.operations.find((o) => o.id == operationId) ?? false;
+        const phase = operation?.phases.find((p) => p.id == phaseId) ?? false;
+        return stage && operation && phase;
+      } else if (!!stageId && !!operationId && !phaseId) {
+        const stage = this.process.stages.find((s) => s.id == stageId);
+        const operation =
+          stage?.operations.find((o) => o.id == operationId) ?? false;
+        const phase = operation?.phases.find((p) => p.id == phaseId) ?? false;
+        return stage && operation && !phase;
+      } else if (!!stageId && !operationId && !phaseId) {
+        const stage = this.process.stages.find((s) => s.id == stageId);
+        const operation =
+          stage.operations?.find((o) => o.id == operationId) ?? false;
+        const phase = operation.phases?.find((p) => p.id == phaseId) ?? false;
+        return stage && !operation && !phase;
+      }
+
+      return false;
     },
     getTotalIssueLoss(item) {
       let total = 0;
-      console.log(item);
       if (item.pathIssues && item.pathIssues.length > 0) {
         item.pathIssues.forEach((issue) => {
-          console.log(issue.effectedMoneyTotalValue);
           total += issue.effectedMoneyTotalValue;
         });
       }
@@ -332,35 +389,7 @@ export default {
 
     getUniquePaths(processPaths = []) {
       if (processPaths.length < 1) return [];
-      const paths = processPaths.filter((p) => {
-        const { stageId } = p;
-        const { operationId } = p;
-        const { phaseId } = p;
-        if (stageId && !operationId && !phaseId) {
-          const stageIndex = this.getIndexWithId(this.process.stages, stageId);
-          return stageIndex > -1;
-        } else if (stageId && operationId && !phaseId) {
-          const stageIndex = this.getIndexWithId(this.process.stages, stageId);
-          const operationIndex = this.getIndexWithId(
-            this.process.stages[stageIndex].operations,
-            operationId
-          );
-          return operationIndex > -1;
-        } else if (stageId && operationId && phaseId) {
-          const stageIndex = this.getIndexWithId(this.process.stages, stageId);
-          const operationIndex = this.getIndexWithId(
-            this.process.stages[stageIndex].operations,
-            operationId
-          );
-          const phaseIndex = this.getIndexWithId(
-            this.process.stages[stageIndex].operations[operationIndex].phases,
-            stageId
-          );
-          return phaseIndex > -1;
-        } else {
-          return false;
-        }
-      });
+      const paths = processPaths.filter((p) => this.doesProcessPathExist(p));
 
       let modified = paths.map((path, index) => ({
         id: index,
@@ -400,6 +429,7 @@ export default {
       return `${stageId}${operationId}${phaseId}`;
     },
     issuePathDeducer(_obj) {
+      if (!_obj.parent) return;
       if (_obj.parent.__typename === "ProcessPhase") {
         const phaseId = _obj.parent.id;
         const operationId = _obj.parent.operation.id;
@@ -427,7 +457,6 @@ export default {
     },
     getPathTitles(path) {
       const getTitle = (path) => {
-        console.log(path);
         this.mappedProcessPaths = {
           stage: null,
           operation: null,
@@ -476,21 +505,21 @@ export default {
         const { phaseId } = path;
 
         if (phaseId) {
-          selectedIssues = this.issues.filter(
+          selectedIssues = this.getIssues.filter(
             (i) =>
               i.parent.id == phaseId && i.parent.__typename == "ProcessPhase"
           );
         }
 
         if (operationId && !phaseId) {
-          selectedIssues = this.issues.filter(
+          selectedIssues = this.getIssues.filter(
             (i) =>
               i.parent.id == operationId &&
               i.parent.__typename == "ProcessOperation"
           );
         }
         if (!operationId && !phaseId) {
-          selectedIssues = this.issues.filter(
+          selectedIssues = this.getIssues.filter(
             (i) =>
               i.parent.id == stageId && i.parent.__typename == "ProcessStage"
           );
@@ -548,7 +577,6 @@ export default {
       ) {
         this.currentRowDetails = row;
         this.currentRowDetails.toggleDetails();
-        console.log(this.currentRowDetails);
         this.currentRowDetails.item._showDetails = true;
       } else {
         this.currentRowDetails = null;
@@ -587,5 +615,9 @@ export default {
 .issueTable_processPath_title {
   display: flex;
   align-items: center;
+}
+
+.row-details {
+  overflow: hidden auto;
 }
 </style>

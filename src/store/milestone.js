@@ -45,7 +45,6 @@ const actions = {
   },
 
   async updateOrDeleteMany(context, form) {
-    console.log(form);
     const result = await form.mutate({
       mutation: MILESTONE.updateOrDeleteMany
     });
@@ -59,9 +58,6 @@ const actions = {
   async reward(context, form) {
     const result = await form.mutate({
       mutation: MILESTONE.reward,
-      variables: {
-        rewarded: form.rewarded
-      }
     });
     await context.dispatch("findAll", {
       force: true

@@ -3,7 +3,6 @@ import store from "../store";
 
 async function middlewarePipeline(context, middleware, index) {
   const nextMiddleware = middleware[index];
-  console.log(nextMiddleware)
   if (!nextMiddleware) {
     return context.next;
   }
@@ -23,7 +22,6 @@ async function middlewarePipeline(context, middleware, index) {
 }
 
 router.beforeEach(async (to, from, next) => {
-  console.log(to);
   if (!to.meta.middleware) {
     return next();
   }

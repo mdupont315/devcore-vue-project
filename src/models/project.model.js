@@ -26,12 +26,10 @@ export default class ProjectModel extends BaseModel {
   }
 
   get hasReviews() {
-    console.log(this.stats)
     return this.stats.totalEvaluations > 0;
   }
 
   get consolidatedPercent() {
-    console.log(this.budget);
     return (this.stats.consolidatedValue * 100) / this.budget;
   }
 
@@ -45,8 +43,6 @@ export default class ProjectModel extends BaseModel {
     let value = 0;
     const stageStats = this.getStageStats(stageId);
     if (stageStats) {
-      console.log(typeof this.budget)
-      console.log((stageStats.consolidatedValue * 100) / this.budget);
       value = (stageStats.consolidatedValue * 100) / this.budget;
     }
     return value;

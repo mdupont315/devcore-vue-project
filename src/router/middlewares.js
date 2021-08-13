@@ -10,9 +10,7 @@ export async function initCurrentUserStateMiddleware(to, from, next) {
   if ($store.state.user.currentUser != null) {
     currentUserId = $store.state.user.currentUser.id;
   }
-  console.log("CHECK FOR TOKEN")
   if (AuthService.hasRefreshToken() && !currentUserId) {
-    console.log("TOKEN MIDDLEWARE!")
     try {
       await AuthService.debounceRefreshTokens();
       await $store.dispatch("user/getCurrent");

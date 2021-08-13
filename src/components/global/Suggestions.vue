@@ -97,7 +97,6 @@ export default {
         this.$emit("input", item);
         this.setInputQuery(item);
         this.showItems = false;
-        // console.log('change value')
       }
     },
     hideItems() {

@@ -38,7 +38,6 @@ const getters = {
 
 const actions = {
   async setTab(context, form) {
-    console.log(form);
     EventBus.$emit("idea/currentTab", {
       form
     });
@@ -62,7 +61,6 @@ const actions = {
   },
 
   async update(context, form) {
-    console.log(form);
     form.type = "PROCESS";
     const result = await form.mutate({
       mutation: IDEA.update,
@@ -101,7 +99,6 @@ const actions = {
   },
 
   async deleteImprovement(context, form) {
-    console.log(form);
     const result = await form.mutate({
       mutation: IDEA.deleteImprovement,
       variables: {
@@ -213,7 +210,6 @@ const actions = {
 
 const mutations = {
   SET_CURRENT_TAB(state, value) {
-    console.log(value);
     state.currentTab = value.tab;
   },
   RESET_STATE(state) {

@@ -141,10 +141,8 @@ export default {
   async mounted() {
     if (!this.items) {
       var result = await this.$store.dispatch("idea/findAll");
-			console.log(result);
     }
     if (this.value) {
-			console.log(this.value);
       this.dataValue = this.value.filter(
         (o) => this.ideas.find((u) => u.id === o) != null
       );

@@ -7,12 +7,12 @@
       @click="overlayClick"
     ></div>
 
-    <page-loader v-if="filter.busy"></page-loader>
-    <engage-progress
-      :items="getMilestones"
-      v-if="!filter.busy"
-    ></engage-progress>
-    <engage-table :items="milestones" v-if="!filter.busy"></engage-table>
+    <page-loader v-if="isLoading"></page-loader>
+
+    <div class="engage_container_content" v-else>
+      <engage-progress :items="getMilestones"></engage-progress>
+      <engage-table :items="milestones"></engage-table>
+    </div>
   </div>
 </template>
 
@@ -25,6 +25,7 @@ import engageTable from "./Table.vue";
 export default {
   data: () => {
     return {
+      isLoading: null,
       filter: {
         busy: false,
       },
@@ -37,11 +38,11 @@ export default {
     "engage-table": engageTable,
   },
   async mounted() {
-    this.filter.busy = true;
+    this.isLoading = true;
     await this.$store.dispatch("milestone/findAll", {
       force: true,
     });
-    this.filter.busy = false;
+    this.isLoading = false;
   },
   computed: {
     ...mapGetters({
@@ -57,11 +58,19 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .engage_container {
   display: flex;
   flex-direction: column;
   flex-basis: 100%;
-  justify-content: space-evenly;
+  max-height: calc(100vh - 60px);
 }
+.engage_container_content {
+  display: flex;
+  height: 100%;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+
 </style>

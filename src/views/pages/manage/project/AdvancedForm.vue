@@ -191,7 +191,6 @@ export default {
   },
   methods: {
     saveSelection() {
-      console.log("SAVE");
       this.$emit("input", this.advancedForm);
     },
     save() {

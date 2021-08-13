@@ -208,7 +208,6 @@ const actions = {
   },
 
   async setCurrentSection(context, section) {
-    console.log(section);
     context.commit("SET_CURRENT_SECTION", section);
   },
 

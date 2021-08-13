@@ -78,6 +78,17 @@ const actions = {
     return role;
   },
 
+  async saveIssueFeedback(context, form) {
+    const result = await form.mutate({
+      mutation: ISSUE.saveIssueFeedback
+    });
+    const role = new Issue().deserialize(result.data.issueChangeStatus);
+    context.dispatch("findAll", {
+      force: true
+    });
+    return role;
+  },
+
   async setEffectTemplate(context, form) {
     const result = await form.mutate({
       mutation: ISSUE.setEffectTemplate,

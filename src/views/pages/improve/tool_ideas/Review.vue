@@ -95,7 +95,6 @@ export default {
 		},
     testingIdeas: {
       get() {
-				console.log(this.currentProcessSection)
         if (this.currentProcessSection) {
           return this.$store.getters[
             `toolIdea/by${this.currentProcessSectionName.capitalize()}`
@@ -111,14 +110,11 @@ export default {
     },
     evaluatedIdeas: {
       get() {
-        console.log(this.currentProcessSectionName.capitalize());
         if (this.currentProcessSection) {
-          console.log(this.currentProcessSection);
 
           var filteredSelection = this.$store.getters[
             `toolIdea/by${this.currentProcessSectionName.capitalize()}`
 					];
-					console.log(this.currentProcessSectionName.capitalize());
 
           var filteredFilteredSelection = filteredSelection(
             this.currentProcessSection.id

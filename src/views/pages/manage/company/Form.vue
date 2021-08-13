@@ -160,7 +160,6 @@ export default {
           value: element.code,
         });
       });
-			console.log(items);
       return items;
     },
   },

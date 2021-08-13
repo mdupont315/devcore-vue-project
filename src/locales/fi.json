@@ -217,7 +217,10 @@
     "stageCreated": "Vaiheen luonti onnistui!",
     "stageCreatedFail": "Vaiheen luonti epäonnistui!",
     "toolCreated": "Työkalun luonti onnistui!",
-    "toolCreatedFail": "Työkalun luonti epäonnistui"
+    "toolCreatedFail": "Työkalun luonti epäonnistui",
+
+    "issueReplyCreate": "Ongelmaan vastaaminen onnistui",
+    "issueReplyCreateFail": "Ongelmaan vastaaminen epäonnistui"
   },
   "Evaluation Restriction": "Arviointi Rajoitus",
   "Evaluation Restriction Info": "Valitut roolit eivät pysty asettamaan hukan määrää mobiili jaa ongelma ominaisuudesta.",
@@ -291,6 +294,7 @@
   "Effect Loss Unit": "Yksikkö",
   "Effect Loss Unit Time": "HH:mm",
   "Effect Loss Unit Value": "kustannus",
+  "Issue specific cost" : "Ongelmakohtainen hukka",
   "Issue effect": "Ongelman vaikutus",
   "Issue comment": "Ongelman kommentti",
   "Issue feedback": "Ongelman palaute",
@@ -304,6 +308,7 @@
   "issueEffectFeedback": "Palaute",
   "issueEffectEdit": "Kommentoi",
   "issueEffectRemove": "Poista",
+  "issueEffectTemplateActive": "Vaikutus aktiivinen",
   "IssueEffectDeleteConfirmation": "Aikaisemmat ongelmat, joissa on tämä vaikutus pysyvät ennallaan.",
   "Create Issue Effect": "Tallenna vaikutus",
   "Apply Issue Effect":"Käytä vaikutusta",

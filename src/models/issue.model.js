@@ -7,7 +7,51 @@ import store from "../store";
 export default class IssueModel extends BaseModel {
   files = [];
 
+  effect = {};
+
+  projectedTemplates = [];
+
   timeValue = 0;
+
+  get effect() {
+    console.log("ACTIVE TEMPLATES");
+    console.log(this.effect);
+    return this.effect;
+  }
+
+  set effect(value) {
+    console.log("ACTIVE TEMPLATES");
+    console.log(this.effect);
+    if (value) {
+      this.effect = value;
+    } else {
+      this.effect = {};
+    }
+  }
+
+  set activeTemplates(value) {
+    if (value) {
+      this.activeTemplates = value;
+    } else {
+      this.projectedTemplates = [];
+    }
+  }
+
+  set projectedTemplates(value) {
+    if (value) {
+      this.projectedTemplates = value;
+    } else {
+      this.projectedTemplates = [];
+    }
+  }
+
+  get projectedTemplates() {
+    return this.projectedTemplates;
+  }
+
+  get issueActiveEffect() {
+    return this.effect;
+  }
 
   get hasFile() {
     return this.files && this.files.length > 0;
@@ -70,14 +114,12 @@ export default class IssueModel extends BaseModel {
   }
 
   get effectedMoneyTotalValue() {
-
     let total = 0;
     total -= this.moneyTotalValue + this.timeTotalValue;
     const active = this.effect;
     if (active) {
       total -= active.effectValue;
       if (active.templates && active.templates.length > 0) {
-
         active.templates.forEach(template => {
           const { roleId } = template;
           const { effectTime } = template;
@@ -86,9 +128,9 @@ export default class IssueModel extends BaseModel {
           total -= template.effectValue;
 
           //time value
-          total -= this.getHourlyCostsByRole.find(
-            r => r.companyRoleId == roleId
-          ).hourlyAverage * effectTime;
+          total -=
+            this.getHourlyCostsByRole.find(r => r.companyRoleId == roleId)
+              .hourlyAverage * effectTime;
         });
       }
     }

@@ -32,7 +32,10 @@
       :items="items"
       :show-empty="true"
       :empty-text="$t('There are no records for the given criteria')"
-      :tbody-tr-class="(item, type) => (isRowEditing(item) ? 'editing' : '')"
+      :tbody-tr-class="
+        (item, type) =>
+          isRowEditing(item) ? 'issueTable-row editing' : 'issueTable-row'
+      "
       @row-unhovered="nullifyHoverRowId"
       @row-hovered="setHoverRowId(item, $event)"
       ref="issueEffect_table"
@@ -85,31 +88,37 @@
       </template>
 
       <!-- effect -->
-      <template v-slot:cell(effect)="row" class="actions" v-if="$can('support/issueEffect/manage')">
-        <b-spinner v-if="isLoading" />
-        <div v-else>
-          <div v-if="hoverRowId !== row.item.id">
-            <div v-if="row.item.effect">
-              {{ getEffectTitle(row.item.effect) }}
+      <template v-slot:cell(effect)="row" class="actions">
+        <div v-if="$can('support/issueEffect/manage')">
+          <b-spinner v-if="isLoading" />
+          <div v-else>
+            <div v-if="hoverRowId !== row.item.id">
+              <div v-if="row.item.effect">
+                {{ getEffectTitle(row.item.effect) }}
+              </div>
+              <div v-else>{{ $t("No Issue Effect") }}</div>
             </div>
-            <div v-else>{{ $t("No Issue Effect") }}</div>
-          </div>
-          <div
-            v-else
-            class="issueEffect-actions__container"
-            :class="{ 'show-when-hovered': isCurrentRowActive(row.item) }"
-          >
-            <issuesEffectAdd
-              :issue="row.item"
-              :items="getIssueEffectTemplates"
-              @setTemplate="setTemplate"
-              @unsetTemplate="unsetTemplate"
-              @toggle="toggleItem"
-              :openState="issueEffectAddOpen"
-              :tableWidth="tableWidth"
-            ></issuesEffectAdd>
+            <div
+              v-else
+              class="issueEffect-actions__container"
+              :class="{ 'show-when-hovered': isCurrentRowActive(row.item) }"
+            >
+              <issuesEffectAdd
+                :key="row.item.id"
+                :issue="row.item"
+                :items="getIssueEffectTemplates"
+                @toggleOverlay="overlayClick"
+                @setTemplate="setTemplate"
+                @unsetTemplate="unsetTemplate"
+                @selectionClosed="setDefaultEffect"
+                @toggle="toggleItem"
+                :openState="issueEffectAddOpen"
+                :tableWidth="tableWidth"
+              ></issuesEffectAdd>
+            </div>
           </div>
         </div>
+        <div v-else>{{ $t("No Issue Effect") }}</div>
       </template>
 
       <!-- actions -->
@@ -120,6 +129,7 @@
         >
           <!-- Issue Effect Actions -->
           <div
+            v-if="$can('support/issue/manage')"
             class="issueEffect-actions__container"
             :class="{ 'show-when-hovered': isCurrentRowActive(row.item) }"
           >
@@ -127,7 +137,7 @@
             <issuesEffectFeedback
               :issue="row.item"
               @toggle="toggleItem"
-              @save="saveItem"
+              @save="saveIssueReply"
               @close="issueEffectFeedbackOpen = false"
               :openState="issueEffectFeedbackOpen"
             ></issuesEffectFeedback>
@@ -136,7 +146,7 @@
             <issuesEffectComment
               :issue="row.item"
               @toggle="toggleItem"
-              @save="saveItem"
+              @save="saveIssueReply"
               @close="issueEffectCommentOpen = false"
               :openState="issueEffectCommentOpen"
             ></issuesEffectComment>
@@ -180,7 +190,7 @@
 <script>
 import GQLForm from "@/lib/gqlform";
 import moment from "moment";
-import icoIssueTrashcan from "@/assets/img/icons/svg/ico-issue-trashcan.svg?inline";
+import icoIssueTrashcan from "@/assets/img/icons/svg/ico-trashcan.svg?inline";
 
 import issuesEffectAdd from "./effect/IssuesTemplateAdd.vue";
 import issuesEffectFeedback from "./effect/IssuesTemplateFeedback.vue";
@@ -218,11 +228,6 @@ export default {
       isLoading: false,
       hoverRowId: null,
       rewardActiveIndex: 0,
-      issueEffectForm: {
-        id: null,
-        feedback: null,
-        comment: null,
-      },
       rewardablePoints: [0, 5, 10, 25, 50, 100],
       editType: null,
       issueEffectFeedbackOpen: false,
@@ -248,7 +253,6 @@ export default {
 
     getIssueEffectTemplates: {
       get() {
-        console.log(this.effectTemplates);
         return this.effectTemplates ?? [];
       },
     },
@@ -301,7 +305,6 @@ export default {
   },
   async mounted() {
     this.isLoading = true;
-    console.log("MOUNTED");
     await this.$store.dispatch("issueEffect/findAll");
     await this.$store.dispatch("companyRole/findAll");
 
@@ -309,6 +312,13 @@ export default {
     this.isLoading = false;
   },
   methods: {
+    setDefaultEffect() {
+      if (this.currentItem) {
+        this.currentItem.effect = this.getIssueEffectTemplates.find(
+          (x) => x.id == this.currentItem.effectTemplateId
+        );
+      }
+    },
     getEffectedMoneyTotal(item) {
       return this.$currency(item.effectedMoneyTotalValue / 100 || 0);
     },
@@ -366,28 +376,23 @@ export default {
       }
     },
     toggleOverlay() {
-      console.log("overlay");
       this.editType === "issueComment"
         ? this.toggleIssueComment()
         : this.toggleIssueFeedback();
     },
     toggleIssueRemove(item) {
-      console.log(this.issueRemoveOpen);
       this.editType = !this.issueRemoveOpen ? "issueRemove" : null;
       if (!this.issueRemoveOpen) this.toggleItem(item, "issueRemove");
     },
 
     toggleIssueFeedback(item) {
       this.editType = !this.issueEffectFeedbackOpen ? "issueFeedback" : null;
-      console.log(this.editType);
       if (!this.issueEffectFeedbackOpen) this.toggleItem(item, "issueFeedback");
     },
 
     toggleIssueComment(item) {
-      console.log(this.editType);
       this.editType = !this.issueEffectCommentOpen ? "issueComment" : null;
       if (!this.issueEffectCommentOpen) this.toggleItem(item, "issueComment");
-      console.log(this.editType);
     },
     async setTemplate(templateId) {
       const { id } = this.currentItem;
@@ -395,11 +400,9 @@ export default {
         id,
         templateId,
       });
-      console.log("newTemplate");
-      console.log(newTemplate);
 
       await this.$store.dispatch("issue/setEffectTemplate", newTemplate);
-      await this.$store.dispatch("issueEffect/findAll");
+      await this.$store.dispatch("issueEffect/findAll", { force: true });
     },
     async unsetTemplate(templateId) {
       const { id } = this.currentItem;
@@ -415,32 +418,26 @@ export default {
       await this.$store.dispatch("issueEffect/findAll");
       return response;
     },
-    async saveItem(input) {
+    async saveIssueReply(input) {
       console.log(input);
-    },
-    async saveIssueFeedback() {
-      /*      const { id } = this.currentItem;
-      const value = rewardablePoints[rewardActiveIndex];
-      const { feedback } = this.issueFeedbackForm;
-      console.log(this.user);
-      const issueFeedbackForm = new GQLForm({
-        id,
-        value,
-        feedback,
-      }); */
-    },
-    async saveIssueComment() {
-      /*    const { comment } = this.issueFeedbackForm;
+      const status = this.issueEffectCommentOpen ? "COMMENT" : "FEEDBACK";
       const { id } = this.currentItem;
-
-      const issueCommentForm = new GQLForm({
-        id,
-        comment,
-      }); */
+      const { description } = input;
+      const { value } = input;
+      const issueReplyForm = new GQLForm({
+        issueId: id,
+        value,
+        status,
+        description,
+      });
+      await this.$store.dispatch("issueReply/create", issueReplyForm);
+			this.issueEffectCommentOpen = false;
+			this.issueEffectFeedbackOpen = false;
     },
+
     toggleItem(item, type) {
       this.closeOtherIssueEffectModals(type);
-
+      console.log("TOGGLED");
       if (
         !item ||
         (this.currentItem &&
@@ -450,12 +447,17 @@ export default {
           !this.issueEffectCommentOpen &&
           this.editType !== "issueRemove")
       ) {
+        console.log("null");
         this.currentItem = null;
       } else {
+        console.log("item");
+
         this.currentItem = item;
       }
     },
     overlayClick() {
+      console.log("overLay Clicked");
+      this.setDefaultEffect();
       if (
         this.currentItem &&
         !this.issueEffectCommentOpen &&
@@ -463,8 +465,10 @@ export default {
         !this.issueEffectAddOpen &&
         !this.issueRemoveOpen
       ) {
+        console.log("overLay Null");
         this.toggleItem(null);
       } else {
+        console.log("overLay Else");
         this.editType = "";
         this.hoverRowId = null;
         this.issueEffectCommentOpen = false;
@@ -510,6 +514,10 @@ export default {
 };
 </script>
 <style>
+.issueTable-row {
+  height: 60px;
+  max-height: 60px;
+}
 </style>
 <style scoped>
 .issue-effect-tooltip-title {

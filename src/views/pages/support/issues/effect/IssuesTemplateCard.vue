@@ -3,11 +3,13 @@
     <!-- Title -->
     <div class="issueTemplate-card__header">
       <span class="issueTemplate-card__header-title">{{ input.title }}</span>
+      <hr style="background: lightgray" />
     </div>
 
-    <hr />
-
     <div class="issueTemplate-card__footer">
+      <div style="padding-bottom: 10px; font-size: 14px">
+      {{$t("Issue specific cost")}}
+      </div>
       <div class="issueTemplate-card__footer-summary">
         <div class="issueTemplate-card__totals-title">
           {{ $t("Effect Loss Time") }}
@@ -33,14 +35,11 @@
       </div>
       <div class="issueTemplate-card__totals-action">
         <b-button
-				v-if="input.id !== issue.effectTemplateId"
+          v-if="input.id !== issue.effectTemplateId"
           @click="setTemplate(input)"
-          class="issueTemplate-card__totals-action-select"
           >{{ $t("Apply Issue Effect") }}</b-button
         >
-				<div v-else>
-					Template active
-				</div>
+        <div v-else>{{ $t("issueEffectTemplateActive") }}</div>
       </div>
     </div>
   </div>
@@ -74,17 +73,41 @@ export default {
         : "0€";
     },
     getTemplateLossPercentageTime() {
-      const issueLoss =
-        this.input.effectTime / this.issue.effectedMoneyTotalValue;
-      const percentage = issueLoss * 100;
-      return percentage.toFixed(2) + " %";
+      if (
+        this.issue.effectedMoneyTotalValue != 0 &&
+        this.input.effectTime != 0
+      ) {
+        console.log(this.issue.effectedMoneyTotalValue);
+        const issueLoss =
+          this.input.effectTime / this.issue.effectedMoneyTotalValue;
+        const percentage = issueLoss * 100;
+        return percentage.toFixed(2) + " %";
+      } else {
+        return "0%";
+      }
     },
     getTemplateLossPercentageValue() {
-      const issueLoss =
-        this.input.effectValue / this.issue.effectedMoneyTotalValue;
-      const percentage = issueLoss * 100;
-      return percentage.toFixed(2) + " %";
+      if (
+        this.input.effectValue != 0 &&
+        this.issue.effectedMoneyTotalValue != 0
+      ) {
+        const issueLoss =
+          this.input.effectValue / this.issue.effectedMoneyTotalValue;
+        const percentage = issueLoss * 100;
+        return percentage.toFixed(2) + " %";
+      } else {
+        return "0%";
+      }
     },
+  },
+  beforeDestroy() {
+    console.log("this.issue.id");
+    console.log(this.issue.effect);
+    if (this.issue && this.issue.effect) {
+      if (this.issue.id != this.issue.effect.issueActiveId) {
+        this.$emit("destroyed");
+      }
+    }
   },
   methods: {
     async setTemplate(input) {
@@ -112,6 +135,9 @@ export default {
 .issueTemplate-card__header-title {
   font-size: 14px;
   color: #4294d0;
+}
+.issueTemplate-card__header {
+  margin-top: 10px;
 }
 
 .issueTemplate-card__body-process {
@@ -147,18 +173,11 @@ export default {
   color: #cc454b;
 }
 .issueTemplate-card__totals-action {
-  padding-top: 10px;
   display: flex;
   letter-spacing: 1px;
   justify-content: space-between;
 }
-.issueTemplate-card__totals-action-select {
-  letter-spacing: 1px;
-}
-.issueTemplate-card__totals-action-deselect {
-  background: #cc454b;
-  letter-spacing: 1px;
-}
+
 .issueTemplate-card__footer-summary {
   display: flex;
   font-size: 14px;
@@ -174,6 +193,7 @@ export default {
   color: #4294d0;
   flex-grow: 1;
 }
+
 .issueTemplate-card__totals-total {
   color: #cc454b;
   display: flex;
@@ -193,12 +213,22 @@ export default {
 
 .issueTemplate-card__container {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 235px;
+  border-radius: 3px;
+  background: #fff;
+  width: 100%;
 }
 .issueTemplate-card__subheading-title {
   color: #4294d0;
   font-weight: 600;
   padding-right: 5px;
   font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
 }
 .issueTemplate-card__subheading-process-separator {
   padding: 0 5px;

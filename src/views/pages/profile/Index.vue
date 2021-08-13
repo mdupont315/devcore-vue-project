@@ -261,8 +261,7 @@ export default {
   },
   mounted() {
     this.initForm();
-    console.log(this.$route.query.i);
-    console.log(this.user);
+
   },
   methods: {
     async initForm() {

@@ -108,7 +108,6 @@ export default {
     }
   },
   async mounted() {
-		console.log("admin mounted");
     if (this.process) {
       this.loadingForm = {
         id: this.process.id,

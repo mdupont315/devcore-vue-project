@@ -13,7 +13,6 @@ Vue.use({
             if (args[1] && args[1].can && args[1]._permissions) {
                 return args[1].can(args[0]);
             }
-
             return user.can(...args);
         }
     }

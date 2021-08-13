@@ -2,7 +2,7 @@
   <b-form
     @submit.prevent="save"
     @keyup="$validator.validateAll()"
-    style="padding: 0 20px"
+    class="issues-template-form"
   >
     <b-row>
       <b-col
@@ -214,5 +214,13 @@ export default {
   flex-grow: 1;
   display: flex;
   place-content: center;
+}
+
+.issues-template-form {
+  padding: 0 20px;
+  height: 235px;
+  border-radius: 3px;
+  background: #fff;
+  width: 100%;
 }
 </style>

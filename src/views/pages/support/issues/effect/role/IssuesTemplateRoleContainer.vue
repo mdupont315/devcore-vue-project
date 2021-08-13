@@ -1,5 +1,8 @@
 <template>
-  <div class="issues-template-role-container">
+  <div
+    class="issues-template-role-container"
+    id="issues-template-role-container"
+  >
     <issue-effect-role-card
       v-if="!isEditing && item.companyRoleId"
       :input="item"
@@ -67,8 +70,6 @@ export default {
         return this.value;
       },
       set(input) {
-        console.log("role container");
-        console.log(input);
         this.$emit("setForm", this.value, this.identifier);
       },
     },
@@ -86,8 +87,6 @@ export default {
   }),
   methods: {
     removeRoleCard(identifier) {
-      console.log(identifier);
-      console.log(this.item);
       this.isEditing = !this.isEditing;
       this.$emit("deleteIdentifier", identifier);
     },
@@ -98,6 +97,29 @@ export default {
   },
 };
 </script>
+<style>
+.issueEffectAddForm-form-popover[x-placement="top"]
+  > .popover-body
+  > .card
+  > div
+  > div
+  > .issues-template-card-container
+  > .issues-template-card-container-items
+  > .issues-template-role-container {
+  align-self: flex-end;
+}
+
+.issueEffectAddForm-form-popover[x-placement="bottom"]
+  > .popover-body
+  > .card
+  > div
+  > div
+  > .issues-template-card-container
+  > .issues-template-card-container-items
+  > .issues-template-role-container {
+  align-self: flex-start;
+}
+</style>
 <style scoped>
 .inner-overlay-create {
   position: absolute;
@@ -109,7 +131,10 @@ export default {
 }
 
 .issues-template-role-container {
+  z-index: 100;
   max-height: 100%;
+  background: transparent;
   max-width: 310px;
+  /*  height: 100%; */
 }
 </style>

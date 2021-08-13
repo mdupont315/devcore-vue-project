@@ -289,7 +289,6 @@ export default {
           );
           newModule._showDetails = true;
         }
-        console.log(this.$refs.modulesTable);
         if (this.$refs.modulesTable) this.$refs.modulesTable.$forceUpdate();
       } finally {
         this.loadingItem = false;
@@ -297,8 +296,6 @@ export default {
     },
 
     async showDetails(row) {
-      console.log("SHOW DETS");
-      console.log(row);
       if (this.currentRowDetails) {
         this.currentRowDetails.item._showDetails = false;
       }
@@ -317,7 +314,6 @@ export default {
       }
     },
     toggleItem(item) {
-      console.log(item);
       this.$validator.pause();
       this.$validator.reset();
       if (!item || (this.currentItem && this.currentItem.id === item.id)) {
@@ -343,14 +339,12 @@ export default {
       this.updateForm.name = item.name;
     },
     async onToolInputChange(query) {
-      console.log(query);
       this.updateForm.tool = null;
 
       if (query.trim().length <= 3) {
         return [];
       }
 
-      console.log(query);
       const response = await this.$store.dispatch("tool/findAll", {
         where: {
           field: "name",

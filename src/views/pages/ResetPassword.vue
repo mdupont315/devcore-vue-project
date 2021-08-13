@@ -41,7 +41,6 @@ export default {
       };
       await this.send();
     } else {
-			console.log("HI");
       await this.$router.replace("/");
     }
   },

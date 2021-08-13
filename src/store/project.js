@@ -186,10 +186,7 @@ const actions = {
       };
       filter.busy = context.getters.all.length < 1;
       try {
-        /* const { data } = await apolloClient.watchquery({
-                    query: PROJECT.findAll,
-                    variables: { filter: filter }
-                }); */
+
         const query = apolloClient.watchQuery({
           query: PROJECT.findAll,
           variables: {
@@ -200,7 +197,6 @@ const actions = {
         const results = result.data.projectFindAll.map(cr => {
           return new Project().deserialize(cr);
         });
-        console.log(results);
         context.commit("SET_ALL", results);
         return results;
       } finally {

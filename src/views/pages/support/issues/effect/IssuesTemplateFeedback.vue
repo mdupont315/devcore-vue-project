@@ -24,7 +24,7 @@
           style="width: 500px; height: 100%"
         >
           <b-textarea
-            v-model="feedbackForm.feedback"
+            v-model="feedbackForm.description"
             v-autoresize
             class="no-style my-0 issue-Effect__feedback-text"
             :placeholder="$t('Issue feedback')"
@@ -50,10 +50,14 @@
               {{ item }}
             </div>
           </div>
-          <b-button
+          <loading-button
+            :disabled="feedbackForm.description.length == 0"
             style="width: 100px; align-self: center; padding: 5px"
+            :loading="isLoading"
             @click="saveIssueFeedback"
-            >{{ $t("Feedback") }}</b-button
+            ><span v-if="!isLoading"
+              >{{ $t("Feedback") }}
+            </span></loading-button
           >
         </div>
       </b-card></b-popover
@@ -79,19 +83,33 @@ export default {
   components: { icoIssueFeedback },
   props: {
     issue: null,
-    openState: false,
+    openState: {
+      required: true,
+      type: Boolean,
+      default() {
+        return false;
+      },
+    },
+  },
+  watch: {
+    openState(newVal) {
+      if (newVal && this.isLoading) {
+        this.isLoading = !this.isLoading;
+        this.feedbackForm.description = "";
+      }
+    },
   },
   data: () => ({
+    isLoading: false,
     feedbackForm: {
-      feedback: null,
-      value: null,
+      description: "",
+      value: 0,
     },
     rewardActiveIndex: 0,
     rewardablePoints: [0, 5, 10, 25, 50, 100],
   }),
   methods: {
     toggleIssueFeedback() {
-      console.log(this.openState);
       //toggles modal
       if (this.openState) {
         this.$emit("close");
@@ -103,6 +121,7 @@ export default {
       //deduct value
       this.feedbackForm.value = this.rewardablePoints[this.rewardActiveIndex];
 
+      this.isLoading = true;
       //emit form
       this.$emit("save", this.feedbackForm);
     },
@@ -121,11 +140,11 @@ export default {
 
 .issueEffect__feedbackIcon {
   border-radius: 50%;
-	fill: #000;
+  fill: #000;
   outline: none;
 }
 
-.issueEffect__feedbackIcon > path{
+.issueEffect__feedbackIcon > path {
   transform: translate(8px, 8px);
 }
 

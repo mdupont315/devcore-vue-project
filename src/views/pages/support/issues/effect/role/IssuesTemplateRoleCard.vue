@@ -1,5 +1,8 @@
 <template>
-  <div class="issueTemplate-role__card-container">
+  <div
+    class="issues-template-role-card-container"
+    id="issueTemplate-role-card-container"
+  >
     <div class="issueTemplate-role__card-container-item">
       <div
         class="issueEffect_add_form-new-issue-effect-create-header"
@@ -25,9 +28,65 @@
     </div>
 
     <div class="issueEffect_add_form-role">{{ getTemplateRole }}</div>
+    <div
+      class="issueEffect_add_form-area"
+      ref="issueEffect_add_form-area"
+      @mouseover="hoveringPath = true"
+      @mouseleave="hoveringPath = false"
+    >
+      <b-popover
+        ref="popover"
+        :target="() => $refs['issueEffect_add_form-area']"
+        :show="isAreaOverCardWidth"
+        triggers="hover"
+        placement="top"
+        style="padding: 10px; border-radius: 3px"
+        class="form-popover"
+        ><template #title
+          ><span style="font-size: 14px; color: #4294d0">{{
+            $t("Area") + ":"
+          }}</span></template
+        >
+        <div
+          style="
+            display: flex;
+            padding: 10px;
+            letter-spacing: 1px;
+            color: #4294d0;
+          "
+        >
+          <div v-for="(title, index) in getTemplateArea" :key="index">
+            <span
+              v-if="index !== 'process'"
+              style="font-size: 8px; padding-left: 5px"
+              >></span
+            >
+            <span> {{ title }}</span>
+          </div>
+        </div>
+      </b-popover>
+      <span style="padding-right: 3px">{{ $t("Area") + ":" }}</span>
+      <div class="issueEffect_add_form-area-items" style="display: flex">
+        <div
+          v-for="(title, index) in getTemplateArea"
+          :key="index"
+          class="issueEffect_add_form-area-item"
+          :style="{
+            'max-width': 180 / Object.keys(getTemplateArea).length + 'px',
+          }"
+        >
+          <span
+            v-if="index !== 'process'"
+            style="font-size: 8px; padding-left: 5px"
+            >></span
+          >
+          <span> {{ title }}</span>
+        </div>
+      </div>
+    </div>
 
     <div class="issueTemplate-card__footer">
-      <hr />
+      <hr style="margin: 0" />
       <div class="issueTemplate-card__footer-summary">
         <div class="issueTemplate-card__totals-title">
           {{ $t("Effect Loss Time") }}
@@ -56,7 +115,7 @@
 <script>
 import { mapGetters } from "vuex";
 import icoEffectEdit from "@/assets/img/icons/svg/ico-issue-effect-edit.svg?inline";
-import icoEffectDelete from "@/assets/img/icons/svg/ico-issue-effect-delete.svg?inline";
+import icoEffectDelete from "@/assets/img/icons/svg/ico-delete.svg?inline";
 
 export default {
   components: {
@@ -76,12 +135,24 @@ export default {
       required: false,
     },
   },
+  data: () => ({
+    hoveringPath: false,
+  }),
 
   computed: {
     ...mapGetters({
       processes: "process/all",
       companyRoles: "companyRole/all",
     }),
+    isAreaOverCardWidth() {
+      const rendered = document.querySelector(
+        ".issueEffect_add_form-area-items"
+      );
+      if (rendered && this.hoveringPath) {
+        return rendered.clientWidth > 160;
+      }
+      return false;
+    },
     getLossTimeValue() {
       return this.formatTime(this.input.effectTime / 100 || 0);
     },
@@ -93,19 +164,50 @@ export default {
         : this.$currencyReverse(0);
     },
     getTemplateLossPercentageTime() {
-      const issueLoss =
-        this.input.effectTime / this.issue.effectedMoneyTotalValue;
-      const percentage = issueLoss * 100;
-      return percentage.toFixed(2) + " %";
+      if (
+        this.input.effectTime != 0 &&
+        this.issue.effectedMoneyTotalValue != 0
+      ) {
+        const issueLoss =
+          this.input.effectTime / this.issue.effectedMoneyTotalValue;
+        const percentage = issueLoss * 100;
+        return percentage.toFixed(2) + " %";
+      } else {
+        return "0%";
+      }
     },
 
     getTemplateLossPercentageValue() {
-      const issueLoss =
-        this.input.effectValue / this.issue.effectedMoneyTotalValue;
-      const percentage = issueLoss * 100;
-      return percentage.toFixed(2) + " %";
+      if (
+        this.input.effectValue != 0 &&
+        this.issue.effectedMoneyTotalValue != 0
+      ) {
+        const issueLoss =
+          this.input.effectValue / this.issue.effectedMoneyTotalValue;
+        const percentage = issueLoss * 100;
+        return percentage.toFixed(2) + " %";
+      } else {
+        return "0%";
+      }
     },
+    getTemplateArea() {
+      const { processId, stageId, operationId, phaseId } = this.input;
+      let path = {};
+      const process = this.processes.find((p) => p.id == processId);
+      const stage = process.stages.find((s) => s.id == stageId);
+      path.process = process.title;
+      if (stage) {
+        path["stage"] = stage.title;
+        const operation = stage.operations.find((s) => s.id == operationId);
+        if (operation) {
+          path["operation"] = operation.title;
+          const phase = operation.phases.find((s) => s.id == phaseId);
+          if (phase) path["phase"] = phase.title;
+        }
+      }
 
+      return path;
+    },
     getTemplateRole() {
       const role = this.companyRoles.find(
         (c) => c.id === this.input.companyRoleId
@@ -130,7 +232,6 @@ export default {
         var timeArr = [...time.toString()];
 
         while (timeArr.length < 4) {
-          console.log(timeArr);
           timeArr.unshift("0");
         }
 
@@ -164,23 +265,38 @@ export default {
   padding-top: 10px;
 }
 
-.issueTemplate-role__card-container {
+
+.issues-template-role-card-container {
   background: #fff;
-  height: 200px;
-  margin-bottom: 10px;
   border-radius: 3px;
   padding: 10px;
-  width: 300px;
   display: flex;
   justify-content: space-between;
   flex-direction: column;
   margin-left: 10px;
+  height: 275px;
+  width: 255px;
 }
 
 .issueEffect_add_form-role {
   font-size: 14px;
   padding: 10px 10px 0 10px;
   color: #4294d0;
+}
+
+.issueEffect_add_form-area {
+  font-size: 14px;
+  padding: 0 10px;
+  color: #4294d0;
+  max-height: 100px;
+  display: flex;
+  overflow: scroll;
+}
+
+.issueEffect_add_form-area-item {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .issueEffect_addRole-editIcon:hover > button > svg > path {
@@ -193,7 +309,9 @@ export default {
 
 .issueTemplate-role__card-container-item {
   align-items: center;
-  padding: 5px 5px 5px 10px;
+  width: 100%;
+  place-self: center;
+  padding: 10px 5px 5px 10px;
   display: flex;
   justify-content: space-between;
 }

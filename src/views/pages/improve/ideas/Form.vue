@@ -225,7 +225,6 @@ export default {
 
     process: {
       get() {
-        console.log(this.currentProcess(this.section));
         return this.currentProcess(this.section);
       },
     },
@@ -295,9 +294,7 @@ export default {
     },
   },
   async mounted() {
-		console.log(this.section)
     this.input = this.item;
-		console.log(this.item);
     if (this.item && this.item.file) this.currentFile = this.item.file;
 
     if (
@@ -309,7 +306,6 @@ export default {
     }
 
     if (this.process) {
-      console.log("find process");
       await this.$store.dispatch("process/findById", {
         id: this.process.process.id,
       });
@@ -321,15 +317,12 @@ export default {
   methods: {
     initForm() {
 			  if (this.section === "issues" && this.issueIdea) {
-				console.log(this.issueIdea);
-				console.log(this.process.process.id);
 				this.form.processId = this.issueIdea.processId;
         this.form.stageId = this.issueIdea.stageId;
         this.form.operationId = this.issueIdea.operationId;
         this.form.phaseId = this.issueIdea.phaseId;
 				return;
       }
-			console.log(this.input)
       if (!this.input.id) {
         this.input.type = this.input.type || "PROCESS";
         this.input.processId = this.input.processId || this.process.process.id;
@@ -357,8 +350,6 @@ export default {
 
       //Issues
       if (this.section === "issues") {
-        console.log("wtf");
-				console.log(this.input);
         this.form.stageId = this.input.stageId;
         this.form.operationId = this.input.operationId;
         this.form.phaseId = this.input.phaseId;
@@ -377,7 +368,6 @@ export default {
           this.form.stageId = this.input.parent.id;
         }
       }
-      console.log(this.form);
     },
     changeStage() {
       this.form.operationId = null;
@@ -390,7 +380,6 @@ export default {
       this.$emit("cancel");
     },
     fileChanged() {
-      console.log(this.form);
       if (!this.form.file) {
         this.form.removeFile = true;
         this.currentFile = null;
@@ -399,10 +388,8 @@ export default {
       }
     },
     async saveItem() {
-      console.log("save Item");
       await this.$validator.validateAll();
 
-      console.log(this.form);
       if (!this.vErrors.any()) {
         this.$validator.reset();
 

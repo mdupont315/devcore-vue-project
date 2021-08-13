@@ -40,7 +40,7 @@
         </div>
         <b-form-input
           id="requiredScore"
-          v-model="form.requiredScore"
+          v-model.number="form.requiredScore"
           :max-length="15"
           autocomplete="off"
           :disabled="form.busy"

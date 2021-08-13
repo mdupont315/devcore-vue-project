@@ -13,7 +13,6 @@ export default class RoleModel extends BaseModel {
 
     deserialize(input) {
         if (input.users) {
-          console.log(input.users);
             input.users = input.users.map(u => {
                 return new UserModel().deserialize(u);
             });
@@ -27,7 +26,6 @@ export default class RoleModel extends BaseModel {
             })
         }
         Object.assign(this, input);
-        console.log(this);
         return this;
     }
 }

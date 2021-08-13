@@ -94,6 +94,9 @@ export const IDEA_FULL_FRAGMENT = gql`
       createdAt
       updatedAt
       anonymous
+      files {
+        ...resourceFields
+      }
       author {
         id
         firstName

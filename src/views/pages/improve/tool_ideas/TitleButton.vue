@@ -64,7 +64,6 @@ export default {
       currentTool: "companyTool/current",
     }),
     getCurrentToolHasValues() {
-      console.log(Boolean(this.currentTool("toolIdeas")));
       return Boolean(this.currentTool("toolIdeas"));
     },
     process: {

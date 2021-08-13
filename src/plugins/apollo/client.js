@@ -34,7 +34,6 @@ const fileUploadLink = new createUploadLink({
   uri: config.graphqlEndpoint,
   credentials: "include",
   fetch: async (uri, options) => {
-    console.log(uri);
     try {
       // add the auth token to the headers
       const token = store.getters["auth/access_token"];
@@ -58,18 +57,10 @@ const fileUploadLink = new createUploadLink({
 
 // apollo links config
 const apolloLinks = [];
-/* console.log(store.getters["auth/access_token"]) */
 config.allowSubscriptions =
   config.allowSubscriptions && store && store.getters["auth/access_token"];
 // allow graphql subscriptions
-console.log(config.allowSubscriptions);
 
-/* if (config.allowSubscriptions) {
-  const echoLink = new EchoLink();
-  apolloLinks.push(echoLink);
-} */
-//const echoLink = new EchoLink();
-//apolloLinks.push(echoLink);
 
 apolloLinks.push(fileUploadLink);
 
@@ -89,11 +80,7 @@ export const apolloClient = new ApolloClient({
     }
   }
 });
-/* const tokenNow = store.getters["auth/access_token"];
-if (tokenNow) {
-  console.log(`Bearer ${tokenNow}`);
-} */
-console.log(apolloClient);
+
 export const apolloProvider = new VueApollo({
   defaultClient: apolloClient
 });

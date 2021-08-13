@@ -42,7 +42,6 @@ export default {
   },
   methods: {
     input(value) {
-			console.log(value);
       this.$emit("input", value);
     }
   }

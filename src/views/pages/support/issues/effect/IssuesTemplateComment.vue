@@ -24,7 +24,7 @@
           style="width: 500px; height: 100%"
         >
           <b-textarea
-            v-model="commentForm.comment"
+            v-model="commentForm.description"
             v-autoresize
             class="no-style my-0 issueEffect__comment-text"
             :placeholder="$t('Issue comment')"
@@ -32,10 +32,12 @@
           ></b-textarea>
         </div>
         <div style="display: flex; justify-content: center; padding-top: 5px">
-          <b-button
+          <loading-button
+            :disabled="commentForm.description.length == 0"
+            :loading="isLoading"
             style="width: 100px; align-self: center; padding: 5px"
             @click="saveIssueComment"
-            >{{ $t("Comment") }}</b-button
+            ><span v-if="!isLoading">{{ $t("Comment") }}</span></loading-button
           >
         </div>
       </b-card></b-popover
@@ -61,16 +63,30 @@ export default {
   components: { icoIssueEdit },
   props: {
     issue: null,
-    openState: false,
+    openState: {
+      required: true,
+      type: Boolean,
+      default() {
+        return false;
+      },
+    },
+  },
+  watch: {
+    openState(newVal) {
+      if (newVal && this.isLoading) {
+        this.isLoading = !this.isLoading;
+				this.commentForm.description = "";
+      }
+    },
   },
   data: () => ({
+    isLoading: false,
     commentForm: {
-      comment: null,
+      description: "",
     },
   }),
   methods: {
     toggleIssueComment() {
-      console.log(this.openState);
       //toggles modal
       if (this.openState) {
         this.$emit("close");
@@ -80,6 +96,7 @@ export default {
     },
     saveIssueComment() {
       //emit form
+      this.isLoading = true;
       this.$emit("save", this.commentForm);
     },
   },

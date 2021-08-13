@@ -231,7 +231,6 @@ export default {
           value: element.code,
         });
       });
-			console.log(items);
       return items;
     },
     getAssignableRoles() {
@@ -253,7 +252,6 @@ export default {
           );
       }
 
-			console.log(assignableRoles);
 
       return assignableRoles;
     },
@@ -280,8 +278,6 @@ export default {
         await this.$validator.validateAll();
         if (!this.vErrors.any()) {
           await this.$validator.reset();
-          console.log(this.form);
-
           if (this.mode === "edit") {
             this.input = await this.$store.dispatch("user/update", this.form);
           } else {

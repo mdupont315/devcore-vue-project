@@ -192,7 +192,6 @@ export default {
         this.$validator.reset();
         await this.$store.dispatch("auth/resetPassword", this.form);
         blockUi();
-        console.log(this.form.code);
         //  await this.$router.push("/login");
         /*   await this.$router.push({
           name: "my-profile",

@@ -41,11 +41,9 @@ export default {
     },
   },
   mounted() {
-		console.log(this.input);
     Object.keys(this.input || {})
       .filter((key) => key in this.form)
       .forEach((key) => (this.form[key] = this.input[key]));
-    console.log(this.form);
   },
   methods: {
     async setPreferences() {

@@ -1,5 +1,8 @@
 <template>
-  <div @click="toggleCreateForm(item)" style="cursor: pointer;max-width:15%;z-index:1">
+  <div
+    @click="toggleCreateForm(item)"
+    class="engage_progress_container_body_item-container"
+  >
     <div
       class="engage_progress_container_body_item-action-center"
       v-if="itemMeta.itemIndex !== itemMeta.count"
@@ -16,11 +19,13 @@
     </div>
     <div
       class="engage_progress_container_body_item-action-last"
-      style="margin-top: 15px"
       v-else
     >
       <b-button
-        class="milestone-line line-last-container-icon line-center-container-icon"
+        class="
+          milestone-line
+          line-last-container-icon line-center-container-icon
+        "
         pill
         variant="outline-primary"
         :id="`btnMilestone-${item.id}`"
@@ -114,15 +119,21 @@ export default {
   font-size: 42px;
   max-height: 50px;
   cursor: pointer;
-  transform: translate(-50px, 0px);
+  /*   transform: translate(-50px, 0px); */
   align-items: center;
   font-size: 20px;
-  transform: translate(-30px, 28px);
+  /*   transform: translate(-30px, 28px); */
   background: #4294d0;
   color: #fff;
 }
 .milestone-line.line-center-container-icon:hover {
   color: #fff;
+}
+
+.engage_progress_container_body_item-container {
+  cursor: pointer;
+  width: 15%;
+  z-index: 1;
 }
 
 .milestone-line.line-center-container-icon {
@@ -143,7 +154,7 @@ export default {
   justify-content: center;
 }
 .engage_progress_container_body_item-action-last {
-  margin: 30px 20px 0 20px;
+  /*   margin: 30px 20px 0 20px; */
 }
 .engage_progress_container_body_item-action-center {
   display: flex;
@@ -157,5 +168,8 @@ export default {
   content: "\F417";
   z-index: 1;
   font-size: 20px;
+  display: flex;
+	margin-top: 44px;
+  place-content: center;
 }
 </style>

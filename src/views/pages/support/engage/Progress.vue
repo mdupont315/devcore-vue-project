@@ -1,7 +1,5 @@
 <template>
   <div class="engage_progress_container">
-    <!--   <div class="engage_progress_container-header"> -->
-    <!-- v-if="items.length > 0 && !isEditing" -->
     <div
       class="engage_progress_container-header-edit"
       :class="{ 'is-elevated-layer': isEditing }"
@@ -44,137 +42,135 @@
 
     <inner-overlay
       v-if="innerOverlayOpen"
-      style="z-index: 1"
+      style="z-index: 2"
       @click="toggleCreateForm"
     ></inner-overlay>
-    <div
-      class="engage_progress_container-body"
-      style="display: flex; flex-direction: row"
-    >
-      <div
-        v-for="(part, index) in getProgressPart"
-        :key="index"
-        class="engage_progress_container_body_item"
-      >
-        <progress-part
-          :item="part"
-          :itemMeta="{
-            itemIndex: index + 1,
-            count: getProgressPart.length,
-          }"
+    <div class="engage_progress_container-body">
+      <div class="engage_progress_container_body_scrollContainer">
+        <div
+          v-for="(part, index) in getProgressPart"
+          :key="index"
+          class="engage_progress_container_body_item"
         >
-          <!-- Delete -->
-
-          <div
-            v-if="isEditing"
-            @click="removeItem(part)"
-            class="
-              deleteIcon
-              engage_progress_container_body_item-delete
-              is-elevated-layer
-            "
+          <progress-part
+            :item="part"
+            :itemMeta="{
+              itemIndex: index + 1,
+              count: getProgressPart.length,
+            }"
           >
-            <i class="mdi mdi-trash-can" />
-          </div>
-
-          <div
-            class="engage_progress_container-body-score"
-            :class="{ 'is-elevated-layer': isEditing }"
-          >
-            <span class="engage_progress_container-body-score-text">
-              {{ $t("requiredScore") }}
-            </span>
-            <div v-if="!isEditing">
-              <span class="engage_progress_container-body-score-value"
-                >{{ part.requiredScore }}
+            <div
+              class="engage_progress_container-body-score"
+              :class="{ 'is-elevated-layer': isEditing }"
+            >
+              <span class="engage_progress_container-body-score-text">
+                {{ $t("requiredScore") }}
               </span>
+              <div v-if="!isEditing">
+                <span class="engage_progress_container-body-score-value"
+                  >{{ part.requiredScore }}
+                </span>
+              </div>
+              <div v-else>
+                <input
+                  type="text"
+                  style="border-radius: 20px"
+                  class="form-control engage_progress_container-edit-input"
+                  :placeholder="part.requiredScore"
+                  v-model="editItems[index].requiredScore"
+                />
+              </div>
             </div>
-            <div v-else>
-              <input
-                type="text"
-                style="border-radius: 20px"
-                class="form-control engage_progress_container-edit-input"
-                :placeholder="part.requiredScore"
-                v-model="editItems[index].requiredScore"
-              />
-            </div>
-          </div>
-          <div
-            class="engage_progress_container-body-reward"
-            :class="{ 'is-elevated-layer': isEditing }"
-          >
-            <div v-if="!isEditing">{{ part.reward }}</div>
-            <div v-else>
-              <input
-                type="text"
-                class="form-control engage_progress_container-edit-input"
-                :placeholder="part.reward"
-                v-model="editItems[index].reward"
-              />
-            </div>
-          </div>
-
-          <div class="engage_progress_container-body-text">
-            <b-card v-if="!isEditing">
-              <b-card-title
-                v-b-tooltip="{
-                  title: part.title ? part.title : '',
-                  placement: 'topright',
-                  variant: 'light',
-                }"
-                :disabled="isTextOverArea(part.id)"
-                :class="{ 'is-elevated-layer': isEditing }"
-                style="
-                  overflow: hidden;
-                  white-space: nowrap;
-                  text-overflow: ellipsis;
-                "
-                >{{ part.title }}</b-card-title
-              >
-              <b-card-text
-                :id="`engage_progress_container-body-text-area-${part.id}`"
-                v-b-tooltip="{
-                  title: part.description ? part.description : '',
-                  placement: 'topright',
-                  variant: 'light',
-                }"
-                :ref="`engage_progress_container-body-text-area-${part.id}`"
-              >
-                {{ part.description ? part.description : $t("No description") }}
-              </b-card-text>
-            </b-card>
-
-            <b-card style="padding: 10px; height: 150px" v-else>
-              <b-card-title>
+            <div
+              class="engage_progress_container-body-reward"
+              :class="{ 'is-elevated-layer': isEditing }"
+            >
+              <div v-if="!isEditing">{{ part.reward }}</div>
+              <div v-else>
                 <input
                   type="text"
                   class="form-control engage_progress_container-edit-input"
-                  v-model="editItems[index].title"
-                  :placeholder="part.title"
-              /></b-card-title>
-
-              <div class="form-group">
-                <textarea
-                  trigger="hover"
-                  :placeholder="part.description"
-                  v-model="editItems[index].description"
-                  class="form-control rounded-0"
-                  rows="3"
-                ></textarea>
+                  :placeholder="part.reward"
+                  v-model="editItems[index].reward"
+                />
               </div>
-            </b-card>
-          </div>
-        </progress-part>
-        <progress-button
-          :item="part"
-          :itemMeta="{
-            itemIndex: index + 1,
-            count: getProgressPart.length,
-            scores: getRequiredScores,
-          }"
-          @toggle="toggleCreateForm"
-        >
-        </progress-button>
+            </div>
+
+            <div
+              class="engage_progress_container-body-text"
+              :class="{ 'is-elevated-layer': isEditing }"
+            >
+              <b-card v-if="!isEditing">
+                <b-card-title
+                  v-b-tooltip="{
+                    title: part.title ? part.title : '',
+                    placement: 'topright',
+                    variant: 'light',
+                  }"
+                  :disabled="isTextOverArea(part.id)"
+                  style="
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                  "
+                  >{{ part.title }}</b-card-title
+                >
+                <b-card-text
+                  :id="`engage_progress_container-body-text-area-${part.id}`"
+                  v-b-tooltip="{
+                    title: part.description ? part.description : '',
+                    placement: 'topright',
+                    variant: 'light',
+                  }"
+                  :ref="`engage_progress_container-body-text-area-${part.id}`"
+                >
+                  {{
+                    part.description ? part.description : $t("No description")
+                  }}
+                </b-card-text>
+              </b-card>
+
+              <b-card style="padding: 10px; height: 150px" v-else>
+                <b-card-title>
+                  <input
+                    type="text"
+                    class="form-control engage_progress_container-edit-input"
+                    v-model="editItems[index].title"
+                    :placeholder="part.title"
+                /></b-card-title>
+
+                <div class="form-group">
+                  <b-form-textarea
+                    no-resize
+                    trigger="hover"
+                    :placeholder="part.description"
+                    v-model="editItems[index].description"
+                    class="form-control rounded-0"
+                    rows="3"
+                  ></b-form-textarea>
+                </div>
+              </b-card>
+            </div>
+          </progress-part>
+          <progress-button
+            v-if="!isEditing"
+            :item="part"
+            :itemMeta="{
+              itemIndex: index + 1,
+              count: getProgressPart.length,
+              scores: getRequiredScores,
+            }"
+            @toggle="toggleCreateForm"
+          >
+          </progress-button>
+          <progress-delete
+            v-else
+            @remove="removeItem"
+            :item="part"
+            class="is-elevated-layer"
+          >
+          </progress-delete>
+        </div>
       </div>
     </div>
   </div>
@@ -183,12 +179,14 @@
 <script>
 import ProgressPart from "./ProgressPart.vue";
 import ProgressButton from "./ProgressButton.vue";
+import ProgressDelete from "./ProgressDelete.vue";
 import MilestoneModel from "@/models/milestone.model";
 import GQLForm from "@/lib/gqlform";
 
 export default {
   components: {
     "progress-part": ProgressPart,
+    "progress-delete": ProgressDelete,
     "progress-button": ProgressButton,
   },
   props: {
@@ -264,26 +262,21 @@ export default {
         `engage_progress_container-body-text-area-${id}`
       );
       if (!el) return;
-      console.log(el.clientHeight);
       return el.clientHeight > 150;
     },
     removeItem(part) {
       this.editItems = this.editItems.filter((item) => item.id !== part.id);
-      console.log(part);
       if (this.editItems.length === 0) {
         this.editItems = [{ ...this.defaultItem }];
       }
-      console.log(this.editItems);
       this.$store.dispatch("milestone/delete", part);
     },
     toggleCreateForm(previous) {
       if (this.isEditing) {
         this.isEditing = !this.isEditing;
       }
-      console.log(previous);
       if (this.items.length > 0) {
         if (previous) {
-          console.log("HI");
           this.items.forEach((item) => (item._clickedIndex = null));
           this.items.find((item) => item.id == previous.id)._clickedIndex =
             previous.id;
@@ -363,7 +356,7 @@ export default {
 .is-elevated-layer {
   z-index: 2;
 }
-
+/*
 .engage_progress_container_body_item-delete {
   background: #dc3545;
   color: #fff;
@@ -379,13 +372,12 @@ export default {
   align-self: flex-end;
   align-items: center;
   transform: translate(0px, -120px);
-}
+} */
 
 .engage_progress_container {
   display: flex;
   flex-direction: column;
   background: #fff;
-  height: 100%;
   margin-right: 15px;
   border-radius: 5px;
   margin-left: 15px;
@@ -446,6 +438,7 @@ export default {
 .engage_progress_container-body-score-text,
 .engage_progress_container-body-reward-text {
   width: 100%;
+  white-space: nowrap;
 }
 
 .engage_progress_container-body-text {
@@ -463,6 +456,7 @@ export default {
 
 .engage_progress_container-header-edit {
   width: 40px;
+  margin-bottom: 20px;
   height: 40px;
   text-align: center;
   margin-right: 40px;
@@ -492,12 +486,20 @@ export default {
   height: 100%;
   margin: auto;
   align-self: center;
+  overflow: hidden;
   justify-content: flex-start;
   background: #fff;
   display: flex;
   flex-direction: row;
 }
-
+.engage_progress_container_body_scrollContainer {
+  overflow-x: scroll;
+  display: flex;
+  flex-direction: row;
+  max-width: 100%;
+  width: 100%;
+  margin: 0 40px;
+}
 .engage-header-edit-icon:before {
   transform: translate(0px, 5px);
 }

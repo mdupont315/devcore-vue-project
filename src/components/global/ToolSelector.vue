@@ -134,9 +134,7 @@ export default {
 
   async mounted() {
     var result = await this.$store.dispatch("companyTool/findAll");
-    console.log(result);
     if (this.value) {
-			console.log(this.value);
       this.dataValue = this.value.filter(
         (o) => this.tools.find((u) => u.id === o) != null
       );
@@ -150,7 +148,6 @@ export default {
       return this.selectedItems && this.selectedItems.length > 0;
     },
     getName(item) {
-      console.log(item);
       return item.name;
     },
     removeItem(item, event) {

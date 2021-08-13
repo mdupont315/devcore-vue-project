@@ -46,7 +46,6 @@ export default class IssueEffectTemplate extends BaseModel {
   }
 
   deserialize(input) {
-    console.log(input);
     Object.assign(this, input);
     return this;
   }

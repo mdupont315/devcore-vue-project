@@ -35,3 +35,4 @@ export * from './reports';
 export * from './milestone';
 export * from './effect';
 export * from './effectTemplate';
+export * from './issueReply';

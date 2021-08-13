@@ -1,7 +1,8 @@
 <template>
   <b-form
     @keyup="$validator.validateAll()"
-    class="issues-template-role-container-form"
+    class="issues-template-role-form-container"
+    id="issues-template-role-form-container"
   >
     <div class="issueTemplate-role__card-container-item">
       <div
@@ -28,8 +29,8 @@
       </div>
     </div>
 
-    <b-row>
-      <b-col class="col-12" style="padding-bottom: 10px; padding-top: 10px">
+    <b-row style="padding: 0 20px">
+      <b-col class="col-12" style="padding-top: 20px; padding-bottom: 10px">
         <div class="form-label-group select required">
           <v-select
             v-model="roleForm.companyRoleId"
@@ -122,7 +123,9 @@
 
       <b-col class="col-12" style="padding-bottom: 10px">
         <b-row style="padding: 0 0 10px 10px">
-          <b-col class="col-5" style="align-self: center"> Cost loss</b-col>
+          <b-col class="col-5" style="align-self: center; font-size: 14px">
+            {{ $t("Effect Loss Value") }}</b-col
+          >
           <b-col class="col-7">
             <b-form-input
               autocomplete="off"
@@ -137,7 +140,9 @@
           </b-col>
         </b-row>
         <b-row style="padding: 0 0 10px 10px">
-          <b-col class="col-5" style="align-self: center"> Time loss</b-col>
+          <b-col class="col-5" style="align-self: center; font-size: 14px">
+            {{ $t("Effect Loss Time") }}</b-col
+          >
           <b-col class="col-7">
             <b-form-input
               v-model="getSelectedLossTime"
@@ -161,7 +166,7 @@
 	<script>
 import { mapGetters } from "vuex";
 import icoEffectView from "@/assets/img/icons/svg/ico-issue-effect-view.svg?inline";
-import icoEffectDelete from "@/assets/img/icons/svg/ico-issue-effect-delete.svg?inline";
+import icoEffectDelete from "@/assets/img/icons/svg/ico-delete.svg?inline";
 
 export default {
   components: {
@@ -271,8 +276,6 @@ export default {
       },
       set(input) {
         this.$validator.validateAll();
-        console.log("role form");
-        console.log(input);
         this.$emit("input", input);
       },
     },
@@ -321,21 +324,24 @@ export default {
 };
 </script>
 <style scoped>
-.issues-template-role-container-form {
-  padding: 10px;
-  width: 300px;
+.issues-template-role-form-container {
   display: flex;
   justify-content: space-between;
   flex-direction: column;
   margin-left: 10px;
   background: #fff;
   border-radius: 3px;
+  width: 255px;
+  min-height: 275px;
 }
 
 .issueTemplate-role__card-container-item {
   align-items: center;
-  padding: 5px 0px 5px 10px;
+  width: 100%;
+  place-self: center;
+  height: 50px;
   display: flex;
+  padding: 20px 20px 0 20px;
   justify-content: space-between;
 }
 .issueEffect_addRole-editIcon > button > svg > path {

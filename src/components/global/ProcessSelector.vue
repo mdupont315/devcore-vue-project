@@ -419,7 +419,6 @@ export default {
     }),
     current: {
       get() {
-        console.log(this.section);
         return this.currentProcess(this.section);
       },
     },
@@ -441,7 +440,6 @@ export default {
   async mounted() {
     try {
       this.loading.process = true;
-      console.log(this.section);
       this.$store.dispatch("process/setCurrentSection", this.section);
       await this.$store.dispatch("process/findAll", {
         filter: null,
@@ -477,11 +475,9 @@ export default {
       if (item.__typename === "Process" && item.stages.length > 0) {
         let count = 0;
         item.stages.forEach(s => {
-					console.log(s.ideasCount);
 					count += s.ideasCount
 				});
 
-        console.log(count);
       }
 
       if (item.__typename === "ProcessStage" && item.operations.length > 0) {
@@ -492,14 +488,11 @@ export default {
       if (!item) {
         return "";
       }
-  /*     console.log(this.showCount); */
       switch (this.showCount) {
         case "ideas": {
-    /*       console.log(section); */
           if (item.__typename === "Process") {
             let stageIdeaCount = 0;
             if (item.stages.length > 0) {
-			/* 				console.log("this.getIdeasCount(item)");*/
 							this.getIdeasCount(item);
               item.stages.map((stage) => (stageIdeaCount += stage.ideaCount));
             }
@@ -530,7 +523,6 @@ export default {
       return "";
     },
     async toggleSection(name) {
-      console.log(name);
       if (this.expandedSection === name) {
         this.expandedSection = null;
       } else {

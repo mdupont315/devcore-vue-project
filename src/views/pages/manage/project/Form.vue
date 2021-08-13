@@ -229,17 +229,14 @@
                 }"
               >
               </inner-overlay>
-              <b-card
-                v-if="showAdvanced"
-                no-body
-              >
+              <b-card v-if="showAdvanced" no-body>
                 <b-popover
                   ref="popover"
                   :target="() => $refs.projectFormNameField"
                   :show.sync="showAdvanced"
                   placement="right"
-									offset="-10%"
-									custom-class="advancedForm-form-popover"
+                  offset="-10%"
+                  custom-class="advancedForm-form-popover"
                   class="form-popover"
                 >
                   <advanced-form
@@ -366,7 +363,7 @@ export default {
     ],
     ready: false,
     input: null,
-    toolsForStage: null,
+    toolsForStage: [],
     budget: null,
     checked: false,
     advancedForm: null,
@@ -441,8 +438,9 @@ export default {
 
         const result = this.$store.getters["idea/byProcess"](this.process.id);
         const filteredIdeasByStatus = result.filter(
-          (o) => o.status === "TESTING" || o.status === "ADOPTED"
+          (o) => (o.status === "TESTING" || o.status === "ADOPTED") && o.parent
         );
+        console.log(filteredIdeasByStatus);
 
         //Include all in Create
         //Include filter by Staged
@@ -540,10 +538,8 @@ export default {
 
   methods: {
     setAdvancedForm() {
-      console.log(this.advancedForm.issueEvaluationRoles);
       this.form.issueEvaluationRoles = this.advancedForm.issueEvaluationRoles;
       this.advancedSettingsSet = this.form.issueEvaluationRoles.length > 0;
-      console.log(this.advancedSettingsSet);
     },
     toggleAdvanced() {
       this.showAdvanced = !this.showAdvanced;
@@ -738,11 +734,12 @@ export default {
 
 <style>
 .advancedForm-form-popover.popover > .arrow {
-	display: none !important;
+  display: none !important;
 }
-.div.arrow{
-	display: none !important;
-}</style>
+.div.arrow {
+  display: none !important;
+}
+</style>
 <style scoped>
 .project_advaced_actions {
   font-size: 15px;
@@ -784,6 +781,4 @@ export default {
   z-index: 1;
   position: fixed;
 }
-
-
 </style>

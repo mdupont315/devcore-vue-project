@@ -213,7 +213,6 @@ export default {
   }),
   methods: {
     getStageIdeasLength(stage) {
-      console.log(stage);
       return stage.ideas.length;
     },
     async toggle() {
@@ -221,7 +220,6 @@ export default {
       await this.loadDetails();
     },
     initEdit() {
-      console.log(this.item);
       this.editItem = {
         id: this.item.id,
         ideaIds: [...new Set(this.item.ideas.map((i) => i.ideaId))],
@@ -259,8 +257,6 @@ export default {
       this.$emit("changed", this.item);
     },
     async completeStage() {
-      console.log(this.item.type);
-      console.log(this.stage);
       const stageIdOrStageIds =
         this.item.type === "NORMAL"
           ? [this.stage.id]

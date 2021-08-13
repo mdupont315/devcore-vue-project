@@ -1,68 +1,69 @@
 <template>
   <div class="container-fluid">
     <!-- page content -->
-    <b-card style="height: 100%">
-      <b-table
-        sort-icon-left
-        sort-by="name"
-        :busy="filter.busy"
-        class="t01"
-        hover
-        :fields="fields"
-        :items="getMilestoneUsers"
-        :show-empty="true"
-        :empty-text="$t('There are no records for the given criteria')"
-      >
-        <template v-slot:table-colgroup>
-          <col style="width: 25%" />
-          <col style="width: 25%" />
-          <col style="width: 25%" />
-          <col style="width: 25%" />
-        </template>
-        <template v-slot:empty="scope">
-          <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
-        </template>
-        <template v-slot:table-busy>
-          <div class="text-center text-primary my-2">
-            <b-spinner class="align-middle"></b-spinner>
-          </div>
-        </template>
+    <b-table
+      sort-icon-left
+      sort-by="name"
+      class="t01"
+      hover
+      fixed
+      sticky-header
+      style="background: #fff"
+      :fields="fields"
+      :items="getMilestoneUsers"
+      table-class="engage_table"
+      :show-empty="true"
+      :empty-text="$t('There are no records for the given criteria')"
+    >
+      <template v-slot:table-colgroup>
+        <col style="width: 25%" />
+        <col style="width: 25%" />
+        <col style="width: 25%" />
+        <col style="width: 25%" />
+      </template>
+      <template v-slot:empty="scope">
+        <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
+      </template>
+      <template v-slot:table-busy>
+        <div class="text-center text-primary my-2">
+          <b-spinner class="align-middle"></b-spinner>
+        </div>
+      </template>
 
-        <!-- name -->
-        <template v-slot:cell(name)="row">
-          <div v-if="row.item.user">
-            {{ row.item.user.firstName }} {{ row.item.user.lastName }}
-          </div>
-        </template>
+      <!-- name -->
+      <template v-slot:cell(name)="row">
+        <div v-if="row.item.user">
+          {{ row.item.user.firstName }} {{ row.item.user.lastName }}
+        </div>
+      </template>
 
-        <!-- engageScore -->
-        <template v-slot:cell(score)="row">
-          <div v-if="row.item.engageScore">{{ row.item.engageScore }}</div>
-        </template>
+      <!-- engageScore -->
+      <template v-slot:cell(score)="row">
+        <div v-if="row.item.engageScore">{{ row.item.engageScore }}</div>
+      </template>
 
-        <!-- reward -->
-        <template v-slot:cell(reward)="row">
-          <div v-if="row.item">{{ getValueRank(row.item) }}</div>
-        </template>
+      <!-- reward -->
+      <template v-slot:cell(reward)="row">
+        <div v-if="row.item">{{ getValueRank(row.item) }}</div>
+      </template>
 
-        <!-- action -->
-        <template v-slot:cell(action)="row">
-          <div v-if="row.item">
-            <loading-button
-              type="submit"
-              size="lg"
-              @click="reward(row)"
-              :variant="row.item.rewarded ? 'outline-primary' : 'success'"
-              :disabled="filter.busy || row.item.rewarded || vErrors.any()"
-              :style="row.item.rewarded ? 'cursor:not-allowed' : 'cursor:pointer'"
-              :loading="filter.busy"
-              :block="true"
-              >{{ getRowItemRewarded(row.item) }}</loading-button
-            >
-          </div>
-        </template>
-      </b-table>
-    </b-card>
+      <!-- action -->
+      <template v-slot:cell(action)="row">
+        <div v-if="row.item">
+          <loading-button
+            type="submit"
+            size="lg"
+            @click="reward(row)"
+            :variant="row.item.rewarded ? 'outline-primary' : 'success'"
+            :disabled="filter.busy || row.item.rewarded || vErrors.any()"
+            :style="row.item.rewarded ? 'cursor:not-allowed' : 'cursor:pointer'"
+            :loading="filter.busy && loadingId == row.item.milestoneId"
+            :block="true"
+            >{{ getRowItemRewarded(row.item) }}</loading-button
+          >
+        </div>
+      </template>
+    </b-table>
   </div>
 </template>
 
@@ -80,6 +81,7 @@ export default {
   data: () => {
     return {
       store: "milestone",
+      loadingId: null,
       filter: {
         busy: false,
       },
@@ -95,18 +97,30 @@ export default {
     fields: {
       get() {
         return [
-          { key: "name", label: this.$t("Username"), sortable: true },
+          {
+            key: "name",
+            label: this.$t("Username"),
+            sortable: true,
+            thClass: "engage_table_header",
+          },
           {
             key: "score",
             label: this.$t("currentValue"),
             sortable: true,
+            thClass: "engage_table_header",
           },
           {
             key: "reward",
             label: this.$t("rewardAchieved"),
             sortable: true,
+            thClass: "engage_table_header",
           },
-          { key: "action", label: this.$t("rewardGiven"), class: "action" },
+          {
+            key: "action",
+            label: this.$t("rewardGiven"),
+            class: "action",
+            thClass: "engage_table_header",
+          },
         ];
       },
     },
@@ -143,13 +157,16 @@ export default {
       console.log("overlayClick");
     },
     async reward(row) {
-      this.filter.busy = true;
+      console.log(row);
+      this.loadingId = row.item.milestoneId;
       if (!row.item.rewarded) {
-        const checkForm = new GQLForm({
+        this.filter.busy = true;
+        const rewardForm = new GQLForm({
           id: row.item.userId,
           rewarded: !row.item.rewarded,
+          milestoneId: row.item.milestoneId,
         });
-        await this.$store.dispatch("milestone/reward", checkForm);
+        await this.$store.dispatch("milestone/reward", rewardForm);
         this.filter.busy = false;
       }
     },
@@ -157,8 +174,18 @@ export default {
 };
 </script>
 
-<style scoped>
-.container-fluid {
-  height: 100%;
+<style>
+.engage_table_header {
+  height: 60px;
+  color: #4294d0;
+  z-index: 1 !important;
+}
+.engage_table_header > div {
+  line-height: 35px;
+  color: #4294d0;
+}
+
+.engage_container_content > .container-fluid > .b-table-sticky-header {
+  padding: 0 20px;
 }
 </style>

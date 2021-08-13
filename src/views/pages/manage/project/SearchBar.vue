@@ -43,7 +43,6 @@ export default {
   },
   methods: {
     async filterResults(filter) {
-			console.log(filter);
       await this.$store.dispatch("project/filter", filter);
     }
   }

@@ -18,10 +18,8 @@ export default class ServerResponse {
   }
 
   fromGraphQLErrors(graphQLErrors) {
-    console.log(graphQLErrors);
     this.statusCode = 500;
     this.code = "Server error";
-    console.log(graphQLErrors);
     if (graphQLErrors && graphQLErrors[0]) {
       const error = graphQLErrors[0];
       this.statusCode =

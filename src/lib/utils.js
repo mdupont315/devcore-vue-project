@@ -78,8 +78,6 @@ export function showGraphqlErrorFromResponse(networkError) {
 }
 
 export function showMessageFromResponse(response) {
-  console.log(response.statusCode);
-  console.log(response);
   if (response.statusCode == 401) {
     window.vm.$snotify.error(window.vm.$t(response.message));
     return;
@@ -90,7 +88,6 @@ export function showMessageFromResponse(response) {
   if (window.vm.$t(translationKey) == translationKey) {
     return;
   }
-  console.log(translationKey);
   if (response.statusCode > 300) {
     window.vm.$snotify.error(window.vm.$t(`${translationKey}Fail`));
   } else {
@@ -159,10 +156,8 @@ export async function loadApp() {
   try {
     await store.dispatch("auth/init");
     var getsession = await store.dispatch("auth/getSession");
-    console.log(getsession);
     try {
       if (store.getters["auth/user"]) {
-        console.log("User logged in!");
         await store.dispatch("app/load");
         store.dispatch("app/asyncLoad");
         if (store.getters["auth/user"].mustChangePassword) {

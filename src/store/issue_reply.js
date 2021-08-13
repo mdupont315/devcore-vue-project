@@ -1,6 +1,5 @@
-import { IssueEffect } from "@/models";
-import { ISSUE_EFFECT } from "@/graphql";
-import { ISSUE_EFFECT_TEMPLATE } from "@/graphql";
+import { ISSUE_REPLY } from "@/graphql";
+import { IssueReply } from "@/models";
 import { queryToPromise } from "../lib/utils";
 import { apolloClient } from "../plugins/apollo/client";
 
@@ -37,9 +36,9 @@ const getters = {
 const actions = {
   async create(context, form) {
     const result = await form.mutate({
-      mutation: ISSUE_EFFECT.create
+      mutation: ISSUE_REPLY.create
     });
-    const role = new IssueEffect().deserialize(result.data.issueEffectCreate);
+    const role = new IssueReply().deserialize(result.data.issueReplyCreate);
     await context.dispatch("findAll", {
       force: true
     });
@@ -48,14 +47,12 @@ const actions = {
 
   async update(context, form) {
     const result = await form.mutate({
-      mutation: ISSUE_EFFECT.update,
+      mutation: ISSUE_REPLY.update,
       variables: {
         id: form.id
       }
     });
-    const role = new IssueEffect().deserialize(
-      result.data.issueEffectUpdate
-    );
+    const role = new IssueReply().deserialize(result.data.issueReplyUpdate);
     await context.dispatch("findAll", {
       force: true
     });
@@ -63,89 +60,72 @@ const actions = {
   },
 
   async delete(context, form) {
+    context.commit("REMOVE_ITEM", form);
     const result = await form.mutate({
-      mutation: ISSUE_EFFECT.delete,
+      mutation: ISSUE_REPLY.delete,
       variables: {
         id: form.id
       }
     });
-
     context.dispatch("findAll", {
       force: true
     });
-    return result.data.issueEffectDelete;
+    // await context.dispatch('findAll', { force: true });
+    return result.data.issueDelete;
   },
 
-  async createTemplate(context, form) {
-    const result = await form.mutate({
-      mutation: ISSUE_EFFECT_TEMPLATE.create
-    });
-    const template = new IssueEffect().deserialize(
-      result.data.issueEffectTemplateCreate
-    );
-    context.commit("SET_TEMPLATE", template);
-
-    return template;
-  },
-
-  async updateTemplate(context, form) {
-    const result = await form.mutate({
-      mutation: ISSUE_EFFECT_TEMPLATE.update,
-      variables: {
-        id: form.id
-      }
-    });
-    const template = new IssueEffect().deserialize(
-      result.data.issueEffectUpdateTemplate
-    );
-    context.dispatch("findAll", {
-      force: true
-    });
-    return template;
-  },
-
-  async deleteTemplate(context, form) {
-    const result = await form.mutate({
-      mutation: ISSUE_EFFECT_TEMPLATE.deleteTemplate,
-      variables: {
-        id: form.id
-      }
-    });
-    return result.data.issueEffectTemplateDelete;
-  },
-
-  async deleteManyTemplate(context, form) {
-    const result = await form.mutate({
-      mutation: ISSUE_EFFECT_TEMPLATE.deleteManyTemplate,
-      variables: {
-        ids: form.ids
-      }
-    });
-
-    return result.data.issueEffectTemplateDeleteMany;
-  },
-
-  async findById(context, filter) {
-    const currentItem = context.state.all.find(o => o.id === filter.id);
-    const force = filter.force || false;
-
-    if (!currentItem || force || !currentItem.loaded) {
-      try {
-        const query = apolloClient.watchQuery({
-          query: ISSUE_EFFECT.findById,
-          variables: filter
-        });
-        const { result } = await queryToPromise(query);
-        const template = new IssueEffect().deserialize(
-          result.data.issueEffectFindById
-        );
-        context.commit("SET_ITEM", template);
-        return template;
-      } finally {
-        filter.busy = false;
-      }
+  async findByProcess(context, filter) {
+    if (!context.state.loadedProcess.includes(filter.id) || filter.force) {
+      const query = apolloClient.watchQuery({
+        query: ISSUE_REPLY.findAll,
+        variables: {
+          filter: {
+            where: {
+              and: [
+                {
+                  field: "process_id",
+                  value: filter.id
+                }
+              ]
+            }
+          }
+        }
+      });
+      const { result } = await queryToPromise(query);
+      console.log(result);
+      result.data.issueReplyFindAll.map(o => {
+        context.commit("SET_ITEM", new IssueReply().deserialize(o));
+      });
     }
-    return currentItem;
+  },
+
+  async findByStage(context, filter) {
+    if (!context.state.loadedStages.includes(filter.id) || filter.force) {
+      const query = apolloClient.watchQuery({
+        query: ISSUE_REPLY.findAll,
+        variables: {
+          filter: {
+            where: {
+              and: [
+                {
+                  field: "parent_type",
+                  value: "stage"
+                },
+                {
+                  field: "parent_id",
+                  value: filter.id
+                }
+              ]
+            }
+          }
+        }
+      });
+      const { result } = await queryToPromise(query);
+      result.data.issueReplyFindAll.map(o => {
+        context.commit("SET_ITEM", new IssueReply().deserialize(o));
+      });
+      return context.getters.all.filter(o => o.stageId === filter.id);
+    }
   },
 
   async findAll(context, { filter = null, force = false } = {}) {
@@ -161,14 +141,15 @@ const actions = {
       filter.busy = context.getters.all.length < 1;
       try {
         const query = apolloClient.watchQuery({
-          query: ISSUE_EFFECT.findAll,
+          query: ISSUE_REPLY.findAll,
           variables: {
             filter: filter.data
           }
         });
         const { result } = await queryToPromise(query);
-        const results = result.data.issueEffectFindAll.map(cr => {
-          return new IssueEffect().deserialize(cr);
+        console.log(result);
+        const results = result.data.issueReplyFindAll.map(cr => {
+          return new IssueReply().deserialize(cr);
         });
         context.commit("SET_ALL", results);
         return results;
@@ -188,12 +169,6 @@ const mutations = {
   RESET_STATE(state) {
     Object.assign(state, initialState());
     return state;
-  },
-  SET_TEMPLATE(state, value) {
-    const index = state.all.findIndex(el => el.id === value.effectId);
-    if (index > -1) {
-      state.all[index].templates = [...state.all[index].templates, value];
-    }
   },
   SET_ALL(state, value) {
     state.all = value;

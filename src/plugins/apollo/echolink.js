@@ -4,7 +4,6 @@ import Pusher from "pusher-js";
 import Echo from "laravel-echo";
 import config from "./config";
 import store from "../../store/index";
-console.log("HI");
 class EchoLink extends ApolloLink {
   constructor() {
     super();
