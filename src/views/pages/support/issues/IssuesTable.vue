@@ -1,15 +1,13 @@
 <template>
-  <div>
-    <div
+  <div ref="issueEffect_table-container">
+    <inner-overlay
       v-if="currentItem"
-      class="overlay"
+      class="overlay-inner"
       :class="{ 'top-all': this.showInnerOverlayOnTop }"
       @click="overlayClick"
-    ></div>
-    <inner-overlay
-      v-if="isEditing"
-      @click="toggleOverlay"
-      class="inner-overlay-create"
+      :scrollable="true"
+      style="overflow: scroll"
+      @overlayScroll="handleScroll"
     >
     </inner-overlay>
     <div class="text-right float-right">
@@ -104,6 +102,7 @@
               :class="{ 'show-when-hovered': isCurrentRowActive(row.item) }"
             >
               <issuesEffectAdd
+                ref="issueEffect_table-container-row"
                 :key="row.item.id"
                 :issue="row.item"
                 :items="getIssueEffectTemplates"
@@ -224,6 +223,7 @@ export default {
 
   data: () => {
     return {
+      tableScrollTop: 0,
       selectedTemplate: null,
       isLoading: false,
       hoverRowId: null,
@@ -257,7 +257,7 @@ export default {
       },
     },
 
-    isEditing() {
+    /*     isEditing() {
       if (this.editType === "issueFeedback") {
         return this.issueEffectFeedbackOpen;
       } else if (this.editType === "issueComment") {
@@ -266,7 +266,7 @@ export default {
         return this.issueEffectAddOpen;
       }
       return false;
-    },
+    }, */
     fields: {
       get() {
         return [
@@ -312,6 +312,12 @@ export default {
     this.isLoading = false;
   },
   methods: {
+    handleScroll(deltaY) {
+/*       console.log(deltaY);
+			const container = document.querySelector('.row-details');
+			container.scrollTop = container.scrollTop + deltaY; */
+
+    },
     setDefaultEffect() {
       if (this.currentItem) {
         this.currentItem.effect = this.getIssueEffectTemplates.find(
@@ -421,18 +427,20 @@ export default {
     async saveIssueReply(input) {
       console.log(input);
       const status = this.issueEffectCommentOpen ? "COMMENT" : "FEEDBACK";
+      console.log(status);
       const { id } = this.currentItem;
       const { description } = input;
       const { value } = input;
-      const issueReplyForm = new GQLForm({
+      const ideaissueReplyForm = new GQLForm({
+				authorId: this.user.id,
         issueId: id,
-        value,
+        value: value,
         status,
         description,
       });
-      await this.$store.dispatch("issueReply/create", issueReplyForm);
-			this.issueEffectCommentOpen = false;
-			this.issueEffectFeedbackOpen = false;
+      await this.$store.dispatch("ideaIssueReply/create", ideaissueReplyForm);
+      this.issueEffectCommentOpen = false;
+      this.issueEffectFeedbackOpen = false;
     },
 
     toggleItem(item, type) {

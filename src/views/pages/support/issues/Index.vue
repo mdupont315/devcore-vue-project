@@ -1,5 +1,5 @@
 <template>
-  <div class="page animated fadeIn">
+  <div class="page animated fadeIn" ref="animated">
     <div
       v-if="currentItem || (currentRowDetails && getIssues.length)"
       class="overlay"
@@ -7,7 +7,7 @@
       @click="overlayClick"
     ></div>
 
-    <div class="container-fluid">
+    <div class="container-fluid" ref="issues_main_page">
       <!-- page content -->
       <b-card>
         <b-table
@@ -276,17 +276,13 @@ export default {
         const populatedProcessPaths = [];
         this.getIssues.map((_issue) => {
           const issue = this.issuePathDeducer(_issue);
-          console.log(issue);
           if (issue) populatedProcessPaths.push(issue);
         });
-
-        console.log(this.getIssues);
 
         if (!populatedProcessPaths || populatedProcessPaths.length == 0) {
           return [];
         }
 
-        console.log(populatedProcessPaths);
         const uniquePaths = Array.from(
           new Set(populatedProcessPaths.map((obj) => JSON.stringify(obj)))
         ).map((str) => JSON.parse(str));
@@ -330,13 +326,6 @@ export default {
 
   methods: {
     deleted(item) {
-      console.log("item");
-      console.log("item");
-      console.log("item");
-      console.log("item");
-      console.log("item");
-      console.log("item");
-      console.log(item);
       if (
         this.currentRowDetails &&
         this.currentRowDetails.item &&

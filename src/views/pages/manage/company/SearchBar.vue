@@ -1,6 +1,6 @@
 <template>
   <div class="search-bar">
-    <b-input-group style="margin-top:5px" class="search">
+    <b-input-group style="margin-top: 5px" class="search">
       <b-form-input
         v-model="currentFilter"
         class="search"
@@ -16,22 +16,24 @@ import { /* mapState, */ mapGetters } from "vuex";
 export default {
   data: () => {
     return {
-      currentFilter: null
+      currentFilter: null,
     };
   },
   computed: {
     ...mapGetters({
       items: "company/filteredItems",
-      filter: "company/filter"
-    })
+      filter: "company/filter",
+    }),
   },
   async mounted() {
+    console.log(this.filter);
     this.currentFilter = this.filter;
   },
   methods: {
     async filterResults(filter) {
+      console.log(filter);
       await this.$store.dispatch("company/filter", filter);
-    }
-  }
+    },
+  },
 };
 </script>

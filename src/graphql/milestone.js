@@ -4,7 +4,6 @@ import { META_FRAGMENT } from "./meta";
 export const MILESTONE_FRAGMENT = gql`
   fragment milestoneFields on Milestone {
     id
-    reward
     title
     requiredScore
     userCount

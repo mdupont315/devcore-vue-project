@@ -1,14 +1,14 @@
 <template>
   <div ref="issuesTemplateCardContainer" class="issues-template-card-container">
-      <div
-        class="issues-template-card-container-items"
-        id="issues-template-card-container"
-        @click="toggleOverlay"
-        ref="issues-template-card-container"
-        :style="{ width: tableWidth * 0.74 + 'px' }"
-      >
-        <slot></slot></div
+    <div
+      class="issues-template-card-container-items"
+      id="issues-template-card-container"
+      @click="toggleOverlay"
+      ref="issues-template-card-container"
+      :style="{ width: tableWidth * 0.74 + 'px' }"
     >
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -74,7 +74,7 @@ export default {
   > div
   > div
   > .issues-template-card-container {
-  top: -120px;
+  top: -170px;
   height: 100%;
   justify-content: flex-end;
 }
@@ -91,12 +91,14 @@ export default {
   height: 100%;
   overflow: hidden;
   display: flex;
-  position: absolute;
+  /*   position: absolute; */
   min-height: 404px;
-	max-height: 404px;
+  max-height: 404px;
   top: 0px;
-  right: 400px;
+  right: 450px;
   margin: 0px 10px;
   border-radius: 5px;
+  position: fixed;
+  min-height: 585px;
 }
 </style>

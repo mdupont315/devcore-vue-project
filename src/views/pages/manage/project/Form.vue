@@ -235,7 +235,7 @@
                   :target="() => $refs.projectFormNameField"
                   :show.sync="showAdvanced"
                   placement="right"
-                  offset="-10%"
+                  offset="15%"
                   custom-class="advancedForm-form-popover"
                   class="form-popover"
                 >
@@ -380,20 +380,29 @@ export default {
       evaluationIntervalUnit: "WEEKS",
       evaluationIntervalAmount: 1,
       budget: 0,
-      issueEvaluationRoles: null,
+      issueEvaluationRoles: [],
+      issueTemplateRoles: [],
     }),
   }),
   computed: {
     advancedSettingsSet: {
       get() {
-        return this.form.issueEvaluationRoles?.length > 0 ?? false;
+        return (
+          this.form.issueEvaluationRoles.length > 0 ||
+          this.form.issueTemplateRoles.length > 0
+        );
       },
       set(val) {
         if (val && this.advancedForm) {
-          this.form.issueEvaluationRoles =
-            this.advancedForm.issueEvaluationRoles;
-        } else {
-          this.form.issueEvaluationRoles = [];
+          if (this.advancedForm.issueTemplateRoles) {
+            this.form.issueTemplateRoles = this.advancedForm.issueTemplateRoles;
+          }
+          console.log(this.advancedForm);
+
+          if (this.advancedForm.issueEvaluationRoles) {
+            this.form.issueEvaluationRoles =
+              this.advancedForm.issueEvaluationRoles;
+          }
         }
       },
     },
@@ -539,7 +548,10 @@ export default {
   methods: {
     setAdvancedForm() {
       this.form.issueEvaluationRoles = this.advancedForm.issueEvaluationRoles;
-      this.advancedSettingsSet = this.form.issueEvaluationRoles.length > 0;
+      this.form.issueTemplateRoles = this.advancedForm.issueTemplateRoles;
+      this.advancedSettingsSet =
+        this.form.issueEvaluationRoles.length > 0 ||
+        this.advancedForm.issueEvaluationRoles.length > 0;
     },
     toggleAdvanced() {
       this.showAdvanced = !this.showAdvanced;
@@ -625,6 +637,12 @@ export default {
         ) {
           this.advancedSettingsSet = true;
           this.form.issueEvaluationRoles = this.input.issueEvaluationRoles;
+        } else if (
+          this.input.issueTemplateRoles &&
+          this.input.issueTemplateRoles.length > 0
+        ) {
+          this.advancedSettingsSet = true;
+          this.form.issueTemplateRoles = this.input.issueTemplateRoles;
         } else {
           this.advancedSettingsSet = false;
         }
@@ -654,19 +672,16 @@ export default {
           this.form.processStageId = [this.stage?.id ?? null];
         }
       } else {
-        /*     if (this.form.type === "ON_GOING") { */
         this.form.processStageId = [
           ...new Set(this.process.stages.map((x) => x.id)),
         ];
-        /*      } else {
-          this.form.processStageId = [this.process.stages[0].id]
-        } */
       }
 
       try {
         await this.$validator.validateAll();
         if (!this.vErrors.any()) {
           this.$validator.reset();
+          console.log(this.form);
           if (this.mode === "edit") {
             this.input = await this.$store.dispatch(
               "project/update",

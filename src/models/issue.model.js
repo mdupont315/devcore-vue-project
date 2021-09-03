@@ -14,14 +14,10 @@ export default class IssueModel extends BaseModel {
   timeValue = 0;
 
   get effect() {
-    console.log("ACTIVE TEMPLATES");
-    console.log(this.effect);
     return this.effect;
   }
 
   set effect(value) {
-    console.log("ACTIVE TEMPLATES");
-    console.log(this.effect);
     if (value) {
       this.effect = value;
     } else {
@@ -90,25 +86,27 @@ export default class IssueModel extends BaseModel {
     let roleHourlyCosts = [];
     let rolesAverage = [];
     const roles = store.getters["companyRole/all"];
-    rolesAverage = roles.map(role =>
-      role.users.map(user => {
-        return {
-          companyRoleId: role.id,
-          hourlyAverage: user.formattedHourlyCosts
-        };
-      })
-    );
+    roles.map(role => {
+      if (role.users.length > 0) {
+        role.users.map(user => {
+          rolesAverage.push({
+            companyRoleId: role.id,
+            hourlyAverage: user.formattedHourlyCosts
+          });
+        });
+      }
+    });
 
     rolesAverage.map(roleUsers => {
-      let roleId = roleUsers[0].companyRoleId;
-      let hourlyAverage = roleUsers[0].hourlyAverage;
 
       if (roleUsers.length > 1) {
+        let roleId = roleUsers[0].companyRoleId;
+        let hourlyAverage = roleUsers[0].hourlyAverage;
         hourlyAverage =
           roleUsers.reduce((total, user) => total + user.hourlyAverage, 0) /
           roleUsers.length;
+        roleHourlyCosts.push({ roleId, hourlyAverage });
       }
-      roleHourlyCosts.push({ roleId, hourlyAverage });
     });
     return roleHourlyCosts;
   }
@@ -128,9 +126,12 @@ export default class IssueModel extends BaseModel {
           total -= template.effectValue;
 
           //time value
-          total -=
-            this.getHourlyCostsByRole.find(r => r.companyRoleId == roleId)
-              .hourlyAverage * effectTime;
+          const hourlyByRole = this.getHourlyCostsByRole.find(
+            r => r.companyRoleId == roleId
+          );
+          if (hourlyByRole && hourlyByRole.hourlyAverage) {
+            total -= hourlyByRole.hourlyAverage * effectTime;
+          }
         });
       }
     }

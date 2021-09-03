@@ -265,7 +265,6 @@ export default {
   padding-top: 10px;
 }
 
-
 .issues-template-role-card-container {
   background: #fff;
   border-radius: 3px;
@@ -317,7 +316,7 @@ export default {
 }
 
 .issueEffect_add_form-new-issue-effect-create-header {
-  font-size: 10.5px;
+  font-size: 12px;
   place-self: center;
   display: flex;
   align-items: center;

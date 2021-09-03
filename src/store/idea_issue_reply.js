@@ -1,5 +1,5 @@
-import { ISSUE_REPLY } from "@/graphql";
-import { IssueReply } from "@/models";
+import { IDEA_ISSUE_REPLY } from "@/graphql";
+import { IdeaIssueReply } from "@/models";
 import { queryToPromise } from "../lib/utils";
 import { apolloClient } from "../plugins/apollo/client";
 
@@ -36,9 +36,9 @@ const getters = {
 const actions = {
   async create(context, form) {
     const result = await form.mutate({
-      mutation: ISSUE_REPLY.create
+      mutation: IDEA_ISSUE_REPLY.create
     });
-    const role = new IssueReply().deserialize(result.data.issueReplyCreate);
+    const role = new IdeaIssueReply().deserialize(result.data.ideaIssueReplyCreate);
     await context.dispatch("findAll", {
       force: true
     });
@@ -47,12 +47,12 @@ const actions = {
 
   async update(context, form) {
     const result = await form.mutate({
-      mutation: ISSUE_REPLY.update,
+      mutation: IDEA_ISSUE_REPLY.update,
       variables: {
         id: form.id
       }
     });
-    const role = new IssueReply().deserialize(result.data.issueReplyUpdate);
+    const role = new IdeaIssueReply().deserialize(result.data.ideaIssueReplyUpdate);
     await context.dispatch("findAll", {
       force: true
     });
@@ -62,7 +62,7 @@ const actions = {
   async delete(context, form) {
     context.commit("REMOVE_ITEM", form);
     const result = await form.mutate({
-      mutation: ISSUE_REPLY.delete,
+      mutation: IDEA_ISSUE_REPLY.delete,
       variables: {
         id: form.id
       }
@@ -77,7 +77,7 @@ const actions = {
   async findByProcess(context, filter) {
     if (!context.state.loadedProcess.includes(filter.id) || filter.force) {
       const query = apolloClient.watchQuery({
-        query: ISSUE_REPLY.findAll,
+        query: IDEA_ISSUE_REPLY.findAll,
         variables: {
           filter: {
             where: {
@@ -93,8 +93,8 @@ const actions = {
       });
       const { result } = await queryToPromise(query);
       console.log(result);
-      result.data.issueReplyFindAll.map(o => {
-        context.commit("SET_ITEM", new IssueReply().deserialize(o));
+      result.data.ideaIssueReplyFindAll.map(o => {
+        context.commit("SET_ITEM", new IdeaIssueReply().deserialize(o));
       });
     }
   },
@@ -102,7 +102,7 @@ const actions = {
   async findByStage(context, filter) {
     if (!context.state.loadedStages.includes(filter.id) || filter.force) {
       const query = apolloClient.watchQuery({
-        query: ISSUE_REPLY.findAll,
+        query: IDEA_ISSUE_REPLY.findAll,
         variables: {
           filter: {
             where: {
@@ -121,8 +121,8 @@ const actions = {
         }
       });
       const { result } = await queryToPromise(query);
-      result.data.issueReplyFindAll.map(o => {
-        context.commit("SET_ITEM", new IssueReply().deserialize(o));
+      result.data.ideaIssueReplyFindAll.map(o => {
+        context.commit("SET_ITEM", new IdeaIssueReply().deserialize(o));
       });
       return context.getters.all.filter(o => o.stageId === filter.id);
     }
@@ -141,15 +141,15 @@ const actions = {
       filter.busy = context.getters.all.length < 1;
       try {
         const query = apolloClient.watchQuery({
-          query: ISSUE_REPLY.findAll,
+          query: IDEA_ISSUE_REPLY.findAll,
           variables: {
             filter: filter.data
           }
         });
         const { result } = await queryToPromise(query);
         console.log(result);
-        const results = result.data.issueReplyFindAll.map(cr => {
-          return new IssueReply().deserialize(cr);
+        const results = result.data.ideaIssueReplyFindAll.map(cr => {
+          return new IdeaIssueReply().deserialize(cr);
         });
         context.commit("SET_ALL", results);
         return results;

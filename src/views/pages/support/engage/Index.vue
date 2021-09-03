@@ -67,10 +67,13 @@ export default {
 }
 .engage_container_content {
   display: flex;
+  overflow-y: hidden;
+  max-width: 100%;
   height: 100%;
   justify-content: space-between;
   flex-direction: column;
 }
-
-
+.table td, .table th{
+	vertical-align: middle;
+}
 </style>

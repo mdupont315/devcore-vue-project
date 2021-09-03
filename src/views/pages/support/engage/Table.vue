@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid">
+  <div class="engage_table_container">
     <!-- page content -->
     <b-table
       sort-icon-left
@@ -7,7 +7,7 @@
       class="t01"
       hover
       fixed
-      sticky-header
+      sticky-header="380px"
       style="background: #fff"
       :fields="fields"
       :items="getMilestoneUsers"
@@ -57,7 +57,7 @@
             :variant="row.item.rewarded ? 'outline-primary' : 'success'"
             :disabled="filter.busy || row.item.rewarded || vErrors.any()"
             :style="row.item.rewarded ? 'cursor:not-allowed' : 'cursor:pointer'"
-            :loading="filter.busy && loadingId == row.item.milestoneId"
+            :loading="filter.busy && isLoadingRow(row)"
             :block="true"
             >{{ getRowItemRewarded(row.item) }}</loading-button
           >
@@ -126,39 +126,27 @@ export default {
     },
   },
   methods: {
+    isLoadingRow(row) {
+      return this.loadingId == row.index;
+    },
     getRowItemRewarded(item) {
       return item.rewarded ? this.$t("Confirmed") : this.$t("Confirm");
     },
     getValueRank(item) {
-      const { engageScore } = item;
+      console.log(item);
+      const { milestoneId } = item;
+      let title = "";
 
-      const deductedPosition = () => {
-        const scoresMap = sorted.map((obj) => {
-          return {
-            score: obj.requiredScore,
-            id: obj.id,
-          };
-        });
-
-        for (let i = 0; i < scoresMap.length; i++) {
-          if (scoresMap[i].score <= engageScore < scoresMap[i + 1].score) {
-            return scoresMap[i].id;
-          }
-        }
-      };
-
-      const sorted = [...this.items].sort((a, b) =>
-        a.requiredScore > b.requiredScore ? 1 : -1
-      );
-      const milestone = sorted.find((rank) => rank.id === deductedPosition());
-      return milestone.reward;
+      if (this.items.length > 0) {
+        const milestone = this.items.find((x) => x.id === milestoneId);
+        title = milestone ? milestone.title : "";
+      }
+      return title;
     },
-    overlayClick() {
-      console.log("overlayClick");
-    },
+
     async reward(row) {
       console.log(row);
-      this.loadingId = row.item.milestoneId;
+      this.loadingId = row.index;
       if (!row.item.rewarded) {
         this.filter.busy = true;
         const rewardForm = new GQLForm({
@@ -179,6 +167,7 @@ export default {
   height: 60px;
   color: #4294d0;
   z-index: 1 !important;
+  width: 100%;
 }
 .engage_table_header > div {
   line-height: 35px;
@@ -187,5 +176,25 @@ export default {
 
 .engage_container_content > .container-fluid > .b-table-sticky-header {
   padding: 0 20px;
+  max-height: 40%;
+}
+
+.engage_table > thead > tr {
+  /*  position: fixed;
+  width: 100%;
+  max-width: 85%;
+  display: flex;
+  flex-direction: row; */
+}
+
+.engage_table_container {
+  right: 20px;
+  height: 100%;
+  background: #fff;
+  margin: 20px;
+  padding-right: 15px;
+  padding-left: 15px;
+  overflow-y: scroll;
+	border-radius: 5px;
 }
 </style>

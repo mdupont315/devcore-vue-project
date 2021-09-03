@@ -27,26 +27,29 @@
       </div>
     </b-button>
 
+    <!--   :offset="tableWidth * 0.1" -->
     <b-popover
       v-if="isSelectionOpen"
       ref="popover"
       :target="() => $refs[`issueEffectAddBtn${issue.id}`]"
       triggers="click"
       :show="openState"
-      boundary="viewport"
-      placement="bottom"
       :offset="tableWidth * 0.1"
+      boundary="window"
+      @click="closeIt"
+      placement="bottomright"
       class="form-popover"
+      boundary-padding="100"
       custom-class="issueEffectAddForm-form-popover"
-    >
+      ><!-- right:20px" -->
       <b-card
         no-body
         style="background: transparent"
         v-if="openState"
-        :style="{ width: tableWidth * 0.25 + 'px' }"
+        :style="{ width: tableWidth * 0.25 - 10 + 'px' }"
       >
         <div class="form-label-group select required">
-          <div style="background: transparent">
+          <div style="background: #fff">
             <!-- Viewing -->
             <div
               v-if="
@@ -85,7 +88,7 @@
                     :confirmPlacement="'left'"
                     :confirmMessage="$t('IssueEffectDeleteConfirmation')"
                     :showOverlay="false"
-                    :btnStyle="'display:flex;background:#fff;border:none;color:#000;align-items:center;box-shadow: none;'"
+                    :btnStyle="'display:flex;flex-direction:row;background:#fff;border:none;color:#000;align-items:center;box-shadow: none;'"
                   >
                     <icoEffectDelete width="16" height="16" /><span>{{
                       $t("Issue Effect Templates Remove")
@@ -160,8 +163,11 @@
             </div>
 
             <!-- Creating -->
-            <div v-else class="issueEffect_add_form-new-issue-effect-create">
-              <div class="issueEffect_add_form-new-issue-effect-create-header">
+            <div v-else>
+              <div
+                class="issueEffect_add_form-new-issue-effect-create-header"
+                style="width: 100%"
+              >
                 <i
                   class="mdi mdi-close"
                   style="font-size: 20px"
@@ -451,6 +457,9 @@ export default {
   }),
 
   methods: {
+    closeIt() {
+      console.log("HIHISADASD");
+    },
     toggleOverlay() {
       console.log("overlay 2");
       this.$emit("toggleOverlay");
@@ -464,6 +473,9 @@ export default {
         }
       } catch (e) {
         console.log(e);
+      } finally {
+        this.issueEffectIsEditing = false;
+        this.issueEffectIsCreating = false;
       }
     },
     issueEffectAddRole() {
@@ -610,7 +622,6 @@ export default {
   top: 20px !important;
   justify-content: flex-start;
 }
-
 </style>
 <style scoped>
 .issueEffectAddOpen-btn {
@@ -686,8 +697,15 @@ export default {
   background: #fff;
   align-items: center;
   cursor: pointer;
+  max-width: 120px;
   width: 100%;
 }
+
+.issueEffect_add_form-new-issue-effect-create {
+  max-width: 120px;
+}
+
+
 
 .issueEffect_add_form_templates_item-edit {
   text-transform: uppercase;
@@ -776,7 +794,7 @@ export default {
 }
 
 .issueEffect_add_form-new-issue-effect-select-back {
-  flex-grow: 1;
+  min-width: 60px;
 }
 
 .issueEffect_add_form_templates-item-selected-title {
@@ -818,6 +836,7 @@ export default {
 .issueEffect_add_form-new-issue-effect-select-remove {
   display: flex;
   align-items: center;
-  flex-grow: 5;
+  width: 100%;
+  font-size: 12px;
 }
 </style>

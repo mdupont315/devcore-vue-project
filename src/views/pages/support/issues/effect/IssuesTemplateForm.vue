@@ -46,7 +46,7 @@
             ></b-form-input>
           </b-col>
         </b-row>
-        <b-row style="padding: 0 0 10px 10px">
+   <!--      <b-row style="padding: 0 0 10px 10px">
           <b-col class="col-5" style="align-self: center">{{
             $t("Effect Loss Time")
           }}</b-col>
@@ -67,7 +67,7 @@
               $displayError("effectTime", effectForm)
             }}</b-form-invalid-feedback>
           </b-col>
-        </b-row>
+        </b-row> -->
 
         <b-row>
           <b-col class="col-12">
@@ -218,7 +218,6 @@ export default {
 
 .issues-template-form {
   padding: 0 20px;
-  height: 235px;
   border-radius: 3px;
   background: #fff;
   width: 100%;

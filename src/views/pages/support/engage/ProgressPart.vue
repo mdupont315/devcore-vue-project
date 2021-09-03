@@ -205,7 +205,6 @@ export default {
 	max-width: 85%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   padding: 0 0 20px 0px;
 }
 .engage_progress_item_container-usercount {

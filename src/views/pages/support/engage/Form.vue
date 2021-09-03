@@ -20,24 +20,7 @@
             $displayError("title", form)
           }}</b-form-invalid-feedback>
         </div>
-        <div class="form-group">
-          <b-form-input
-            id="reward"
-            v-model.trim="form.reward"
-            v-validate="'required|min:4'"
-            v-autofocus
-            autocomplete="off"
-            :disabled="form.busy"
-            :placeholder="$t('Milestone reward')"
-            type="text"
-            name="reward"
-            :state="$validateState('reward', form)"
-          ></b-form-input>
-          <label for="reward">{{ $t("Milestone reward") }}</label>
-          <b-form-invalid-feedback>{{
-            $displayError("reward", form)
-          }}</b-form-invalid-feedback>
-        </div>
+
         <b-form-input
           id="requiredScore"
           v-model.number="form.requiredScore"
@@ -98,7 +81,6 @@ export default {
       title: null,
       description: null,
       requiredScore: null,
-      reward: null,
     }),
   }),
   computed: {
@@ -145,7 +127,6 @@ export default {
         title: this.form.title,
         description: this.form.description,
         requiredScore: this.form.requiredScore,
-        reward: this.form.reward,
       });
       await this.$store.dispatch("milestone/create", createForm);
 			this.form.busy = false;

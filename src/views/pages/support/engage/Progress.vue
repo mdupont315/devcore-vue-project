@@ -81,7 +81,7 @@
                 />
               </div>
             </div>
-            <div
+      <!--       <div
               class="engage_progress_container-body-reward"
               :class="{ 'is-elevated-layer': isEditing }"
             >
@@ -94,7 +94,7 @@
                   v-model="editItems[index].reward"
                 />
               </div>
-            </div>
+            </div> -->
 
             <div
               class="engage_progress_container-body-text"
@@ -202,7 +202,7 @@ export default {
       defaultItem: {
         description: "description",
         id: "1",
-        reward: "reward",
+     /*    reward: "reward", */
         title: "title",
         requiredScore: 0,
         userCount: 0,
@@ -213,7 +213,7 @@ export default {
         {
           description: "description",
           id: "1",
-          reward: "reward",
+         /*  reward: "reward", */
           title: "title",
           requiredScore: 0,
           userCount: 0,
@@ -297,7 +297,7 @@ export default {
           return {
             id: item.id,
             requiredScore: item.requiredScore,
-            reward: item.reward,
+         /*    reward: item.reward, */
             title: item.title,
             description: item.description,
           };
@@ -316,7 +316,7 @@ export default {
         return {
           id: item.id,
           requiredScore: item.requiredScore,
-          reward: item.reward,
+        /*   reward: item.reward, */
           title: item.title,
           description: item.description,
         };
@@ -376,11 +376,12 @@ export default {
 
 .engage_progress_container {
   display: flex;
+	border-radius: 5px;
   flex-direction: column;
   background: #fff;
-  margin-right: 15px;
+  margin-right: 20px;
   border-radius: 5px;
-  margin-left: 15px;
+  margin-left: 20px;
   margin-bottom: 20px;
 }
 .engage_progress_container-header {

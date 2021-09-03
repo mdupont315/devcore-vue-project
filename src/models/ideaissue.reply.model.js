@@ -1,6 +1,6 @@
 import BaseModel from "./base.model";
 
-export default class IssueReplyModel extends BaseModel {
+export default class IdeaIssueReplyModel extends BaseModel {
 
   deserialize(input) {
 

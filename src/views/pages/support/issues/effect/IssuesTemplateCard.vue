@@ -8,9 +8,9 @@
 
     <div class="issueTemplate-card__footer">
       <div style="padding-bottom: 10px; font-size: 14px">
-      {{$t("Issue specific cost")}}
+        {{ $t("Issue specific cost") }}
       </div>
-      <div class="issueTemplate-card__footer-summary">
+      <!--    <div class="issueTemplate-card__footer-summary">
         <div class="issueTemplate-card__totals-title">
           {{ $t("Effect Loss Time") }}
         </div>
@@ -21,7 +21,7 @@
           {{ getTemplateLossPercentageTime }}
         </div>
       </div>
-
+ -->
       <div class="issueTemplate-card__footer-summary">
         <div class="issueTemplate-card__totals-title">
           {{ $t("Effect Loss Value") }}
@@ -173,6 +173,7 @@ export default {
   color: #cc454b;
 }
 .issueTemplate-card__totals-action {
+  padding: 20px 0 10px 0;
   display: flex;
   letter-spacing: 1px;
   justify-content: space-between;
@@ -216,7 +217,6 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 235px;
   border-radius: 3px;
   background: #fff;
   width: 100%;

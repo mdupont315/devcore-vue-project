@@ -221,8 +221,10 @@
     "toolCreated": "Tool created succesfully!",
     "toolCreatedFail": "Creating tool failed!"
   },
-  "Evaluation Restriction": "Evaluation Restriction",
-  "Evaluation Restriction Info": "Selected roles are restricted to evaluate issue loss amounts in mobile report issue feature.",
+  "Issue Evaluation Restriction": "Issue Restriction",
+  "Issue Evaluation Restriction Info": "Selected roles are restricted to evaluate issue loss amounts in mobile report issue feature.",
+  "Issue Template Restriction": "Issue Effect Restriction",
+  "Issue Template Restriction Info": "Selected roles are restricted to set issue template in mobile report issue feature.",
   "Project Advanced": "Advanced settings",
   "Milestone reward": "Reward",
   "Engage": "Engage",
