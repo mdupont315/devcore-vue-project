@@ -388,6 +388,8 @@ export default {
     advancedSettingsSet: {
       get() {
         return (
+					this.form.issueEvaluationRoles &&
+					this.form.issueTemplateRoles &&
           this.form.issueEvaluationRoles.length > 0 ||
           this.form.issueTemplateRoles.length > 0
         );

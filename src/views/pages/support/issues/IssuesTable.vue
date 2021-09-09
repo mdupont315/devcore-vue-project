@@ -432,7 +432,7 @@ export default {
       const { description } = input;
       const { value } = input;
       const ideaissueReplyForm = new GQLForm({
-				authorId: this.user.id,
+				authorId: this.currentItem.author.id,
         issueId: id,
         value: value,
         status,
