@@ -1,5 +1,10 @@
 <template>
   <b-card :id="'idea-card-' + idea.id" no-body class="border mb-3 idea-card">
+    <inner-overlay
+      v-if="showPopOverFeedback"
+      style="z-index: 1"
+      @click="closePopovers"
+    ></inner-overlay>
     <b-card-header class="bg-white border-0">
       <div style="line-height: 1em">
         <nav aria-label="breadcrumb" class="m-0 p-0 d-inline-block">
@@ -77,11 +82,30 @@
       <hr />
       <author-time
         :user="idea.author"
-				:anonymous="idea.anonymous"
+        :anonymous="idea.anonymous"
         :time="idea.createdAt"
         class="d-inline-block"
       ></author-time>
-      <div class="info float-right">
+      <div class="info float-right" style="display: flex; align-items: center">
+        <idea-feedback
+          v-if="!idea.replied"
+          style="margin-left: 20px; max-height: 46px"
+          :item="idea"
+          refTarget="ideaFeedbackIcon"
+          :textPlaceholder="$t('Idea feedback')"
+          type="ideaFeedback"
+          @toggle="togglePopOverFeedback"
+          @save="saveIdeaReply"
+          @close="closeIdeaForFeedback"
+          :openState="showPopOverFeedback"
+        >
+          <small
+            class="d-block text-gray"
+            style="line-height: 1em; align-self: center"
+            >{{ $t("Feedback") }}</small
+          >
+        </idea-feedback>
+
         <span v-if="idea.evaluationsCount > 0" class="font-15x ml-2">
           <b-badge variant="black">{{ idea.evaluationsCount }}</b-badge>
         </span>
@@ -126,9 +150,13 @@
 <script>
 import { mapGetters } from "vuex";
 import IdeaDetail from "./Detail";
+import feedbackForm from "../../../../components/global/FeedbackForm.vue";
+import GQLForm from "@/lib/gqlform";
+
 /* eslint-disable */
 export default {
   components: {
+    "idea-feedback": feedbackForm,
     "idea-detail": IdeaDetail,
   },
   props: {
@@ -138,6 +166,7 @@ export default {
   },
   data: () => ({
     showDetail: false,
+    showPopOverFeedback: false,
   }),
   computed: {
     ...mapGetters({
@@ -179,6 +208,31 @@ export default {
   },
 
   methods: {
+    async closeIdeaForFeedback() {
+      const ideaCloseForm = new GQLForm({
+        ideaId: this.idea.id,
+      });
+      await this.$store.dispatch("idea/closeFeedback", ideaCloseForm);
+			this.closePopovers();
+    },
+    closePopovers() {
+      this.showPopOverFeedback = false;
+    },
+    togglePopOverFeedback() {
+      this.showPopOverFeedback = !this.showPopOverFeedback;
+    },
+    async saveIdeaReply(input) {
+      const status = "FEEDBACK";
+      const ideaReplyForm = new GQLForm({
+        authorId: this.idea.author.id,
+        ideaId: this.idea.id,
+        value: input.value,
+        description: input.description,
+        status,
+      });
+      await this.$store.dispatch("ideaIssueReply/create", ideaReplyForm);
+      this.togglePopOverFeedback();
+    },
     async setCurrentTool(event, toolId) {
       event.preventDefault();
       this.$store.dispatch("companyTool/setCurrent", {

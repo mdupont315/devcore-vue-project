@@ -92,7 +92,6 @@ const actions = {
         }
       });
       const { result } = await queryToPromise(query);
-      console.log(result);
       result.data.ideaIssueReplyFindAll.map(o => {
         context.commit("SET_ITEM", new IdeaIssueReply().deserialize(o));
       });
@@ -147,7 +146,6 @@ const actions = {
           }
         });
         const { result } = await queryToPromise(query);
-        console.log(result);
         const results = result.data.ideaIssueReplyFindAll.map(cr => {
           return new IdeaIssueReply().deserialize(cr);
         });

@@ -1,5 +1,6 @@
 import { IDEA } from "@/graphql";
 import { Idea } from "@/models";
+import { IdeaIssue } from "@/models";
 import { queryToPromise } from "../lib/utils";
 import { apolloClient } from "../plugins/apollo/client";
 import EventBus from "@/lib/eventbus";
@@ -108,6 +109,39 @@ const actions = {
     context.commit("REMOVE_IMPROVE_ITEM", form);
     // await context.dispatch('findAll', { force: true });
     return result.data.ideaDelete;
+  },
+
+  async closeFeedback(context, form) {
+    console.log(form);
+    const result = await form.mutate({
+      mutation: IDEA.closeFeedback,
+      variables: {
+        id: form.ideaId
+      }
+    });
+    console.log(result);
+    const idea = new Idea().deserialize(result.data.ideaCloseFeedback);
+    console.log(idea);
+    context.commit("SET_ITEM", idea);
+    // await context.dispatch('findAll', { force: true });
+    return result.data.ideaCloseFeedback;
+  },
+
+  async closeImprovementFeedback(context, form) {
+    console.log(form);
+    const result = await form.mutate({
+      mutation: IDEA.closeImprovementFeedback,
+      variables: {
+        id: form.id,
+        improvementId: form.improvementId
+      }
+    });
+    console.log(result);
+    const idea = new Idea().deserialize(result.data.ideaImprovementCloseFeedback);
+    console.log(idea);
+    context.commit("SET_ITEM", idea);
+
+    return result.data.ideaImprovementCloseFeedback;
   },
 
   async findById(context, filter) {
@@ -220,6 +254,7 @@ const mutations = {
     state.all = value;
   },
   SET_ITEM(state, value) {
+    console.log(value);
     const index = state.all.findIndex(el => el.id === value.id);
     if (index > -1) {
       state.all[index] = value;

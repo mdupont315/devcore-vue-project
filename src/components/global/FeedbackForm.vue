@@ -1,11 +1,14 @@
 <template>
-  <div class="issueEffect__feedback__container">
+  <div
+    class="issueEffect__feedback__container"
+    style="flex-direction: column; display: flex"
+  >
     <div class="text-center">
-      <b-tooltip :target="() => $refs[refTarget]" variant="primary"
+      <!--   <b-tooltip :target="() => $refs[refTarget]" variant="primary"
         ><span class="issue-effect-tooltip-title">{{
           $t("issueEffectFeedback")
         }}</span></b-tooltip
-      >
+      > -->
     </div>
 
     <b-popover
@@ -13,13 +16,99 @@
       :target="() => $refs[refTarget]"
       triggers="click"
       :show="openState"
-      placement="bottom"
-      offset="-115"
+      placement="top"
+      :offset="offset"
       class="form-popover"
       custom-class="issueEffectCommentForm-form-popover"
     >
-      <b-card no-body v-if="openState" style="padding: 5px">
+      <b-card no-body v-if="openState" style="width: 275px">
         <div
+          class="feedback-form-author"
+          style="
+            padding: 10px;
+            border-bottom: 1px solid lightgray;
+            display: flex;
+            height: 80px;
+            justify-content: space-between;
+          "
+        >
+          <div>
+            <div style="display: flex; justify-content: space-between">
+              <div>Jennifer Jane</div>
+              <div>just now</div>
+            </div>
+
+            <div>we can imporve this idea</div>
+          </div>
+          <div>
+            <confirm-button
+              v-if="!isLoading"
+              @confirm="toggleFeedback"
+              :confirmPlacement="'left'"
+              :confirmMessage="getConfirmMessage"
+              :btnStyle="'display:flex;flex-direction:row;background:#fff;border:none;color:#000;align-items:center;box-shadow: none;'"
+            >
+              <i class="mdi mdi-close" style="font-size: 2rem"></i>
+            </confirm-button>
+          </div>
+        </div>
+        <div
+          class="feedback-form-message"
+          style="
+            padding: 10px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+          "
+        >
+          <input
+            style="
+              font-size: 12px;
+              outline: none;
+              border: none;
+              width: 100%;
+              height: 100%;
+            "
+            v-model="feedbackForm.description"
+            placeholder="Leave a reply"
+            type="text"
+            debounce="500"
+          />
+
+          <div @click="saveFeedback" style="cursor: pointer">
+            <i
+              class="mdi mdi-send"
+              style="font-size: 30px; color: #4494d1"
+              v-if="!isLoading"
+            ></i>
+            <b-spinner v-else></b-spinner>
+          </div>
+        </div>
+
+        <div
+          class="feedback-form-value-and-submit"
+          style="
+            display: flex;
+            align-items: center;
+            height: 40px;
+            padding: 10px;
+          "
+        >
+          <div>
+            <div style="display: flex">
+              <div
+                v-for="(item, index) in rewardablePoints"
+                :key="index"
+                class="issueEffect__feedback_feedback_reward"
+                @click="rewardActiveIndex = index"
+                :class="rewardActiveIndex === index ? 'reward__active' : ''"
+              >
+                {{ item }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--     <div
           class="form-label-group select required"
           style="width: 500px; height: 100%"
         >
@@ -27,7 +116,7 @@
             v-model="feedbackForm.description"
             v-autoresize
             class="no-style my-0 issue-Effect__feedback-text"
-            :placeholder="$t('Issue feedback')"
+            :placeholder="textPlaceholder"
             name="feedback"
           ></b-textarea>
         </div>
@@ -52,19 +141,17 @@
           </div>
           <loading-button
             :disabled="feedbackForm.description.length == 0"
-            style="width: 100px; align-self: center; padding: 5px"
+            style="align-self: center; padding: 5px"
             :loading="isLoading"
-            @click="saveIssueFeedback"
-            ><span v-if="!isLoading"
-              >{{ $t("Feedback") }}
-            </span></loading-button
+            @click="saveFeedback"
           >
-        </div>
-      </b-card></b-popover
-    >
+          </loading-button>
+        </div>-->
+      </b-card>
+    </b-popover>
 
     <icoIssueFeedback
-      @click="toggleIssueFeedback"
+      @click="toggleFeedback"
       :ref="refTarget"
       class="issueEffect__feedbackIcon"
       :class="{
@@ -73,6 +160,7 @@
       width="40px"
       height="40px"
     ></icoIssueFeedback>
+    <slot></slot>
   </div>
 </template>
 
@@ -81,6 +169,17 @@ import icoIssueFeedback from "@/assets/img/icons/svg/ico-issue-feedback.svg?inli
 
 export default {
   components: { icoIssueFeedback },
+  computed: {
+    getConfirmMessage() {
+      if (this.type == "ideaFeedback") {
+        return this.$t("IdeaFeedbackClose");
+      } else if (this.type == "issueFeedback") {
+        return this.$t("IdeaFeedbackClose");
+      } else {
+        return this.$t("IdeaissueFeedbackClose");
+      }
+    },
+  },
   props: {
     item: {
       required: true,
@@ -94,8 +193,19 @@ export default {
       type: String,
     },
     type: {
+      required: false,
+      type: String,
+    },
+    textPlaceholder: {
       required: true,
       type: String,
+    },
+    offset: {
+      required: false,
+      type: Number,
+      default() {
+        return 0;
+      },
     },
     openState: {
       required: true,
@@ -123,15 +233,16 @@ export default {
     rewardablePoints: [0, 5, 10, 25, 50, 100],
   }),
   methods: {
-    toggleIssueFeedback() {
+    toggleFeedback() {
       //toggles modal
+      console.log(this.openState);
       if (this.openState) {
         this.$emit("close");
         return;
       }
       this.$emit("toggle", this.item, this.type);
     },
-    saveIssueFeedback() {
+    saveFeedback() {
       //deduct value
       this.feedbackForm.value = this.rewardablePoints[this.rewardActiveIndex];
 

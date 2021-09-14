@@ -18,6 +18,7 @@ export const IDEA_FRAGMENT = gql`
     anonymous
     createdAt
     updatedAt
+    replied
     stats {
       problems
       improvements
@@ -94,6 +95,7 @@ export const IDEA_FULL_FRAGMENT = gql`
       createdAt
       updatedAt
       anonymous
+      replied
       files {
         ...resourceFields
       }
@@ -111,6 +113,7 @@ export const IDEA_FULL_FRAGMENT = gql`
       createdAt
       updatedAt
       anonymous
+      replied
       files {
         ...resourceFields
       }
@@ -175,5 +178,21 @@ export const IDEA = {
     mutation ideaImprovementDelete($id: ID!) {
       ideaImprovementDelete(id: $id)
     }
-  `
+  `,
+  closeFeedback: gql`
+    mutation ideaCloseFeedback($id: ID!) {
+      ideaCloseFeedback(id: $id) {
+        ...ideaFullFields
+      }
+    }
+    ${IDEA_FULL_FRAGMENT}
+  `,
+  closeImprovementFeedback: gql`
+  mutation ideaImprovementCloseFeedback($input: IdeaImprovementCloseInput!) {
+    ideaImprovementCloseFeedback(input: $input) {
+      ...ideaFullFields
+    }
+  }
+  ${IDEA_FULL_FRAGMENT}
+`
 };

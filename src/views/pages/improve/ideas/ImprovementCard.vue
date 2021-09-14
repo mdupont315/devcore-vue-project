@@ -5,9 +5,9 @@
       style="position: relative"
     >
       <inner-overlay
-        v-if="showPopOver"
+        v-if="showPopOverNew || showPopOverFeedback"
         style="z-index: 1"
-        @click="togglePopOver"
+        @click="closePopovers"
       ></inner-overlay>
       <b-card-body
         class="card-footer border-0 pl-0"
@@ -18,7 +18,7 @@
         </div>
         <div
           class="text-justify"
-          style="cursor: pointer;display:flex"
+          style="cursor: pointer; display: flex"
           v-if="item.files && item.files.length > 0"
         >
           <i class="mdi mdi-folder-open-outline" style="margin-right: 10px"></i>
@@ -38,7 +38,10 @@
           :time="item.createdAt"
           class="d-inline-block"
         ></author-time>
-        <div class="float-right" style="position: relative; top: -10px">
+        <div
+          class="float-right"
+          style="position: relative; top: -10px; display: flex"
+        >
           <confirm-button
             class="d-inline-block"
             variant="transparent"
@@ -51,11 +54,45 @@
               $t("Delete")
             }}</small>
           </confirm-button>
+          <improvement-feedback
+            v-if="!item.replied"
+            style="margin-left: 20px; max-height: 46px"
+            :item="item"
+            refTarget="improvementFeedbackIcon"
+            :textPlaceholder="$t('Improvement feedback')"
+            type="improvementFeedback"
+            @toggle="togglePopOverFeedback"
+            @save="saveImprovementReply"
+            @close="closeImprovementForFeedback"
+            :openState="showPopOverFeedback"
+          >
+            <small
+              class="d-block text-gray"
+              style="line-height: 1em; align-self: center"
+              >{{ $t("Feedback") }}</small
+            >
+          </improvement-feedback>
+          <!--   <b-button
+            ref="btnFeedback"
+            variant="transparent"
+            class="text-success p-0 border-0 ml-4"
+            style="outline: none !important; box-shadow: none !important"
+            @click="createFeedback"
+          >
+            <i class="mdi mdi-check" style="font-size: 2rem"></i>
+            <small class="d-block text-gray" style="line-height: 1em">{{
+              $t("Feedback")
+            }}</small>
+          </b-button> -->
           <b-button
             ref="btnNew"
             variant="transparent"
             class="text-success p-0 border-0 ml-4"
-            style="outline: none !important; box-shadow: none !important"
+            style="
+              outline: none !important;
+              box-shadow: none !important;
+              height: 100%;
+            "
             @click="startCreation"
           >
             <i class="mdi mdi-check" style="font-size: 2rem"></i>
@@ -66,11 +103,32 @@
         </div>
       </b-card-footer>
     </b-card>
+    <!--     <b-popover
+      ref="popover"
+      v-click-outside
+      :target="() => this.$refs['btnFeedback']"
+      :show.sync="showPopOverFeedback"
+      placement="top"
+      class="form-popover"
+    >
+      <b-card no-body style="width: 400px">
+        <b-card-body>
+          <issuesEffectFeedback
+            :issue="row.item"
+            @toggle="toggleItem"
+            @save="saveIssueReply"
+            @close="issueEffectFeedbackOpen = false"
+            :openState="issueEffectFeedbackOpen"
+          ></issuesEffectFeedback>
+        </b-card-body>
+      </b-card>
+    </b-popover> -->
+
     <b-popover
       ref="popover"
       v-click-outside
       :target="() => this.$refs['btnNew']"
-      :show.sync="showPopOver"
+      :show.sync="showPopOverNew"
       placement="top"
       class="form-popover"
     >
@@ -90,10 +148,14 @@
 <script>
 import { Idea } from "@/models";
 import IdeaFrom from "./Form";
+import feedbackForm from "../../../../components/global/FeedbackForm.vue";
+import GQLForm from "@/lib/gqlform";
 
 export default {
   components: {
     "idea-form": IdeaFrom,
+    "improvement-feedback": feedbackForm,
+    /*     issuesEffectFeedback, */
   },
   props: {
     item: {
@@ -107,11 +169,37 @@ export default {
   },
   data: () => ({
     currentFile: null,
-    showPopOver: false,
+    showPopOverNew: false,
+    showPopOverFeedback: false,
     newIdea: {},
   }),
 
   methods: {
+    async closeImprovementForFeedback() {
+      const improvementCloseForm = new GQLForm({
+				id: this.idea.id,
+        improvementId: this.item.id,
+      });
+      await this.$store.dispatch(
+        "idea/closeImprovementFeedback",
+        improvementCloseForm
+      );
+      this.closePopovers();
+    },
+    async saveImprovementReply(input) {
+      console.log(input);
+      const status = "FEEDBACK";
+
+      const ideaissueReplyForm = new GQLForm({
+        authorId: this.item.author.id,
+        ideaIssueId: this.item.id,
+        value: input.value,
+        description: input.description,
+        status,
+      });
+      await this.$store.dispatch("ideaIssueReply/create", ideaissueReplyForm);
+      this.togglePopOverFeedback();
+    },
     async reloadDetail() {
       this.$emit("reload", this.item);
     },
@@ -126,9 +214,14 @@ export default {
         force: true,
       });
     },
-    togglePopOver() {
-      this.showPopOver = !this.showPopOver;
+    closePopovers() {
+      this.showPopOverNew = false;
+      this.showPopOverFeedback = false;
     },
+    togglePopOverFeedback() {
+      this.showPopOverFeedback = !this.showPopOverFeedback;
+    },
+
     async startCreation() {
       this.$nextTick(() => {
         this.newIdea = new Idea();
@@ -143,7 +236,7 @@ export default {
         this.newIdea.sourceType = "idea_issue";
       });
       setTimeout(() => {
-        this.showPopOver = true;
+        this.showPopOverNew = true;
       }, 500);
     },
   },

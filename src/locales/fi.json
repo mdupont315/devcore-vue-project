@@ -226,7 +226,7 @@
   "Evaluation Restriction Info": "Valitut roolit eivät pysty asettamaan hukan määrää mobiilissa jaa ongelma ominaisuudesta.",
   "Issue Evaluation Restriction": "Ongelman vaikutuksen rajoitus",
   "Issue Evaluation Restriction Info": "Valitut roolit eivät pysty asettamaan ongelman vaikutusta mobiilissa jaa ongelma ominaisuudesta.",
- 
+
   "Issue Template Restriction": "Template Restriction",
   "Issue Template Restriction Info": "Selected roles are restricted to set issue template in mobile report issue feature.",
 
@@ -304,6 +304,7 @@
   "Issue effect": "Ongelman vaikutus",
   "Issue comment": "Ongelman kommentti",
   "Issue feedback": "Ongelman palaute",
+  "Improvement feedback": "Parannuksen palaute",
   "Add Another Role": "Lisää rooli",
   "Feedback": "Palaute",
   "Comment": "Kommentoi",
@@ -562,6 +563,9 @@
   "Archived ideas": "Arkistoidut ohjeet",
   "New ideas": "Uudet kehitysideat",
   "Idea title": "Ohjeen nimi",
+  "IdeaFeedbackClose": "Ohjeelle ei voi enään antaa palautetta.",
+  "IssueFeedbackClose": "Ongelmalle ei voi enään antaa palautetta.",
+  "IdeaIssueFeedbackClose": "Parannukselle ei voi enään antaa palautetta.",
   "No files attached": "Ei tiedostoja lisättynä",
   "Download": "Lataa",
   "Price model": "Hintamalli",

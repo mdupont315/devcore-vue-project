@@ -133,13 +133,17 @@
             :class="{ 'show-when-hovered': isCurrentRowActive(row.item) }"
           >
             <!-- feedback -->
-            <issuesEffectFeedback
-              :issue="row.item"
+            <issues-effect-feedback
+              :item="row.item"
+              :textPlaceholder="$t('Issue feedback')"
+              refTarget="issueEffectFeedbackIcon"
+              type="issueFeedback"
+							:offset="'-115'"
               @toggle="toggleItem"
               @save="saveIssueReply"
               @close="issueEffectFeedbackOpen = false"
               :openState="issueEffectFeedbackOpen"
-            ></issuesEffectFeedback>
+            ></issues-effect-feedback>
 
             <!-- edit -->
             <issuesEffectComment
@@ -192,7 +196,7 @@ import moment from "moment";
 import icoIssueTrashcan from "@/assets/img/icons/svg/ico-trashcan.svg?inline";
 
 import issuesEffectAdd from "./effect/IssuesTemplateAdd.vue";
-import issuesEffectFeedback from "./effect/IssuesTemplateFeedback.vue";
+import feedbackForm from "../../../../components/global/FeedbackForm.vue";
 import issuesEffectComment from "./effect/IssuesTemplateComment.vue";
 import { /* mapState, */ mapGetters } from "vuex";
 
@@ -200,7 +204,7 @@ export default {
   components: {
     icoIssueTrashcan,
     issuesEffectAdd,
-    issuesEffectFeedback,
+    "issues-effect-feedback": feedbackForm,
     issuesEffectComment,
   },
   props: {
@@ -313,10 +317,9 @@ export default {
   },
   methods: {
     handleScroll(deltaY) {
-/*       console.log(deltaY);
+      /*       console.log(deltaY);
 			const container = document.querySelector('.row-details');
 			container.scrollTop = container.scrollTop + deltaY; */
-
     },
     setDefaultEffect() {
       if (this.currentItem) {
@@ -432,7 +435,7 @@ export default {
       const { description } = input;
       const { value } = input;
       const ideaissueReplyForm = new GQLForm({
-				authorId: this.currentItem.author.id,
+        authorId: this.currentItem.author.id,
         issueId: id,
         value: value,
         status,
