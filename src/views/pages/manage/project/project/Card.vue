@@ -60,7 +60,16 @@
           <!-- <div v-if="stage.status!=='STARTED'"> -->
           <div
             v-if="getStageIdeasLength(stage) > 0"
-            class="card bg-primary rounded-0 text-white mt-3 mb-0 ideas detail-card"
+            class="
+              card
+              bg-primary
+              rounded-0
+              text-white
+              mt-3
+              mb-0
+              ideas
+              detail-card
+            "
           >
             <div class="card-body px-3 py-2">
               <layer v-if="showIdeas" @closed="toggleIdeas">
@@ -230,8 +239,9 @@ export default {
         process: this.item.process ? this.item.process.id : this.item.processId,
         stage: this.stage.processStageId,
         type: this.item.type,
-				issueEvaluationRoles: this.item.issueEvaluationRoles,
-        //	allStages: [...new Set(this.item.stages.map((i) => i.ideaId))],
+        useAdvanced: this.item.useAdvanced,
+        issueEvaluationRoles: this.item.issueEvaluationRoles,
+        issueTemplateRoles: this.item.issueTemplateRoles,
       };
     },
     async toggleEdit() {

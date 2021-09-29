@@ -6,9 +6,13 @@
       :class="{ 'top-all': this.showInnerOverlayOnTop }"
       @click="overlayClick"
       :scrollable="true"
-      style="overflow: scroll"
-      @overlayScroll="handleScroll"
+      style="transform: translate3d(0px, 0px, 0px)"
     >
+      <!--   position: fixed;
+        top: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 120vh; -->
     </inner-overlay>
     <div class="text-right float-right">
       <confirm-button
@@ -27,12 +31,14 @@
       primary-key="id"
       hover
       :fields="fields"
-      :items="items"
+      :items="getItems"
       :show-empty="true"
       :empty-text="$t('There are no records for the given criteria')"
       :tbody-tr-class="
         (item, type) =>
-          isRowEditing(item) ? 'issueTable-row editing' : 'issueTable-row'
+          isRowEditing(item)
+            ? `issueTable-row editing issueTable-row-${getItemIdOrNull(item)}`
+            : `issueTable-row issueTable-row-${getItemIdOrNull(item)}`
       "
       @row-unhovered="nullifyHoverRowId"
       @row-hovered="setHoverRowId(item, $event)"
@@ -42,10 +48,11 @@
         <col style="width: 10%" />
         <col style="width: 10%" />
         <col style="width: 10%" />
-        <col style="width: 35%" />
-        <col style="width: 10%" />
-        <col style="width: 15%" />
-        <col style="width: 10%" />
+        <col style="width: 38%" />
+        <col style="width: 3%" />
+        <col style="width: 6%" />
+        <col style="width: 6%" />
+        <col style="width: 6%" />
       </template>
       <template v-slot:empty="scope">
         <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -78,6 +85,18 @@
           {{ row.item.description }}
         </div></template
       >
+
+      <!-- comment -->
+      <template v-slot:cell(comment)="row">
+        <!-- edit -->
+        <issuesEffectComment
+          :issue="row.item"
+          @toggle="toggleItem"
+          @save="saveIssueReply"
+          @close="issueEffectCommentOpen = false"
+          :openState="issueEffectCommentOpen"
+        ></issuesEffectComment
+      ></template>
       <!-- loss -->
       <template v-slot:cell(loss)="row">
         <span :class="{ 'text-danger': row.item.effectedMoneyTotalValue != 0 }">
@@ -124,7 +143,7 @@
       <template v-slot:cell(actions)="row" class="text-right">
         <div
           class="text-right p-1 px-0"
-          style="display: flex; align-items: center"
+          style="display: flex; align-items: center; justify-content: right"
         >
           <!-- Issue Effect Actions -->
           <div
@@ -134,25 +153,16 @@
           >
             <!-- feedback -->
             <issues-effect-feedback
+              v-show="!row.item.replied"
               :item="row.item"
               :textPlaceholder="$t('Issue feedback')"
               refTarget="issueEffectFeedbackIcon"
               type="issueFeedback"
-							:offset="'-115'"
               @toggle="toggleItem"
               @save="saveIssueReply"
-              @close="issueEffectFeedbackOpen = false"
+              @close="closeIssueForFeedback"
               :openState="issueEffectFeedbackOpen"
             ></issues-effect-feedback>
-
-            <!-- edit -->
-            <issuesEffectComment
-              :issue="row.item"
-              @toggle="toggleItem"
-              @save="saveIssueReply"
-              @close="issueEffectCommentOpen = false"
-              :openState="issueEffectCommentOpen"
-            ></issuesEffectComment>
           </div>
           <!-- trashcan -->
           <div class="issueEffect-remove__container">
@@ -254,23 +264,17 @@ export default {
       user: "auth/user",
       effectTemplates: "issueEffect/all",
     }),
-
+    getItems: {
+      get() {
+        return this.items;
+      },
+    },
     getIssueEffectTemplates: {
       get() {
         return this.effectTemplates ?? [];
       },
     },
 
-    /*     isEditing() {
-      if (this.editType === "issueFeedback") {
-        return this.issueEffectFeedbackOpen;
-      } else if (this.editType === "issueComment") {
-        return this.issueEffectCommentOpen;
-      } else if (this.editType === "issueAdd") {
-        return this.issueEffectAddOpen;
-      }
-      return false;
-    }, */
     fields: {
       get() {
         return [
@@ -292,6 +296,11 @@ export default {
             sortable: true,
           },
           {
+            key: "comment",
+            label: this.$t("Comment"),
+            sortable: true,
+          },
+          {
             key: "loss",
             label: this.$t("Estimated loss"),
             sortable: true,
@@ -308,6 +317,8 @@ export default {
     },
   },
   async mounted() {
+
+
     this.isLoading = true;
     await this.$store.dispatch("issueEffect/findAll");
     await this.$store.dispatch("companyRole/findAll");
@@ -316,10 +327,10 @@ export default {
     this.isLoading = false;
   },
   methods: {
-    handleScroll(deltaY) {
-      /*       console.log(deltaY);
-			const container = document.querySelector('.row-details');
-			container.scrollTop = container.scrollTop + deltaY; */
+    getItemIdOrNull(item) {
+      if (item) {
+        return item.id;
+      }
     },
     setDefaultEffect() {
       if (this.currentItem) {
@@ -428,9 +439,7 @@ export default {
       return response;
     },
     async saveIssueReply(input) {
-      console.log(input);
       const status = this.issueEffectCommentOpen ? "COMMENT" : "FEEDBACK";
-      console.log(status);
       const { id } = this.currentItem;
       const { description } = input;
       const { value } = input;
@@ -442,13 +451,44 @@ export default {
         description,
       });
       await this.$store.dispatch("ideaIssueReply/create", ideaissueReplyForm);
+      await this.$store.dispatch("issue/findById", {
+        id: this.currentItem.id,
+        force: true,
+      });
+      this.closePopovers();
+    },
+    async closeIssueForFeedback() {
+      const issueCloseForm = new GQLForm({
+        id: this.currentItem.id,
+      });
+      await this.$store.dispatch("issue/closeFeedback", issueCloseForm);
+      this.closePopovers();
+    },
+    closePopovers() {
       this.issueEffectCommentOpen = false;
       this.issueEffectFeedbackOpen = false;
     },
+    scrollToPosAndSetParentPadding(item) {
+      if (item && item.id) {
+        var element = document.getElementsByClassName(
+          `issueTable-row-${item.id}`
+        )[0];
 
+				const tableDetailsMaxHeight = 614;
+        this.$emit("issuesTableOffsetTop", tableDetailsMaxHeight);
+        this.$nextTick(() => {
+          element.scrollIntoView({
+            behavior: "smooth",
+          });
+        });
+      } else {
+        this.$emit("issuesTableOffsetTop", 0);
+      }
+    },
     toggleItem(item, type) {
       this.closeOtherIssueEffectModals(type);
-      console.log("TOGGLED");
+      this.scrollToPosAndSetParentPadding(item);
+
       if (
         !item ||
         (this.currentItem &&
@@ -462,7 +502,9 @@ export default {
         this.currentItem = null;
       } else {
         console.log("item");
+        console.log(item);
 
+        console.log("TOGGLED");
         this.currentItem = item;
       }
     },
@@ -502,7 +544,7 @@ export default {
     },
     async deleteAll() {
       const deleteForm = new GQLForm({
-        ids: this.items.map((i) => i.id),
+        ids: this.getItems.map((i) => i.id),
       });
       await this.$store.dispatch("issue/deleteMany", deleteForm);
       this.$parent.$emit("deletedAll", {});

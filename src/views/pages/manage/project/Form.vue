@@ -203,16 +203,33 @@
 
         <b-col class="col-12" style="height: 40px">
           <b-row style="height: 100%; margin: auto; align-items: center">
-            <b-col>
+            <b-col style="padding: 0">
               <div @click="toggleAdvanced" class="form-label-group required">
                 <div class="project_advaced_actions">
-                  <div>
+                  <b-button variant="primary">
                     {{ this.$t("Project Advanced") }}
-                  </div>
+                  </b-button>
                   <div class="advanced-form-advanced-switch">
+                    <b-popover
+                      target="advanced_form_info_text-info-id"
+                      container="advanced_form_info_text-info-id"
+                      placement="top"
+                      triggers="hover focus"
+                      :content="getAdvancedInfoContent"
+                    >
+                    </b-popover>
+                    <div
+                      class="advanced_form_info_text-info"
+                      id="advanced_form_info_text-info-id"
+                    >
+                      <i
+                        class="mdi mdi-information advanced_form_info_icon"
+                      ></i>
+                    </div>
                     <b-form-checkbox
-                      v-model="advancedSettingsSet"
+                      v-model="form.useAdvanced"
                       name="check-button"
+                      style="margin-top: 3px"
                       size="lg"
                       switch
                     >
@@ -241,7 +258,6 @@
                 >
                   <advanced-form
                     v-model="advancedForm"
-                    @input="setAdvancedForm"
                     @done="toggleAdvanced"
                     :users="users"
                     :form="form"
@@ -365,8 +381,11 @@ export default {
     input: null,
     toolsForStage: [],
     budget: null,
-    checked: false,
-    advancedForm: null,
+    advancedChecked: false,
+    advancedForm: {
+      issueEvaluationRoles: [],
+      issueTemplateRoles: [],
+    },
     form: new GQLForm({
       id: null,
       name: null,
@@ -380,32 +399,16 @@ export default {
       evaluationIntervalUnit: "WEEKS",
       evaluationIntervalAmount: 1,
       budget: 0,
-      issueEvaluationRoles: [],
-      issueTemplateRoles: [],
+      useAdvanced: false,
     }),
   }),
   computed: {
-    advancedSettingsSet: {
+    getAdvancedInfoContent: {
       get() {
-        return (
-					this.form.issueEvaluationRoles &&
-					this.form.issueTemplateRoles &&
-          this.form.issueEvaluationRoles.length > 0 ||
-          this.form.issueTemplateRoles.length > 0
-        );
-      },
-      set(val) {
-        if (val && this.advancedForm) {
-          if (this.advancedForm.issueTemplateRoles) {
-            this.form.issueTemplateRoles = this.advancedForm.issueTemplateRoles;
-          }
-          console.log(this.advancedForm);
-
-          if (this.advancedForm.issueEvaluationRoles) {
-            this.form.issueEvaluationRoles =
-              this.advancedForm.issueEvaluationRoles;
-          }
+        if (this.form.useAdvanced) {
+          return `${this.$t("AdvancedForm-switch-info")} ${this.$t("inUse")}`;
         }
+        return `${this.$t("AdvancedForm-switch-info")} ${this.$t("notInUse")}`;
       },
     },
     getBudget: {
@@ -530,11 +533,6 @@ export default {
       allTools: "companyTool/all",
     }),
   },
-  watch: {
-    advancedForm(newVal) {
-      console.log(newVal);
-    },
-  },
   async mounted() {
     this.intent = Math.random();
     this.input = this.value;
@@ -548,13 +546,6 @@ export default {
   },
 
   methods: {
-    setAdvancedForm() {
-      this.form.issueEvaluationRoles = this.advancedForm.issueEvaluationRoles;
-      this.form.issueTemplateRoles = this.advancedForm.issueTemplateRoles;
-      this.advancedSettingsSet =
-        this.form.issueEvaluationRoles.length > 0 ||
-        this.advancedForm.issueEvaluationRoles.length > 0;
-    },
     toggleAdvanced() {
       this.showAdvanced = !this.showAdvanced;
     },
@@ -633,25 +624,23 @@ export default {
           this.budget = this.input.budget / 100;
         }
 
-        if (
-          this.input.issueEvaluationRoles &&
-          this.input.issueEvaluationRoles.length > 0
-        ) {
-          this.advancedSettingsSet = true;
-          this.form.issueEvaluationRoles = this.input.issueEvaluationRoles;
-        } else if (
-          this.input.issueTemplateRoles &&
-          this.input.issueTemplateRoles.length > 0
-        ) {
-          this.advancedSettingsSet = true;
-          this.form.issueTemplateRoles = this.input.issueTemplateRoles;
-        } else {
-          this.advancedSettingsSet = false;
-        }
+        const advancedFormFields = Object.keys(this.advancedForm);
+        console.log(Object.entries(this.input));
+
+        //set advancedform
+        Object.entries(this.input).forEach((item) => {
+          console.log(item);
+          if (advancedFormFields.indexOf(item[0]) > -1 && item[1]) {
+            const key = item[0].toString();
+            const value = item[1];
+            this.advancedForm[key] = value;
+          }
+        });
       }
     },
 
     async save() {
+      console.log(this.form);
       this.form.ideaIds = [...this.selectedProjectIdeas];
       this.form.budget = this.budget * 100;
 
@@ -662,6 +651,18 @@ export default {
         });
       }
 
+      //Add advanced settings
+      if (this.form.useAdvanced) {
+        Object.entries(this.advancedForm).forEach((item) => {
+          const key = item[0].toString();
+          const value = item[1];
+          console.log(key);
+          console.log(value);
+          this.form._fields[key] = value;
+        });
+      }
+
+      console.log(this.form);
       //include all stages if ON_GOING project
       if (this.mode === "edit") {
         if (this.input.type === "ON_GOING") {
@@ -758,9 +759,23 @@ export default {
 }
 </style>
 <style scoped>
+.advanced_form_info_text-info > .advanced_form_info_icon {
+  color: #4294d0;
+  padding-left: 3px;
+  font-size: 20px;
+  padding-right: 3px;
+}
+.advanced_form_info_text-info > .popover {
+  padding: 5px;
+  max-width: 250px;
+}
 .project_advaced_actions {
   font-size: 15px;
   justify-content: space-between;
+  display: flex;
+  cursor: pointer;
+}
+.advanced-form-advanced-switch {
   display: flex;
 }
 

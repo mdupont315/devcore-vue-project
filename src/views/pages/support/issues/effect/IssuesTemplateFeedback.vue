@@ -16,7 +16,6 @@
       placement="bottom"
       offset="-115"
       class="form-popover"
-      custom-class="issueEffectCommentForm-form-popover"
     >
       <b-card no-body v-if="openState" style="padding: 5px">
         <div

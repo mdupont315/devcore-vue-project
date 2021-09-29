@@ -10,17 +10,18 @@
           {{ labelText }}
 
           <b-popover
-            target="advanced_evaluation_restriction-text-info-id"
+            :target="`advanced_restriction-${name}`"
             container="advanced_evaluation_restriction-text-info-id"
             placement="top"
-            triggers="hover focus"
+            triggers="hover"
             :content="infoText"
+            custom-class="advanced_restriction_popover"
           >
           </b-popover>
 
           <div
             class="advanced_evaluation_restriction-text-info"
-            id="advanced_evaluation_restriction-text-info-id"
+            :id="`advanced_restriction-${name}`"
           >
             <i class="mdi mdi-information restriction-text-info-icon"></i>
           </div>
@@ -31,7 +32,6 @@
           :class="{
             'advancedRoles-border-active': value.length > 0,
           }"
-          style="flex-grow: 3; border-radius: 5px"
         >
           <div>
             <div
@@ -51,7 +51,9 @@
                 </div>
               </div>
               <div v-else class="text-dark advanced-role-noroles">
-                {{ $t("No") }} {{ $t("roles") }} {{ $t("selected") }}
+                <b-button variant="primary" style="width: 100%">
+                  {{ $t("NoRolesSelected") }}
+                </b-button>
               </div>
             </div>
           </div>
@@ -151,15 +153,15 @@ export default {
     },
     name: {
       type: String,
-      default: () => ""
+      default: () => "",
     },
-		 labelText: {
+    labelText: {
       type: String,
       default: () => "",
     },
     infoText: {
       type: String,
-      default: () => ""
+      default: () => "",
     },
   },
   computed: {
@@ -188,13 +190,19 @@ export default {
 };
 </script>
 
+<style>
+.advanced_restriction_popover {
+  padding: 10px;
+  max-width: 200px;
+}
+</style>
 <style scoped>
 .companyRoles {
-  max-width: 100px;
-  flex-grow: 3;
+  flex-grow: 1;
   border-radius: 5px;
-  min-width: 100px;
+  width: 75px;
 }
+
 .advancedRoles-border-active {
   border: 1px solid grey;
 }
@@ -213,7 +221,8 @@ export default {
 
 .advanced_evaluation_restriction-text {
   font-size: 15px;
-  flex-grow: 4;
+  width: 200px;
+  flex-grow: 15;
   align-self: center;
   align-items: center;
   display: flex;

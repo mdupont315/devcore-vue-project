@@ -116,7 +116,6 @@ const actions = {
     return issue;
   },
 
-
   async delete(context, form) {
     context.commit("REMOVE_ITEM", form);
     const result = await form.mutate({
@@ -163,6 +162,43 @@ const actions = {
     return result.data.issueDeleteMany;
   },
 
+  async closeFeedback(context, form) {
+    console.log(form);
+    const result = await form.mutate({
+      mutation: ISSUE.closeFeedback,
+      variables: {
+        id: form.issueId
+      }
+    });
+    console.log(result);
+    const issue = new Issue().deserialize(result.data.ideaCloseFeedback);
+    console.log(issue);
+    context.commit("SET_ITEM", issue);
+    // await context.dispatch('findAll', { force: true });
+    return result.data.ideaCloseFeedback;
+  },
+  async findById(context, filter) {
+    const currentItem = context.state.all.find(o => o.id === filter.id);
+    const force = filter.force || false;
+
+    if (!currentItem || force || !currentItem.loaded) {
+      try {
+        const query = apolloClient.watchQuery({
+          query: ISSUE.findById,
+          variables: filter
+        });
+        const { result } = await queryToPromise(query);
+        console.log(result);
+        const issue = new Issue().deserialize(result.data.issueFindById);
+        issue.loaded = true;
+        context.commit("SET_ITEM", issue);
+        return issue;
+      } finally {
+        filter.busy = false;
+      }
+    }
+    return currentItem;
+  },
   async findByProcess(context, filter) {
     if (!context.state.loadedProcess.includes(filter.id) || filter.force) {
       const query = apolloClient.watchQuery({

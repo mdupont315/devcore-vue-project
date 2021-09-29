@@ -171,6 +171,7 @@ export default {
   computed: {
     ...mapGetters({
       allProcess: "process/all",
+      ideaReplies: "ideaIssueReply/all",
     }),
 
     process: {
@@ -213,7 +214,7 @@ export default {
         ideaId: this.idea.id,
       });
       await this.$store.dispatch("idea/closeFeedback", ideaCloseForm);
-			this.closePopovers();
+      this.closePopovers();
     },
     closePopovers() {
       this.showPopOverFeedback = false;
@@ -231,6 +232,11 @@ export default {
         status,
       });
       await this.$store.dispatch("ideaIssueReply/create", ideaReplyForm);
+      await this.$store.dispatch("idea/findById", {
+        id: this.idea.id,
+        force: true,
+      });
+
       this.togglePopOverFeedback();
     },
     async setCurrentTool(event, toolId) {

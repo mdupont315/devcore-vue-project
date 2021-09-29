@@ -177,7 +177,7 @@ export default {
   methods: {
     async closeImprovementForFeedback() {
       const improvementCloseForm = new GQLForm({
-				id: this.idea.id,
+        id: this.idea.id,
         improvementId: this.item.id,
       });
       await this.$store.dispatch(
@@ -198,6 +198,11 @@ export default {
         status,
       });
       await this.$store.dispatch("ideaIssueReply/create", ideaissueReplyForm);
+      await this.$store.dispatch("idea/findById", {
+        id: this.idea.id,
+        force: true,
+      });
+
       this.togglePopOverFeedback();
     },
     async reloadDetail() {

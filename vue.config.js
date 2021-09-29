@@ -4,9 +4,9 @@ const path = require("path");
 const webpack = require("webpack");
 
 const appUrls = {
-  dev: process.env.VUE_APP_GRAPHQL_ENDPOINT,
-  proxy: "https://devcore.app/graphql",
-  prod: "https://devcore.app/graphql"
+  dev: "http://homestead.test",
+  proxy: "https://devcore.app",
+  prod: "https://devcore.app"
 };
 
 module.exports = {
@@ -103,17 +103,12 @@ module.exports = {
     if (process.env.NODE_ENV !== "production") {
       console.log("Development");
       config.plugin("define").tap(options => {
-        // mutate for development...
         if (argv.mode === "proxy") {
-          options[0][
-            "process.env"
-          ].VUE_APP_GRAPHQL_ENDPOINT = `'${appUrls.proxy}'`;
+          options[0]["process.env"].BASE_URL = `'${appUrls.proxy}'`;
           return options;
         }
         if (argv.mode === "dev") {
-          options[0][
-            "process.env"
-          ].VUE_APP_GRAPHQL_ENDPOINT = `'${appUrls.dev}'`;
+          options[0]["process.env"].BASE_URL = `'${appUrls.dev}'`;
           return options;
         }
       });
@@ -128,9 +123,8 @@ module.exports = {
         return args;
       });
       config.plugin("define").tap(options => {
-        options[0][
-          "process.env"
-        ].VUE_APP_GRAPHQL_ENDPOINT = `'${appUrls.prod}'`;
+        console.log(options[0]["process.env"]);
+        options[0]["process.env"].BASE_URL = `'${appUrls.prod}'`;
         return options;
       });
     }

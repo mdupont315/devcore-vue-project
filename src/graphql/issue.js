@@ -20,6 +20,7 @@ export const ISSUE_FRAGMENT = gql`
     moneyValue
     totalValue
     checked
+    replied
     effectTemplateId
     project {
       id
@@ -162,5 +163,13 @@ export const ISSUE = {
     mutation deleteMany($ids: [ID!]!) {
       issueDeleteMany(ids: $ids)
     }
+  `,
+  closeFeedback: gql`
+    mutation issueCloseFeedback($id: ID!) {
+      issueCloseFeedback(id: $id) {
+        ...issueFullFields
+      }
+    }
+    ${ISSUE_FULL_FRAGMENT}
   `
 };

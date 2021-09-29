@@ -7,7 +7,6 @@
       class="t01"
       hover
       fixed
-      sticky-header="380px"
       style="background: #fff"
       :fields="fields"
       :items="getMilestoneUsers"
@@ -169,32 +168,32 @@ export default {
   z-index: 1 !important;
   width: 100%;
 }
+.engage_table {
+  /*  max-width: 97%; */
+}
 .engage_table_header > div {
   line-height: 35px;
   color: #4294d0;
 }
 
 .engage_container_content > .container-fluid > .b-table-sticky-header {
-  padding: 0 20px;
-  max-height: 40%;
-}
-
-.engage_table > thead > tr {
-  /*  position: fixed;
-  width: 100%;
-  max-width: 85%;
-  display: flex;
-  flex-direction: row; */
+  /*   padding: 0 20px;
+  max-height: 40%; */
 }
 
 .engage_table_container {
-  right: 20px;
-  height: 100%;
   background: #fff;
-  margin: 20px;
+  border-radius: 5px;
+  height: 100%;
+  padding: 0 20px;
+  overflow-y: scroll;
+  /*   height: 100%;
+  background: #fff;
+  margin: 20px 20px 0 20px;
+	    max-height: 310px;
+    overflow: hidden;
   padding-right: 15px;
   padding-left: 15px;
-  overflow-y: scroll;
-	border-radius: 5px;
+	border-radius: 5px; */
 }
 </style>

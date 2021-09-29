@@ -183,9 +183,14 @@
 
           <!-- details -->
           <template v-slot:row-details="currentRowDetails">
-            <div class="row-details" v-if="currentRowDetails">
+            <div
+              class="row-details"
+              v-if="currentRowDetails"
+              :style="`padding-bottom:${clickedRowBoundingClientRect}px`"
+            >
               <issues-table
                 @deleted="deleted"
+                @issuesTableOffsetTop="setParentPadding"
                 :items="currentRowDetails.item.pathIssues"
                 :item="currentRowDetails.item"
                 :loading="loadingItem"
@@ -210,6 +215,7 @@ export default {
   },
   data: () => {
     return {
+			clickedRowBoundingClientRect: 0,
       ideaFromIssue: {},
       deleting: false,
       updateForm: null,
@@ -325,6 +331,10 @@ export default {
   },
 
   methods: {
+		setParentPadding(offsetTop){
+			console.log(offsetTop);
+			this.clickedRowBoundingClientRect = offsetTop
+		},
     deleted(item) {
       if (
         this.currentRowDetails &&

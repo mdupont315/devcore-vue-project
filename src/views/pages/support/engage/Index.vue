@@ -62,18 +62,21 @@ export default {
 .engage_container {
   display: flex;
   flex-direction: column;
+  padding-bottom: 20px;
   flex-basis: 100%;
   max-height: calc(100vh - 60px);
 }
 .engage_container_content {
   display: flex;
-  overflow-y: hidden;
   max-width: 100%;
+  margin: 20px;
   height: 100%;
+  overflow-y: hidden;
   justify-content: space-between;
   flex-direction: column;
 }
-.table td, .table th{
-	vertical-align: middle;
+.table td,
+.table th {
+  vertical-align: middle;
 }
 </style>

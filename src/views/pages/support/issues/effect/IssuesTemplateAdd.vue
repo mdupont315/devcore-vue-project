@@ -27,7 +27,6 @@
       </div>
     </b-button>
 
-    <!--   :offset="tableWidth * 0.1" -->
     <b-popover
       v-if="isSelectionOpen"
       ref="popover"
@@ -37,11 +36,11 @@
       :offset="tableWidth * 0.1"
       boundary="window"
       @click="closeIt"
-      placement="bottomright"
+      placement="top"
       class="form-popover"
       boundary-padding="100"
       custom-class="issueEffectAddForm-form-popover"
-      ><!-- right:20px" -->
+    >
       <b-card
         no-body
         style="background: transparent"
@@ -704,8 +703,6 @@ export default {
 .issueEffect_add_form-new-issue-effect-create {
   max-width: 120px;
 }
-
-
 
 .issueEffect_add_form_templates_item-edit {
   text-transform: uppercase;

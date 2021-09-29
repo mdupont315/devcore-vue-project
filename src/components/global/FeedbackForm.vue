@@ -1,74 +1,58 @@
 <template>
-  <div
-    class="issueEffect__feedback__container"
-    style="flex-direction: column; display: flex"
-  >
-    <div class="text-center">
-      <!--   <b-tooltip :target="() => $refs[refTarget]" variant="primary"
-        ><span class="issue-effect-tooltip-title">{{
-          $t("issueEffectFeedback")
-        }}</span></b-tooltip
-      > -->
-    </div>
-
+  <div class="feedback__container">
     <b-popover
       ref="popover"
       :target="() => $refs[refTarget]"
       triggers="click"
       :show="openState"
+			boundary="window"
       placement="top"
       :offset="offset"
       class="form-popover"
-      custom-class="issueEffectCommentForm-form-popover"
     >
-      <b-card no-body v-if="openState" style="width: 275px">
-        <div
-          class="feedback-form-author"
-          style="
-            padding: 10px;
-            border-bottom: 1px solid lightgray;
-            display: flex;
-            height: 80px;
-            justify-content: space-between;
-          "
-        >
-          <div>
-            <div style="display: flex; justify-content: space-between">
-              <div>Jennifer Jane</div>
-              <div>just now</div>
+      <b-card
+        no-body
+        v-if="openState"
+        style="width: 275px"
+        class="feedback-form"
+      >
+        <div class="feedback-form-header">
+          <div class="feedback-form-header-body">
+            <div class="feedback-form-header-body-author">
+              <div class="feedback-form-header-body-author-name">
+                <img
+                  :src="user.getAvatarUrl('50x50')"
+                  class="border rounded-circle"
+                  height="22"
+                />
+
+                <div class="feedback-form-header-body-author-name-text">
+                  {{ user.fullName }}
+                </div>
+                <div class="feedback-form-header-body-author-name-time">
+                  just now
+                </div>
+              </div>
+
+              <confirm-button
+                @confirm="toggleFeedback"
+                :confirmPlacement="'left'"
+                :confirmMessage="getConfirmMessage"
+                :btnStyle="getConfirmBtnStyle"
+              >
+                <i class="mdi mdi-close" style="font-size: 2rem"></i>
+              </confirm-button>
             </div>
 
-            <div>we can imporve this idea</div>
-          </div>
-          <div>
-            <confirm-button
-              v-if="!isLoading"
-              @confirm="toggleFeedback"
-              :confirmPlacement="'left'"
-              :confirmMessage="getConfirmMessage"
-              :btnStyle="'display:flex;flex-direction:row;background:#fff;border:none;color:#000;align-items:center;box-shadow: none;'"
-            >
-              <i class="mdi mdi-close" style="font-size: 2rem"></i>
-            </confirm-button>
+            <div class="feedback-form-header-body-content">
+							{{$t("We can improve this idea")}}
+            </div>
           </div>
         </div>
-        <div
-          class="feedback-form-message"
-          style="
-            padding: 10px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-          "
-        >
+        <div class="feedback-form-body">
           <input
-            style="
-              font-size: 12px;
-              outline: none;
-              border: none;
-              width: 100%;
-              height: 100%;
-            "
+            class="feedback-form-body-input"
+            autofocus
             v-model="feedbackForm.description"
             placeholder="Leave a reply"
             type="text"
@@ -85,50 +69,8 @@
           </div>
         </div>
 
-        <div
-          class="feedback-form-value-and-submit"
-          style="
-            display: flex;
-            align-items: center;
-            height: 40px;
-            padding: 10px;
-          "
-        >
-          <div>
-            <div style="display: flex">
-              <div
-                v-for="(item, index) in rewardablePoints"
-                :key="index"
-                class="issueEffect__feedback_feedback_reward"
-                @click="rewardActiveIndex = index"
-                :class="rewardActiveIndex === index ? 'reward__active' : ''"
-              >
-                {{ item }}
-              </div>
-            </div>
-          </div>
-        </div>
-        <!--     <div
-          class="form-label-group select required"
-          style="width: 500px; height: 100%"
-        >
-          <b-textarea
-            v-model="feedbackForm.description"
-            v-autoresize
-            class="no-style my-0 issue-Effect__feedback-text"
-            :placeholder="textPlaceholder"
-            name="feedback"
-          ></b-textarea>
-        </div>
-        <div
-          class="issueEffect__feedback_feedback-btn"
-          style="
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-          "
-        >
-          <div style="display: flex">
+        <div class="feedback-form-footer">
+          <div class="feedback-form-footer-body">
             <div
               v-for="(item, index) in rewardablePoints"
               :key="index"
@@ -139,26 +81,17 @@
               {{ item }}
             </div>
           </div>
-          <loading-button
-            :disabled="feedbackForm.description.length == 0"
-            style="align-self: center; padding: 5px"
-            :loading="isLoading"
-            @click="saveFeedback"
-          >
-          </loading-button>
-        </div>-->
+        </div>
       </b-card>
     </b-popover>
 
     <icoIssueFeedback
       @click="toggleFeedback"
       :ref="refTarget"
-      class="issueEffect__feedbackIcon"
+      class="feedbackIcon"
       :class="{
-        'issueEffectIcon-active': openState,
+        'feedbackIcon-active': openState,
       }"
-      width="40px"
-      height="40px"
     ></icoIssueFeedback>
     <slot></slot>
   </div>
@@ -166,10 +99,18 @@
 
 <script>
 import icoIssueFeedback from "@/assets/img/icons/svg/ico-issue-feedback.svg?inline";
+import { /* mapState, */ mapGetters } from "vuex";
 
 export default {
   components: { icoIssueFeedback },
   computed: {
+    ...mapGetters({
+      user: "auth/user",
+    }),
+
+    getConfirmBtnStyle() {
+      return `display:flex;flex-direction:row;background:#fff;border:none;color:#000;align-items:center;box-shadow: none;`;
+    },
     getConfirmMessage() {
       if (this.type == "ideaFeedback") {
         return this.$t("IdeaFeedbackClose");
@@ -255,32 +196,105 @@ export default {
 </script>
 
 <style scoped>
-.issueEffect__feedbackIcon:hover path,
-.issueEffect__feedback__container
-  > .issueEffect__feedbackIcon.issueEffectIcon-active
-  path {
+.feedback__container {
+  flex-direction: column;
+  display: flex;
+}
+.feedbackIcon:hover path,
+.feedback__container > .feedbackIcon.feedbackIcon-active path {
   fill: #fff;
   background: #4294d0;
 }
 
-.issueEffect__feedbackIcon {
+.feedback-form-body {
+  padding: 5px 10px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid lightgrey;
+}
+
+.feedback-form-header-body {
+  padding: 10px;
+  display: flex;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.feedback-form {
+  width: 275px;
+  box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
+  border-radius: 0px;
+}
+
+.feedback-form-header-body-author {
+  display: flex;
+  justify-content: space-between;
+}
+.feedback-form-body-input {
+  font-size: 12px;
+  outline: none;
+  border: none;
+  width: 100%;
+  height: 100%;
+}
+
+.feedback-form-header-body-author-name {
+  display: flex;
+  align-items: center;
+}
+.feedback-form-header-body-author-name-text {
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #4294d0;
+  margin: 0 10px;
+}
+
+.feedback-form-header-body-content {
+  margin-left: 32px;
+  font-size: 12px;
+  color: #777;
+}
+
+.feedback-form-header-body-author-name-time {
+  color: #777;
+  opacity: 0.5;
+  font-size: 10px;
+  letter-spacing: 1;
+  align-self: center;
+}
+
+.feedback-form-footer {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 10px;
+}
+.feedback-form-footer-body {
+  display: flex;
+}
+.feedbackIcon {
   border-radius: 50%;
   fill: #000;
   outline: none;
+  width: 40px;
+  height: 40px;
 }
 
-.issueEffect__feedbackIcon > path {
+.feedbackIcon > path {
   transform: translate(8px, 8px);
 }
 
-.issueEffect__feedbackIcon:hover {
+.feedbackIcon:hover {
   background: #4294d0;
   border-radius: 50%;
   outline: none;
   cursor: pointer;
 }
 
-.issueEffectIcon-active {
+.feedbackIcon-active {
   background: #4294d0;
   position: relative;
   z-index: 1;
@@ -292,19 +306,6 @@ export default {
   letter-spacing: 1.5px;
   align-content: center;
   text-transform: uppercase;
-}
-
-.issue-Effect__feedback-text {
-  min-height: 20px;
-  overflow: hidden;
-  max-height: 100px;
-  border: 1px solid lightgray;
-}
-
-.issueEffect__feedback_feedback-btn {
-  display: flex;
-  justify-content: center;
-  padding-top: 5px;
 }
 
 .issueEffect__feedback_feedback_reward {

@@ -9,8 +9,8 @@
     >
       <div class="engage_progress_container_body_item-delete-wrapper">
         <icoMilestoneRemove
-          width="32px"
-          height="32px"
+          width="40px"
+          height="40px"
           class="engage_progress_container_body_item-delete-icon"
         ></icoMilestoneRemove>
       </div>
@@ -39,15 +39,17 @@ export default {
   height: 28px;
 }
 .engage_progress_container_body_item-delete-wrapper {
-  margin-top: 40px;
   background: #fff;
   border-radius: 50%;
 }
 
 .engage_progress_container_body_item-delete-wrapper:hover {
-  background: #dc3545;
+  background: #4294d0;
 }
-.engage_progress_container_body_item-delete-container{
-	width:15%
+
+.engage_progress_container_body_item-delete-container {
+  max-width: 25px;
+  max-height: 25px;
+  margin-left: 20px;
 }
 </style>

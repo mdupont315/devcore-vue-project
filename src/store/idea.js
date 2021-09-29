@@ -155,6 +155,7 @@ const actions = {
           variables: filter
         });
         const { result } = await queryToPromise(query);
+        console.log(result);
         const idea = new Idea().deserialize(result.data.ideaFindById);
         idea.loaded = true;
         context.commit("SET_ITEM", idea);
@@ -167,6 +168,7 @@ const actions = {
   },
 
   async findByProcess(context, filter) {
+    console.log("find by process");
     if (!context.state.loadedProcess.includes(filter.id) || filter.force) {
       const query = apolloClient.watchQuery({
         query: IDEA.findAll,

@@ -3,6 +3,7 @@
     @click="toggleCreateForm(item)"
     class="engage_progress_container_body_item-container"
   >
+
     <div
       class="engage_progress_container_body_item-action-center"
       v-if="itemMeta.itemIndex !== itemMeta.count"
@@ -17,10 +18,7 @@
         <i class="mdi mdi-plus"></i>
       </b-button>
     </div>
-    <div
-      class="engage_progress_container_body_item-action-last"
-      v-else
-    >
+    <div class="engage_progress_container_body_item-action-last" v-else>
       <b-button
         class="
           milestone-line
@@ -60,6 +58,11 @@ export default {
     "milestone-form": MilestoneForm,
   },
   props: {
+		isEditing:{
+			type: Boolean,
+			required: false,
+			default: () => false
+		},
     itemMeta: {
       type: Object,
       required: false,
@@ -119,10 +122,8 @@ export default {
   font-size: 42px;
   max-height: 50px;
   cursor: pointer;
-  /*   transform: translate(-50px, 0px); */
   align-items: center;
   font-size: 20px;
-  /*   transform: translate(-30px, 28px); */
   background: #4294d0;
   color: #fff;
 }
@@ -132,8 +133,9 @@ export default {
 
 .engage_progress_container_body_item-container {
   cursor: pointer;
-  width: 15%;
+  width: 100%;
   z-index: 1;
+	margin-top: 47px;
 }
 
 .milestone-line.line-center-container-icon {
@@ -142,8 +144,8 @@ export default {
   content: "\F417";
   color: #4294d0;
   box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
-  height: 32px;
-  width: 32px;
+  height: 28px;
+  width:28px;
   cursor: pointer;
   border-radius: 100%;
   display: flex;
@@ -153,14 +155,10 @@ export default {
   align-self: center;
   justify-content: center;
 }
-.engage_progress_container_body_item-action-last {
-  /*   margin: 30px 20px 0 20px; */
-}
+
 .engage_progress_container_body_item-action-center {
   display: flex;
   flex-direction: column;
-  margin-top: 45px;
-  width: 60px;
   text-align: center;
 }
 .engage_progress_container_body_item-action-center,
@@ -169,7 +167,6 @@ export default {
   z-index: 1;
   font-size: 20px;
   display: flex;
-	margin-top: 44px;
   place-content: center;
 }
 </style>

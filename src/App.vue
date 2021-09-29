@@ -70,7 +70,7 @@ export default {
 </script>
 <style>
 /* Hide scrollbar for Chrome, Safari and Opera */
-::-webkit-scrollbar {
+ ::-webkit-scrollbar {
   display: none;
 }
 
@@ -78,5 +78,6 @@ export default {
 html {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+	-webkit-transform: translate3d(0, 0, 0);
 }
 </style>

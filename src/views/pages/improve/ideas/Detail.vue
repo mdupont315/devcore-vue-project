@@ -90,6 +90,7 @@
                 :key="file.id"
                 class="list-item font-13x text-gray"
               >
+
                 <a class="text-gray" :href="file.downloadUrl" target="_blank">
                   {{ $t("Download") }}
                 </a>

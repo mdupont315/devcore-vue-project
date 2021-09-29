@@ -5,7 +5,7 @@
       id="issues-template-card-container"
       @click="toggleOverlay"
       ref="issues-template-card-container"
-      :style="{ width: tableWidth * 0.74 + 'px' }"
+      :style="{ width: tableWidth * 0.7 + 'px' }"
     >
       <slot></slot>
     </div>
@@ -91,11 +91,10 @@ export default {
   height: 100%;
   overflow: hidden;
   display: flex;
-  /*   position: absolute; */
   min-height: 404px;
   max-height: 404px;
   top: 0px;
-  right: 450px;
+  right: 100%;
   margin: 0px 10px;
   border-radius: 5px;
   position: fixed;
