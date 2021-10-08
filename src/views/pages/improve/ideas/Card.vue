@@ -172,6 +172,7 @@ export default {
     ...mapGetters({
       allProcess: "process/all",
       ideaReplies: "ideaIssueReply/all",
+			 user: "auth/user",
     }),
 
     process: {
@@ -225,7 +226,7 @@ export default {
     async saveIdeaReply(input) {
       const status = "FEEDBACK";
       const ideaReplyForm = new GQLForm({
-        authorId: this.idea.author.id,
+        authorId: this.user.id,
         ideaId: this.idea.id,
         value: input.value,
         description: input.description,
@@ -237,7 +238,8 @@ export default {
         force: true,
       });
 
-      this.togglePopOverFeedback();
+     /*  this.togglePopOverFeedback(); */
+		 this.showPopOverFeedback = false;
     },
     async setCurrentTool(event, toolId) {
       event.preventDefault();

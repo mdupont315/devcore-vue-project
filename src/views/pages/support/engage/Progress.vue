@@ -72,7 +72,11 @@
               </span>
               <div v-if="!isEditing">
                 <span class="engage_progress_container-body-score-value"
-                  >{{ part.requiredScore }}
+                  >{{
+                    part.requiredScore
+                      ? part.requiredScore
+                      : defaultItem.requiredScore
+                  }}
                 </span>
               </div>
               <div v-else>
@@ -115,7 +119,11 @@
                       text-overflow: ellipsis;
                     "
                   >
-                    {{ `${index + 1}. ${part.title}` }}
+                    {{
+                      `${index + 1}. ${
+                        part.title ? part.title : defaultItem.title
+                      }`
+                    }}
                   </div>
                 </b-card-title>
                 <div style="max-height: 100px; overflow: scroll">
@@ -190,18 +198,16 @@ export default {
       defaultItem: {
         description: "description",
         id: "1",
-        /*    reward: "reward", */
         title: "title",
         requiredScore: 0,
         userCount: 0,
         users: [],
-        _clickedIndex: null,
+        _clickedIndex: 0,
       },
       editItems: [
         {
           description: "description",
           id: "1",
-          /*  reward: "reward", */
           title: "title",
           requiredScore: 0,
           userCount: 0,
@@ -210,14 +216,17 @@ export default {
         },
       ],
       isEditing: false,
+      isDefault: false,
     };
   },
   computed: {
     innerOverlayOpen() {
+      if (this.isEditing) return true;
+      if (this.isDefault) return true;
       if (this.items.length > 0) {
-        return this.items.some((x) => x._clickedIndex) || this.isEditing;
+        return this.items.some((x) => x._clickedIndex);
       } else {
-        return this.editItems.some((x) => x._clickedIndex) || this.isEditing;
+        return this.editItems.some((x) => x._clickedIndex);
       }
     },
     getProgressPart() {
@@ -230,8 +239,8 @@ export default {
           return this.items;
         }
       } else {
-				return this.editItems;
-			}
+        return this.editItems;
+      }
     },
     getRequiredScores() {
       if (this.items.length > 0) {
@@ -241,8 +250,8 @@ export default {
       } else {
         return [
           {
-            requiredScore: this.editItems[0].requiredScore,
-            id: this.editItems[0].id,
+            requiredScore: this.defaultItem.requiredScore,
+            id: this.defaultItem.id,
           },
         ];
       }
@@ -259,9 +268,16 @@ export default {
     },
 
     toggleCreateForm(previous) {
+      console.log(previous);
       if (this.isEditing) {
         this.isEditing = !this.isEditing;
       }
+      if (previous && previous.id == undefined) {
+			console.log(previous.id);
+
+        this.isDefault = !this.isDefault;
+      }
+      console.log(previous);
       if (this.items.length > 0) {
         if (previous) {
           this.items.forEach((item) => (item._clickedIndex = null));
@@ -271,10 +287,19 @@ export default {
           this.items.forEach((item) => (item._clickedIndex = null));
         }
       } else {
-        if (previous) {
-          this.editItems[0]["_clickedIndex"] = previous.id;
+        if (this.editItems[0]) {
+          if (previous) {
+            this.editItems[0]["_clickedIndex"] = previous.id;
+          } else {
+            this.editItems[0]["_clickedIndex"] = null;
+          }
         } else {
-          this.editItems[0]["_clickedIndex"] = null;
+          this.isDefault = !this.isDefault;
+          if (!this.isDefault) {
+            this.defaultItem._clickedIndex = null;
+          } else {
+            this.defaultItem._clickedIndex = 0;
+          }
         }
       }
     },
@@ -349,7 +374,7 @@ export default {
   flex-direction: column;
   background: #fff;
   border-radius: 5px;
-  margin-bottom: 20px;
+  margin: 20px;
 }
 .engage_progress_container-header {
   background: #fff;
@@ -450,7 +475,7 @@ export default {
 .engage_progress_container-body {
   width: 100%;
   height: 100%;
-	border-radius:5px;
+  border-radius: 5px;
   margin: auto;
   align-self: center;
   overflow: auto;
@@ -458,6 +483,7 @@ export default {
   background: #fff;
   display: flex;
   flex-direction: row;
+  min-height: 400px;
 }
 .engage_body_scrollContainer {
   display: flex;

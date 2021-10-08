@@ -117,7 +117,7 @@ export default {
       } else if (this.type == "issueFeedback") {
         return this.$t("IdeaFeedbackClose");
       } else {
-        return this.$t("IdeaissueFeedbackClose");
+        return this.$t("IdeaIssueFeedbackClose");
       }
     },
   },

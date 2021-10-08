@@ -1,10 +1,11 @@
 <template>
   <div
-    @click="toggleCreateForm(item)"
+
     class="engage_progress_container_body_item-container"
   >
 
     <div
+		  @click="toggleCreateForm(item)"
       class="engage_progress_container_body_item-action-center"
       v-if="itemMeta.itemIndex !== itemMeta.count"
     >
@@ -18,7 +19,8 @@
         <i class="mdi mdi-plus"></i>
       </b-button>
     </div>
-    <div class="engage_progress_container_body_item-action-last" v-else>
+    <div class="engage_progress_container_body_item-action-last" v-else
+		 @click="toggleCreateForm(item)">
       <b-button
         class="
           milestone-line

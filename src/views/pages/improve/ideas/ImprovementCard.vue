@@ -203,7 +203,7 @@ export default {
         force: true,
       });
 
-      this.togglePopOverFeedback();
+      this.showPopOverFeedback = false;
     },
     async reloadDetail() {
       this.$emit("reload", this.item);

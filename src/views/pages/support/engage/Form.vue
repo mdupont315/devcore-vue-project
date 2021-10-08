@@ -57,7 +57,7 @@
       <b-card-footer>
         <loading-button
           :disabled="vErrors.any() || form.busy"
-					style="cursor:pointer"
+          style="cursor: pointer"
           :loading="form.busy"
           size="lg"
           block
@@ -87,9 +87,11 @@ export default {
     getScoreValidator: {
       get() {
         if (this.nextScore) {
-          return `required|numeric|between:${this.prevScore},${this.nextScore}`;
+          return `required|numeric|between:${this.prevScore + 1},${
+            this.nextScore - 1
+          }`;
         } else {
-          return `required|numeric|min_value:${this.prevScore}`;
+          return `required|numeric|min_value:${this.prevScore + 1}`;
         }
       },
     },
@@ -118,18 +120,18 @@ export default {
       const prevItem = this.itemMeta.scores[getIndex()] ?? null;
       const nextItem = this.itemMeta.scores[getIndex() + 1] ?? null;
 
-			this.prevScore = prevItem?.requiredScore ?? 0;
-			this.nextScore = nextItem?.requiredScore ?? null;
+      this.prevScore = prevItem?.requiredScore ?? 0;
+      this.nextScore = nextItem?.requiredScore ?? null;
     },
     async saveItem() {
-			this.form.busy = true;
+      this.form.busy = true;
       const createForm = new GQLForm({
         title: this.form.title,
         description: this.form.description,
         requiredScore: this.form.requiredScore,
       });
       await this.$store.dispatch("milestone/create", createForm);
-			this.form.busy = false;
+      this.form.busy = false;
     },
   },
 };

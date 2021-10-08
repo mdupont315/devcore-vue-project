@@ -7,6 +7,7 @@
       class="t01"
       hover
       fixed
+      sticky
       style="background: #fff"
       :fields="fields"
       :items="getMilestoneUsers"
@@ -89,7 +90,6 @@ export default {
   computed: {
     getMilestoneUsers() {
       const milestoneUsers = [];
-      console.log(this.items);
       this.items.forEach((item) => milestoneUsers.push(...item.users));
       return milestoneUsers;
     },
@@ -132,7 +132,6 @@ export default {
       return item.rewarded ? this.$t("Confirmed") : this.$t("Confirm");
     },
     getValueRank(item) {
-      console.log(item);
       const { milestoneId } = item;
       let title = "";
 
@@ -144,7 +143,6 @@ export default {
     },
 
     async reward(row) {
-      console.log(row);
       this.loadingId = row.index;
       if (!row.item.rewarded) {
         this.filter.busy = true;
@@ -186,6 +184,7 @@ export default {
   border-radius: 5px;
   height: 100%;
   padding: 0 20px;
+  margin: 0 20px;
   overflow-y: scroll;
   /*   height: 100%;
   background: #fff;

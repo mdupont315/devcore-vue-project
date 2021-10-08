@@ -69,7 +69,6 @@ export default {
 .engage_container_content {
   display: flex;
   max-width: 100%;
-  margin: 20px;
   height: 100%;
   overflow-y: hidden;
   justify-content: space-between;
