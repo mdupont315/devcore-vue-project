@@ -12,6 +12,7 @@ const appUrls = {
 module.exports = {
   publicPath: process.env.VUE_APP_SUBFOLDER || "/",
   lintOnSave: false,
+  runtimeCompiler: true,
   devServer: {
     proxy: "https://127.0.0.1",
     headers: { "Access-Control-Allow-Origin": "*" },

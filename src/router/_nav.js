@@ -72,7 +72,7 @@ export default function getItems(user) {
           url: {
             name: "support-engage"
           },
-          permissions: "support/engage/manage"
+          permissions: "core/support/engage/manage"
         }
       ]
     },

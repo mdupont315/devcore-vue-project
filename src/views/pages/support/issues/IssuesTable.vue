@@ -1,7 +1,7 @@
 <template>
   <div ref="issueEffect_table-container">
     <inner-overlay
-      v-if="currentItem"
+      v-if="currentItem || issueDescriptionExpanded"
       class="overlay-inner"
       :class="{ 'top-all': this.showInnerOverlayOnTop }"
       @click="overlayClick"
@@ -81,10 +81,48 @@
       >
       <!-- description -->
       <template v-slot:cell(description)="row">
-        <div>
-          {{ row.item.description }}
-        </div></template
-      >
+        <div :ref="`issue_description_${row.item.id}`">
+          <div
+            style="max-height: 20px; overflow: hidden"
+            :id="`issues_table-description-${row.item.id}`"
+          >
+            <component :is="processedHtml(row.item, false)" />
+          </div>
+          <div @click="setExpandIssueDescription(row.item)">
+            <div
+              style="
+                color: #4294d0;
+                text-decoration: underline;
+                cursor: pointer;
+              "
+            >
+              <div
+                class="issues_table-description-expand"
+                v-show="
+                  isTextOverArea(row.item.id) || row.item.comments.length > 0
+                "
+              >
+                View all
+              </div>
+            </div>
+          </div>
+          <b-popover
+            ref="popover"
+            v-if="currentItem && currentItem.id == row.item.id"
+            :target="() => $refs[`issue_description_${row.item.id}`]"
+            triggers="click"
+            boundary="window"
+            placement="top"
+            :show.sync="issueDescriptionExpanded"
+            class="form-popover"
+            custom-class="issueDescription-form-popover"
+          >
+            <b-card no-body style="width: 320px; padding: 20px">
+              <component :is="processedHtml(row.item, true)" />
+            </b-card>
+          </b-popover>
+        </div>
+      </template>
 
       <!-- comment -->
       <template v-slot:cell(comment)="row">
@@ -106,10 +144,10 @@
 
       <!-- effect -->
       <template v-slot:cell(effect)="row" class="actions">
-        <div v-if="$can('support/issueEffect/manage')">
+        <div v-if="$can('support/issueEffect/manage')" style="min-width: 100px">
           <b-spinner v-if="isLoading" />
           <div v-else>
-            <div v-if="hoverRowId !== row.item.id">
+            <div v-if="hoverRowId !== row.item.id && !currentItem">
               <div v-if="row.item.effect">
                 {{ getEffectTitle(row.item.effect) }}
               </div>
@@ -146,6 +184,7 @@
           style="display: flex; align-items: center; justify-content: right"
         >
           <!-- Issue Effect Actions -->
+
           <div
             v-if="$can('support/issue/manage')"
             class="issueEffect-actions__container"
@@ -155,13 +194,16 @@
             <issues-effect-feedback
               v-show="!row.item.replied"
               :item="row.item"
+							:user="row.item.author"
               :textPlaceholder="$t('Issue feedback')"
               refTarget="issueEffectFeedbackIcon"
               type="issueFeedback"
+              :offset="-38"
               @toggle="toggleItem"
               @save="saveIssueReply"
               @close="closeIssueForFeedback"
               :openState="issueEffectFeedbackOpen"
+              :itemDescription="row.item.description"
             ></issues-effect-feedback>
           </div>
           <!-- trashcan -->
@@ -238,6 +280,7 @@ export default {
   data: () => {
     return {
       tableScrollTop: 0,
+      issueDescriptionExpanded: null,
       selectedTemplate: null,
       isLoading: false,
       hoverRowId: null,
@@ -262,8 +305,10 @@ export default {
     ...mapGetters({
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
       user: "auth/user",
+      allUsers: "user/all",
       effectTemplates: "issueEffect/all",
     }),
+
     getItems: {
       get() {
         return this.items;
@@ -317,16 +362,55 @@ export default {
     },
   },
   async mounted() {
-
-
     this.isLoading = true;
     await this.$store.dispatch("issueEffect/findAll");
     await this.$store.dispatch("companyRole/findAll");
+    await this.$store.dispatch("user/findAll");
 
     this.tableWidth = this.$refs.issueEffect_table?.$el.clientWidth ?? 1582;
     this.isLoading = false;
   },
   methods: {
+    isTextOverArea(id) {
+      const el = document.getElementById(`issues_table-description-${id}`);
+      if (!el) return false;
+      return el.firstChild.getBoundingClientRect().height >= 40;
+    },
+
+    setExpandIssueDescription(item) {
+      if (!this.currentItem) {
+        this.currentItem = item;
+        this.closeOtherIssueEffectModals("issueExpand");
+      } else {
+        this.closeOtherIssueEffectModals("");
+      }
+    },
+    /**
+     * item = issue
+     * extended = include issue comments
+     */
+    processedHtml(item, extended) {
+      if (!item) return "";
+
+      let html = `<div style='color:#000'>${item.description}</div>`;
+      if (item.comments.length > 0 && extended) {
+        item.comments.map((i) => {
+          html += `<div style='color:#4294d0'>${i.description}</div>`;
+        });
+      }
+
+      return {
+        template: "<div class='issue-description-content'>" + html + "</div>",
+        props: {
+          comments: {
+            type: null,
+            default: () => {
+              return item.comments;
+            },
+          },
+        },
+      };
+    },
     getItemIdOrNull(item) {
       if (item) {
         return item.id;
@@ -359,7 +443,7 @@ export default {
       this.hoverRowId = null;
     },
     setHoverRowId(row, issue) {
-      if (issue && issue.id) {
+      if (issue && issue.id && !this.currentItem) {
         this.hoverRowId = issue.id;
       }
     },
@@ -380,6 +464,7 @@ export default {
       this.issueEffectFeedbackOpen = false;
       this.issueEffectAddOpen = false;
       this.issueRemoveOpen = false;
+      this.issueDescriptionExpanded = false;
       switch (type) {
         case "issueRemove":
           this.issueRemoveOpen = true;
@@ -392,6 +477,9 @@ export default {
           break;
         case "issueComment":
           this.issueEffectCommentOpen = true;
+          break;
+        case "issueExpand":
+          this.issueDescriptionExpanded = true;
           break;
       }
     },
@@ -474,8 +562,16 @@ export default {
           `issueTable-row-${item.id}`
         )[0];
 
-				const tableDetailsMaxHeight = 614;
-        this.$emit("issuesTableOffsetTop", tableDetailsMaxHeight);
+        const test = document.getElementsByClassName(
+          `issueTable-row-${item.id}`
+        )[0];
+        const reduceWindow = Math.abs(
+          window.innerHeight - test.getBoundingClientRect().bottom - 614 - 200
+        );
+
+				console.log("HI");
+
+        this.$emit("issuesTableOffsetTop", reduceWindow);
         this.$nextTick(() => {
           element.scrollIntoView({
             behavior: "smooth",
@@ -487,7 +583,11 @@ export default {
     },
     toggleItem(item, type) {
       this.closeOtherIssueEffectModals(type);
-      this.scrollToPosAndSetParentPadding(item);
+      if (type == "issueAdd") {
+        this.scrollToPosAndSetParentPadding(item);
+      } else {
+        this.scrollToPosAndSetParentPadding();
+      }
 
       if (
         !item ||
@@ -498,19 +598,14 @@ export default {
           !this.issueEffectCommentOpen &&
           this.editType !== "issueRemove")
       ) {
-        console.log("null");
         this.currentItem = null;
       } else {
-        console.log("item");
-        console.log(item);
-
-        console.log("TOGGLED");
         this.currentItem = item;
       }
     },
     overlayClick() {
-      console.log("overLay Clicked");
       this.setDefaultEffect();
+      this.issueDescriptionExpanded = false;
       if (
         this.currentItem &&
         !this.issueEffectCommentOpen &&
@@ -518,16 +613,15 @@ export default {
         !this.issueEffectAddOpen &&
         !this.issueRemoveOpen
       ) {
-        console.log("overLay Null");
         this.toggleItem(null);
       } else {
-        console.log("overLay Else");
         this.editType = "";
         this.hoverRowId = null;
         this.issueEffectCommentOpen = false;
         this.issueEffectFeedbackOpen = false;
         this.issueEffectAddOpen = false;
         this.issueRemoveOpen = false;
+        this.issueDescriptionExpanded = false;
       }
     },
 
@@ -570,6 +664,14 @@ export default {
 .issueTable-row {
   height: 60px;
   max-height: 60px;
+}
+
+.issueDescription-form-popover[x-placement="top"] {
+  top: -10px !important;
+}
+
+.issueDescription-form-popover[x-placement="bottom"] {
+  top: 10px !important;
 }
 </style>
 <style scoped>

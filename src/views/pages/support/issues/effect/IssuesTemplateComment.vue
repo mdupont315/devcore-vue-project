@@ -14,8 +14,8 @@
       triggers="click"
       :show="openState"
       placement="bottom"
-      offset="-155"
       class="form-popover"
+      custom-class="issueComments-form-popover"
     >
       <b-card no-body v-if="openState" style="padding: 5px">
         <div
@@ -25,6 +25,7 @@
           <b-textarea
             v-model="commentForm.description"
             v-autoresize
+						autofocus
             class="no-style my-0 issueEffect__comment-text"
             :placeholder="$t('Issue comment')"
             name="comment"
@@ -74,7 +75,7 @@ export default {
     openState(newVal) {
       if (newVal && this.isLoading) {
         this.isLoading = !this.isLoading;
-				this.commentForm.description = "";
+        this.commentForm.description = "";
       }
     },
   },
@@ -101,7 +102,15 @@ export default {
   },
 };
 </script>
+<style>
+.issueComments-form-popover[x-placement="top"] {
+  top: -10px !important;
+}
 
+.issueComments-form-popover[x-placement="bottom"] {
+  top: 10px !important;
+}
+</style>
 <style scoped>
 .issueEffect__editIcon:hover path,
 .issueEffect__comment__container

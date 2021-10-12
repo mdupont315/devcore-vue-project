@@ -329,7 +329,6 @@ export default {
       }
     },
     toggleItem(item) {
-			console.log(item);
       this.$validator.pause();
       this.$validator.reset();
       if (!item || (this.currentItem && this.currentItem.id === item.id)) {

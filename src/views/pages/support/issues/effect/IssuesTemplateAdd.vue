@@ -542,7 +542,6 @@ export default {
       this.loadingIndex = loadingIndex;
       this.initForm = null;
       let effect = this.defaultForm;
-      console.log(item);
       if (item) {
         try {
           effect = await this.$store.dispatch("issueEffect/findById", {

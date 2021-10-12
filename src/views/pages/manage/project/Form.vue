@@ -629,7 +629,6 @@ export default {
 
         //set advancedform
         Object.entries(this.input).forEach((item) => {
-          console.log(item);
           if (advancedFormFields.indexOf(item[0]) > -1 && item[1]) {
             const key = item[0].toString();
             const value = item[1];

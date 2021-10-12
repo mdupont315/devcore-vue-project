@@ -246,7 +246,7 @@ const routes = [
         meta: {
           middleware: [auth],
           title: "Engage",
-          permissions: "support/engage/manage",
+          permissions: "core/support/engage/manage",
           // titleButton: () => import(/* webpackChunkName: "manage" */'@/views/pages/manage/proccess/TitleButton'),
          // topCentral: () =>
           //  import(

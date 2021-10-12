@@ -86,6 +86,8 @@ export default {
   flex-direction: row-reverse;
   height: 100%;
   flex-wrap: wrap;
+	padding-bottom:60px;
+	overscroll-behavior: none;
 }
 .issues-template-card-container {
   height: 100%;

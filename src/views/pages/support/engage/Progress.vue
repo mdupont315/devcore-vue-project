@@ -331,8 +331,6 @@ export default {
       const editItems = [
         ...new Set(
           this.editItems.map((item) => {
-            console.log("2");
-            console.log(item);
             return {
               id: item.id,
               requiredScore: item.requiredScore,

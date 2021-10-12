@@ -58,6 +58,8 @@
             v-if="!item.replied"
             style="margin-left: 20px; max-height: 46px"
             :item="item"
+						:itemDescription="item.description"
+						:user="item.author"
             refTarget="improvementFeedbackIcon"
             :textPlaceholder="$t('Improvement feedback')"
             type="improvementFeedback"

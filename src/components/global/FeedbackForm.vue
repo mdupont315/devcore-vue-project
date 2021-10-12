@@ -1,99 +1,99 @@
 <template>
-  <div class="feedback__container">
-    <b-popover
-      ref="popover"
-      :target="() => $refs[refTarget]"
-      triggers="click"
-      :show="openState"
-			boundary="window"
-      placement="top"
-      :offset="offset"
-      class="form-popover"
-    >
-      <b-card
-        no-body
-        v-if="openState"
-        style="width: 275px"
-        class="feedback-form"
+  <div>
+    <div class="feedback__container" v-if="$can('core/ideaIssueReply/manage')">
+      <b-popover
+        ref="popover"
+        :target="() => $refs[refTarget]"
+        triggers="click"
+        :show="openState"
+        boundary="window"
+        placement="top"
+        :offset="offset"
+        class="form-popover"
+        custom-class="general-feedback-form"
       >
-        <div class="feedback-form-header">
-          <div class="feedback-form-header-body">
-            <div class="feedback-form-header-body-author">
-              <div class="feedback-form-header-body-author-name">
-                <img
-                  :src="user.getAvatarUrl('50x50')"
-                  class="border rounded-circle"
-                  height="22"
-                />
+        <b-card
+          no-body
+          v-if="openState"
+          style="width: 275px"
+          class="feedback-form"
+        >
+          <div class="feedback-form-header">
+            <div class="feedback-form-header-body">
+              <div class="feedback-form-header-body-author">
+                <div class="feedback-form-header-body-author-name">
+                  <img
+                    :src="user.getAvatarUrl('50x50')"
+                    class="border rounded-circle"
+                    height="22"
+                  />
 
-                <div class="feedback-form-header-body-author-name-text">
-                  {{ user.fullName }}
+                  <div class="feedback-form-header-body-author-name-text">
+                    {{ user.fullName }}
+                  </div>
                 </div>
-                <div class="feedback-form-header-body-author-name-time">
-                  just now
-                </div>
+
+                <confirm-button
+                  @confirm="toggleFeedback"
+                  :confirmPlacement="'left'"
+                  :confirmMessage="getConfirmMessage"
+                  :btnStyle="getConfirmBtnStyle"
+                >
+                  <i class="mdi mdi-close" style="font-size: 2rem"></i>
+                </confirm-button>
               </div>
 
-              <confirm-button
-                @confirm="toggleFeedback"
-                :confirmPlacement="'left'"
-                :confirmMessage="getConfirmMessage"
-                :btnStyle="getConfirmBtnStyle"
+              <div class="feedback-form-header-body-content">
+                {{ itemDescription }}
+              </div>
+            </div>
+          </div>
+          <div class="feedback-form-body">
+            <input
+              class="feedback-form-body-input"
+              autofocus
+              v-model="feedbackForm.description"
+              placeholder="Leave a reply"
+              type="text"
+              debounce="500"
+            />
+
+            <div @click="saveFeedback" style="cursor: pointer">
+              <i
+                class="mdi mdi-send"
+                style="font-size: 30px; color: #4494d1"
+                v-if="!isLoading"
+              ></i>
+              <b-spinner v-else></b-spinner>
+            </div>
+          </div>
+
+          <div class="feedback-form-footer">
+            <div class="feedback-form-footer-body">
+              <div
+                v-for="(item, index) in rewardablePoints"
+                :key="index"
+                class="issueEffect__feedback_feedback_reward"
+                @click="rewardActiveIndex = index"
+                :class="rewardActiveIndex === index ? 'reward__active' : ''"
               >
-                <i class="mdi mdi-close" style="font-size: 2rem"></i>
-              </confirm-button>
-            </div>
-
-            <div class="feedback-form-header-body-content">
-							{{$t("We can improve this idea")}}
+                {{ item }}
+              </div>
             </div>
           </div>
-        </div>
-        <div class="feedback-form-body">
-          <input
-            class="feedback-form-body-input"
-            autofocus
-            v-model="feedbackForm.description"
-            placeholder="Leave a reply"
-            type="text"
-            debounce="500"
-          />
+        </b-card>
+      </b-popover>
 
-          <div @click="saveFeedback" style="cursor: pointer">
-            <i
-              class="mdi mdi-send"
-              style="font-size: 30px; color: #4494d1"
-              v-if="!isLoading"
-            ></i>
-            <b-spinner v-else></b-spinner>
-          </div>
-        </div>
-
-        <div class="feedback-form-footer">
-          <div class="feedback-form-footer-body">
-            <div
-              v-for="(item, index) in rewardablePoints"
-              :key="index"
-              class="issueEffect__feedback_feedback_reward"
-              @click="rewardActiveIndex = index"
-              :class="rewardActiveIndex === index ? 'reward__active' : ''"
-            >
-              {{ item }}
-            </div>
-          </div>
-        </div>
-      </b-card>
-    </b-popover>
-
-    <icoIssueFeedback
-      @click="toggleFeedback"
-      :ref="refTarget"
-      class="feedbackIcon"
-      :class="{
-        'feedbackIcon-active': openState,
-      }"
-    ></icoIssueFeedback>
-    <slot></slot>
+      <icoIssueFeedback
+        @click="toggleFeedback"
+        :ref="refTarget"
+        class="feedbackIcon"
+        :class="{
+          'feedbackIcon-active': openState,
+        }"
+      ></icoIssueFeedback>
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -104,9 +104,9 @@ import { /* mapState, */ mapGetters } from "vuex";
 export default {
   components: { icoIssueFeedback },
   computed: {
-    ...mapGetters({
+  /*   ...mapGetters({
       user: "auth/user",
-    }),
+    }), */
 
     getConfirmBtnStyle() {
       return `display:flex;flex-direction:row;background:#fff;border:none;color:#000;align-items:center;box-shadow: none;`;
@@ -137,13 +137,18 @@ export default {
       required: false,
       type: String,
     },
+    user: {
+      required: true,
+    },
     textPlaceholder: {
       required: true,
       type: String,
     },
+    itemDescription: {
+      required: false,
+    },
     offset: {
       required: false,
-      type: Number,
       default() {
         return 0;
       },
@@ -195,6 +200,16 @@ export default {
 };
 </script>
 
+<style>
+.general-feedback-form[x-placement="top"] {
+  top: -10px !important;
+}
+
+.general-feedback-form[x-placement="bottom"] {
+  top: 10px !important;
+}
+</style>
+
 <style scoped>
 .feedback__container {
   flex-direction: column;
@@ -217,7 +232,6 @@ export default {
 .feedback-form-header-body {
   padding: 10px;
   display: flex;
-  height: 80px;
   display: flex;
   flex-direction: column;
   margin-bottom: 10px;
@@ -253,7 +267,7 @@ export default {
 }
 
 .feedback-form-header-body-content {
-  margin-left: 32px;
+  margin: 0 20px;
   font-size: 12px;
   color: #777;
 }

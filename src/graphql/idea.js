@@ -19,6 +19,11 @@ export const IDEA_FRAGMENT = gql`
     createdAt
     updatedAt
     replied
+    comments {
+      id
+      description,
+      type,
+    }
     stats {
       problems
       improvements
@@ -96,6 +101,12 @@ export const IDEA_FULL_FRAGMENT = gql`
       updatedAt
       anonymous
       replied
+      comments {
+        id
+        description,
+        type,
+        createdAt
+      }
       files {
         ...resourceFields
       }
@@ -114,6 +125,12 @@ export const IDEA_FULL_FRAGMENT = gql`
       updatedAt
       anonymous
       replied
+      comments {
+        id
+        description,
+        type,
+        createdAt
+      }
       files {
         ...resourceFields
       }

@@ -250,7 +250,6 @@ export default {
       }
     },
     itemChanged(item) {
-      console.log(item);
       if (item) {
         this.loadItem(item);
       }

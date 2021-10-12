@@ -22,6 +22,12 @@ export const ISSUE_FRAGMENT = gql`
     checked
     replied
     effectTemplateId
+    comments {
+      id
+      description,
+      type,
+      createdAt
+    }
     project {
       id
       name

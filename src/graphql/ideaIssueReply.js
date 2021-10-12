@@ -7,6 +7,7 @@ export const IDEA_ISSUE_REPLY_FRAGMENT = gql`
     issueId
     ideaId
     description
+    createdAt
     author {
       id
       firstName
