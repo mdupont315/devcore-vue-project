@@ -222,6 +222,8 @@
     "issueReplyCreate": "Ongelmaan vastaaminen onnistui",
     "issueReplyCreateFail": "Ongelmaan vastaaminen epäonnistui"
   },
+  "Privacy Policy": "Tietosuojakäytäntö",
+  "EULA": "EULA",
   "Evaluation Restriction": "Ongelman arviointi rajoitus",
   "Evaluation Restriction Info": "Valitut roolit eivät pysty asettamaan hukan määrää mobiilissa jaa ongelma ominaisuudesta.",
   "Issue Evaluation Restriction": "Ongelman vaikutuksen rajoitus",

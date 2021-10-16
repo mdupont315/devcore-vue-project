@@ -32,7 +32,7 @@
       ref="popover"
       :target="() => $refs[`issueEffectAddBtn${issue.id}`]"
       triggers="click"
-      :show="openState"
+      :show="openState && isSelectionOpen"
       :offset="tableWidth * 0.1"
       boundary="window"
       @click="closeIt"
@@ -454,8 +454,8 @@ export default {
       phaseId: null,
     },
   }),
-
   methods: {
+
     closeIt() {
       console.log("HIHISADASD");
     },

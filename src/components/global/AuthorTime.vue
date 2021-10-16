@@ -1,17 +1,12 @@
 <template>
   <div v-if="user" class="author-time">
-    {{ user.firstName }}
     <img
+      v-if="!anonymous"
       :src="getAvatarUrl('50x50')"
       height="30"
       class="rounded-circle border"
     />
-  <!--   <img
-      v-else
-      style="filter: invert(50%) hue-rotate(270deg)"
-      :src="getAnonAvatarUrl()"
-      class="rounded-circle border"
-    /> -->
+    <img v-else :src="getAnonAvatarUrl()" class="rounded-circle border" />
     <span class="right">
       <span class="name" v-if="!anonymous"
         >{{ user.fullName }} {{ user.lang }}</span
@@ -38,13 +33,13 @@ export default {
     },
   },
   methods: {
- /*    getAnonAvatarUrl(lang = "en") {
+    getAnonAvatarUrl(lang = "en") {
       if (lang === "en") {
-        return require("../../assets/img/icons/svg/");
+        return require("@/assets/anonUserEn.png");
       } else {
-        return require("../../assets/anonUserFi.png");
+        return require("@/assets/anonUserFi.png");
       }
-    }, */
+    },
     getAvatarUrl(size = "0x0") {
       if (this.user.avatarUrl) {
         return imageResolver(this.user.avatarUrl, size);

@@ -191,9 +191,9 @@ export default {
     async saveImprovementReply(input) {
       console.log(input);
       const status = "FEEDBACK";
-
       const ideaissueReplyForm = new GQLForm({
         authorId: this.item.author.id,
+        typeAuthorId: input.typeAuthorId,
         ideaIssueId: this.item.id,
         value: input.value,
         description: input.description,

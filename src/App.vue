@@ -76,8 +76,9 @@ export default {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 html {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+
+ -ms-overflow-style: none;
+  scrollbar-width: none;
 	-webkit-transform: translate3d(0, 0, 0);
 }
 </style>

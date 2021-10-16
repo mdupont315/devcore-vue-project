@@ -12,9 +12,9 @@ export default class UserModel extends BaseModel {
 
   getAnonAvatarUrl(lang = "en") {
     if (lang === "en") {
-      return require("../assets/anonUserEn.png");
+      return require("@/assets/anonUserEn.png");
     } else {
-      return require("../assets/anonUserFi.png");
+      return require("@/assets/anonUserFi.png");
     }
   }
 

@@ -86,10 +86,11 @@ export default {
   flex-direction: row-reverse;
   height: 100%;
   flex-wrap: wrap;
-	padding-bottom:60px;
+	scrollbar-width: none;
 	overscroll-behavior: none;
 }
 .issues-template-card-container {
+	scrollbar-width: none;
   height: 100%;
   overflow: hidden;
   display: flex;

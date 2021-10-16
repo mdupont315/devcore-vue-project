@@ -191,6 +191,7 @@ export default {
     saveFeedback() {
       //deduct value
       this.feedbackForm.value = this.rewardablePoints[this.rewardActiveIndex];
+			this.feedbackForm.typeAuthorId = this.item.author.id;
 
       this.isLoading = true;
       //emit form

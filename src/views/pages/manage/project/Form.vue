@@ -454,7 +454,6 @@ export default {
         const filteredIdeasByStatus = result.filter(
           (o) => (o.status === "TESTING" || o.status === "ADOPTED") && o.parent
         );
-        console.log(filteredIdeasByStatus);
 
         //Include all in Create
         //Include filter by Staged
@@ -576,6 +575,9 @@ export default {
 
       this.form.processId = this.process.id;
 
+      const allTools = this.allTools.filter((tool) => tool.type === "TOOL");
+      this.toolsForStage = [...allTools];
+
       if (this.input) {
         if (this.input.toolIds) {
           const selectedProjectForStage = this.filteredProjects.find(
@@ -585,9 +587,6 @@ export default {
           const availableToolsForStage = selectedProjectForStage?.tools.filter(
             (x) => x.stageId == this.stage?.id
           );
-
-          const allTools = this.allTools.filter((tool) => tool.type === "TOOL");
-          this.toolsForStage = [...allTools];
 
           const availableToolIdsForStage = availableToolsForStage
             .filter((x) => this.input.toolIds.indexOf(x.toolId) >= 0)
@@ -625,7 +624,6 @@ export default {
         }
 
         const advancedFormFields = Object.keys(this.advancedForm);
-        console.log(Object.entries(this.input));
 
         //set advancedform
         Object.entries(this.input).forEach((item) => {
@@ -639,7 +637,6 @@ export default {
     },
 
     async save() {
-      console.log(this.form);
       this.form.ideaIds = [...this.selectedProjectIdeas];
       this.form.budget = this.budget * 100;
 
@@ -655,13 +652,10 @@ export default {
         Object.entries(this.advancedForm).forEach((item) => {
           const key = item[0].toString();
           const value = item[1];
-          console.log(key);
-          console.log(value);
           this.form._fields[key] = value;
         });
       }
 
-      console.log(this.form);
       //include all stages if ON_GOING project
       if (this.mode === "edit") {
         if (this.input.type === "ON_GOING") {
@@ -683,7 +677,6 @@ export default {
         await this.$validator.validateAll();
         if (!this.vErrors.any()) {
           this.$validator.reset();
-          console.log(this.form);
           if (this.mode === "edit") {
             this.input = await this.$store.dispatch(
               "project/update",

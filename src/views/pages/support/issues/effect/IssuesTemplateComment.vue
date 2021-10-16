@@ -1,6 +1,6 @@
 <template>
   <div class="issueEffect__comment__container">
-    <div class="text-center">
+    <div class="text-center" v-if="!openState">
       <b-tooltip :target="() => $refs.issueEffectCommentIcon" variant="primary"
         ><span class="issueEffect__tooltip-title">{{
           $t("issueEffectEdit")
@@ -12,7 +12,7 @@
       ref="popover"
       :target="() => $refs[`issueEffectCommentIcon`]"
       triggers="click"
-      :show="openState"
+      :show.sync="openState"
       placement="bottom"
       class="form-popover"
       custom-class="issueComments-form-popover"
@@ -25,7 +25,7 @@
           <b-textarea
             v-model="commentForm.description"
             v-autoresize
-						autofocus
+            autofocus
             class="no-style my-0 issueEffect__comment-text"
             :placeholder="$t('Issue comment')"
             name="comment"

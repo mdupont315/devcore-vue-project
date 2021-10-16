@@ -221,6 +221,8 @@
     "toolCreated": "Tool created succesfully!",
     "toolCreatedFail": "Creating tool failed!"
   },
+  "Privacy Policy": "Privacy Policy",
+  "EULA": "EULA",
   "Issue Evaluation Restriction": "Issue Restriction",
   "Issue Evaluation Restriction Info": "Selected roles are restricted to evaluate issue loss amounts in mobile report issue feature.",
   "Issue Template Restriction": "Issue Effect Restriction",

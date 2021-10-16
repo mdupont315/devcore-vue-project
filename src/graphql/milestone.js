@@ -9,9 +9,9 @@ export const MILESTONE_FRAGMENT = gql`
     userCount
     description
     users {
+      id
       milestoneId
       rewarded
-      userId
       engageScore
       user {
         id

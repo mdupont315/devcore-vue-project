@@ -227,8 +227,10 @@ export default {
     },
     async saveIdeaReply(input) {
       const status = "FEEDBACK";
+
       const ideaReplyForm = new GQLForm({
         authorId: this.user.id,
+        typeAuthorId: input.typeAuthorId,
         ideaId: this.idea.id,
         value: input.value,
         description: input.description,

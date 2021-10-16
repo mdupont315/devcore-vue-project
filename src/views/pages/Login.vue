@@ -83,6 +83,23 @@
           $t("Forgot password?")
         }}</router-link>
       </div>
+      <div class="text-center">
+        <a
+          class="link title text-sm"
+          target="_blank"
+          href="/privacy/privacypolicy.pdf"
+        >
+          {{ $t("Privacy Policy") }}</a
+        >
+      </div>
+      <div class="text-center">
+        <a
+          class="link title text-sm"
+          target="_blank"
+          href="/privacy/eula.pdf"
+          >{{ $t("EULA") }}</a
+        >
+      </div>
     </div>
   </external-layout>
 </template>
@@ -125,7 +142,9 @@ export default {
           window.location.replace(process.env.VUE_APP_MOBILE_URL);
         }
 
-        await this.$router.replace(this.$store.getters["app/intented_route"] || defaultRoute);
+        await this.$router.replace(
+          this.$store.getters["app/intented_route"] || defaultRoute
+        );
       } catch (ex) {
         if (ex.code && ex.code === "MUST_VERIFY_EMAIL") {
           await this.$router.push({

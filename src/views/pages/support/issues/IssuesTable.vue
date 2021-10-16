@@ -5,7 +5,6 @@
       class="overlay-inner"
       :class="{ 'top-all': this.showInnerOverlayOnTop }"
       @click="overlayClick"
-      :scrollable="true"
       style="transform: translate3d(0px, 0px, 0px)"
     >
       <!--   position: fixed;
@@ -18,6 +17,8 @@
       <confirm-button
         variant="transparent text-danger"
         @confirm="() => deleteAll()"
+        :showOverlay="true"
+        test="wtf"
       >
         <i class="mdi mdi-delete"></i>
         {{ $t("Delete all") }}
@@ -117,7 +118,7 @@
             class="form-popover"
             custom-class="issueDescription-form-popover"
           >
-            <b-card no-body style="width: 320px; padding: 20px">
+            <b-card no-body style="min-width: 320px; padding: 20px">
               <component :is="processedHtml(row.item, true)" />
             </b-card>
           </b-popover>
@@ -132,7 +133,7 @@
           @toggle="toggleItem"
           @save="saveIssueReply"
           @close="issueEffectCommentOpen = false"
-          :openState="issueEffectCommentOpen"
+          :openState="issueEffectCommentOpen && isCurrentItemRowId(row.item.id)"
         ></issuesEffectComment
       ></template>
       <!-- loss -->
@@ -194,7 +195,7 @@
             <issues-effect-feedback
               v-show="!row.item.replied"
               :item="row.item"
-							:user="row.item.author"
+              :user="row.item.author"
               :textPlaceholder="$t('Issue feedback')"
               refTarget="issueEffectFeedbackIcon"
               type="issueFeedback"
@@ -211,6 +212,8 @@
             <confirm-button
               variant="btn-white"
               size="md"
+              :isSelected="isCurrentItemRowId(row.item.id)"
+              :showOverlay="false"
               @confirm="() => deleteItem(row.item)"
               @showConfirm="toggleIssueRemoveOpen"
               @cancel="overlayClick"
@@ -371,6 +374,12 @@ export default {
     this.isLoading = false;
   },
   methods: {
+    isCurrentItemRowId(id) {
+      if (this.currentItem) {
+        return this.currentItem.id === id;
+      }
+      return false;
+    },
     isTextOverArea(id) {
       const el = document.getElementById(`issues_table-description-${id}`);
       if (!el) return false;
@@ -421,6 +430,7 @@ export default {
         this.currentItem.effect = this.getIssueEffectTemplates.find(
           (x) => x.id == this.currentItem.effectTemplateId
         );
+        this.issueEffectAddOpen = false;
       }
     },
     getEffectedMoneyTotal(item) {
@@ -533,6 +543,7 @@ export default {
       const { value } = input;
       const ideaissueReplyForm = new GQLForm({
         authorId: this.currentItem.author.id,
+        typeAuthorId: input.typeAuthorId,
         issueId: id,
         value: value,
         status,
@@ -558,18 +569,16 @@ export default {
     },
     scrollToPosAndSetParentPadding(item) {
       if (item && item.id) {
-        var element = document.getElementsByClassName(
-          `issueTable-row-${item.id}`
-        )[0];
-
-        const test = document.getElementsByClassName(
+        const element = document.getElementsByClassName(
           `issueTable-row-${item.id}`
         )[0];
         const reduceWindow = Math.abs(
-          window.innerHeight - test.getBoundingClientRect().bottom - 614 - 200
+          window.innerHeight -
+            element.getBoundingClientRect().bottom -
+            614 -
+            200 -
+            140
         );
-
-				console.log("HI");
 
         this.$emit("issuesTableOffsetTop", reduceWindow);
         this.$nextTick(() => {
@@ -577,8 +586,17 @@ export default {
             behavior: "smooth",
           });
         });
-      } else {
+      } else if (this.currentItem) {
+        const element = document.getElementsByClassName(
+          `issueTable-row-${this.currentItem.id}`
+        )[0];
+
         this.$emit("issuesTableOffsetTop", 0);
+        this.$nextTick(() => {
+          element.scrollIntoView({
+            behavior: "smooth",
+          });
+        });
       }
     },
     toggleItem(item, type) {
@@ -648,7 +666,8 @@ export default {
         id: item.id,
       });
       await this.$store.dispatch("issue/delete", deleteForm);
-      this.$parent.$emit("deleted", item);
+      this.issueRemoveOpen = false;
+      this.currentItem = null;
     },
     async checkItem(item) {
       const checkForm = new GQLForm({
@@ -716,7 +735,7 @@ export default {
 
 .issue-Effect__RemoveIcon.removeIcon__active {
   position: relative;
-  z-index: 999;
+  z-index: 1;
   background: #4294d0;
 }
 .issue-Effect__RemoveIcon.removeIcon__active > path {

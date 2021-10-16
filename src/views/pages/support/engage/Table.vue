@@ -1,13 +1,15 @@
 <template>
   <div class="engage_table_container">
     <!-- page content -->
+		    <div class="table-responsive" style="overflow: visible">
+
     <b-table
       sort-icon-left
       sort-by="name"
       class="t01"
       hover
       fixed
-      sticky
+      sticky-header
       style="background: #fff"
       :fields="fields"
       :items="getMilestoneUsers"
@@ -64,7 +66,7 @@
         </div>
       </template>
     </b-table>
-  </div>
+  </div>  </div>
 </template>
 
 <script>
@@ -73,6 +75,11 @@ import GQLForm from "@/lib/gqlform";
 export default {
   props: {
     items: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    users: {
       type: Array,
       required: false,
       default: () => [],
@@ -89,9 +96,14 @@ export default {
   },
   computed: {
     getMilestoneUsers() {
-      const milestoneUsers = [];
-      this.items.forEach((item) => milestoneUsers.push(...item.users));
-      return milestoneUsers;
+      const users = this.items.map((x) => x.users);
+      if (users.length > 0) {
+        return this.items
+          .map((x) => x.users)
+          .flat()
+          .filter((x) => !x.rewarded);
+      }
+      return [];
     },
     fields: {
       get() {
@@ -144,10 +156,11 @@ export default {
 
     async reward(row) {
       this.loadingId = row.index;
+			console.log(row.item);
       if (!row.item.rewarded) {
         this.filter.busy = true;
         const rewardForm = new GQLForm({
-          id: row.item.userId,
+          id: row.item.id,
           rewarded: !row.item.rewarded,
           milestoneId: row.item.milestoneId,
         });
@@ -160,6 +173,16 @@ export default {
 </script>
 
 <style>
+
+ .table.b-table>thead>tr>th {
+  background-color: #fff;
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  z-index: 2;
+}
+
+
 .engage_table_header {
   height: 60px;
   color: #4294d0;
@@ -185,8 +208,11 @@ export default {
   height: 100%;
   padding: 0 20px;
   margin: 0 20px;
-  overflow-y: scroll;
-  /*   height: 100%;
+	overflow: hidden;
+
+  /*
+	  overflow-y: scroll;
+	height: 100%;
   background: #fff;
   margin: 20px 20px 0 20px;
 	    max-height: 310px;
