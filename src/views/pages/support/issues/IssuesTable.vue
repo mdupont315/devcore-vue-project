@@ -561,7 +561,8 @@ export default {
         id: this.currentItem.id,
       });
       await this.$store.dispatch("issue/closeFeedback", issueCloseForm);
-      this.closePopovers();
+      this.issueEffectCommentOpen = false;
+      this.issueEffectFeedbackOpen = false;
     },
     closePopovers() {
       this.issueEffectCommentOpen = false;

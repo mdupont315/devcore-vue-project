@@ -68,6 +68,7 @@ function getErrorMessage(vue, ref, form = null) {
       : null;
   }
 
+
   if (errorMessage) {
     const validationlocales = require(`../locales/${userLanguage}.json`);
     if (errorMessage.includes(ref)) {

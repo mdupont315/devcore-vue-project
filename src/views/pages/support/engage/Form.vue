@@ -45,7 +45,7 @@
         v-autoresize
         v-validate="''"
         :disabled="form.busy"
-        :placeholder="$t('Idea description')"
+        :placeholder="$t('Milestone reward text')"
         style="max-height: 150px"
         name="description"
         :state="$validateState('description', form)"
@@ -56,7 +56,7 @@
       }}</b-form-invalid-feedback>
       <b-card-footer>
         <loading-button
-          :disabled="vErrors.any() || form.busy"
+          :disabled="vErrors.any() || form.busy || !form.requiredScore"
           style="cursor: pointer"
           :loading="form.busy"
           size="lg"
@@ -131,7 +131,10 @@ export default {
         requiredScore: this.form.requiredScore,
       });
       await this.$store.dispatch("milestone/create", createForm);
+
       this.form.busy = false;
+      console.log("ITEM SAVED!");
+      this.$emit("close");
     },
   },
 };

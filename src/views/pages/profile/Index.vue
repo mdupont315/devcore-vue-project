@@ -252,7 +252,6 @@ export default {
   watch: {
     $route: {
       handler(route) {
-				console.log(route);
         if (route.query.i) {
           this.intent = Math.random();
         }
@@ -261,7 +260,6 @@ export default {
   },
   mounted() {
     this.initForm();
-
   },
   methods: {
     async initForm() {
@@ -276,6 +274,17 @@ export default {
       if (!this.vErrors.any()) {
         await this.$validator.reset();
         await this.$store.dispatch("auth/updateProfile", this.form);
+        const quest = this.user.company.experienceQuests.find(
+          (x) => x.title == "Study Instructions"
+        );
+
+        const test = new GQLForm({
+          userId: this.user.id,
+          questId: quest.id,
+          experiencePoints: 10,
+        });
+        await this.$store.dispatch("experience/update", test);
+
         this.initForm();
       }
     },

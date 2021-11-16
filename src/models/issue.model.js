@@ -98,7 +98,6 @@ export default class IssueModel extends BaseModel {
     });
 
     rolesAverage.map(roleUsers => {
-
       if (roleUsers.length > 1) {
         let roleId = roleUsers[0].companyRoleId;
         let hourlyAverage = roleUsers[0].hourlyAverage;
@@ -183,18 +182,20 @@ export default class IssueModel extends BaseModel {
   }
 
   deserialize(input) {
-    if (input.author) {
-      input.author = new UserModel().deserialize(input.author);
-    }
+    if (input) {
+      if (input.author) {
+        input.author = new UserModel().deserialize(input.author);
+      }
 
-    if (input.files) {
-      input.files = input.files.map(f => {
-        return new ResourceModel().deserialize(f);
-      });
-    }
+      if (input.files) {
+        input.files = input.files.map(f => {
+          return new ResourceModel().deserialize(f);
+        });
+      }
 
-    if (input.effect) {
-      input.effect = new IssueEffect().deserialize(input.effect);
+      if (input.effect) {
+        input.effect = new IssueEffect().deserialize(input.effect);
+      }
     }
 
     Object.assign(this, input);

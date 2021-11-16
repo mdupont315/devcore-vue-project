@@ -189,8 +189,10 @@ export default {
   z-index: 1 !important;
   width: 100%;
 }
-.engage_table {
-  /*  max-width: 97%; */
+
+.table td,
+.table th {
+	vertical-align: center;
 }
 .engage_table_header > div {
   line-height: 35px;
@@ -200,6 +202,13 @@ export default {
 .engage_container_content > .container-fluid > .b-table-sticky-header {
   /*   padding: 0 20px;
   max-height: 40%; */
+}
+.b-table-sticky-header{
+	padding-bottom:20px;
+}
+
+.b-table-sticky-header{
+
 }
 
 .engage_table_container {

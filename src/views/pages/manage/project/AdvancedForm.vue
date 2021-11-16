@@ -162,6 +162,7 @@ export default {
   align-items: center;
   display: flex;
   cursor: pointer;
+  justify-content: space-between;
 }
 
 .advanced_evaluation_restriction-text-info > .restriction-text-info-icon {

@@ -22,7 +22,13 @@
             <div class="feedback-form-header-body">
               <div class="feedback-form-header-body-author">
                 <div class="feedback-form-header-body-author-name">
-                  <img
+                  <author-time
+                    :user="user"
+                    :anonymous="item.anonymous"
+                    :time="item.createdAt"
+                    class="d-inline-block"
+                  ></author-time>
+                  <!--  <img
                     :src="user.getAvatarUrl('50x50')"
                     class="border rounded-circle"
                     height="22"
@@ -30,7 +36,7 @@
 
                   <div class="feedback-form-header-body-author-name-text">
                     {{ user.fullName }}
-                  </div>
+                  </div> -->
                 </div>
 
                 <confirm-button
@@ -104,7 +110,7 @@ import { /* mapState, */ mapGetters } from "vuex";
 export default {
   components: { icoIssueFeedback },
   computed: {
-  /*   ...mapGetters({
+    /*   ...mapGetters({
       user: "auth/user",
     }), */
 
@@ -191,7 +197,7 @@ export default {
     saveFeedback() {
       //deduct value
       this.feedbackForm.value = this.rewardablePoints[this.rewardActiveIndex];
-			this.feedbackForm.typeAuthorId = this.item.author.id;
+      this.feedbackForm.typeAuthorId = this.item.author.id;
 
       this.isLoading = true;
       //emit form

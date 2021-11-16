@@ -1,15 +1,11 @@
 <template>
-  <div
-
-    class="engage_progress_container_body_item-container"
-  >
-
+  <div class="engage_progress_container_body_item-container">
     <div
-		  @click="toggleCreateForm(item)"
-      class="engage_progress_container_body_item-action-center"
       v-if="itemMeta.itemIndex !== itemMeta.count"
+      class="engage_progress_container_body_item-action-center"
     >
       <b-button
+        @click="toggleCreateForm(item)"
         class="milestone-line line-center-container-icon"
         pill
         variant="outline-primary"
@@ -19,9 +15,9 @@
         <i class="mdi mdi-plus"></i>
       </b-button>
     </div>
-    <div class="engage_progress_container_body_item-action-last" v-else
-		 @click="toggleCreateForm(item)">
+    <div class="engage_progress_container_body_item-action-last" v-else>
       <b-button
+        @click="toggleCreateForm(item)"
         class="
           milestone-line
           line-last-container-icon line-center-container-icon
@@ -37,7 +33,7 @@
     <b-popover
       ref="popover"
       :target="`btnMilestone-${item.id}`"
-      :show.sync="isPopoverOpen"
+      :show="isPopoverOpen"
       placement="bottom"
       class="form-popover"
     >
@@ -46,6 +42,7 @@
           ><milestone-form
             :itemMeta="itemMeta"
             :item="item"
+            @close="closePopover"
           ></milestone-form> </b-card-body
       ></b-card>
     </b-popover>
@@ -60,11 +57,16 @@ export default {
     "milestone-form": MilestoneForm,
   },
   props: {
-		isEditing:{
-			type: Boolean,
-			required: false,
-			default: () => false
-		},
+    isEditing: {
+      type: Boolean,
+      required: false,
+      default: () => false,
+    },
+    isDefault: {
+      type: Boolean,
+      required: false,
+      default: () => false,
+    },
     itemMeta: {
       type: Object,
       required: false,
@@ -75,14 +77,17 @@ export default {
       required: false,
       default: () => {},
     },
+    openFormId: {
+      type: String,
+      required: false,
+      default: () => null,
+    },
   },
+
   computed: {
     isPopoverOpen: {
       get() {
-        return this.item.id === this.item._clickedIndex;
-      },
-      set(value) {
-        this.popoverState = value;
+        return this.openFormId == this.item.id;
       },
     },
   },
@@ -94,7 +99,12 @@ export default {
   },
 
   methods: {
+    closePopover() {
+			console.log("CLOSE1");
+      this.$emit("close");
+    },
     toggleCreateForm(item) {
+			console.log("TOGGLE");
       this.$emit("toggle", item);
     },
   },
@@ -137,7 +147,7 @@ export default {
   cursor: pointer;
   width: 100%;
   z-index: 1;
-	margin-top: 47px;
+  margin-top: 47px;
 }
 
 .milestone-line.line-center-container-icon {
@@ -147,7 +157,7 @@ export default {
   color: #4294d0;
   box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
   height: 28px;
-  width:28px;
+  width: 28px;
   cursor: pointer;
   border-radius: 100%;
   display: flex;

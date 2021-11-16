@@ -36,3 +36,4 @@ export * from './milestone';
 export * from './effect';
 export * from './effectTemplate';
 export * from './ideaIssueReply';
+export * from './experience';

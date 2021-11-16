@@ -22,6 +22,7 @@ module.exports = {
   },
 
   outputDir: "../devcore_server_lavarel/public/frontend",
+  productionSourceMap: false,
   pluginOptions: {
     i18n: {
       locale: "en",
@@ -35,7 +36,8 @@ module.exports = {
     }
   },
   configureWebpack: {
-    devtool: "source-map",
+    devtool: "",
+
     plugins: [
       new webpack.DefinePlugin({
         "process.env": {
@@ -59,6 +61,7 @@ module.exports = {
   },
 
   chainWebpack: config => {
+
     config.resolve.alias.set("@", path.join(__dirname, "./src"));
 
     const svgRule = config.module.rule("svg");

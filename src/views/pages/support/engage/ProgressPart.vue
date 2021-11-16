@@ -12,12 +12,12 @@
               class="engage_progress_item_container-usercount-badge"
             ></b-avatar>
             <span class="engage_progress_item_container-usercount-text"
-              >{{ item.userCount }}
+              >{{ getItemUsers }}
             </span>
           </b-badge>
         </div>
         <progress-delete
-          v-show="isEditing"
+          v-show="isEditing && !item.isDefault"
           @remove="removeItem"
           :item="item"
           class="is-elevated-layer"
@@ -31,7 +31,7 @@
           :class="{ 'milestone-line-active': itemMeta.itemIndex !== 1 }"
         ></div>
         <div class="engage_progress_item_container-icons-milestone-container">
-          <div :class="`milestone_rank_${itemMeta.itemIndex}`"></div>
+          <div :class="getMilestoneRankIcon()"></div>
         </div>
         <div
           v-if="itemMeta.itemIndex !== itemMeta.count"
@@ -78,155 +78,147 @@ export default {
       default: () => {},
     },
   },
+  computed: {
+    getItemUsers() {
+      if (this.item.users) {
+        return new Set(this.item.users.map((x) => x.userId)).size;
+      } else {
+        return "";
+      }
+    },
+  },
   methods: {
+    getMilestoneRankIcon() {
+      if (this.item && this.item.isDefault) return `milestone_rank_0`;
+      return `milestone_rank_${this.itemMeta.itemIndex}`;
+    },
     removeItem(part) {
       this.$emit("removePart", part);
     },
   },
 };
 </script>
-
-<style lang="scss" href="../../../../scss/_icons.scss"></style>
 <style scoped>
+/* Icons */
+
+.milestone_rank_0 {
+  width: 50px;
+  height: 50px;
+  background: url("~@/assets/sprite_star.png") 0 0;
+  transform: scale(1) translate(10px, 10px);
+}
+
 .milestone_rank_1 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -80px -220px;
+  background: url("~@/assets/sprite_star.png") 0 -52px;
   transform: scale(1) translate(10px, 10px);
 }
 
 .milestone_rank_2 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -150px -220px;
+  background: url("~@/assets/sprite_star.png") 0 -104px;
   transform: scale(1) translate(10px, 10px);
 }
 
 .milestone_rank_3 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -220px -220px;
+  background: url("~@/assets/sprite_star.png") 0 -156px;
   transform: scale(1) translate(10px, 10px);
 }
 
 .milestone_rank_4 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -290px -80px;
+  background: url("~@/assets/sprite_star.png") 0 -208px;
   transform: scale(1) translate(10px, 10px);
 }
 
 .milestone_rank_5 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -290px -10px;
+  background: url("~@/assets/sprite_star.png") 0 -260px;
   transform: scale(1) translate(10px, 10px);
 }
-
 .milestone_rank_6 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -290px -220px;
+  background: url("~@/assets/sprite_star.png") 0 -312px;
   transform: scale(1) translate(10px, 10px);
 }
+
 .milestone_rank_7 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -290px -150px;
-
+  background: url("~@/assets/sprite_star.png") 0 -364px;
   transform: scale(1) translate(10px, 10px);
 }
-
 .milestone_rank_8 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -10px -80px;
+  background: url("~@/assets/sprite_star.png") 0 -416px;
   transform: scale(1) translate(10px, 10px);
 }
+
 .milestone_rank_9 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -10px -10px;
+  background: url("~@/assets/sprite_star.png") 0 -468px;
   transform: scale(1) translate(10px, 10px);
 }
 
 .milestone_rank_10 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -80px -10px;
+  background: url("~@/assets/sprite_star.png") 0 -518px;
   transform: scale(1) translate(10px, 10px);
 }
 
 .milestone_rank_11 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -80px -80px;
+  background: url("~@/assets/sprite_star.png") 0 -570px;
   transform: scale(1) translate(10px, 10px);
 }
 
 .milestone_rank_12 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -150px -10px;
+  background: url("~@/assets/sprite_star.png") 0 -622px;
   transform: scale(1) translate(10px, 10px);
 }
 
 .milestone_rank_13 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -150px -80px;
+  background: url("~@/assets/sprite_star.png") 0 -674px;
   transform: scale(1) translate(10px, 10px);
 }
 
 .milestone_rank_14 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -10px -150px;
+  background: url("~@/assets/sprite_star.png") 0 -726px;
   transform: scale(1) translate(10px, 10px);
 }
 
 .milestone_rank_15 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -80px -150px;
+  background: url("~@/assets/sprite_star.png") 0px -776px;
   transform: scale(1) translate(10px, 10px);
 }
 
 .milestone_rank_16 {
   width: 50px;
   height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -150px -150px;
-  transform: scale(1) translate(10px, 10px);
-}
-
-.milestone_rank_17 {
-  width: 50px;
-  height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -220px -10px;
-  transform: scale(1) translate(10px, 10px);
-}
-
-.milestone_rank_18 {
-  width: 50px;
-  height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -220px -80px;
-  transform: scale(1) translate(10px, 10px);
-}
-
-.milestone_rank_19 {
-  width: 50px;
-  height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -220px -150px;
-  transform: scale(1) translate(10px, 10px);
-}
-
-.milestone_rank_20 {
-  width: 50px;
-  height: 50px;
-  background: url("../../../../assets/milestones_sprite.png") -10px -220px;
+  background: url("~@/assets/sprite_star.png") 0px -820px;
   transform: scale(1) translate(10px, 10px);
 }
 </style>
+
 <style scoped>
 .engage_progress_item_container {
   height: 100%;

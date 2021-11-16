@@ -13,6 +13,7 @@ const COMPANY_FRAGMENT = gql `
             name,
             symbol,
         }
+
     }
 `;
 

@@ -74,7 +74,7 @@
                 :item="row.item"
                 :show-save-button="$can('core/companyRole/update', row.item)"
                 :disable-save-button="vErrors.any()||updateForm.busy"
-                :show-delete-button="$can('core/companyRole/delete', row.item)"
+                :show-delete-button="$can('core/companyRole/delete', row.item) && row.item.users.length===0"
                 :loading="updateForm.busy"
                 store="companyRole"
                 @cancel="toggleItem(row.item)"
@@ -87,7 +87,7 @@
               v-else
               :item="row.item"
               :show-edit-button="$can('core/companyRole/update', row.item)"
-              :show-delete-button="$can('core/companyRole/delete', row.item)"
+              :show-delete-button="$can('core/companyRole/delete', row.item) && row.item.users.length===0"
               store="companyRole"
               @editItem="toggleItem(row.item)"
             ></table-tools-buttons>

@@ -38522,6 +38522,7 @@
   }
 
   .table .btn.btn-action.btn-edit {
+		max-width:136px;
     color: #4294d0;
   }
 

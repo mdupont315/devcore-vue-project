@@ -1,7 +1,12 @@
 
 <template>
   <div>
-    <b-form v-if="form" class="hide-labels" @submit.prevent="saveItem">
+    <b-form
+      v-if="form"
+      class="hide-labels"
+      @submit.prevent="saveItem"
+      @keyup="$validator.validateAll()"
+    >
       <b-card no-body class="d-block">
         <b-card-body class="p-0" :class="{ 'p-3': mode === 'edit' }">
           <div class="form-group">
@@ -14,8 +19,8 @@
               :placeholder="$t('Idea title')"
               type="text"
               name="title"
-							autocomplete="off"
-							autofocus
+              autocomplete="off"
+              autofocus
               :state="$validateState('title', form)"
             ></b-form-input>
             <label for="title">{{ $t("Idea title") }}</label>
@@ -188,7 +193,7 @@ export default {
       type: String,
       default: () => "PROCESS",
     },
-		  issueIdea: {
+    issueIdea: {
       required: false,
       type: Object,
     },
@@ -316,12 +321,12 @@ export default {
 
   methods: {
     initForm() {
-			  if (this.section === "issues" && this.issueIdea) {
-				this.form.processId = this.issueIdea.processId;
+      if (this.section === "issues" && this.issueIdea) {
+        this.form.processId = this.issueIdea.processId;
         this.form.stageId = this.issueIdea.stageId;
         this.form.operationId = this.issueIdea.operationId;
         this.form.phaseId = this.issueIdea.phaseId;
-				return;
+        return;
       }
       if (!this.input.id) {
         this.input.type = this.input.type || "PROCESS";
@@ -402,38 +407,40 @@ export default {
               tab: "New",
             });
           }
+
+          this.$emit("done");
+          if (this.formFrom === "improveIdea") {
+            //reload details page
+            this.$emit("reload");
+          }
+          if (this.section == "issues") {
+            return;
+          }
+
+          await this.$store.dispatch("process/setCurrentProcess", {
+            section: this.section,
+            process: this.process.process,
+            stage: this.stages?.filter((x) => x.id === this.form.stageId)[0],
+            operation: this.operations?.filter(
+              (x) => x.id === this.form.operationId
+            )[0],
+            phase: this.phases?.filter((x) => x.id === this.form.phaseId)[0],
+          });
+
+          //Find created idea to UI
+          await this.$store.dispatch("process/findById", {
+            id: this.form.processId,
+            force: true,
+          });
+          await this.$store.dispatch(`${this.storeName}/findByProcess`, {
+            id: this.form.processId,
+            force: true,
+          });
         } catch (e) {
+          console.log(this.$validateState("title", this.form));
           console.log(e);
+					await this.$validator.reset();
         }
-
-        this.$emit("done");
-        if (this.formFrom === "improveIdea") {
-          //reload details page
-          this.$emit("reload");
-        }
-        if (this.section == "issues") {
-          return;
-        }
-
-        await this.$store.dispatch("process/setCurrentProcess", {
-          section: this.section,
-          process: this.process.process,
-          stage: this.stages?.filter((x) => x.id === this.form.stageId)[0],
-          operation: this.operations?.filter(
-            (x) => x.id === this.form.operationId
-          )[0],
-          phase: this.phases?.filter((x) => x.id === this.form.phaseId)[0],
-        });
-
-        //Find created idea to UI
-        await this.$store.dispatch("process/findById", {
-          id: this.form.processId,
-          force: true,
-        });
-        await this.$store.dispatch(`${this.storeName}/findByProcess`, {
-          id: this.form.processId,
-          force: true,
-        });
       }
     },
   },

@@ -13,6 +13,7 @@ export const MILESTONE_FRAGMENT = gql`
       milestoneId
       rewarded
       engageScore
+      userId
       user {
         id
         firstName

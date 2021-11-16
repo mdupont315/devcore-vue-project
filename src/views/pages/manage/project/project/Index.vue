@@ -135,14 +135,11 @@ export default {
         .sort((a, b) => {
           const stageA = a.getStage(stage.id);
           const stageB = b.getStage(stage.id);
-				console.log(stageA);
-				console.log(stageB);
           if (stageA.status != stageB.status) {
             return stageA.status === "STARTED" ? -1 : 1;
           }
           return a.name < b.name ? -1 : 1;
         });
-			console.log(it);
       return it;
     },
     isRowEditing(row) {

@@ -136,9 +136,7 @@ const actions = {
         improvementId: form.improvementId
       }
     });
-    console.log(result);
     const idea = new Idea().deserialize(result.data.ideaImprovementCloseFeedback);
-    console.log(idea);
     context.commit("SET_ITEM", idea);
 
     return result.data.ideaImprovementCloseFeedback;

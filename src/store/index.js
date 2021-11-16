@@ -36,6 +36,7 @@ import analysis from "./analysis";
 import milestone from "./milestone";
 import issueEffect from "./issue_effect";
 import ideaIssueReply from "./idea_issue_reply";
+import experience from "./experience";
 
 import EventBus from "@/lib/eventbus";
 
@@ -106,7 +107,8 @@ const store = new Vuex.Store({
     analysis,
     milestone,
     issueEffect,
-    ideaIssueReply
+    ideaIssueReply,
+    experience
   }
 });
 

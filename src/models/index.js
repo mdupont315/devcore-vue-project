@@ -29,3 +29,4 @@ export { default as Milestone } from "./milestone.model";
 export { default as IssueEffect } from "./issueeffect.model";
 export { default as IssueEffectTemplate } from "./issueeffecttemplate.model";
 export { default as IdeaIssueReply } from "./ideaissue.reply.model";
+export { default as Experience } from "./experience.model";

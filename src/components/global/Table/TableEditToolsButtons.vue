@@ -19,7 +19,7 @@
       <b-button
         v-if="showSaveButton"
         :class="btnEditClass"
-        style="max-width:150px"
+        style="max-width:136.5px"
         :disabled="disableSaveButton"
         :loading="loading"
         @click="save"
@@ -29,6 +29,7 @@
       </b-button>
       <b-button
         v-if="showCancelButton"
+				  style="max-width:136.5px"
         :class="btnCancelClass"
         variant="link"
         :disabled="disableCancelButton"

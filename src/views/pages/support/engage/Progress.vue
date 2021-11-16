@@ -3,11 +3,12 @@
     <inner-overlay
       v-if="innerOverlayOpen"
       style="z-index: 2"
-      @click="toggleCreateForm"
+      @click="closeCreateForm"
     ></inner-overlay>
     <div
       class="engage_progress_container-header-edit"
       :class="{ 'is-elevated-layer': isEditing }"
+      v-if="items.length > 0"
     >
       <div class="engage_progress_container_header-action">
         <div
@@ -42,6 +43,7 @@
         </div>
       </div>
     </div>
+    <div style="height: 55px" v-else></div>
 
     <div class="engage_progress_container-body">
       <div
@@ -80,6 +82,9 @@
                 </span>
               </div>
               <div v-else>
+                <!--   <div class="form-control engage_progress_container-edit-input">
+                  {{ editItems[index].requiredScore }}
+                </div> -->
                 <input
                   type="text"
                   style="border-radius: 20px"
@@ -160,12 +165,14 @@
           <progress-button
             :item="part"
             :isEditing="isEditing"
+            :openFormId="openFormId"
             :itemMeta="{
               itemIndex: index + 1,
               count: getProgressPart.length,
               scores: getRequiredScores,
             }"
-            @toggle="toggleCreateForm"
+            @toggle="closeCreateForm"
+            @close="closeCreateForm"
           >
           </progress-button>
         </div>
@@ -195,14 +202,15 @@ export default {
   data: () => {
     return {
       loading: false,
+      openFormId: null,
       defaultItem: {
         description: "description",
-        id: "1",
+        id: "0",
         title: "title",
+        isDefault: true,
         requiredScore: 0,
         userCount: 0,
         users: [],
-        _clickedIndex: 0,
       },
       editItems: [
         {
@@ -212,7 +220,6 @@ export default {
           requiredScore: 0,
           userCount: 0,
           users: [],
-          _clickedIndex: null,
         },
       ],
       isEditing: false,
@@ -222,7 +229,11 @@ export default {
   computed: {
     innerOverlayOpen() {
       if (this.isEditing) return true;
-      if (this.isDefault) return true;
+      if (this.openFormId) {
+        console.log(this.openFormId);
+        console.log("HI");
+        return true;
+      }
       if (this.items.length > 0) {
         return this.items.some((x) => x._clickedIndex);
       } else {
@@ -232,8 +243,8 @@ export default {
     getProgressPart() {
       if (!this.isEditing) {
         if (this.items.length == 0) {
-          const model = new MilestoneModel().deserialize(this.editItems[0]);
-
+          const model = new MilestoneModel().deserialize(this.defaultItem);
+          model.isDefault = true;
           return [model];
         } else {
           return this.items;
@@ -266,41 +277,23 @@ export default {
         return el.getBoundingClientRect().width < 150;
       });
     },
+    /*     closeCreateForm() {
+			console.log("close!");
+			console.log(this.openFormId);
+      this.isEditing = false;
+      this.openFormId = null;
+    }, */
+    closeCreateForm(previous) {
+      console.log("toggleCreate!");
 
-    toggleCreateForm(previous) {
-      console.log(previous);
       if (this.isEditing) {
-        this.isEditing = !this.isEditing;
+        this.isEditing = false;
       }
-      if (previous && previous.id == undefined) {
-			console.log(previous.id);
-
-        this.isDefault = !this.isDefault;
-      }
-      console.log(previous);
-      if (this.items.length > 0) {
-        if (previous) {
-          this.items.forEach((item) => (item._clickedIndex = null));
-          this.items.find((item) => item.id == previous.id)._clickedIndex =
-            previous.id;
-        } else {
-          this.items.forEach((item) => (item._clickedIndex = null));
-        }
+      console.log(this.openFormId);
+      if (!this.openFormId && previous) {
+        this.openFormId = previous.id;
       } else {
-        if (this.editItems[0]) {
-          if (previous) {
-            this.editItems[0]["_clickedIndex"] = previous.id;
-          } else {
-            this.editItems[0]["_clickedIndex"] = null;
-          }
-        } else {
-          this.isDefault = !this.isDefault;
-          if (!this.isDefault) {
-            this.defaultItem._clickedIndex = null;
-          } else {
-            this.defaultItem._clickedIndex = 0;
-          }
-        }
+        this.openFormId = null;
       }
     },
     async toggleEdit() {
@@ -322,12 +315,9 @@ export default {
     removeEditItem(part) {
       const editItems = this.editItems.filter((item) => item.id !== part.id);
       this.editItems = [...new Set(editItems)];
-      console.log(this.editItems);
     },
     async saveEdits() {
       this.loading = true;
-      console.log("1");
-      console.log(this.editItems);
       const editItems = [
         ...new Set(
           this.editItems.map((item) => {
@@ -340,8 +330,6 @@ export default {
           })
         ),
       ];
-      console.log("3");
-      console.log(this.editItems);
 
       const updateOrDeleteForm = new GQLForm({
         ...editItems,
@@ -355,6 +343,7 @@ export default {
         force: true,
       });
       this.isEditing = !this.isEditing;
+      this.openFormId = null;
       this.loading = false;
     },
   },
@@ -366,6 +355,11 @@ export default {
   z-index: 2;
 }
 
+.engage_progress_container-edit-input {
+  background: #fff;
+  display: flex;
+  align-items: center;
+}
 .engage_progress_container {
   display: flex;
   border-radius: 5px;

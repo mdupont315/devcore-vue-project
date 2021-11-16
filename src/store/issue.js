@@ -164,18 +164,18 @@ const actions = {
 
   async closeFeedback(context, form) {
     console.log(form);
+    console.log(form.id);
     const result = await form.mutate({
       mutation: ISSUE.closeFeedback,
       variables: {
-        id: form.issueId
+        id: form.id
       }
     });
     console.log(result);
-    const issue = new Issue().deserialize(result.data.ideaCloseFeedback);
-    console.log(issue);
+    const issue = new Issue().deserialize(result.data.issueCloseFeedback);
     context.commit("SET_ITEM", issue);
     // await context.dispatch('findAll', { force: true });
-    return result.data.ideaCloseFeedback;
+    return result.data.issueCloseFeedback;
   },
   async findById(context, filter) {
     const currentItem = context.state.all.find(o => o.id === filter.id);

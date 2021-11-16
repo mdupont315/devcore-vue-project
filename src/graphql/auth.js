@@ -7,6 +7,12 @@ const COMPANY_FRAGMENT = gql`
     logo
     logoUrl
     currencyCode
+    experienceQuests {
+      id,
+      user_type,
+      requiredPoints,
+      title
+    }
     currency {
       code
       name

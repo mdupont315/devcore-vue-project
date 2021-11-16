@@ -219,10 +219,22 @@
     "stageCreated": "Stage created succesfully!",
     "stageCreatedFail": "Stage creation failed!",
     "toolCreated": "Tool created succesfully!",
-    "toolCreatedFail": "Creating tool failed!"
+    "toolCreatedFail": "Creating tool failed!",
+
+    "ideaIssueReplyCreate": "Reply submitted succesfully!",
+    "ideaIssueReplyCreateFail": "Submitting reply failed!",
+
+    "issueCloseFeedback": "Issue closed for feedback succesfully!",
+    "issueCloseFeedbackFail": "Closing issue feedback failed!",
+    "ideaCloseFeedback": "Idea closed for feedback succesfully!",
+    "ideaCloseFeedbackFail": "Closing idea feedback failed!",
+    "ideaImprovementCloseFeedback": "Issue closed for feedback succesfully!",
+    "ideaImprovementCloseFeedbackFail": "Closing issue feedback failed!"
   },
+
   "Privacy Policy": "Privacy Policy",
   "EULA": "EULA",
+  "Milestone reward text": "Reward here",
   "Issue Evaluation Restriction": "Issue Restriction",
   "Issue Evaluation Restriction Info": "Selected roles are restricted to evaluate issue loss amounts in mobile report issue feature.",
   "Issue Template Restriction": "Issue Effect Restriction",

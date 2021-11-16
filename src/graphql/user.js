@@ -28,7 +28,7 @@ const USER_FULL_FRAGMENT = gql`
     ...userFields
     company {
       id
-      name
+      name,
     }
     roles {
       id
