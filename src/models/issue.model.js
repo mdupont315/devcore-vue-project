@@ -1,7 +1,7 @@
 import BaseModel from "./base.model";
 import UserModel from "./user.model";
 import ResourceModel from "./resource.model";
-import IssueEffect from "./issueEffect.model";
+import IssueEffect from "./issueeffect";
 import store from "../store";
 
 export default class IssueModel extends BaseModel {
