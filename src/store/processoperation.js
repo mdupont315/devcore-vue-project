@@ -123,7 +123,7 @@ const actions = {
         if (context.rootGetters.all.length === 0 || force) {
             filter = filter || {
                 data: {
-                    orderBy: ["name"]
+                    orderBy: ["title"]
                 }
 
             };

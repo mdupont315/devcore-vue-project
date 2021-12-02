@@ -38,6 +38,7 @@ const getters = {
 };
 
 const actions = {
+
   async setTab(context, form) {
     EventBus.$emit("idea/currentTab", {
       form
@@ -112,23 +113,19 @@ const actions = {
   },
 
   async closeFeedback(context, form) {
-    console.log(form);
     const result = await form.mutate({
       mutation: IDEA.closeFeedback,
       variables: {
         id: form.ideaId
       }
     });
-    console.log(result);
     const idea = new Idea().deserialize(result.data.ideaCloseFeedback);
-    console.log(idea);
     context.commit("SET_ITEM", idea);
     // await context.dispatch('findAll', { force: true });
     return result.data.ideaCloseFeedback;
   },
 
   async closeImprovementFeedback(context, form) {
-    console.log(form);
     const result = await form.mutate({
       mutation: IDEA.closeImprovementFeedback,
       variables: {
@@ -153,7 +150,6 @@ const actions = {
           variables: filter
         });
         const { result } = await queryToPromise(query);
-        console.log(result);
         const idea = new Idea().deserialize(result.data.ideaFindById);
         idea.loaded = true;
         context.commit("SET_ITEM", idea);
@@ -166,7 +162,6 @@ const actions = {
   },
 
   async findByProcess(context, filter) {
-    console.log("find by process");
     if (!context.state.loadedProcess.includes(filter.id) || filter.force) {
       const query = apolloClient.watchQuery({
         query: IDEA.findAll,
@@ -254,7 +249,6 @@ const mutations = {
     state.all = value;
   },
   SET_ITEM(state, value) {
-    console.log(value);
     const index = state.all.findIndex(el => el.id === value.id);
     if (index > -1) {
       state.all[index] = value;

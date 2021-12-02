@@ -437,7 +437,6 @@ export default {
             force: true,
           });
         } catch (e) {
-          console.log(this.$validateState("title", this.form));
           console.log(e);
 					await this.$validator.reset();
         }

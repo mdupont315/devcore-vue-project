@@ -124,7 +124,7 @@ const actions = {
     if (context.getters.all.length === 0 || force) {
       filter = filter || {
         data: {
-          orderBy: ["name"]
+          orderBy: ["title"]
         }
       };
       filter.busy = context.getters.all.length < 1;

@@ -33,8 +33,13 @@ export default {
     "idea-card": IdeaCard,
   },
   mounted() {
+    console.log("this.$route.params");
+    console.log(this.$route.params);
     if (this.$router.currentRoute.params) {
-      if (this.$router.currentRoute.params?.type) {
+      if (
+        this.$router.currentRoute.params.type &&
+        this.$router.currentRoute.params.type == "new"
+      ) {
         this.$nextTick(() => {
           let element = document.getElementById("newIdeas__container");
           element.scrollIntoView({ behavior: "smooth", block: "end" });
