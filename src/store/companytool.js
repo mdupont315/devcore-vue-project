@@ -47,6 +47,12 @@ const getters = {
 };
 
 const actions = {
+  async setTool(context, form) {
+    EventBus.$emit("idea/currentTab", {
+      form
+    });
+    context.commit("SET_CURRENT_TAB", form);
+  },
   async create(context, form) {
     const result = await form.mutate({
       mutation: COMPANY_TOOL.create
@@ -166,6 +172,8 @@ const actions = {
   },
 
   async setCurrent(context, { section, tool }) {
+    console.log(section);
+    console.log(tool);
     context.commit("SET_CURRENT_TOOL", {
       section,
       tool

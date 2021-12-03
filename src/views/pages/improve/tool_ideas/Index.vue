@@ -57,8 +57,8 @@
           :variant="isActive('new') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'tool-ideas' }"
           class="text-uppercase mr-1 tool_ideas__routerLink"
-          ref="toolideas_new__innerView__new"
-          id="ideas_new__innerView__new"
+          id="toolideas_innerView_new"
+          ref="toolideas_innerView_New"
           size="md"
           @click="loadComponent"
           >{{ $t("New") }} ({{ newIdeas.length }})</b-button
@@ -67,6 +67,8 @@
           :variant="isActive('review') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'tool-ideas', params: { type: 'review' } }"
           class="text-uppercase mr-1 tool_ideas__routerLink"
+          id="toolideas_innerView_review"
+          ref="toolideas_innerView_Review"
           size="md"
           @click="loadComponent"
           >{{ $t("Review") }} ({{ reviewIdeas.length }})</b-button
@@ -75,6 +77,8 @@
           :variant="isActive('adopted') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'tool-ideas', params: { type: 'adopted' } }"
           class="text-uppercase mr-1 tool_ideas__routerLink"
+          id="toolideas_innerView_adopted"
+          ref="toolideas_innerView_Adopted"
           size="md"
           @click="loadComponent"
           >{{ $t("Adopted") }} ({{ adoptedIdeas.length }})</b-button
@@ -170,6 +174,7 @@ import EventBus from "@/lib/eventbus";
 export default {
   data: () => ({
     currentComponent: null,
+    storeName: "toolIdea",
   }),
 
   computed: {
@@ -178,6 +183,7 @@ export default {
       tools: "companyTool/all",
       currentTool: "companyTool/current",
       tab: "toolIdea/currentTab",
+      processes: "process/all",
     }),
     process: {
       get() {
@@ -320,28 +326,122 @@ export default {
   },
   async mounted() {
     this.loadComponent();
-    const result = await this.$store.dispatch("companyTool/findAll");
-    if (this.process.process) {
-      this.$store.dispatch("process/findById", {
-        id: this.process.process.id,
+    console.log("TOOL IDEA MOUNTED!");
+    await this.$store.dispatch("companyTool/findAll");
+
+    if (this.process.process || this.$router.currentRoute.query.processId) {
+      await this.$store.dispatch("process/findById", {
+        id:
+          this.$router.currentRoute.query.processId ?? this.process.process.id,
+        force: true,
+      });
+      await this.$store.dispatch("toolIdea/findByProcess", {
+        id:
+          this.$router.currentRoute.query.processId ?? this.process.process.id,
         force: true,
       });
     }
 
-    EventBus.$on("tool_idea/currentTab", (data) => {
-      if (
-        this.$route.path !== "/improve/tool-ideas" &&
-        this.$route.path.includes("/tool-ideas/")
-      ) {
-        if (this.$refs.toolideas_new__innerView__new) {
-          this.$refs.toolideas_new__innerView__new.$el.click();
-        }
+    EventBus.$on("process/changeCurrent", (data) => {
+      console.log("PROCESS CHANGE CURRENT!");
+      if (data.section === "toolIdeas") {
+        if (!this.process.process) return;
+        this.$store.dispatch("toolIdea/findByProcess", {
+          id:
+            this.$router.currentRoute.query.processId ??
+            this.process.process.id,
+          force: true,
+        });
       }
-
-      this.currentComponent = () => import("./New.vue");
     });
+
+    EventBus.$on("tool_idea/currentTab", (data) => {
+      const tabName =
+        data && data.form && data.form.tab ? data.form.tab : "New";
+
+      const ref = `toolideas_innerView_${tabName}`;
+      if (this.$refs[ref] && this.$refs[ref].$el) {
+        this.$refs[ref].$el.click();
+      }
+    });
+
+    if (
+      this.$router.currentRoute.query &&
+      Object.keys(this.$router.currentRoute.query).length > 0
+    ) {
+      await this.goToToolIdea();
+    }
   },
   methods: {
+    async setCurrentTool(toolId) {
+      await this.$store.dispatch("companyTool/setCurrent", {
+        section: "toolIdeas",
+        tool: { id: toolId },
+      });
+    },
+    async goToToolIdea() {
+      console.log(this.$router.currentRoute.query);
+      const query = {
+        processId: this.$router.currentRoute.query.processId ?? null,
+        toolId: this.$router.currentRoute.query.toolId ?? null,
+        stageId: this.$router.currentRoute.query.stageId ?? null,
+        operationId: this.$router.currentRoute.query.operationId ?? null,
+        phaseId: this.$router.currentRoute.query.phaseId ?? null,
+      };
+      await this.navigateToToolIdea(query);
+    },
+    async navigateToToolIdea({
+      processId = null,
+      toolId = null,
+      stageId = null,
+      operationId = null,
+      phaseId = null,
+    }) {
+      const processPath = this.processes.find((p) => p.id == processId);
+      const stagePath =
+        processPath && processPath.stages.length > 0
+          ? processPath.stages.find((s) => s.id == stageId)
+          : null;
+      const operationsPath =
+        stagePath && stagePath.operations.length > 0
+          ? stagePath.operations.find((o) => o.id == operationId)
+          : null;
+      const phasePath =
+        operationsPath && operationsPath.phases.length > 0
+          ? operationsPath.phases.find((p) => p.id == phaseId)
+          : null;
+
+      if (processPath && stagePath) {
+        await this.$store.dispatch("process/setCurrentProcess", {
+          section: "toolIdeas",
+          process: processPath,
+          stage: stagePath,
+          operation: operationsPath,
+          phase: phasePath,
+        });
+
+        console.log("_______________");
+        console.log(this.$router.currentRoute.params);
+        console.log(this.getTools);
+        let tab = "New";
+        if (toolId) {
+          console.log("Tool id Adopted:");
+          console.log(toolId);
+          await this.setCurrentTool(toolId);
+        }
+
+        if (
+          this.$router.currentRoute.params &&
+          this.$router.currentRoute.params.type
+        ) {
+          tab = this.$router.currentRoute.params.type;
+        }
+
+        await this.$store.dispatch(`${this.storeName}/setTab`, {
+          tab: tab,
+        });
+      }
+    },
     getAllIdeasLength(option) {
       return this.allIdeas.filter((i) => i.companyToolId === option.id).length;
     },

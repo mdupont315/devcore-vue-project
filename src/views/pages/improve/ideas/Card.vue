@@ -91,10 +91,10 @@
           v-if="!idea.replied"
           style="margin-left: 20px; max-height: 46px"
           :item="idea"
-					:user="idea.author"
+          :user="idea.author"
           refTarget="ideaFeedbackIcon"
           :textPlaceholder="$t('Idea feedback')"
-					:itemDescription="idea.description"
+          :itemDescription="idea.description"
           type="ideaFeedback"
           @toggle="togglePopOverFeedback"
           @save="saveIdeaReply"
@@ -170,11 +170,25 @@ export default {
     showDetail: false,
     showPopOverFeedback: false,
   }),
+  mounted() {
+    const route = this.$router.currentRoute;
+    if (route.query) {
+      if (route.query.uuid) {
+        if (this.idea.uuid == route.query.uuid) {
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.toggleIdea();
+            }, 1000);
+          });
+        }
+      }
+    }
+  },
   computed: {
     ...mapGetters({
       allProcess: "process/all",
       ideaReplies: "ideaIssueReply/all",
-			 user: "auth/user",
+      user: "auth/user",
     }),
 
     process: {
@@ -242,8 +256,8 @@ export default {
         force: true,
       });
 
-     /*  this.togglePopOverFeedback(); */
-		 this.showPopOverFeedback = false;
+      /*  this.togglePopOverFeedback(); */
+      this.showPopOverFeedback = false;
     },
     async setCurrentTool(event, toolId) {
       event.preventDefault();

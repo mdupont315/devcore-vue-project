@@ -8,6 +8,8 @@
         </h3>
         <idea-card
           v-for="item in testingIdeas"
+          :id="`idea-id-${item.uuid}`"
+          :ref="`idea-ref-${item.uuid}`"
           :key="item.id"
           :idea="item"
         ></idea-card>
@@ -24,6 +26,8 @@
         </h3>
         <idea-card
           v-for="item in evaluatedIdeas"
+          :id="`idea-id-${item.uuid}`"
+          :ref="`idea-ref-${item.uuid}`"
           :key="item.id"
           :idea="item"
         ></idea-card>
@@ -43,6 +47,20 @@ import IdeaCard from "./Card";
 export default {
   components: {
     "idea-card": IdeaCard,
+  },
+  mounted() {
+    if (this.$router.currentRoute.query) {
+      if (this.$router.currentRoute.query.uuid) {
+        const { uuid } = this.$router.currentRoute.query;
+        this.$nextTick(() => {
+          const ideaSelector = `idea-id-${uuid}`;
+          const element = document.getElementById(ideaSelector);
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        });
+      }
+    }
   },
   computed: {
     ...mapGetters({

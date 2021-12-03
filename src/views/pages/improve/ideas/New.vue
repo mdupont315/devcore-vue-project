@@ -11,6 +11,8 @@
         </div>
         <idea-card
           v-for="item in newIdeas"
+          :id="`idea-id-${item.uuid}`"
+          :ref="`idea-ref-${item.uuid}`"
           :key="item.id"
           :idea="item"
         ></idea-card>
@@ -33,16 +35,15 @@ export default {
     "idea-card": IdeaCard,
   },
   mounted() {
-    console.log("this.$route.params");
-    console.log(this.$route.params);
-    if (this.$router.currentRoute.params) {
-      if (
-        this.$router.currentRoute.params.type &&
-        this.$router.currentRoute.params.type == "new"
-      ) {
+    if (this.$router.currentRoute.query) {
+      if (this.$router.currentRoute.query.uuid) {
+        const { uuid } = this.$router.currentRoute.query;
         this.$nextTick(() => {
-          let element = document.getElementById("newIdeas__container");
-          element.scrollIntoView({ behavior: "smooth", block: "end" });
+          const ideaSelector = `idea-id-${uuid}`;
+          const element = document.getElementById(ideaSelector);
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
         });
       }
     }

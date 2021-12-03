@@ -4,7 +4,7 @@
       <b-col cols="6" class="mx-auto">
         <div class="h4 text-white text-uppercase clearfix">
           <h3 class="h4 float-left" style="padding-top: 9px">
-           {{ $t("New ideas") }}
+            {{ $t("New ideas") }}
             <span class="h4 text-gray-lighter">{{ newIdeas.length }}</span>
           </h3>
           &nbsp;
@@ -16,6 +16,8 @@
         </div>
         <idea-card
           v-for="item in newIdeas"
+          :id="`tool-idea-id-${item.uuid}`"
+          :ref="`tool-idea-ref-${item.uuid}`"
           :key="item.id"
           :idea="item"
         ></idea-card>
@@ -37,6 +39,23 @@ export default {
   components: {
     "idea-card": IdeaCard,
   },
+  async mounted() {
+		console.log("NEW!");
+		console.log(this.$router.currentRoute);
+    if (this.$router.currentRoute.query) {
+      if (this.$router.currentRoute.query.uuid) {
+        const { uuid } = this.$router.currentRoute.query;
+        this.$nextTick(() => {
+          const ideaSelector = `tool-idea-id-${uuid}`;
+          const element = document.getElementById(ideaSelector);
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        });
+      }
+    }
+  },
+
   computed: {
     ...mapGetters({
       currentProcess: "process/current",

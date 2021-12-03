@@ -9,6 +9,8 @@
         <idea-card
           v-for="item in testingIdeas"
           :key="item.id"
+          :id="`tool-idea-id-${item.uuid}`"
+          :ref="`tool-idea-ref-${item.uuid}`"
           :idea="item"
         ></idea-card>
         <div v-if="testingIdeas.length == 0">
@@ -24,6 +26,8 @@
         </h3>
         <idea-card
           v-for="item in evaluatedIdeas"
+          :id="`tool-idea-id-${item.uuid}`"
+          :ref="`tool-idea-ref-${item.uuid}`"
           :key="item.id"
           :idea="item"
         ></idea-card>
@@ -43,6 +47,22 @@ import IdeaCard from "../ideas/Card";
 export default {
   components: {
     "idea-card": IdeaCard,
+  },
+  async mounted() {
+				console.log("REVIEW!");
+		console.log(this.$router.currentRoute);
+    if (this.$router.currentRoute.query) {
+      if (this.$router.currentRoute.query.uuid) {
+        const { uuid } = this.$router.currentRoute.query;
+        this.$nextTick(() => {
+          const ideaSelector = `tool-idea-id-${uuid}`;
+          const element = document.getElementById(ideaSelector);
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        });
+      }
+    }
   },
   computed: {
     ...mapGetters({
@@ -92,7 +112,7 @@ export default {
         }
         return null;
       },
-		},
+    },
     testingIdeas: {
       get() {
         if (this.currentProcessSection) {
@@ -111,10 +131,10 @@ export default {
     evaluatedIdeas: {
       get() {
         if (this.currentProcessSection) {
-
-          var filteredSelection = this.$store.getters[
-            `toolIdea/by${this.currentProcessSectionName.capitalize()}`
-					];
+          var filteredSelection =
+            this.$store.getters[
+              `toolIdea/by${this.currentProcessSectionName.capitalize()}`
+            ];
 
           var filteredFilteredSelection = filteredSelection(
             this.currentProcessSection.id

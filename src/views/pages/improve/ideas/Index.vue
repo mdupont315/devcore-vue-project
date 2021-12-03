@@ -4,18 +4,6 @@
       v-if="process.process && process.process.stages.length > 0"
       class="sub-top-bar shadow-sm d-flex flex-row"
     >
-      <button
-        @click="
-          navigateToIdea({
-            processId: 5,
-            stageId: 10,
-            operationId: 7,
-            phaseId: 7,
-          })
-        "
-      >
-        Hello
-      </button>
       <div class="flex-grow-1">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb text-capitalize bg-white">
@@ -115,6 +103,13 @@
         :is="currentComponent"
         v-if="currentProcess && currentComponent"
       ></component>
+
+      <!-- <div v-if="currentProcess && currentComponent">
+        <idea-review v-if="currentComponent == 'review'"></idea-review>
+        <idea-adopted v-else-if="currentComponent == 'adopted'"></idea-adopted>
+        <idea-new v-else-if="currentComponent == 'new'"></idea-new>
+      </div> -->
+
       <empty-page v-else>
         <div v-if="!currentProcess" class="h2 text-center text-white">
           {{ $t("Just the empty space...") }}
@@ -139,11 +134,17 @@ import { mapGetters } from "vuex";
 import EventBus from "@/lib/eventbus";
 import TopNav from "@/views/layouts/components/TopNav";
 import MainNav from "@/views/layouts/components/MainNav";
+import New from "./New.vue";
+import Review from "./Review.vue";
+import Adopted from "./Adopted.vue";
 
 export default {
   components: {
     "top-nav": TopNav,
     "main-nav": MainNav,
+    "idea-new": New,
+    "idea-review": Review,
+    "idea-adopted": Adopted,
   },
   data: () => ({
     currentComponent: null,
@@ -288,7 +289,7 @@ export default {
       });
     }
     EventBus.$on("process/changeCurrent", (data) => {
-      console.log("FIND IDEAS");
+			console.log("PROCESS CHANGE CURRENT!");
       if (data.section === "ideas") {
         if (!this.process.process) return;
         this.$store.dispatch("idea/findByProcess", {
@@ -301,22 +302,11 @@ export default {
       const tabName =
         data && data.form && data.form.tab ? data.form.tab : "New";
 
-      if (
-        this.$route.path.includes("/ideas/adopted") ||
-        this.$route.path.includes("/ideas/review")
-      ) {
-        let ref = `ideas_innerView_New`;
-        ref = `ideas_innerView_${tabName}`;
-        console.log("REF:::::");
-        console.log(ref);
-        console.log(this.$refs);
-        if (this.$refs[ref] && this.$refs[ref].$el) {
-          this.$refs[ref].$el.click();
-        }
+      const ref = `ideas_innerView_${tabName}`;
+      if (this.$refs[ref] && this.$refs[ref].$el) {
+        this.$refs[ref].$el.click();
       }
-      this.currentComponent = () => import(`./${tabName}.vue`);
     });
-    console.log("Go To Mounted!");
     if (
       this.$router.currentRoute.query &&
       Object.keys(this.$router.currentRoute.query).length > 0
@@ -326,17 +316,11 @@ export default {
   },
   methods: {
     async goToIdea() {
-      console.log(this.$route.params);
-      console.log("Go To iDea!");
-      console.log(this.$router.currentRoute);
-
-      console.log(this.$router.currentRoute.query);
       const query = {
         processId: this.$router.currentRoute.query.processId ?? null,
         stageId: this.$router.currentRoute.query.stageId ?? null,
         operationId: this.$router.currentRoute.query.operationId ?? null,
         phaseId: this.$router.currentRoute.query.phaseId ?? null,
-        uuid: this.$router.currentRoute.query.uuid ?? null,
       };
       await this.navigateToIdea(query);
     },
@@ -345,13 +329,8 @@ export default {
       stageId = null,
       operationId = null,
       phaseId = null,
-      uuid = null,
     }) {
-      console.log("NavigateToIdea!:");
-      console.log(processId);
-      console.log(stageId);
-      console.log(operationId);
-      console.log(phaseId);
+
       const processPath = this.processes.find((p) => p.id == processId);
       const stagePath =
         processPath && processPath.stages.length > 0
@@ -366,14 +345,6 @@ export default {
           ? operationsPath.phases.find((p) => p.id == phaseId)
           : null;
 
-      console.log("processPath");
-      console.log(processPath);
-      console.log("stagePath");
-      console.log(stagePath);
-      console.log("operationsPath");
-      console.log(operationsPath);
-      console.log("phasePath");
-      console.log(phasePath);
 
       if (processPath && stagePath) {
         await this.$store.dispatch("process/setCurrentProcess", {
@@ -393,14 +364,11 @@ export default {
           this.$router.currentRoute.params.type
         ) {
           tab = this.$router.currentRoute.params.type;
-
         }
 
         await this.$store.dispatch(`${this.storeName}/setTab`, {
           tab: tab,
         });
-
-        console.log(uuid);
       }
     },
     filterByProcessSection(item, status) {
@@ -462,6 +430,8 @@ export default {
       }
     },
     async loadComponent() {
+      console.log("@loadComponent_______________");
+      //this.currentComponent = type;
       this.currentComponent = () =>
         import(
           "./" +
