@@ -14,6 +14,8 @@
           sort-icon-left
           sort-by="name"
           :busy="filter.busy"
+          ref="issues-index-table"
+          selectable
           class="t01"
           hover
           :fields="fields"
@@ -173,6 +175,7 @@
                   m-0
                 "
                 style="font-size: 1.2rem; 3px 10px;white-space: nowrap;"
+                :ref="`issuePath-${row.index}`"
                 @click="showDetails(row)"
                 >{{
                   row.item._showDetails ? $t("Close") : $t("Details")
@@ -215,7 +218,7 @@ export default {
   },
   data: () => {
     return {
-			clickedRowBoundingClientRect: 0,
+      clickedRowBoundingClientRect: 0,
       ideaFromIssue: {},
       deleting: false,
       updateForm: null,
@@ -239,32 +242,8 @@ export default {
       filterValue: "issue/filter",
       currentProcess: "process/current",
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
+      processes: "process/all",
     }),
-
-    /*   getAvailablePaths() {
-      const available = {
-        stages: [],
-        operations: [],
-        phases: [],
-      };
-
-      if (this.process.stages.length > 0) {
-        available.stages = this.process.stages.forEach((stage) => {
-          available.stages.push(stage.id);
-
-          if (stage.operations.length > 0) {
-            stage.operations.forEach((operations) => {
-              operations
-            });
-          }
-        });
-      }
-
-      console.log(available);
-      console.log(this.process.stages);
-      this.process.stages;
-      return available;
-    }, */
     getIssues: {
       get() {
         if (this.process) {
@@ -328,13 +307,86 @@ export default {
     if (this.process) {
       await this.loadProcessAndIssues();
     }
+
+    console.log("CURRENT ROUTE:");
+    console.log(this.$router.currentRoute);
+    if (
+      this.$router.currentRoute.query &&
+      Object.keys(this.$router.currentRoute.query).length > 0
+    ) {
+      console.log(this.$router.currentRoute.query);
+      await this.goToIssue();
+    }
   },
 
   methods: {
-		setParentPadding(offsetTop){
-			console.log(offsetTop);
-			this.clickedRowBoundingClientRect = offsetTop
-		},
+    async goToIssue() {
+      const query = {
+        processId: this.$router.currentRoute.query.processId ?? null,
+        stageId: this.$router.currentRoute.query.stageId ?? null,
+        operationId: this.$router.currentRoute.query.operationId ?? null,
+        phaseId: this.$router.currentRoute.query.phaseId ?? null,
+      };
+      await this.navigateToIssueDetails(query);
+    },
+    async navigateToIssueDetails({
+      processId = null,
+      stageId = null,
+      operationId = null,
+      phaseId = null,
+    }) {
+      console.log("_______________");
+      console.log(processId);
+      console.log(stageId);
+      console.log(operationId);
+      console.log(phaseId);
+      console.log("_______________");
+      const processPath = this.processes.find((p) => p.id == processId);
+      const stagePath =
+        processId && processPath && processPath.stages.length > 0
+          ? processPath.stages.find((s) => s.id == stageId)
+          : null;
+
+      const operationsPath =
+        operationId && stagePath && stagePath.operations.length > 0
+          ? stagePath.operations.find((o) => o.id == operationId)
+          : null;
+      const phasePath =
+        phaseId && operationsPath && operationsPath.phases.length > 0
+          ? operationsPath.phases.find((p) => p.id == phaseId)
+          : null;
+
+      console.log("::::::::");
+      console.log(stagePath);
+      console.log(operationsPath);
+      console.log(phasePath);
+
+      const selectedProcess = processPath.id;
+      const selectedStage = stagePath ? stagePath.id : null;
+      const selectedOperation = operationsPath ? operationsPath.id : null;
+      const selectedPhase = phasePath ? phasePath.id : null;
+
+      const selected = this.uniqueProcessPathIds.find(
+        (unique) =>
+          unique.processId == selectedProcess &&
+          unique.stageId == selectedStage &&
+          unique.operationId == selectedOperation &&
+          unique.phaseId == selectedPhase
+      );
+
+      await this.$store.dispatch("process/setCurrentProcess", {
+        section: "issues",
+        process: processPath,
+      });
+
+      this.$nextTick(() => {
+        this.$refs[`issuePath-${selected.id}`].click();
+      });
+    },
+    setParentPadding(offsetTop) {
+      console.log(offsetTop);
+      this.clickedRowBoundingClientRect = offsetTop;
+    },
     deleted(item) {
       if (
         this.currentRowDetails &&
@@ -389,9 +441,10 @@ export default {
     getUniquePaths(processPaths = []) {
       if (processPaths.length < 1) return [];
       const paths = processPaths.filter((p) => this.doesProcessPathExist(p));
-
+      console.log(paths);
       let modified = paths.map((path, index) => ({
         id: index,
+        processId: path.processId,
         stageId: path.stageId,
         operationId: path.operationId,
         phaseId: path.phaseId,
@@ -410,6 +463,10 @@ export default {
       return modified.filter((issuePaths) => issuePaths.pathIssues.length > 0);
     },
     isRowOpen(index) {
+      console.log(index);
+      // if(index === 0){
+      // 	return true;
+      // }
       if (this.currentRowDetails) {
         if (
           index === this.currentRowDetails.index &&
@@ -428,28 +485,35 @@ export default {
       return `${stageId}${operationId}${phaseId}`;
     },
     issuePathDeducer(_obj) {
+      console.log(_obj);
       if (!_obj.parent) return;
       if (_obj.parent.__typename === "ProcessPhase") {
+        const processId = _obj.parent.processId;
         const phaseId = _obj.parent.id;
         const operationId = _obj.parent.operation.id;
         const stageId = _obj.parent.operation.stageId;
         return {
+          processId: processId,
           phaseId: phaseId,
           operationId: operationId,
           stageId: stageId,
         };
       }
       if (_obj.parent.__typename === "ProcessOperation") {
+        const processId = _obj.parent.processId;
         const operationId = _obj.parent.id;
         const stageId = _obj.parent.stageId;
         return {
+          processId: processId,
           operationId: operationId,
           stageId: stageId,
         };
       }
       if (_obj.parent.__typename === "ProcessStage") {
+        const processId = _obj.parent.processId;
         const stageId = _obj.parent.id;
         return {
+          processId: processId,
           stageId: stageId,
         };
       }

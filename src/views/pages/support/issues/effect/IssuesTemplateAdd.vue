@@ -359,11 +359,8 @@ export default {
       // return master templates unless replacable with edited one
 
       if (this.issue.effect) {
-        console.log("this.issue.effec");
         //get active from issue
-        console.log(this.issue.effect);
         if (this.issue.effect.effectId) {
-          console.log("IF");
           const itemsFiltered = this.items.filter(
             (x) =>
               x.issueActiveId === null && x.id != this.issue.effect.effectId
@@ -382,7 +379,6 @@ export default {
             ),
           ];
         } else {
-          console.log("ELSE");
           const active = this.items.find(
             (x) => x.issueActiveId == this.issue.id
           );

@@ -68,7 +68,12 @@ export default class IssueModel extends BaseModel {
   get timeTotalValue() {
     let total = 0;
     if (this.timeValue !== 0) {
-      total -= Math.round(this.author.formattedHourlyCosts * this.timeValue);
+      let formattedCost = 0;
+      if (this.author && this.author.formattedHourlyCosts) {
+        formattedCost = this.author.formattedHourlyCost;
+      }
+
+      total -= Math.round(formattedCost * this.timeValue);
     }
     return total;
   }

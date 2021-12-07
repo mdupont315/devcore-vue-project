@@ -65,9 +65,15 @@
       </template>
 
       <!-- project -->
-      <template v-slot:cell(user)="row">{{
-        row.item.anonymous ? $t("Anonymous") : row.item.author.fullName
-      }}</template>
+      <template v-slot:cell(user)="row">
+        <div>
+          <div v-if="row.item.author">
+            {{
+              row.item.anonymous ? $t("Anonymous") : row.item.author.fullName
+            }}
+          </div>
+        </div>
+      </template>
 
       <!-- project -->
       <template v-slot:cell(project)="row">{{
@@ -103,7 +109,7 @@
                   isTextOverArea(row.item.id) || row.item.comments.length > 0
                 "
               >
-                View all
+                {{ $t("View all") }}
               </div>
             </div>
           </div>
@@ -372,8 +378,10 @@ export default {
 
     this.tableWidth = this.$refs.issueEffect_table?.$el.clientWidth ?? 1582;
     this.isLoading = false;
+
   },
   methods: {
+
     isCurrentItemRowId(id) {
       if (this.currentItem) {
         return this.currentItem.id === id;
