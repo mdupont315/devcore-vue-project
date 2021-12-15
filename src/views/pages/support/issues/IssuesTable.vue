@@ -223,6 +223,7 @@
               @confirm="() => deleteItem(row.item)"
               @showConfirm="toggleIssueRemoveOpen"
               @cancel="overlayClick"
+							:confirmBoundary="'window'"
             >
               <div class="text-center">
                 <b-tooltip

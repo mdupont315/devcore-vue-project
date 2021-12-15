@@ -335,12 +335,7 @@ export default {
       operationId = null,
       phaseId = null,
     }) {
-      console.log("_______________");
-      console.log(processId);
-      console.log(stageId);
-      console.log(operationId);
-      console.log(phaseId);
-      console.log("_______________");
+
       const processPath = this.processes.find((p) => p.id == processId);
       const stagePath =
         processId && processPath && processPath.stages.length > 0
@@ -356,10 +351,7 @@ export default {
           ? operationsPath.phases.find((p) => p.id == phaseId)
           : null;
 
-      console.log("::::::::");
-      console.log(stagePath);
-      console.log(operationsPath);
-      console.log(phasePath);
+
 
       const selectedProcess = processPath.id;
       const selectedStage = stagePath ? stagePath.id : null;

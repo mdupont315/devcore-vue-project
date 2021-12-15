@@ -8,7 +8,7 @@
     >
       <span v-show="true">
         <span
-          v-if="!editing && allowEdit"
+          v-if="!editing && current.process"
           class="edit-btn"
           @click.stop="initEdit"
         >
@@ -60,17 +60,40 @@
               :disabled="vErrors.any()"
               size="xs"
               variant="transparent"
-              class="action mdi mdi-check text-success font-15x m-0 outline-none"
+              style="width: 36px; height: 36px"
+              class="
+                action
+                mdi mdi-check
+                text-success
+                font-15x
+                m-0
+                outline-none
+              "
               :title="$t('Save')"
               @click="saveItem"
             ></b-button>
-            <b-button
-              size="xs"
-              variant="transparent"
-              class="action mdi mdi-close text-danger font-15x m-0 outline-none"
-              :title="$t('Cancel')"
-              @click="cancelEdit"
-            ></b-button>
+            <confirm-button
+              @confirm="() => removeItem(current.process)"
+              :showOverlay="false"
+              :popoverCustomClass="'process_selector_popover_custom_class'"
+              :btnStyle="'background:transparent;color:#DC3545;border-color:transparent'"
+            >
+              <!-- <b-button
+                size="xs"
+                variant="transparent"
+                class="
+                  action
+                  mdi mdi-close
+                  text-danger
+                  font-15x
+                  m-0
+                  outline-none
+                "
+                :title="$t('Cancel')"
+                @click="cancelEdit"
+              ></b-button> -->
+              <i class="mdi mdi-window-close" style="font-size: 16px"></i>
+            </confirm-button>
           </div>
         </div>
       </layer>
@@ -131,6 +154,14 @@
                       <b-spinner></b-spinner>
                     </div>
                     <ul class="list-unstyled m-0 scrollY">
+                      <li
+                        class="item"
+                        :class="{ active: !selectedProcess }"
+                        @click="selectProcess(null, false)"
+                      >
+                        {{ $t("None") }}
+                      </li>
+
                       <li
                         v-for="item in items"
                         :key="item.id"
@@ -378,11 +409,6 @@ export default {
       required: false,
       type: Function,
     },
-    allowEdit: {
-      required: false,
-      type: Boolean,
-      default: () => false,
-    },
   },
   data: () => ({
     expanded: false,
@@ -471,13 +497,39 @@ export default {
     }
   },
   methods: {
+    async removeItem(item) {
+      if (!item) return;
+      try {
+        await this.$store.dispatch(
+          "process/delete",
+          new GQLForm({
+            id: item.id,
+          })
+        );
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.initEdit();
+				 this.loading.stage = false;
+          this.loading.operation = false;
+          this.loading.phase = false;
+          this.selectedProcess = null;
+
+        await this.$store.dispatch("process/setCurrentProcess", {
+          section: this.section,
+          process: null,
+          stage: null,
+          operation: null,
+          phase: null,
+        });
+      }
+    },
     getIdeasCount(item) {
       if (item.__typename === "Process" && item.stages.length > 0) {
         let count = 0;
-        item.stages.forEach(s => {
-					count += s.ideasCount
-				});
-
+        item.stages.forEach((s) => {
+          count += s.ideasCount;
+        });
       }
 
       if (item.__typename === "ProcessStage" && item.operations.length > 0) {
@@ -493,7 +545,7 @@ export default {
           if (item.__typename === "Process") {
             let stageIdeaCount = 0;
             if (item.stages.length > 0) {
-							this.getIdeasCount(item);
+              this.getIdeasCount(item);
               item.stages.map((stage) => (stageIdeaCount += stage.ideaCount));
             }
           }
@@ -593,6 +645,7 @@ export default {
       });
     },
     initEdit() {
+      console.log("initEdit");
       if (!this.editing) {
         this.$validator.pause();
         this.$validator.reset();
@@ -638,7 +691,8 @@ export default {
       }
     },
     cancelEdit() {
-      this.initEdit();
+      // console.log("Cancel edit!");
+      //  this.initEdit();
     },
     close() {
       this.expanded = false;
@@ -661,7 +715,28 @@ export default {
         this.selectedOperation = null;
         this.selectedPhase = null;
         this.selectedStage = null;
+
+        if (!process && lastProcess) {
+          this.loading.stage = false;
+          this.loading.operation = false;
+          this.loading.phase = false;
+          this.selectedProcess = null;
+
+          await this.$store.dispatch("process/setCurrentProcess", {
+            section: this.section,
+            process: null,
+            stage: null,
+            operation: null,
+            phase: null,
+          });
+
+          //	 	await this.$store.dispatch("process/resetProcess");
+        }
       }
+
+      console.log("lastProcess");
+      console.log(lastProcess);
+
       if (process) {
         this.selectedProcess = await this.$store.dispatch("process/findById", {
           id: process.id,
@@ -788,3 +863,10 @@ export default {
   },
 };
 </script>
+
+<style>
+.process_selector_popover_custom_class {
+  top: -5px;
+  z-index: 10000;
+}
+</style>

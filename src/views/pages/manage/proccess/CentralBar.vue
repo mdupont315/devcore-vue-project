@@ -1,10 +1,13 @@
 <template>
   <div>
-    <process-selector max-level="process" show-count="items" section="process" :allow-edit="true" :on-apply="onApply"></process-selector>
+    <process-selector max-level="process" @nullifyProcess="section = null" show-count="items" :section="section" :allow-edit="true" :on-apply="onApply"></process-selector>
   </div>
 </template>
 <script>
 export default {
+ data: () => ({
+    section: "process",
+  }),
   methods: {
    async onApply(args) {
       if (args.process) {

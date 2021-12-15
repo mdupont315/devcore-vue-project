@@ -23,21 +23,41 @@ function loadCurrent(state, section) {
     operation: null,
     phase: null
   };
+
   if (!section) {
+    current.process = null;
+
     return current;
   }
   state.storage[section] = state.storage[section] || {};
+
+  console.log("@loadCurrent");
+  console.log(state.storage);
 
   if (state.storage[section].processId) {
     current.process = state.all.find(
       p => p.id === state.storage[section].processId
     );
   }
-  if (!current.process) {
-    current.process = state.all[0];
+  if (!current.process && state.all.length > 0) {
+    console.log("NO CURRENT PROCESS!");
+    const mostRecentSectionModified = state.storage["latestModify"];
+
+    console.log(mostRecentSectionModified);
+
+    if (mostRecentSectionModified && mostRecentSectionModified.processId) {
+      console.log(mostRecentSectionModified.processId);
+      current.process = state.all.find(
+        p => p.id == mostRecentSectionModified.processId
+      );
+    }
+    //  else {
+    //   current.process = state.all[0];
+    // }
   }
 
   if (current.process && current.process.loaded) {
+    console.log("1!");
     if (state.storage[section].stageId) {
       current.stage = current.process.stages.find(
         i => i.id === state.storage[section].stageId
@@ -58,6 +78,8 @@ function loadCurrent(state, section) {
         : null;
     }
   } else {
+    console.log("2!");
+
     current.stage = null;
     current.operation = null;
     current.phase = null;
@@ -121,7 +143,8 @@ const actions = {
 
   async delete(context, form) {
     const result = await form.mutate({
-      mutation: PROCESS.delete
+      mutation: PROCESS.delete,
+      variables: { id: form.id }
     });
     await context.dispatch("findAll", {
       force: true
@@ -152,13 +175,10 @@ const actions = {
           });
           const { result } = await queryToPromise(query);
 
-          const results = result.data.processFindAll;
-
-          results.map(r => {
-            const process = new Process().deserialize(r);
-            context.commit("SET_ITEM", process);
+          const results = result.data.processFindAll.map(r => {
+            return new Process().deserialize(r);
           });
-
+          context.commit("SET_ALL", results);
           context.commit("SET_LOADED", true);
         }
       }
@@ -251,6 +271,8 @@ const mutations = {
     state.sectionsLoaded[value.section] = value.loaded;
   },
   SET_ITEM(state, value) {
+    console.log("state");
+    console.log(state);
     const index = state.all.findIndex(el => el.id === value.id);
     if (index > -1) {
       state.all[index] = value;
@@ -290,9 +312,20 @@ const mutations = {
     state.storage = AppStorage.get("CURRENT_PROCESS");
   },
   SET_CURRENT_PROCESS(state, { section, process, stage, operation, phase }) {
+    console.log("SETTING PROCESS!");
+    console.log(state);
+    console.log("process: ");
+    console.log(process);
+    console.log("localstorage");
+    console.log(AppStorage.get("CURRENT_PROCESS"));
     AppStorage.set(
       "CURRENT_PROCESS",
       Object.assign(AppStorage.get("CURRENT_PROCESS", {}), {
+        latestModify: {
+          timestamp: new Date(),
+          section: section,
+          processId: process
+        },
         [section]: {
           processId: process ? process.id : null,
           stageId: stage ? stage.id : null,

@@ -35,7 +35,7 @@
         >
           <div>
             <div
-              class="stacked-avatars left"
+              class="stacked-avatars"
               style="display: block; height: 30px"
             >
               <div v-if="value.length > 0">

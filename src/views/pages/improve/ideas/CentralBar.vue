@@ -3,9 +3,10 @@
     <process-selector
       max-level="phase"
       show-count="ideas"
-      section="ideas"
-      :list="{withStages:true}"
-      :detail="{withStagesFull:true}"
+      :section="section"
+      @setSection="setSection"
+      :list="{ withStages: true }"
+      :detail="{ withStagesFull: true }"
     ></process-selector>
   </div>
 </template>
@@ -14,7 +15,14 @@ export default {
   async mounted() {
     // await this.$store.dispatch("idea/findAll");
   },
+  data: () => ({
+    section: "ideas",
+  }),
   methods: {
+    setSection(section) {
+
+			this.section = section;
+    },
     async onSelectionChange(section, item) {
       try {
         if (section === "process") {
@@ -23,7 +31,7 @@ export default {
       } catch (ex) {
         console.log(ex);
       }
-    }
-  }
+    },
+  },
 };
 </script>

@@ -344,6 +344,7 @@ export default {
 
     EventBus.$on("process/changeCurrent", (data) => {
       console.log("PROCESS CHANGE CURRENT!");
+      console.log(data);
       if (data.section === "toolIdeas") {
         if (!this.process.process) return;
         this.$store.dispatch("toolIdea/findByProcess", {

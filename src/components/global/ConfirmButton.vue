@@ -22,6 +22,7 @@
       :show.sync="showConfirmMessage"
       :placement="confirmPlacement"
       :boundary="confirmBoundary"
+			:custom-class="popoverCustomClass"
     >
       <slot name="confirm">
         <b-card no-body style="width: 200px" class="text-center light">
@@ -58,6 +59,9 @@ export default {
       required: false,
     },
     btnStyle: {
+      required: false,
+    },
+    popoverCustomClass: {
       required: false,
     },
     confirmTitle: {

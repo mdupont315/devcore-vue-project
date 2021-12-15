@@ -329,7 +329,6 @@ export default {
       operationId = null,
       phaseId = null,
     }) {
-
       const processPath = this.processes.find((p) => p.id == processId);
       const stagePath =
         processPath && processPath.stages.length > 0
@@ -343,7 +342,6 @@ export default {
         operationsPath && operationsPath.phases.length > 0
           ? operationsPath.phases.find((p) => p.id == phaseId)
           : null;
-
 
       if (processPath && stagePath) {
         await this.$store.dispatch("process/setCurrentProcess", {
