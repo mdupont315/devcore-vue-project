@@ -193,6 +193,7 @@
             >
               <issues-table
                 @deleted="deleted"
+								@deletedAll="deletedAll"
                 @issuesTableOffsetTop="setParentPadding"
                 :items="currentRowDetails.item.pathIssues"
                 :item="currentRowDetails.item"
@@ -389,6 +390,9 @@ export default {
         }
       }
     },
+		deletedAll(){
+			console.log("DELETED ALL!");
+		},
     doesProcessPathExist(path) {
       const { stageId } = path;
       const { operationId } = path;

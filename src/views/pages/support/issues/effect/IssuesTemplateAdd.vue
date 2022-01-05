@@ -48,7 +48,7 @@
         :style="{ width: tableWidth * 0.25 - 10 + 'px' }"
       >
         <div class="form-label-group select required">
-          <div style="background: #fff">
+          <div style="background: #fff;border-radius: 5px 5px 0 0;">
             <!-- Viewing -->
             <div
               v-if="
@@ -85,6 +85,7 @@
                     class="issueEffect_add_form-new-issue-effect-select-remove"
                     @confirm="() => deleteItems(itemForm)"
                     :confirmPlacement="'left'"
+                    :confirmBoundary="'window'"
                     :confirmMessage="$t('IssueEffectDeleteConfirmation')"
                     :showOverlay="false"
                     :btnStyle="'display:flex;flex-direction:row;background:#fff;border:none;color:#000;align-items:center;box-shadow: none;'"
@@ -123,7 +124,22 @@
                     <i class="mdi mdi-close" style="font-size: 20px"></i>
                   </div>
 
-                  <div
+
+                  <confirm-button
+                    class="issueEffect_add_form-new-issue-effect-select-remove"
+                    @confirm="() => deleteItems(itemForm)"
+                    :confirmPlacement="'left'"
+                    :confirmBoundary="'window'"
+                    :confirmMessage="$t('IssueEffectDeleteConfirmation')"
+                    :showOverlay="false"
+                    :btnStyle="'display:flex;flex-direction:row;background:#fff;border:none;color:#000;align-items:center;box-shadow: none;'"
+                  >
+                    <icoEffectDelete width="16" height="16" /><span>{{
+                      $t("Issue Effect Templates Remove")
+                    }}</span>
+                  </confirm-button>
+
+                  <!-- <div
                     class="issueEffect_add_form-new-issue-effect-select-remove"
                     @click="deleteItems(itemForm)"
                   >
@@ -132,7 +148,7 @@
                       height="16"
                       ref="issueEffectTemplateRemoveIcon"
                     /><span>{{ $t("Issue Effect Templates Remove") }}</span>
-                  </div>
+                  </div> -->
                 </div>
                 <div
                   class="issueEffect_add_form-new-issue-effect-select-edit"
@@ -448,9 +464,8 @@ export default {
     },
   }),
   methods: {
-
     closeIt() {
-			console.log("Close")
+      console.log("Close");
     },
     toggleOverlay() {
       this.$emit("toggleOverlay");

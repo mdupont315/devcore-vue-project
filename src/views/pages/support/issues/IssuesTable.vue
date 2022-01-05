@@ -16,6 +16,8 @@
     <div class="text-right float-right">
       <confirm-button
         variant="transparent text-danger"
+        :confirmPlacement="'left'"
+        :confirmBoundary="'window'"
         @confirm="() => deleteAll()"
         :showOverlay="true"
       >
@@ -222,7 +224,7 @@
               @confirm="() => deleteItem(row.item)"
               @showConfirm="toggleIssueRemoveOpen"
               @cancel="overlayClick"
-							:confirmBoundary="'window'"
+              :confirmBoundary="'window'"
             >
               <div class="text-center">
                 <b-tooltip
@@ -378,10 +380,8 @@ export default {
 
     this.tableWidth = this.$refs.issueEffect_table?.$el.clientWidth ?? 1582;
     this.isLoading = false;
-
   },
   methods: {
-
     isCurrentItemRowId(id) {
       if (this.currentItem) {
         return this.currentItem.id === id;
@@ -442,7 +442,6 @@ export default {
       }
     },
     getEffectedMoneyTotal(item) {
-			console.log(item);
       return this.$currency(item.effectedMoneyTotalValue / 100 || 0);
     },
     getEffectTitle(item) {
@@ -586,9 +585,10 @@ export default {
           window.innerHeight -
             element.getBoundingClientRect().bottom -
             614 -
-            200 -
+            300 -
             140
         );
+        console.log("OFFSET TOP @ : " + reduceWindow);
 
         this.$emit("issuesTableOffsetTop", reduceWindow);
         this.$nextTick(() => {
@@ -669,7 +669,8 @@ export default {
         ids: this.getItems.map((i) => i.id),
       });
       await this.$store.dispatch("issue/deleteMany", deleteForm);
-      this.$parent.$emit("deletedAll", {});
+      console.log(deleteForm);
+      this.$emit("deletedAll", deleteForm);
     },
     async deleteItem(item) {
       const deleteForm = new GQLForm({

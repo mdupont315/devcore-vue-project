@@ -216,6 +216,7 @@ export default {
   justify-content: space-between;
   border-radius: 3px;
   background: #fff;
+	min-height:235px;
   width: 100%;
 }
 .issueTemplate-card__subheading-title {
