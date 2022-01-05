@@ -1,7 +1,7 @@
 <template>
   <div v-if="user" class="author-time">
     <img
-      v-if="!anonymous"
+      v-if="!anonymous && user"
       :src="getAvatarUrl('50x50')"
       height="30"
       class="rounded-circle border"
@@ -9,7 +9,7 @@
     <img v-else :src="getAnonAvatarUrl()" class="rounded-circle border" />
     <span class="right">
       <span class="name" v-if="!anonymous"
-        >{{ user.fullName }} {{ user.lang }}</span
+        >{{ user.fullName }}</span
       >
       <span class="name" v-else>{{ $t("Anonymous") }}</span>
       <time-ago v-if="time" class="time" :time="time" />
@@ -47,9 +47,7 @@ export default {
       return null;
     },
   },
-  mounted() {
-    console.log(this.user);
-  },
+
 };
 </script>
 

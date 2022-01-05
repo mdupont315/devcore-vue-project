@@ -163,15 +163,12 @@ const actions = {
   },
 
   async closeFeedback(context, form) {
-    console.log(form);
-    console.log(form.id);
     const result = await form.mutate({
       mutation: ISSUE.closeFeedback,
       variables: {
         id: form.id
       }
     });
-    console.log(result);
     const issue = new Issue().deserialize(result.data.issueCloseFeedback);
     context.commit("SET_ITEM", issue);
     // await context.dispatch('findAll', { force: true });
@@ -188,7 +185,6 @@ const actions = {
           variables: filter
         });
         const { result } = await queryToPromise(query);
-        console.log(result);
         const issue = new Issue().deserialize(result.data.issueFindById);
         issue.loaded = true;
         context.commit("SET_ITEM", issue);

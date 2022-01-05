@@ -50,7 +50,6 @@ export default {
         );
       },
       set(value) {
-        console.log(value);
         this.advancedForm.issueEvaluationRoles = value;
       },
     },
@@ -61,7 +60,6 @@ export default {
         );
       },
       set(value) {
-        console.log(value);
         this.advancedForm.issueTemplateRoles = value;
       },
     },

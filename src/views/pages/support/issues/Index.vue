@@ -308,13 +308,10 @@ export default {
       await this.loadProcessAndIssues();
     }
 
-    console.log("CURRENT ROUTE:");
-    console.log(this.$router.currentRoute);
     if (
       this.$router.currentRoute.query &&
       Object.keys(this.$router.currentRoute.query).length > 0
     ) {
-      console.log(this.$router.currentRoute.query);
       await this.goToIssue();
     }
   },
@@ -376,7 +373,6 @@ export default {
       });
     },
     setParentPadding(offsetTop) {
-      console.log(offsetTop);
       this.clickedRowBoundingClientRect = offsetTop;
     },
     deleted(item) {
@@ -433,7 +429,6 @@ export default {
     getUniquePaths(processPaths = []) {
       if (processPaths.length < 1) return [];
       const paths = processPaths.filter((p) => this.doesProcessPathExist(p));
-      console.log(paths);
       let modified = paths.map((path, index) => ({
         id: index,
         processId: path.processId,
@@ -455,7 +450,6 @@ export default {
       return modified.filter((issuePaths) => issuePaths.pathIssues.length > 0);
     },
     isRowOpen(index) {
-      console.log(index);
       // if(index === 0){
       // 	return true;
       // }
@@ -477,7 +471,6 @@ export default {
       return `${stageId}${operationId}${phaseId}`;
     },
     issuePathDeducer(_obj) {
-      console.log(_obj);
       if (!_obj.parent) return;
       if (_obj.parent.__typename === "ProcessPhase") {
         const processId = _obj.parent.processId;

@@ -67,7 +67,6 @@ export default {
   methods: {
     togglePopOver() {
       this.item = new Idea();
-      console.log(this.item);
       this.showPopOver = !this.showPopOver;
       this.$store.dispatch("app/showOverlay", {
         show: this.showPopOver,

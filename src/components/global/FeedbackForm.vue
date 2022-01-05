@@ -187,7 +187,6 @@ export default {
   methods: {
     toggleFeedback() {
       //toggles modal
-      console.log(this.openState);
       if (this.openState) {
         this.$emit("close");
         return;

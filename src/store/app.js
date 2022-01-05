@@ -152,16 +152,12 @@ const mutations = {
 
     },
     SET_ROUTE_META(state, route) {
-      console.log("route");
-      console.log(route);
         state.route = route;
-        console.log(state)
         state.page_meta = route.meta || {
             title: process.env.VUE_APP_NAME
         };
     },
     SET_INTENTED_ROUTE(state, route) {
-      console.log(route);
         state.intented_route = route;
     },
     SHOW_OVERLAY(state, {

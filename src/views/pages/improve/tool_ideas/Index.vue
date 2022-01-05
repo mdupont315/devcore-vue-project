@@ -326,7 +326,6 @@ export default {
   },
   async mounted() {
     this.loadComponent();
-    console.log("TOOL IDEA MOUNTED!");
     await this.$store.dispatch("companyTool/findAll");
 
     if (this.process.process || this.$router.currentRoute.query.processId) {
@@ -343,8 +342,6 @@ export default {
     }
 
     EventBus.$on("process/changeCurrent", (data) => {
-      console.log("PROCESS CHANGE CURRENT!");
-      console.log(data);
       if (data.section === "toolIdeas") {
         if (!this.process.process) return;
         this.$store.dispatch("toolIdea/findByProcess", {
@@ -381,7 +378,6 @@ export default {
       });
     },
     async goToToolIdea() {
-      console.log(this.$router.currentRoute.query);
       const query = {
         processId: this.$router.currentRoute.query.processId ?? null,
         toolId: this.$router.currentRoute.query.toolId ?? null,
@@ -421,13 +417,8 @@ export default {
           phase: phasePath,
         });
 
-        console.log("_______________");
-        console.log(this.$router.currentRoute.params);
-        console.log(this.getTools);
         let tab = "New";
         if (toolId) {
-          console.log("Tool id Adopted:");
-          console.log(toolId);
           await this.setCurrentTool(toolId);
         }
 

@@ -55,7 +55,7 @@
             }}</small>
           </confirm-button>
           <improvement-feedback
-            v-if="!item.replied"
+            v-if="!item.replied && item.author"
             style="margin-left: 20px; max-height: 46px"
             :item="item"
 						:itemDescription="item.description"
@@ -189,7 +189,6 @@ export default {
       this.closePopovers();
     },
     async saveImprovementReply(input) {
-      console.log(input);
       const status = "FEEDBACK";
       const ideaissueReplyForm = new GQLForm({
         authorId: this.item.author.id,
@@ -215,7 +214,6 @@ export default {
     },
 
     async loadIdea() {
-      console.log("LOAD");
       await this.$store.dispatch("idea/findById", {
         id: this.idea.id,
         force: true,

@@ -211,7 +211,6 @@ export default {
       this.$store.dispatch("app/toggleInnerOverlay");
     },
     async saveItem(form) {
-			console.log(form);
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         await this.$validator.reset();

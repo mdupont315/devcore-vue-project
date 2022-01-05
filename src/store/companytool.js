@@ -172,8 +172,6 @@ const actions = {
   },
 
   async setCurrent(context, { section, tool }) {
-    console.log(section);
-    console.log(tool);
     context.commit("SET_CURRENT_TOOL", {
       section,
       tool

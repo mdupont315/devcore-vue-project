@@ -100,11 +100,9 @@ export default {
 
   methods: {
     closePopover() {
-			console.log("CLOSE1");
       this.$emit("close");
     },
     toggleCreateForm(item) {
-			console.log("TOGGLE");
       this.$emit("toggle", item);
     },
   },

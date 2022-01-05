@@ -105,7 +105,6 @@ module.exports = {
       });
 
     if (process.env.NODE_ENV !== "production") {
-      console.log("Development");
       config.plugin("define").tap(options => {
         if (argv.mode === "proxy") {
           options[0]["process.env"].BASE_URL = `'${appUrls.proxy}'`;
@@ -127,7 +126,6 @@ module.exports = {
         return args;
       });
       config.plugin("define").tap(options => {
-        console.log(options[0]["process.env"]);
         options[0]["process.env"].BASE_URL = `'${appUrls.prod}'`;
         return options;
       });

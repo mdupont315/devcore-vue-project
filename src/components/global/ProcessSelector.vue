@@ -645,7 +645,6 @@ export default {
       });
     },
     initEdit() {
-      console.log("initEdit");
       if (!this.editing) {
         this.$validator.pause();
         this.$validator.reset();
@@ -690,10 +689,7 @@ export default {
         });
       }
     },
-    cancelEdit() {
-      // console.log("Cancel edit!");
-      //  this.initEdit();
-    },
+
     close() {
       this.expanded = false;
       this.expandedSection = null;
@@ -734,8 +730,6 @@ export default {
         }
       }
 
-      console.log("lastProcess");
-      console.log(lastProcess);
 
       if (process) {
         this.selectedProcess = await this.$store.dispatch("process/findById", {

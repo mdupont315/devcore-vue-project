@@ -88,7 +88,7 @@
       ></author-time>
       <div class="info float-right" style="display: flex; align-items: center">
         <idea-feedback
-          v-if="!idea.replied"
+          v-if="!idea.replied && idea.author"
           style="margin-left: 20px; max-height: 46px"
           :item="idea"
           :user="idea.author"

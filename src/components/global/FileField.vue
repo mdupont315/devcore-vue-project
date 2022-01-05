@@ -65,7 +65,6 @@ export default {
 	data: () => ({
 		file: null,
 	}),
-	mounted() {},
 	methods: {
 		fileChanged(event) {
 			if (event.target.files[0]) {

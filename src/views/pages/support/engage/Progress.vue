@@ -230,8 +230,6 @@ export default {
     innerOverlayOpen() {
       if (this.isEditing) return true;
       if (this.openFormId) {
-        console.log(this.openFormId);
-        console.log("HI");
         return true;
       }
       if (this.items.length > 0) {
@@ -284,12 +282,10 @@ export default {
       this.openFormId = null;
     }, */
     closeCreateForm(previous) {
-      console.log("toggleCreate!");
 
       if (this.isEditing) {
         this.isEditing = false;
       }
-      console.log(this.openFormId);
       if (!this.openFormId && previous) {
         this.openFormId = previous.id;
       } else {

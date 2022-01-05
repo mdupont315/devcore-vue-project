@@ -17,7 +17,6 @@
 export default {
   methods: {
     toggleOverlay($event) {
-      console.log($event.target);
       const clickEmpty =
         $event.target.getAttribute("id") ==
         this.$el.firstChild.getAttribute("id");

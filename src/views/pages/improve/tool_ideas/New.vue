@@ -40,8 +40,6 @@ export default {
     "idea-card": IdeaCard,
   },
   async mounted() {
-		console.log("NEW!");
-		console.log(this.$router.currentRoute);
     if (this.$router.currentRoute.query) {
       if (this.$router.currentRoute.query.uuid) {
         const { uuid } = this.$router.currentRoute.query;

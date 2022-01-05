@@ -18,7 +18,6 @@ const getters = {
 
 const actions = {
   async update(context, form) {
-    console.log("UPDATE STORE");
     const result = await form.mutate({
       mutation: EXPERIENCE.increaseUserExperience
     });

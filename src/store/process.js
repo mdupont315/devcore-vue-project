@@ -31,8 +31,6 @@ function loadCurrent(state, section) {
   }
   state.storage[section] = state.storage[section] || {};
 
-  console.log("@loadCurrent");
-  console.log(state.storage);
 
   if (state.storage[section].processId) {
     current.process = state.all.find(
@@ -40,13 +38,10 @@ function loadCurrent(state, section) {
     );
   }
   if (!current.process && state.all.length > 0) {
-    console.log("NO CURRENT PROCESS!");
     const mostRecentSectionModified = state.storage["latestModify"];
 
-    console.log(mostRecentSectionModified);
 
     if (mostRecentSectionModified && mostRecentSectionModified.processId) {
-      console.log(mostRecentSectionModified.processId);
       current.process = state.all.find(
         p => p.id == mostRecentSectionModified.processId
       );
@@ -57,7 +52,6 @@ function loadCurrent(state, section) {
   }
 
   if (current.process && current.process.loaded) {
-    console.log("1!");
     if (state.storage[section].stageId) {
       current.stage = current.process.stages.find(
         i => i.id === state.storage[section].stageId
@@ -78,8 +72,6 @@ function loadCurrent(state, section) {
         : null;
     }
   } else {
-    console.log("2!");
-
     current.stage = null;
     current.operation = null;
     current.phase = null;
@@ -271,8 +263,6 @@ const mutations = {
     state.sectionsLoaded[value.section] = value.loaded;
   },
   SET_ITEM(state, value) {
-    console.log("state");
-    console.log(state);
     const index = state.all.findIndex(el => el.id === value.id);
     if (index > -1) {
       state.all[index] = value;
@@ -312,12 +302,6 @@ const mutations = {
     state.storage = AppStorage.get("CURRENT_PROCESS");
   },
   SET_CURRENT_PROCESS(state, { section, process, stage, operation, phase }) {
-    console.log("SETTING PROCESS!");
-    console.log(state);
-    console.log("process: ");
-    console.log(process);
-    console.log("localstorage");
-    console.log(AppStorage.get("CURRENT_PROCESS"));
     AppStorage.set(
       "CURRENT_PROCESS",
       Object.assign(AppStorage.get("CURRENT_PROCESS", {}), {

@@ -213,7 +213,6 @@ const actions = {
 
 const mutations = {
   SET_CURRENT_TAB(state, value){
-    console.log(value);
     state.currentTab = value.tab
   },
   RESET_STATE(state) {
@@ -224,7 +223,6 @@ const mutations = {
     state.all = value;
   },
   REMOVE_IMPROVE_ITEM(state, value) {
-    console.log(state);
     state.all = state.all.filter(o => o.id != value.id);
   },
   SET_ITEM(state, value) {

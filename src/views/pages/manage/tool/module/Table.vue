@@ -347,7 +347,6 @@ export default {
       this.deleting = false;
       this.$validator.pause();
       this.$validator.reset();
-      console.log("Tools/Modules/Table/Toggle Item");
       if (!item || (this.currentItem && this.currentItem.id === item.id)) {
         this.currentItem = null;
         this.updateForm = null;

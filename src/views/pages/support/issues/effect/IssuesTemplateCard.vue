@@ -77,7 +77,6 @@ export default {
         this.issue.effectedMoneyTotalValue != 0 &&
         this.input.effectTime != 0
       ) {
-        console.log(this.issue.effectedMoneyTotalValue);
         const issueLoss =
           this.input.effectTime / this.issue.effectedMoneyTotalValue;
         const percentage = issueLoss * 100;
@@ -101,8 +100,6 @@ export default {
     },
   },
   beforeDestroy() {
-    console.log("this.issue.id");
-    console.log(this.issue.effect);
     if (this.issue && this.issue.effect) {
       if (this.issue.id != this.issue.effect.issueActiveId) {
         this.$emit("destroyed");

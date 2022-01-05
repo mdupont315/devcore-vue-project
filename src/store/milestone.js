@@ -89,9 +89,7 @@ const actions = {
             filter: filter.data
           }
         });
-        console.log(query);
         const { result } = await queryToPromise(query);
-        console.log(result);
         const results = result.data.milestoneFindAll.map(cr => {
           return new Milestone().deserialize(cr);
         });
@@ -114,7 +112,6 @@ const mutations = {
     state.all = value;
   },
   REMOVE_ITEM(state, value) {
-    console.log(value);
     const index = state.all.findIndex(el => el.id === value.id);
     if (index > -1 && state.all.length > 0) {
       state.all.splice(index, 1);

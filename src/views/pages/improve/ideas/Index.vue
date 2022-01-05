@@ -352,7 +352,6 @@ export default {
           phase: phasePath,
         });
 
-        console.log(this.$router.currentRoute.params);
 
         let tab = "New";
 
@@ -427,7 +426,6 @@ export default {
       }
     },
     async loadComponent() {
-      console.log("@loadComponent_______________");
       //this.currentComponent = type;
       this.currentComponent = () =>
         import(

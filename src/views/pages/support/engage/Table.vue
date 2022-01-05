@@ -156,7 +156,6 @@ export default {
 
     async reward(row) {
       this.loadingId = row.index;
-			console.log(row.item);
       if (!row.item.rewarded) {
         this.filter.busy = true;
         const rewardForm = new GQLForm({

@@ -352,7 +352,6 @@ export default {
           value: query,
         },
       });
-      console.log(response);
       return response;
     },
     async itemChanged() {

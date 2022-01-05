@@ -26,12 +26,10 @@ export default {
     }),
   },
   async mounted() {
-    console.log(this.filter);
     this.currentFilter = this.filter;
   },
   methods: {
     async filterResults(filter) {
-      console.log(filter);
       await this.$store.dispatch("company/filter", filter);
     },
   },

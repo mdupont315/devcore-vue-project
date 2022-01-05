@@ -129,7 +129,6 @@ const actions = {
   },
 
   async completeStage(context, form) {
-    console.log(form);
     const result = await form.mutate({
       mutation: PROJECT.completeStage,
       variables: {
@@ -255,7 +254,6 @@ const mutations = {
     state.loadedProcess.push(value);
   },
   SET_ITEM(state, value) {
-    console.log(value);
     const index = state.all.findIndex(el => el.id === value.id);
     if (index > -1) {
       state.all[index] = value;

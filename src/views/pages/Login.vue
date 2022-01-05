@@ -153,7 +153,6 @@ export default {
           });
         }
       } finally {
-        console.log("UNBLOCK");
         unblockUi();
       }
     },

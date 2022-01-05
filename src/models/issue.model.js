@@ -70,10 +70,9 @@ export default class IssueModel extends BaseModel {
     if (this.timeValue !== 0) {
       let formattedCost = 0;
       if (this.author && this.author.formattedHourlyCosts) {
-        formattedCost = this.author.formattedHourlyCost;
+        formattedCost = this.author.formattedHourlyCosts;
+        total -= Math.round(formattedCost * this.timeValue);
       }
-
-      total -= Math.round(formattedCost * this.timeValue);
     }
     return total;
   }
@@ -102,43 +101,53 @@ export default class IssueModel extends BaseModel {
       }
     });
 
-    rolesAverage.map(roleUsers => {
-      if (roleUsers.length > 1) {
-        let roleId = roleUsers[0].companyRoleId;
-        let hourlyAverage = roleUsers[0].hourlyAverage;
-        hourlyAverage =
-          roleUsers.reduce((total, user) => total + user.hourlyAverage, 0) /
-          roleUsers.length;
-        roleHourlyCosts.push({ roleId, hourlyAverage });
-      }
+    const keys = [...new Set(rolesAverage.map(x => x.companyRoleId))];
+
+    keys.map(roleId => {
+      const multiples = rolesAverage.filter(x => x.companyRoleId == roleId);
+      const hourlyAverage =
+        multiples.reduce((total, user) => total + user.hourlyAverage, 0) /
+        multiples.length;
+
+      roleHourlyCosts.push({ roleId, hourlyAverage });
     });
+
     return roleHourlyCosts;
   }
 
   get effectedMoneyTotalValue() {
     let total = 0;
-    total -= this.moneyTotalValue + this.timeTotalValue;
+    if (this.moneyTotalValue) {
+      total -= this.moneyTotalValue;
+    }
+
+    if (this.timeTotalValue) {
+      total -= this.timeTotalValue;
+    }
+
     const active = this.effect;
     if (active) {
       total -= active.effectValue;
       if (active.templates && active.templates.length > 0) {
         active.templates.forEach(template => {
-          const { roleId } = template;
-          const { effectTime } = template;
+          const companyRoleId = template.companyRoleId;
+          const effectTime = template.effectTime;
 
           //money value
           total -= template.effectValue;
 
           //time value
           const hourlyByRole = this.getHourlyCostsByRole.find(
-            r => r.companyRoleId == roleId
+            r => r.roleId == companyRoleId
           );
+
           if (hourlyByRole && hourlyByRole.hourlyAverage) {
             total -= hourlyByRole.hourlyAverage * effectTime;
           }
         });
       }
     }
+
     return total;
   }
 

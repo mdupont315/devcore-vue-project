@@ -133,7 +133,6 @@ export default {
       await this.$store.dispatch("milestone/create", createForm);
 
       this.form.busy = false;
-      console.log("ITEM SAVED!");
       this.$emit("close");
     },
   },

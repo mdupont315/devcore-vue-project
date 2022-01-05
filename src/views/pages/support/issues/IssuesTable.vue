@@ -18,7 +18,6 @@
         variant="transparent text-danger"
         @confirm="() => deleteAll()"
         :showOverlay="true"
-        test="wtf"
       >
         <i class="mdi mdi-delete"></i>
         {{ $t("Delete all") }}
@@ -199,7 +198,7 @@
           >
             <!-- feedback -->
             <issues-effect-feedback
-              v-show="!row.item.replied"
+              v-show="!row.item.replied && row.item.author"
               :item="row.item"
               :user="row.item.author"
               :textPlaceholder="$t('Issue feedback')"
@@ -443,6 +442,7 @@ export default {
       }
     },
     getEffectedMoneyTotal(item) {
+			console.log(item);
       return this.$currency(item.effectedMoneyTotalValue / 100 || 0);
     },
     getEffectTitle(item) {

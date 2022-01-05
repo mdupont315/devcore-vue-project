@@ -44,23 +44,23 @@ export default {
     await loadApp();
     this.loaded = true;
   },
-  apollo: {
-    $subscribe: {
-      subscribed: {
-        query: gql`
-          subscription notificationSubscription {
-            newNotification{
-              type
-              payload
-            }
-          }
-        `,
-        result({ data }) {
-          console.log(data);
-        }
-      }
-    }
-  },
+  // apollo: {
+  //   $subscribe: {
+  //     subscribed: {
+  //       query: gql`
+  //         subscription notificationSubscription {
+  //           newNotification{
+  //             type
+  //             payload
+  //           }
+  //         }
+  //       `,
+  //       result({ data }) {
+  //         console.log(data);
+  //       }
+  //     }
+  //   }
+  // },
   methods: {
     overlayClicked($event) {
       this.$store.dispatch("app/overlayClicked", $event);

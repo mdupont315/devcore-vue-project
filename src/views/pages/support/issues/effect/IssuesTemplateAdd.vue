@@ -352,7 +352,6 @@ export default {
     }),
 
     getIssue() {
-      console.log(this.issue);
       return this.issue;
     },
     getItems() {
@@ -382,7 +381,6 @@ export default {
           const active = this.items.find(
             (x) => x.issueActiveId == this.issue.id
           );
-          console.log(active);
           if (active) {
             return [
               ...new Set(this.items.filter((x) => x.id != active.effectId)),
@@ -407,7 +405,6 @@ export default {
     isSelectionOpen: {
       handler(newVal) {
         if (!newVal) {
-          console.log("closed");
           this.$emit("selectionClosed");
         }
       },
@@ -453,10 +450,9 @@ export default {
   methods: {
 
     closeIt() {
-      console.log("HIHISADASD");
+			console.log("Close")
     },
     toggleOverlay() {
-      console.log("overlay 2");
       this.$emit("toggleOverlay");
     },
     async saveAll() {
