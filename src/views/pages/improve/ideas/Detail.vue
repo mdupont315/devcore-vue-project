@@ -1,5 +1,5 @@
 <template>
-  <div class="idea-detail">
+  <div class="idea-detail" style="width:100%">
     <b-card v-if="idea" no-body class="rounded">
       <b-card-header>
         <div style="line-height: 1em">

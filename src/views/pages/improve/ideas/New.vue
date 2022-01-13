@@ -1,21 +1,24 @@
 <template>
   <div style="padding-bottom: 400px" id="newIdeas__container">
-    <b-row v-if="currentProcessSection">
-      <b-col cols="6" class="mx-auto">
-        <div class="h4 text-white text-uppercase clearfix">
+    <b-row
+      v-if="currentProcessSection"
+      style="display: flex; flex-direction: column; align-content: center"
+    >
+      <b-col cols="12">
+        <!-- <div class="h4 text-white text-uppercase clearfix">
           <h3 class="h4 float-left" style="padding-top: 9px">
             {{ $t("New ideas") }}
             <span class="h4 text-gray-lighter">{{ newIdeas.length }}</span>
           </h3>
           &nbsp;
-        </div>
-        <idea-card
-          v-for="item in newIdeas"
-          :id="`idea-id-${item.uuid}`"
-          :ref="`idea-ref-${item.uuid}`"
-          :key="item.id"
-          :idea="item"
-        ></idea-card>
+        </div> -->
+          <idea-card
+            v-for="item in newIdeas"
+            :id="`idea-id-${item.uuid}`"
+            :ref="`idea-ref-${item.uuid}`"
+            :key="item.id"
+            :idea="item"
+          ></idea-card>
         <div v-if="newIdeas.length == 0">
           <p class="alert alert-warning">
             {{ $t("There are no records for the given criteria") }}
@@ -27,6 +30,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+
 import IdeaCard from "./Card";
 /* eslint-disable */
 
@@ -51,7 +55,13 @@ export default {
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
+      editingIdea: "idea/isEditingIdea",
     }),
+    ideaColWidth: {
+      get() {
+        return this.editingIdea;
+      },
+    },
     process: {
       get() {
         return this.currentProcess("ideas");

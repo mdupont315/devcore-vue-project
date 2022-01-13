@@ -1,12 +1,12 @@
 import { IDEA } from "@/graphql";
 import { Idea } from "@/models";
-import { IdeaIssue } from "@/models";
 import { queryToPromise } from "../lib/utils";
 import { apolloClient } from "../plugins/apollo/client";
 import EventBus from "@/lib/eventbus";
 
 const initialState = () => {
   return {
+    isEditingIdea: null,
     loading: false,
     all: [],
     filter: null,
@@ -17,6 +17,7 @@ const initialState = () => {
 const state = initialState();
 
 const getters = {
+  isEditingIdea: state => state.isEditingIdea,
   loading: state => state.loading,
   all: state => state.all,
   filter: state => state.filter,
@@ -38,6 +39,10 @@ const getters = {
 };
 
 const actions = {
+
+  async setIsEditingIdea(context, form){
+    context.commit("IS_EDITING_IDEA", form)
+  },
 
   async setTab(context, form) {
     EventBus.$emit("idea/currentTab", {
@@ -238,6 +243,9 @@ const actions = {
 };
 
 const mutations = {
+  IS_EDITING_IDEA(state, value){
+    state.isEditingIdea = value.id
+  },
   SET_CURRENT_TAB(state, value) {
     state.currentTab = value.tab;
   },
