@@ -1,13 +1,25 @@
 <template>
-  <div class="idea_editor_container">Idea Editor</div>
+  <div class="idea_editor_content">
+    <idea-editor  />
+  </div>
 </template>
 
-<script>
-export default {};
+	<script>
+	import IdeaEditor from "./parts/Index.vue"
+export default {
+  components: {
+    "idea-editor": IdeaEditor,
+  },
+};
 </script>
 
+
 <style scoped>
-.idea_editor_container {
-  background: "yellow";
+.idea_edit_content_container {
+  background: #fff;
+  width: 100%;
+  margin: 0 10px;
+  padding: 20px;
+  border-radius: 5px;
 }
 </style>

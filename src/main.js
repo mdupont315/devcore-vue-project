@@ -12,6 +12,7 @@ import ExternalLayout from "./views/layouts/ExternalLayout";
 import AppComponent from "./App.vue";
 /* import wysiwyg from 'vue-wysiwyg';
  */
+import 'remixicon/fonts/remixicon.css'
 import "@/lib/functions";
 
 import "./components/global";

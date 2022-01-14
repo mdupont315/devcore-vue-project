@@ -1,10 +1,18 @@
 <template>
-  <div class="idea_edit_content_container">IdeaEditContent</div>
+  <div class="idea_edit_content_container">
+    <idea-editor />
+  </div>
 </template>
 
 	<script>
-export default {};
+import ideaEditor from "../editor/IdeaContentEditor.vue";
+export default {
+  components: {
+    "idea-editor": ideaEditor,
+  },
+};
 </script>
+
 
 <style scoped>
 .idea_edit_content_container {
