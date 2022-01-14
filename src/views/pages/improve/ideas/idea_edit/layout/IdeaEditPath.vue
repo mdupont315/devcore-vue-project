@@ -101,15 +101,45 @@
                   }}</b-form-invalid-feedback>
                 </div>
 
-                <div class="form-label-group select required">
+                <div class="form-group">
+                  <div
+                    class="idea_edit_path_container-body-process-select-title"
+                  >
+                    INSTRUCTION TITLE
+                  </div>
+                  <b-form-input
+                    id="title"
+                    v-model.trim="form.title"
+                    v-validate="'required|min:4'"
+                    v-autofocus
+                    :disabled="form.busy"
+                    :placeholder="$t('Idea title')"
+                    type="text"
+                    name="title"
+                    autocomplete="off"
+                    autofocus
+                    :state="$validateState('title', form)"
+                  ></b-form-input>
+                  <label for="title">{{ $t("Idea title") }}</label>
+                  <b-form-invalid-feedback>{{
+                    $displayError("title", form)
+                  }}</b-form-invalid-feedback>
+                </div>
+                <div class="form-group">
+                  <div
+                    class="idea_edit_path_container-body-process-select-title"
+                  >
+                    INSTRUCTION DESCRIPTION
+                  </div>
                   <b-form-textarea
                     id="description"
                     v-model="form.description"
                     v-autoresize
                     v-validate="''"
+										no-resize
                     :disabled="form.busy"
                     :placeholder="$t('Idea description')"
-                    style="max-height: 150px"
+                    style="min-height: 50px;max-height:180px"
                     name="description"
                     :state="$validateState('description', form)"
                   ></b-form-textarea>
@@ -120,6 +150,34 @@
                 </div>
               </div>
             </b-card-body>
+            <b-card-footer>
+              <b-row>
+                <b-col>
+                  <loading-button
+                    :disabled="vErrors.any() || form.busy"
+                    :loading="form.busy"
+                    size="lg"
+                    block
+                    type="submit"
+                    >{{ $t("Save changes") }}</loading-button
+                  ></b-col
+                >
+                <b-col>
+                  <confirm-button
+                    variant="outline-danger"
+                    size="lg"
+                    class="pl-2"
+                    :confirm-title="$t('Delete') + ' ' + form.title + '?'"
+                    :confirmPlacement="'top'"
+                    :confirm-message="$t('This action cannot be undone!')"
+                    :btnStyle="'background:#fff;height:41px;width:100%;color:#cc454b;padding:0'"
+                    @confirm="deleteItem"
+                  >
+                    <div class="ideaEditPath-remove-idea-button">{{ $t("Remove") }}</div>
+                  </confirm-button>
+                </b-col>
+              </b-row>
+            </b-card-footer>
           </b-card>
         </b-form>
       </div>
@@ -179,10 +237,12 @@ export default {
       operationId: null,
       phaseId: null,
       description: null,
+      title: null,
     }),
   }),
 
   methods: {
+    async deleteItem(item) {},
     changeStage() {
       this.form.operationId = null;
       this.form.phaseId = null;
@@ -201,9 +261,11 @@ export default {
 .idea_edit_path_container {
   background: #fff;
   width: 100%;
+  height: 100%;
   margin: 0 10px;
   border-radius: 5px;
 }
+
 .idea_edit_path_container-header {
   display: flex;
   justify-content: space-between;
@@ -216,5 +278,20 @@ export default {
   list-style-type: none;
   padding: 20px;
   height: calc(100% - 60px);
+}
+
+.idea_edit_path_container-body-process-select-title {
+  padding: 10px 0;
+}
+</style>
+
+<style>
+.ideaEditPath-remove-idea-button:hover {
+  height: 100%;
+  place-items: center;
+  display: flex;
+  place-content: center;
+	background:#cc454b;
+	color:#fff;
 }
 </style>
