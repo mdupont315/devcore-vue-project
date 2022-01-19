@@ -6,7 +6,7 @@ import EventBus from "@/lib/eventbus";
 
 const initialState = () => {
   return {
-    isEditingIdea: null,
+    isEditingIdea: [],
     loading: false,
     all: [],
     filter: null,
@@ -17,7 +17,8 @@ const initialState = () => {
 const state = initialState();
 
 const getters = {
-  isEditingIdea: state => state.isEditingIdea,
+  isEditingIdea: state => ideaId =>
+    state.isEditingIdea.findIndex(x => x.id == ideaId) >= 0,
   loading: state => state.loading,
   all: state => state.all,
   filter: state => state.filter,
@@ -39,9 +40,9 @@ const getters = {
 };
 
 const actions = {
-
-  async setIsEditingIdea(context, form){
-    context.commit("IS_EDITING_IDEA", form)
+  async setIsEditingIdea(context, form) {
+    console.log(form);
+    context.commit("IS_EDITING_IDEA", form);
   },
 
   async setTab(context, form) {
@@ -138,7 +139,9 @@ const actions = {
         improvementId: form.improvementId
       }
     });
-    const idea = new Idea().deserialize(result.data.ideaImprovementCloseFeedback);
+    const idea = new Idea().deserialize(
+      result.data.ideaImprovementCloseFeedback
+    );
     context.commit("SET_ITEM", idea);
 
     return result.data.ideaImprovementCloseFeedback;
@@ -243,8 +246,17 @@ const actions = {
 };
 
 const mutations = {
-  IS_EDITING_IDEA(state, value){
-    state.isEditingIdea = value.id
+  IS_EDITING_IDEA(state, value) {
+    console.log(state.isEditingIdea);
+    if (value) {
+      if (value.id) {
+        state.isEditingIdea.push(value);
+      } else {
+        state.isEditingIdea = [
+          ...state.isEditingIdea.filter(x => x.userId !== value.userId)
+        ];
+      }
+    }
   },
   SET_CURRENT_TAB(state, value) {
     state.currentTab = value.tab;

@@ -105,7 +105,6 @@
 
 <script>
 import icoIssueFeedback from "@/assets/img/icons/svg/ico-issue-feedback.svg?inline";
-import { /* mapState, */ mapGetters } from "vuex";
 
 export default {
   components: { icoIssueFeedback },

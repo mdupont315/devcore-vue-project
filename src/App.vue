@@ -17,7 +17,6 @@
 import { mapGetters } from "vuex";
 import { loadApp } from "@/lib/utils";
 import UpdateFound from "./components/UpdateFound";
-import gql from "graphql-tag";
 
 const defaultLayout = "default-layout";
 export default {

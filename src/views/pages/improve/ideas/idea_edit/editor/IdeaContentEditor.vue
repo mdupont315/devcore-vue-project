@@ -1,11 +1,11 @@
 <template>
   <div class="idea_editor_content">
-    <idea-editor  />
+    <idea-editor />
   </div>
 </template>
 
 	<script>
-	import IdeaEditor from "./parts/Index.vue"
+import IdeaEditor from "./parts/Index.vue";
 export default {
   components: {
     "idea-editor": IdeaEditor,
@@ -21,5 +21,6 @@ export default {
   margin: 0 10px;
   padding: 20px;
   border-radius: 5px;
+	height: 100%;
 }
 </style>

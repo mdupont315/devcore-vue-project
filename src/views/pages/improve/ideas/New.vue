@@ -12,13 +12,16 @@
           </h3>
           &nbsp;
         </div> -->
-          <idea-card
-            v-for="item in newIdeas"
-            :id="`idea-id-${item.uuid}`"
-            :ref="`idea-ref-${item.uuid}`"
-            :key="item.id"
-            :idea="item"
-          ></idea-card>
+        <idea-card
+          v-for="item in newIdeas"
+          :class="
+            isEditingIdea(item) ? 'idea_card_expanded' : 'idea_card_shrunk'
+          "
+          :id="`idea-id-${item.uuid}`"
+          :ref="`idea-ref-${item.uuid}`"
+          :key="item.id"
+          :idea="item"
+        ></idea-card>
         <div v-if="newIdeas.length == 0">
           <p class="alert alert-warning">
             {{ $t("There are no records for the given criteria") }}
@@ -57,11 +60,11 @@ export default {
       currentProcess: "process/current",
       editingIdea: "idea/isEditingIdea",
     }),
-    ideaColWidth: {
-      get() {
-        return this.editingIdea;
-      },
-    },
+    // ideaColWidth: {
+    //   get() {
+    //     return this.editingIdea;
+    //   },
+    // },
     process: {
       get() {
         return this.currentProcess("ideas");
@@ -109,6 +112,13 @@ export default {
   },
 
   methods: {
+    isEditingIdea(idea) {
+      let ret = false;
+      if (idea && idea.id) {
+        ret = this.editingIdea(idea.id);
+      }
+      return ret;
+    },
     filterByProcessSection(item, status) {
       switch (this.currentProcessSectionName) {
         case "process":
@@ -129,3 +139,15 @@ export default {
   },
 };
 </script>
+
+<style>
+.idea_card_shrunk {
+  width: 50%;
+  margin: auto;
+}
+
+.idea_card_expanded {
+  width: 100%;
+  margin: 20px;
+}
+</style>

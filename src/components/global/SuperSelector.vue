@@ -1,6 +1,6 @@
 <template>
   <div
-    v-click-outside="ousideClicked"
+    v-click-outside="outsideClicked"
     class="super-select"
     :class="{
       expanded: expanded,
@@ -532,7 +532,7 @@ export default {
       });
       this.$emit("input", this.dataValue, event);
     },
-    ousideClicked() {
+    outsideClicked() {
       if (this.outsideClose & this.expanded) {
         this.close();
       }

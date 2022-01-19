@@ -17,6 +17,7 @@ export default {
 <style scoped>
 .idea_edit_content_container {
   background: #fff;
+	max-width:50%;
   width: 100%;
   margin: 0 10px;
   padding: 20px;

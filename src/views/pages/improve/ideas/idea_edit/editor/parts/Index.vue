@@ -28,6 +28,13 @@ import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import Highlight from "@tiptap/extension-highlight";
 import CharacterCount from "@tiptap/extension-character-count";
+import Underline from "@tiptap/extension-underline";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import { Indent } from "../extensions/indent.js";
+
 import * as Y from "yjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import MenuBar from "./MenuBar.vue";
@@ -71,10 +78,20 @@ export default {
     //   document: ydoc,
     // })
 
+    // this.provider = new HocuspocusProvider({
+    //   url: "ws://127.0.0.1/1234",
+    //   name: "example-document",
+    //   document: ydoc,
+    // });
+
     this.provider = new HocuspocusProvider({
-      url: "ws://127.0.0.1/1234",
-      name: "example-document",
       document: ydoc,
+      url: "ws://127.0.0.1:1234",
+      name: "collaboration/1",
+      onAwarenessUpdate: ({ states }) => {
+        this.currentStates = states;
+      },
+      broadcast: false,
     });
 
     this.provider.on("status", (event) => {
@@ -86,7 +103,19 @@ export default {
         StarterKit.configure({
           history: false,
         }),
+        Indent.configure({
+          types: ["listItem", "paragraph"],
+          minLevel: 0,
+          maxLevel: 8,
+        }),
         Highlight,
+        Underline,
+				Table.configure({
+          resizable: true,
+        }),
+        TableRow,
+        TableHeader,
+        TableCell,
         Collaboration.configure({
           document: ydoc,
         }),
@@ -179,6 +208,7 @@ export default {
   color: #0d0d0d;
   background-color: #fff;
   border-radius: 0.75rem;
+  min-height: 100%;
 
   &__header {
     display: flex;
@@ -257,6 +287,62 @@ export default {
 </style>
 
 <style lang="scss">
+
+/* Table */
+.ProseMirror {
+  table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+
+    td,
+    th {
+      min-width: 1em;
+      border: 2px solid #ced4da;
+      padding: 3px 5px;
+      vertical-align: top;
+      box-sizing: border-box;
+      position: relative;
+
+      > * {
+        margin-bottom: 0;
+      }
+    }
+
+    th {
+      font-weight: bold;
+      text-align: left;
+      background-color: #f1f3f5;
+    }
+
+    .selectedCell:after {
+      z-index: 2;
+      position: absolute;
+      content: "";
+      left: 0; right: 0; top: 0; bottom: 0;
+      background: rgba(200, 200, 255, 0.4);
+      pointer-events: none;
+    }
+
+    .column-resize-handle {
+      position: absolute;
+      right: -2px;
+      top: 0;
+      bottom: -2px;
+      width: 4px;
+      background-color: #adf;
+      pointer-events: none;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+
 /* Give a remote user a caret */
 .collaboration-cursor__caret {
   position: relative;
@@ -283,6 +369,11 @@ export default {
 }
 
 /* Basic editor styles */
+.ProseMirror {
+  outline: none;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
 .ProseMirror {
   > * + * {
     margin-top: 0.75em;

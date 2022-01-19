@@ -148,6 +148,7 @@
       <idea-edit
         v-if="showDetail"
         @close="closeEdit"
+				:idea="idea"
         :ref="`ideaEdit-${idea.id}`"
       ></idea-edit>
 
@@ -214,7 +215,8 @@ export default {
       get() {
         let openState = false;
         if (this.idea && this.idea.id) {
-          openState = this.editingIdea == this.idea.id;
+						console.log(this.editingIdea(this.idea.id));
+          openState = this.editingIdea(this.idea.id);
         }
         return openState;
       },
@@ -254,14 +256,16 @@ export default {
   },
 
   methods: {
-    async closeEdit() {
+    async closeEdit(idea = this.idea) {
       await this.$store.dispatch("idea/setIsEditingIdea", {
         id: null,
+				userId: this.user.id
       });
     },
     async openIdeaEdit(idea) {
       await this.$store.dispatch("idea/setIsEditingIdea", {
         id: idea.id,
+				userId: this.user.id
       });
     },
     async closeIdeaForFeedback() {

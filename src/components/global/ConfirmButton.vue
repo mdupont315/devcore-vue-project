@@ -1,5 +1,5 @@
 <template>
-  <div class="confirm-button-wrapper" v-click-outside="ousideClicked">
+  <div class="confirm-button-wrapper" v-click-outside="outsideClicked">
     <div
       v-if="showConfirmMessage && showOverlay"
       class="overlay"
@@ -119,7 +119,7 @@ export default {
     showConfirmMessage: false,
   }),
   methods: {
-    ousideClicked() {
+    outsideClicked() {
       if (!this.showOverlay && this.isSelected) {
         this.showConfirmMessage = false;
       }
