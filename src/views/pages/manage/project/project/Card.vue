@@ -229,6 +229,7 @@ export default {
       await this.loadDetails();
     },
     initEdit() {
+			console.log(this.editItem);
       this.editItem = {
         id: this.item.id,
         ideaIds: [...new Set(this.item.ideas.map((i) => i.ideaId))],

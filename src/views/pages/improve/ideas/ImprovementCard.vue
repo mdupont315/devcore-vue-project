@@ -149,13 +149,13 @@
 </template>
 <script>
 import { Idea } from "@/models";
-import IdeaFrom from "./Form";
+import IdeaForm from "./Form";
 import feedbackForm from "../../../../components/global/FeedbackForm.vue";
 import GQLForm from "@/lib/gqlform";
 
 export default {
   components: {
-    "idea-form": IdeaFrom,
+    "idea-form": IdeaForm,
     "improvement-feedback": feedbackForm,
     /*     issuesEffectFeedback, */
   },

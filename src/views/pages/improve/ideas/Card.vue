@@ -101,11 +101,7 @@
           @close="closeIdeaForFeedback"
           :openState="showPopOverFeedback"
         >
-          <small
-            class="d-block text-gray"
-            style="line-height: 1em; align-self: center"
-            >{{ $t("Feedback") }}</small
-          >
+
         </idea-feedback>
 
         <span v-if="idea.evaluationsCount > 0" class="font-15x ml-2">
