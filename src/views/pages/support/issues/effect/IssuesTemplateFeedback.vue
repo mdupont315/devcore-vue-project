@@ -54,9 +54,7 @@
             style="width: 100px; align-self: center; padding: 5px"
             :loading="isLoading"
             @click="saveIssueFeedback"
-            ><span v-if="!isLoading"
-              >{{ $t("Feedback") }}
-            </span></loading-button
+            ></loading-button
           >
         </div>
       </b-card></b-popover

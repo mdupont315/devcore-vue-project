@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height:100%">
     <div class="feedback__container" v-if="$can('core/ideaIssueReply/manage')">
       <b-popover
         ref="popover"
@@ -217,6 +217,7 @@ export default {
 
 <style scoped>
 .feedback__container {
+	height:100%;
   flex-direction: column;
   display: flex;
 }
@@ -299,7 +300,7 @@ export default {
   fill: #000;
   outline: none;
   width: 40px;
-  height: 40px;
+  height: 37px;
 }
 
 .feedbackIcon > path {

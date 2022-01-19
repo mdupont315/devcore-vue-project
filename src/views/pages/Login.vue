@@ -22,7 +22,7 @@
             <div class="form-label-group required">
               <b-form-input
                 id="username"
-                v-model="form.username"
+                v-model.trim="form.username"
                 v-validate="'required|email'"
                 type="text"
                 :disabled="form.busy"
