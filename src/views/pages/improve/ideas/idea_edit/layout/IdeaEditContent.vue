@@ -150,10 +150,12 @@ export default {
   height: 60px;
   padding: 20px;
   font-size: 20px;
+
 }
 .idea_edit_content_container {
   background: #fff;
-  flex-grow: 10;
+  flex-grow: 3;
   border-radius: 5px;
+	width:75%
 }
 </style>

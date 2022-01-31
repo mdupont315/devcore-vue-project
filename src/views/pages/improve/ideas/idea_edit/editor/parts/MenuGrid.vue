@@ -14,7 +14,7 @@
     <b-popover
       :show="selectionOpen"
       class="menu-grid-items"
-      triggers="click blur"
+      triggers="click"
       boundary="window"
       :target="() => $refs.menuListButtonHeading"
       placement="bottom"
@@ -70,13 +70,14 @@ export default {
       // if (this.isTableActive()) {
       console.log(this.isTableActive());
       listItem.action();
+      // if (!this.selectionOpen) {
+      //   this.$emit("close");
+      // }
       //  }
     },
     toggleSelection() {
+      console.log("HLELL");
       this.selectionOpen = !this.selectionOpen;
-      if (!this.selectionOpen) {
-        this.$emit("close");
-      }
     },
   },
   data() {

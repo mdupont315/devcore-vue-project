@@ -63,7 +63,6 @@ export default {
   components: {
     "idea-form": Form,
   },
-  mounted() {},
   methods: {
     togglePopOver() {
       this.item = new Idea();

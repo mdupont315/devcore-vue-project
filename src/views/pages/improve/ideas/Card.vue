@@ -146,20 +146,6 @@
         :idea="idea"
         :ref="`ideaEdit-${idea.id}`"
       ></idea-edit>
-
-      <!-- <b-modal
-        v-model="showDetail"
-        :title="idea.title"
-        size="lg modal-idea-card col-6"
-        hide-footer
-      > -->
-      <!-- <idea-detail
-          v-if="showDetail"
-          ref="detail"
-          :idea="idea"
-          @closed="toggleIdea"
-        ></idea-detail> -->
-      <!-- </b-modal> -->
     </b-row>
   </b-card>
 </template>

@@ -122,6 +122,9 @@ export default {
           Highlight,
           Underline,
           Table.configure({
+            HTMLAttributes: {
+              class: 'idea-editor-custom-table',
+            },
             resizable: true,
           }),
           TableRow,
@@ -434,5 +437,8 @@ export default {
       }
     }
   }
+}
+.idea-editor-custom-table{
+	width:100%
 }
 </style>

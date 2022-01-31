@@ -335,6 +335,7 @@ export default {
   margin-left: 15px;
   border-radius: 5px;
   flex-grow: 1;
+	width: 25%;
 }
 
 .idea_edit_path_container-header {

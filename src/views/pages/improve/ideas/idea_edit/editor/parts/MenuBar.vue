@@ -7,12 +7,7 @@
         :key="`divider${index}`"
       />
       <menu-list v-else-if="item.type === 'list'" :key="index" :item="item" />
-      <menu-grid
-        v-else-if="item.type === 'grid'"
-        @close="focusEditor()"
-        :key="index"
-        :item="item"
-      />
+      <menu-grid v-else-if="item.type === 'grid'" :key="index" :item="item" />
       <menu-item v-else :key="index" v-bind="item" />
     </template>
   </div>
@@ -36,12 +31,6 @@ export default {
       required: true,
     },
   },
-  methods: {
-    focusEditor() {
-      this.editor.focus();
-    },
-  },
-
   data() {
     return {
       items: [
