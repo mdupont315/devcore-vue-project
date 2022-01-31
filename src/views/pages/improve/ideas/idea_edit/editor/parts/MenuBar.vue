@@ -7,7 +7,12 @@
         :key="`divider${index}`"
       />
       <menu-list v-else-if="item.type === 'list'" :key="index" :item="item" />
-      <menu-grid v-else-if="item.type === 'grid'" :key="index" :item="item" />
+      <menu-grid
+        v-else-if="item.type === 'grid'"
+        @close="focusEditor()"
+        :key="index"
+        :item="item"
+      />
       <menu-item v-else :key="index" v-bind="item" />
     </template>
   </div>
@@ -29,6 +34,11 @@ export default {
     editor: {
       type: Object,
       required: true,
+    },
+  },
+  methods: {
+    focusEditor() {
+      this.editor.focus();
     },
   },
 
@@ -205,34 +215,20 @@ export default {
             {
               icon: "checkbox-blank-line",
               title: "table-clear",
-              action: () =>
-                this.editor
-                  .chain()
-                  .focus()
-                  .deleteTable()
-                  .run(),
+              action: () => this.editor.chain().focus().deleteTable().run(),
               isActive: () => this.editor.isActive("table-clear"),
             },
-						 {
+            {
               icon: "merge-cells-vertical",
               title: "table-merge",
-              action: () =>
-                this.editor
-                  .chain()
-                  .focus()
-                  .mergeOrSplit()
-                  .run(),
+              action: () => this.editor.chain().focus().mergeOrSplit().run(),
               isActive: () => this.editor.isActive("table-merge"),
             },
-						 {
+            {
               icon: "heading",
               title: "table-header-cell",
               action: () =>
-                this.editor
-                  .chain()
-                  .focus()
-                  .toggleHeaderCell()
-                  .run(),
+                this.editor.chain().focus().toggleHeaderCell().run(),
               isActive: () => this.editor.isActive("table-header-cell"),
             },
             {
@@ -247,7 +243,7 @@ export default {
               action: () => this.editor.chain().focus().addColumnAfter().run(),
               isActive: () => this.editor.isActive("insert-column-right"),
             },
-						  {
+            {
               icon: "delete-column",
               title: "delete-column",
               action: () => this.editor.chain().focus().deleteColumn().run(),

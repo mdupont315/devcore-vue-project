@@ -1,5 +1,5 @@
 <template>
-  <div class="menu-list">
+  <div>
     <button
       class="menu-list"
       :class="{ 'is-active': selectionOpen }"
@@ -64,8 +64,8 @@ export default {
       if (this.activeHeadingIndex !== index) {
         this.activeHeadingIndex = index;
       } else {
-				this.activeHeadingIndex = null;
-			}
+        this.activeHeadingIndex = null;
+      }
     },
     toggleSelection() {
       this.selectionOpen = !this.selectionOpen;
@@ -131,15 +131,17 @@ export default {
 }
 
 .menu-list {
+  height: 100%;
   width: 1.75rem;
   height: 1.75rem;
+	display: flex;
   z-index: 1;
   color: #0d0d0d;
   border: none;
   background-color: transparent;
   border-radius: 0.4rem;
   padding: 0.25rem;
-  margin-right: 0.25rem;
+  margin-right: 0.5rem;
 
   svg {
     width: 100%;

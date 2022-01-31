@@ -1,5 +1,5 @@
 <template>
-  <div class="menu-grid">
+  <div>
     <button
       class="menu-grid"
       :class="{ 'is-active': selectionOpen }"
@@ -25,7 +25,9 @@
             <b-col
               v-for="(listItem, index) in item.listItems"
               :key="index"
-              :class="`menu-grid-item menu-grid-item-${listItem.title}`"
+              :class="`menu-grid-item menu-grid-item-${
+                listItem.title
+              } ${isTableActive()}`"
               @click="invokeGridItemAction(listItem, index)"
             >
               <svg class="remix">
@@ -61,21 +63,22 @@ export default {
   },
   methods: {
     isTableActive() {
-			console.log(this.item.listItems);
       const table = this.item.listItems.find((t) => t.title == "table");
-      return table.isActive();
+      return table.isActive() ? "table-active" : "table-not-active";
     },
     invokeGridItemAction(listItem, index) {
       // if (this.isTableActive()) {
-        console.log(this.isTableActive());
-        listItem.action();
-    //  }
+      console.log(this.isTableActive());
+      listItem.action();
+      //  }
     },
     toggleSelection() {
       this.selectionOpen = !this.selectionOpen;
+      if (!this.selectionOpen) {
+        this.$emit("close");
+      }
     },
   },
-
   data() {
     return {
       selectionOpen: false,
@@ -89,10 +92,6 @@ export default {
 .remix {
   width: 20px;
   height: 20px;
-}
-
-.menu-grid-item.menu-grid-item-table{
-	background: #fff;
 }
 
 .menu-grid-item:hover {
@@ -109,14 +108,22 @@ export default {
 }
 .menu-grid-item {
   padding: 5px 10px;
-  background: lightgray;
+  background: #fff;
   width: 100%;
   cursor: pointer;
+  &.table-not-active:not(.menu-grid-item-table) {
+    background: lightgray;
+    cursor: not-allowed;
+  }
+  &.table-active:not(.menu-grid-item-table) {
+    background: #fff;
+  }
 }
 
 .menu-grid {
   width: 1.75rem;
   height: 1.75rem;
+  display: flex;
   z-index: 1;
   color: #0d0d0d;
   border: none;

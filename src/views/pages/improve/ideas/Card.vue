@@ -5,11 +5,6 @@
     class="mb-3 idea-card"
     :class="showDetail ? 'idea-card-expanded' : 'idea-card-shrunk'"
   >
-    <!-- <inner-overlay
-      v-if="showPopOverFeedback"
-      style="z-index: 1"
-      @click="closePopovers"
-    ></inner-overlay> -->
     <b-col cols="12">
       <div v-if="!showDetail" class="idea_card_container">
         <b-card-header class="bg-white border-0">
@@ -144,11 +139,11 @@
         </b-card-footer>
       </div>
     </b-col>
-    <b-row>
+    <b-row style="max-width: 100%">
       <idea-edit
         v-if="showDetail"
         @close="closeEdit"
-				:idea="idea"
+        :idea="idea"
         :ref="`ideaEdit-${idea.id}`"
       ></idea-edit>
 
@@ -215,7 +210,7 @@ export default {
       get() {
         let openState = false;
         if (this.idea && this.idea.id) {
-						console.log(this.editingIdea(this.idea.id));
+          console.log(this.editingIdea(this.idea.id));
           openState = this.editingIdea(this.idea.id);
         }
         return openState;
@@ -254,19 +249,25 @@ export default {
       },
     },
   },
-
+  async beforeDestroy() {
+    await this.closeEdit(this.idea);
+  },
   methods: {
     async closeEdit(idea = this.idea) {
       await this.$store.dispatch("idea/setIsEditingIdea", {
         id: null,
-				userId: this.user.id
+        userId: this.user.id,
+        uuid: null,
       });
+      this.$emit("closeIdea", idea);
     },
     async openIdeaEdit(idea) {
       await this.$store.dispatch("idea/setIsEditingIdea", {
         id: idea.id,
-				userId: this.user.id
+        userId: this.user.id,
+        uuid: idea.uuid,
       });
+      this.$emit("openIdea", idea);
     },
     async closeIdeaForFeedback() {
       const ideaCloseForm = new GQLForm({
@@ -283,7 +284,6 @@ export default {
     },
     async saveIdeaReply(input) {
       const status = "FEEDBACK";
-
       const ideaReplyForm = new GQLForm({
         authorId: this.user.id,
         typeAuthorId: input.typeAuthorId,

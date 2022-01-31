@@ -348,6 +348,7 @@ export default {
       Object.keys(this.input || {})
         .filter((key) => key in this.form)
         .forEach((key) => (this.form[key] = this.input[key]));
+
       this.form.type = this.input.type;
       this.form.stageId = this.input.stageId;
       this.form.operationId = this.input.operationId;

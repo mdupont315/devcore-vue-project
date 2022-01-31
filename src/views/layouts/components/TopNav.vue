@@ -19,7 +19,7 @@
     </b-navbar-nav>
 
     <b-navbar-nav class="d-none d-md-flex flex-grow-1 align-items-end flex-column maxw-30">
-      <component :is="page.topCentral" v-if="page.topCentral"></component>
+      <component :is="page.topCentral" v-if="page.topCentral" class="hide-on-small-screen"></component>
       <portal-target name="topbar-central"></portal-target>
       <h5 v-if="$can('core/company/manage')">{{ $t('Super Admininstrator Panel') }}</h5>
     </b-navbar-nav>
@@ -177,5 +177,15 @@ export default {
 
 .top-nav{
 	height: 100%;
+}
+@media only screen and (max-width: 800px) {
+  .hide-on-small-screen {
+    visibility: none;
+  }
+}
+@media only screen and (min-width: 800px) {
+  .hide-on-small-screen {
+    visibility: none;
+  }
 }
 </style>

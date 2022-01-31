@@ -91,7 +91,7 @@ export const Indent = Extension.create({
   name: "indent",
 
   defaultOptions: {
-    types: ["heading", "paragraph"],
+    types: ["heading", "paragraph", "heading1"],
     indentLevels: [0, 30, 60, 90, 120, 150, 180, 210],
     defaultIndentLevel: 0
   },
@@ -179,16 +179,16 @@ export const Indent = Extension.create({
           return this.editor.commands.outdent();
         }
       },
-      Backspace: () => {
-        if (
-          !(
-            this.editor.isActive("bulletList") ||
-            this.editor.isActive("orderedList")
-          )
-        ) {
-          return this.editor.commands.outdent();
-        }
-      }
+      // Backspace: () => {
+      //   if (
+      //     !(
+      //       this.editor.isActive("bulletList") ||
+      //       this.editor.isActive("orderedList")
+      //     )
+      //   ) {
+      //     return this.editor.commands.outdent();
+      //   }
+      // }
     };
   }
 });

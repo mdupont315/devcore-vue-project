@@ -19,6 +19,7 @@ const state = initialState();
 const getters = {
   isEditingIdea: state => ideaId =>
     state.isEditingIdea.findIndex(x => x.id == ideaId) >= 0,
+  ideasInEdit: state => state.isEditingIdea,
   loading: state => state.loading,
   all: state => state.all,
   filter: state => state.filter,
@@ -55,16 +56,8 @@ const actions = {
     form.type = "PROCESS";
     const result = await form.mutate({
       mutation: IDEA.create
-      /* update(cache, result) {
-                const { ideaFindAll } = cache.readQuery({ query: IDEA.findAll });
-                cache.writeQuery({
-                    query: IDEA.findAll,
-                    data: { ideaFindAll: ideaFindAll.concat([result.data.ideaCreate]) },
-                });
-            } */
     });
     const role = new Idea().deserialize(result.data.ideaCreate);
-    // await context.dispatch('findAll', { force: true });
     return role;
   },
 
@@ -82,16 +75,25 @@ const actions = {
   },
 
   async changeStatus(context, form) {
-    const result = await form.mutate({
-      mutation: IDEA.changeStatus,
-      variables: {
-        id: form.id,
-        status: form.status
-      }
-    });
-    const role = new Idea().deserialize(result.data.ideaChangeStatus);
-    // context.dispatch('findAll', { force: true });
-    return role;
+    let ret = null;
+    try {
+      form.busy = true;
+      const result = await form.mutate({
+        mutation: IDEA.changeStatus,
+        variables: {
+          id: form.id,
+          status: form.status
+        }
+      });
+      ret = new Idea().deserialize(result.data.ideaChangeStatus);
+      // context.dispatch('findAll', { force: true });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      form.busy = false;
+    }
+
+    return ret;
   },
 
   async delete(context, form) {

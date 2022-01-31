@@ -1,29 +1,28 @@
 <template>
-  <div style="padding-bottom: 400px" id="newIdeas__container">
-    <b-row
-      v-if="currentProcessSection"
-      style="display: flex; flex-direction: column; align-content: center"
-    >
+  <div style="padding-bottom: 100px" id="newIdeas__container">
+    <b-row v-if="currentProcessSection" class="newIdeas__container">
       <b-col cols="12">
-        <!-- <div class="h4 text-white text-uppercase clearfix">
-          <h3 class="h4 float-left" style="padding-top: 9px">
+        <div class="h4 text-white text-uppercase clearfix newIdeas-idea-count">
+          <h3 class="h4 newIdeas-idea-count-text" style="padding-top: 9px">
             {{ $t("New ideas") }}
             <span class="h4 text-gray-lighter">{{ newIdeas.length }}</span>
           </h3>
           &nbsp;
-        </div> -->
+        </div>
         <idea-card
           v-for="item in newIdeas"
           :class="
-            isEditingIdea(item) ? 'idea_card_expanded' : 'idea_card_shrunk'
+            isEditingIdea(item)
+              ? 'new-idea_card_expanded'
+              : 'new-idea_card_shrunk'
           "
           :id="`idea-id-${item.uuid}`"
           :ref="`idea-ref-${item.uuid}`"
           :key="item.id"
           :idea="item"
         ></idea-card>
-        <div v-if="newIdeas.length == 0">
-          <p class="alert alert-warning">
+        <div v-if="newIdeas.length === 0">
+          <p class="alert alert-warning newIdeas-empty">
             {{ $t("There are no records for the given criteria") }}
           </p>
         </div>
@@ -60,11 +59,6 @@ export default {
       currentProcess: "process/current",
       editingIdea: "idea/isEditingIdea",
     }),
-    // ideaColWidth: {
-    //   get() {
-    //     return this.editingIdea;
-    //   },
-    // },
     process: {
       get() {
         return this.currentProcess("ideas");
@@ -140,14 +134,32 @@ export default {
 };
 </script>
 
-<style>
-.idea_card_shrunk {
+<style lang="scss">
+.new-idea_card_shrunk {
   width: 50%;
   margin: auto;
 }
 
-.idea_card_expanded {
+.new-idea_card_expanded {
   width: 100%;
-  margin: 20px;
+  margin: 0 20px 20px 20px;
+}
+
+.newIdeas-idea-count {
+  width: 50%;
+  margin: auto;
+  & > .newIdeas-idea-count-text {
+    padding-top: 9px;
+  }
+}
+
+.newIdeas__container {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+}
+.newIdeas-empty {
+  margin: auto;
+  max-width: 50%;
 }
 </style>

@@ -100,7 +100,6 @@
                     $displayError("operation_id", form)
                   }}</b-form-invalid-feedback>
                 </div>
-
                 <div class="form-group">
                   <div
                     class="idea_edit_path_container-body-process-select-title"
@@ -136,10 +135,10 @@
                     v-model="form.description"
                     v-autoresize
                     v-validate="''"
-										no-resize
+                    no-resize
                     :disabled="form.busy"
                     :placeholder="$t('Idea description')"
-                    style="min-height: 50px;max-height:180px"
+                    style="min-height: 50px; max-height: 180px"
                     name="description"
                     :state="$validateState('description', form)"
                   ></b-form-textarea>
@@ -152,6 +151,30 @@
             </b-card-body>
             <b-card-footer>
               <b-row>
+                  <loading-button
+                    v-if="
+                      idea.status === 'NEW' &&
+                      $can('improve/idea/change_status', idea)
+                    "
+                    variant="primary"
+                    size="lg"
+                    :loading="form.busy || loading"
+                    style="width: 120px !important"
+                    @click="updateStatus"
+                    >{{ $t("Test") }}</loading-button
+                  >
+                  <loading-button
+                    v-if="
+                      idea.status === 'TESTING' &&
+                      $can('improve/idea/change_status', idea)
+                    "
+                    variant="primary"
+                    size="lg"
+                    :loading="form.busy || loading"
+                    style="width: 120px !important"
+                    @click="updateStatus"
+                    >{{ $t("Adopt") }}</loading-button
+                  >
                 <b-col>
                   <loading-button
                     :disabled="vErrors.any() || form.busy"
@@ -173,7 +196,9 @@
                     :btnStyle="'background:#fff;height:41px;width:100%;color:#cc454b;padding:0'"
                     @confirm="deleteItem"
                   >
-                    <div class="ideaEditPath-remove-idea-button">{{ $t("Remove") }}</div>
+                    <div class="ideaEditPath-remove-idea-button">
+                      {{ $t("Remove") }}
+                    </div>
                   </confirm-button>
                 </b-col>
               </b-row>
@@ -189,6 +214,12 @@
 import { mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
 export default {
+  props: {
+    idea: {
+      type: Object,
+      required: false,
+    },
+  },
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
@@ -228,8 +259,18 @@ export default {
       },
     },
   },
+  async mounted() {
+    this.form.id = this.idea.id;
+    this.form.type = this.idea.type;
+    this.form.stageId = this.idea.stageId;
+    this.form.operationId = this.idea.operationId;
+    this.form.phaseId = this.idea.phaseId;
+    this.form.description = this.idea.description;
+    this.form.title = this.idea.title;
+  },
   data: () => ({
     section: "ideas",
+    loading: false,
     form: new GQLForm({
       id: undefined,
       processId: null,
@@ -242,7 +283,37 @@ export default {
   }),
 
   methods: {
-    async deleteItem(item) {},
+    async updateStatus() {
+      this.loading = true;
+      const editForm = new GQLForm({
+        id: this.idea.id,
+        status: this.idea.status === "NEW" ? "TESTING" : "ADOPTED",
+      });
+      await this.$store.dispatch(`idea/changeStatus`, editForm);
+      this.$store.dispatch(`idea/findByProcess`, {
+        id: this.idea.processId,
+        force: true,
+      });
+			this.closeIdeaEdit();
+      this.loading = false;
+      // this.closed();
+    },
+    async deleteItem() {
+      this.form.busy = true;
+      const editForm = new GQLForm({
+        id: this.idea.id,
+      });
+      await this.$store.dispatch(`idea/delete`, editForm);
+      this.$store.dispatch(`idea/findByProcess`, {
+        id: this.idea.processId,
+        force: true,
+      });
+      this.$store.dispatch("process/findById", {
+        id: this.idea.processId,
+        force: true,
+      });
+      this.form.busy = false;
+    },
     changeStage() {
       this.form.operationId = null;
       this.form.phaseId = null;
@@ -260,10 +331,10 @@ export default {
 <style scoped>
 .idea_edit_path_container {
   background: #fff;
-  width: 100%;
   height: 100%;
-  margin: 0 10px;
+  margin-left: 15px;
   border-radius: 5px;
+  flex-grow: 1;
 }
 
 .idea_edit_path_container-header {
@@ -291,7 +362,7 @@ export default {
   place-items: center;
   display: flex;
   place-content: center;
-	background:#cc454b;
-	color:#fff;
+  background: #cc454b;
+  color: #fff;
 }
 </style>
