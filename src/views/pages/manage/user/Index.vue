@@ -343,7 +343,6 @@ export default {
           roleId: item.role ? item.role.id : null,
           companyRoleId: item.companyRole ? item.companyRole.id : null,
           yearlyCosts: item.yearlyCosts,
-          avatar: item.avatar,
         });
         this.currentItem = item;
         this.$validator.reset();
