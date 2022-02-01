@@ -151,38 +151,39 @@
             </b-card-body>
             <b-card-footer>
               <b-row>
-                  <loading-button
-                    v-if="
-                      idea.status === 'NEW' &&
-                      $can('improve/idea/change_status', idea)
-                    "
-                    variant="primary"
-                    size="lg"
-                    :loading="form.busy || loading"
-                    style="width: 120px !important"
-                    @click="updateStatus"
-                    >{{ $t("Test") }}</loading-button
-                  >
-                  <loading-button
-                    v-if="
-                      idea.status === 'TESTING' &&
-                      $can('improve/idea/change_status', idea)
-                    "
-                    variant="primary"
-                    size="lg"
-                    :loading="form.busy || loading"
-                    style="width: 120px !important"
-                    @click="updateStatus"
-                    >{{ $t("Adopt") }}</loading-button
-                  >
+                <loading-button
+                  v-if="
+                    idea.status === 'NEW' &&
+                    $can('improve/idea/change_status', idea)
+                  "
+                  variant="primary"
+                  size="lg"
+                  :loading="form.busy || loading"
+                  style="width: 120px !important"
+                  @click="updateStatus"
+                  >{{ $t("Test") }}</loading-button
+                >
+                <loading-button
+                  v-if="
+                    idea.status === 'TESTING' &&
+                    $can('improve/idea/change_status', idea)
+                  "
+                  variant="primary"
+                  size="lg"
+                  :loading="form.busy || loading"
+                  style="height: 40px"
+                  @click="updateStatus"
+                  >{{ $t("Adopt") }}</loading-button
+                >
                 <b-col>
                   <loading-button
                     :disabled="vErrors.any() || form.busy"
                     :loading="form.busy"
                     size="lg"
+                    style="height: 40px"
                     block
                     type="submit"
-                    >{{ $t("Save changes") }}</loading-button
+                    >{{ $t("Save") }}</loading-button
                   ></b-col
                 >
                 <b-col>
@@ -190,6 +191,7 @@
                     variant="outline-danger"
                     size="lg"
                     class="pl-2"
+                    style="height: 40px"
                     :confirm-title="$t('Delete') + ' ' + form.title + '?'"
                     :confirmPlacement="'top'"
                     :confirm-message="$t('This action cannot be undone!')"
@@ -294,7 +296,7 @@ export default {
         id: this.idea.processId,
         force: true,
       });
-			this.closeIdeaEdit();
+      this.closeIdeaEdit();
       this.loading = false;
       // this.closed();
     },
@@ -335,7 +337,7 @@ export default {
   margin-left: 15px;
   border-radius: 5px;
   flex-grow: 1;
-	width: 25%;
+  width: 25%;
 }
 
 .idea_edit_path_container-header {
