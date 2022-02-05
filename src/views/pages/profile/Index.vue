@@ -114,7 +114,7 @@
             <b-col>
               <b-card
                 :key="intent"
-                :class="user.mustChangePassword ? 'shake' : ''"
+                :class="user.mustChangePassword ? 'shake-password' : ''"
                 class="p-0 border"
                 style="overflow: hidden"
                 no-body
@@ -135,7 +135,7 @@
                   <b-collapse
                     id="changePasswordCollapse"
                     :visible="form.changePassword || user.mustChangePassword"
-                    class="shake"
+                    class="shake-password"
                   >
                     <b-card-body>
                       <b-row>
@@ -283,7 +283,7 @@ export default {
 </script>
 
 <style scoped>
-.shake {
+.shake-password {
   animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
   transform: translate3d(0, 0, 0);
 }
