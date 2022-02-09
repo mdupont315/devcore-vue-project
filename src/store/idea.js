@@ -42,7 +42,6 @@ const getters = {
 
 const actions = {
   async setIsEditingIdea(context, form) {
-    console.log(form);
     context.commit("IS_EDITING_IDEA", form);
   },
 
@@ -249,7 +248,6 @@ const actions = {
 
 const mutations = {
   IS_EDITING_IDEA(state, value) {
-    console.log(state.isEditingIdea);
     if (value) {
       if (value.id) {
         state.isEditingIdea.push(value);

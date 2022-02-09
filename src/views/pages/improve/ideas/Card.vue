@@ -196,7 +196,6 @@ export default {
       get() {
         let openState = false;
         if (this.idea && this.idea.id) {
-          console.log(this.editingIdea(this.idea.id));
           openState = this.editingIdea(this.idea.id);
         }
         return openState;

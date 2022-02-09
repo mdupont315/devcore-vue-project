@@ -4,7 +4,12 @@
       <div class="editor_header_border">
         <menu-bar class="editor__header" :editor="editor" />
       </div>
-      <editor-content class="editor__content" :editor="editor" />
+      <button @click="insertCustomTable()">TEST</button>
+      <editor-content
+        class="editor__content"
+        :editor="editor"
+        ref="editor_content"
+      />
       <div class="editor__footer">
         <div :class="`editor__status editor__status--${status}`">
           <template v-if="status === 'connected'">
@@ -35,17 +40,26 @@ import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import Highlight from "@tiptap/extension-highlight";
 import CharacterCount from "@tiptap/extension-character-count";
 import Underline from "@tiptap/extension-underline";
+
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
+import { TableView } from "./extensions/Table/tableView";
+//import { Table, TableRow, TableCell, TableHeader } from "./extensions/Table/table";
+import { VueNodeViewRenderer } from "@tiptap/vue-2";
+// import Table from "./extensions/Table"
 
 import * as Y from "yjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { MenuBar } from "./parts";
 import { Indent } from "./extensions/indent.js";
 import { EventHandler } from "./extensions/eventHandler.js";
+//import CustomTable from "./extensions/Table/customTable";
+import Component from "./extensions/Component.vue";
 
+import { mergeAttributes, getExtensionField, callOrReturn } from "@tiptap/core";
+/* eslint-disable */
 export default {
   components: {
     EditorContent,
@@ -84,11 +98,23 @@ export default {
     };
   },
   methods: {
+    insertCustomTable() {
+      this.editor
+        .chain()
+        .focus()
+        .insertTable({
+          caption: "title",
+        })
+        .run();
+    },
     focusEditor() {
       console.log("Focus!");
       this.editor.commands.focus();
       // this.editor.commands.focus();
       //	this.editor.commands.setTextSelection(10)
+    },
+    test() {
+      console.log("test");
     },
     initEditor() {
       if (this.editor) this.editor.destroy();
@@ -121,15 +147,248 @@ export default {
           }),
           Highlight,
           Underline,
-          Table.configure({
-            HTMLAttributes: {
-              class: 'idea-editor-custom-table',
-            },
-            resizable: true,
-          }),
           TableRow,
           TableHeader,
           TableCell,
+          Table.extend({
+            name: "testComponent",
+            toggle: null,
+            addNodeView() {
+              return ({ node, HTMLAttributes, getPos, editor }) => {
+                console.log(node);
+                console.log(HTMLAttributes);
+                console.log(getPos());
+                console.log(editor);
+
+                const container = document.createElement("table");
+								container.className = "table-container-table"
+								container.dataset.width = "1000"
+
+
+                const removeRowButton = document.createElement("button");
+                const addRowButton = document.createElement("button");
+
+                const removeColButton = document.createElement("button");
+                const addColButton = document.createElement("button");
+
+                addRowButton.appendChild(document.createTextNode("+"));
+                removeRowButton.appendChild(document.createTextNode("-"));
+
+                addColButton.appendChild(document.createTextNode("+"));
+                removeColButton.appendChild(document.createTextNode("-"));
+
+                const actionsRowButtons = document.createElement("div");
+                actionsRowButtons.className = "table-actions-rowButtons";
+
+                const actionsColButtons = document.createElement("div");
+                actionsColButtons.className = "table-actions-colButtons";
+
+                actionsRowButtons.appendChild(addRowButton);
+                actionsRowButtons.appendChild(removeRowButton);
+
+                actionsColButtons.appendChild(addColButton);
+                actionsColButtons.appendChild(removeColButton);
+
+                addColButton.addEventListener("click", (event) => {
+                  this.editor.chain().focus().addRowAfter().run();
+                });
+                removeColButton.addEventListener("click", (event) => {
+                  this.editor.chain().focus().deleteRow().run();
+                });
+
+                addRowButton.addEventListener("click", (event) => {
+                  this.editor.chain().focus().addColumnAfter().run();
+                });
+                removeRowButton.addEventListener("click", (event) => {
+                  this.editor.chain().focus().deleteColumn().run();
+                });
+
+                // const actionsColButtons = document.createElement("div");
+                // actionsColButtons.className = "table-actions-colButtons"
+                // const addColButton = document.createElement("button");
+                // const minus = document.createTextNode("-");
+                // addColButton.appendChild(minus);
+                // actionsColButtons.appendChild(addColButton);
+
+                const div = document.createElement("div");
+                //  div.append(actionsRowButtons);
+                div.className = "table-container";
+
+                // const content = document.createElement("tbody");
+                // container.append();
+
+                console.log(container);
+                container.appendChild(document.createElement("div"));
+                div.append(container, actionsRowButtons, actionsColButtons);
+
+                // container.append(actionsColButtons);
+
+                return {
+                  dom: div,
+                  contentDOM: container,
+                };
+              };
+            },
+            // addNodeView() {
+            //   return VueNodeViewRenderer(Component);
+            // },
+            addCommands() {
+              if (this.parent) console.log(this.parent());
+              this.toggle =
+                () =>
+                ({ chain }) => {
+                  return chain()
+                    .command(({ tr, commands }) => {
+                      console.log("commands");
+                      console.log(commands);
+                      return commands.addColumnAfter();
+                    })
+                    .run();
+                };
+
+              return {
+                ...this.parent?.(),
+                addTableRow:
+                  () =>
+                  ({ chain }) => {
+                    return chain()
+                      .command(({ tr, commands }) => {
+                        console.log("commands");
+                        console.log(commands);
+                        return commands.addColumnAfter();
+                      })
+                      .run();
+                  },
+              };
+            },
+            extendNodeSchema(extension) {
+              const context = {
+                name: extension.name,
+                options: extension.options,
+                storage: extension.storage,
+              };
+
+              return {
+                tableRole: callOrReturn(
+                  getExtensionField(extension, "tableRole", context)
+                ),
+              };
+            },
+            addOptions() {
+              console.log("addOptions");
+              console.log(this);
+              if (this.parent) console.log(this.parent());
+
+              const test = () => console.log("hello");
+              return {
+                ...this.parent?.(),
+                HTMLAttributes: {
+                  style: "width:500px;overflow-x:scroll",
+                  class: `editIdea-test-custom-class-${this.name}`,
+                  onclick: "this.toggle()",
+                  // onclick: ({ chain }) => {
+                  //   return chain()
+                  //     .command(({ tr, commands }) => {
+                  //       console.log("commands");
+                  //       console.log(commands);
+                  //       return commands.addColumnAfter();
+                  //     })
+                  //     .run();
+                  // },
+                },
+                MyCustomAttributes: {
+                  style: "width:100px;overflow-x:scroll",
+                  class: "editIdea-test-custom-class",
+                  onclick: "console.log(this.$refs)",
+                },
+                cellMinWidth: 200,
+              };
+            },
+
+            addAttributes() {
+              console.log("addAttr");
+              return {
+                addRow: {
+                  renderHTML: (attributes) => {
+                    console.log("attrs");
+                    console.log(attributes);
+                    return {
+                      "data-color": attributes.color,
+                      style: `color: ${attributes.color}`,
+                    };
+                  },
+                },
+                color: {
+                  // Set the color attribute according to the value of the `data-color` attribute
+                  parseHTML: (element) => {
+                    console.log("element");
+                    console.log(element);
+                    return element.getAttribute("data-color");
+                    //return element.getAttribute("data-color");
+                  },
+                },
+              };
+            },
+
+            // parseHTML() {
+            //   console.log("parseHTML");
+            //   console.log(this);
+            //   return [
+            //     {
+            //       tag: "div",
+            //       contentElement: (node) => {
+            //         console.log(node);
+            //         return "button";
+            //       },
+
+            //       getAttrs: (node) => {
+            //         console.log("getAttrs");
+            //         console.log(node);
+            //         return node.className === "captioned-table" && null;
+            //       },
+            //     },
+            //   ];
+            // },
+
+            renderHTML({ node, HTMLAttributes }) {
+              console.log(node);
+              console.log("@RenderHTML");
+
+              const { schema } = node.type;
+              //console.log(schema);
+
+              console.log("HTMLAttributes");
+              console.log(node.attrs);
+              console.log(this.options.HTMLAttributes);
+
+              const test = () => console.log("hello");
+
+              // console.log(this.options.HTMLAttributes);
+              return [
+                "div",
+                mergeAttributes(this.options.HTMLAttributes, {
+                  class: "captioned-table",
+                }),
+                ["table", HTMLAttributes, ["tbody", 0]],
+                [
+                  "button",
+                  mergeAttributes({
+                    ...this.options.MyCustomAttributes,
+                    ...HTMLAttributes,
+                  }),
+                  "+",
+                ],
+                [
+                  "button",
+                  mergeAttributes(
+                    this.options.MyCustomAttributes,
+                    HTMLAttributes
+                  ),
+                  "-",
+                ],
+              ];
+            },
+          }),
           EventHandler,
           Collaboration.configure({
             document: ydoc,
@@ -438,7 +697,38 @@ export default {
     }
   }
 }
-.idea-editor-custom-table{
-	width:100%
+.idea-editor-custom-table {
+  width: 100%;
+}
+
+.table-actions-rowButtons {
+  width: 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: center;
+}
+
+.table-container {
+  display: flex;
+
+  flex-wrap: wrap;
+}
+
+.table-container > table {
+  width: 90%;
+}
+
+.table-actions-colButtons {
+  display: flex;
+}
+
+.table-actions-rowButtons > button,
+.table-actions-colButtons > button {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  place-content: center;
+  align-items: center;
 }
 </style>
