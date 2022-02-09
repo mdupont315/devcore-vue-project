@@ -151,14 +151,9 @@ export default {
           TableHeader,
           TableCell,
           Table.extend({
-            name: "testComponent",
-            toggle: null,
+            name: "CustomTable",
             addNodeView() {
               return ({ node, HTMLAttributes, getPos, editor }) => {
-                console.log(node);
-                console.log(HTMLAttributes);
-                console.log(getPos());
-                console.log(editor);
 
                 const container = document.createElement("table");
 								container.className = "table-container-table"
@@ -203,25 +198,12 @@ export default {
                   this.editor.chain().focus().deleteColumn().run();
                 });
 
-                // const actionsColButtons = document.createElement("div");
-                // actionsColButtons.className = "table-actions-colButtons"
-                // const addColButton = document.createElement("button");
-                // const minus = document.createTextNode("-");
-                // addColButton.appendChild(minus);
-                // actionsColButtons.appendChild(addColButton);
 
                 const div = document.createElement("div");
-                //  div.append(actionsRowButtons);
                 div.className = "table-container";
 
-                // const content = document.createElement("tbody");
-                // container.append();
-
-                console.log(container);
                 container.appendChild(document.createElement("div"));
                 div.append(container, actionsRowButtons, actionsColButtons);
-
-                // container.append(actionsColButtons);
 
                 return {
                   dom: div,
@@ -229,141 +211,25 @@ export default {
                 };
               };
             },
-            // addNodeView() {
-            //   return VueNodeViewRenderer(Component);
-            // },
-            addCommands() {
-              if (this.parent) console.log(this.parent());
-              this.toggle =
-                () =>
-                ({ chain }) => {
-                  return chain()
-                    .command(({ tr, commands }) => {
-                      console.log("commands");
-                      console.log(commands);
-                      return commands.addColumnAfter();
-                    })
-                    .run();
-                };
 
-              return {
-                ...this.parent?.(),
-                addTableRow:
-                  () =>
-                  ({ chain }) => {
-                    return chain()
-                      .command(({ tr, commands }) => {
-                        console.log("commands");
-                        console.log(commands);
-                        return commands.addColumnAfter();
-                      })
-                      .run();
-                  },
-              };
-            },
-            extendNodeSchema(extension) {
-              const context = {
-                name: extension.name,
-                options: extension.options,
-                storage: extension.storage,
-              };
-
-              return {
-                tableRole: callOrReturn(
-                  getExtensionField(extension, "tableRole", context)
-                ),
-              };
-            },
             addOptions() {
-              console.log("addOptions");
-              console.log(this);
-              if (this.parent) console.log(this.parent());
 
-              const test = () => console.log("hello");
               return {
                 ...this.parent?.(),
                 HTMLAttributes: {
                   style: "width:500px;overflow-x:scroll",
                   class: `editIdea-test-custom-class-${this.name}`,
-                  onclick: "this.toggle()",
-                  // onclick: ({ chain }) => {
-                  //   return chain()
-                  //     .command(({ tr, commands }) => {
-                  //       console.log("commands");
-                  //       console.log(commands);
-                  //       return commands.addColumnAfter();
-                  //     })
-                  //     .run();
-                  // },
                 },
-                MyCustomAttributes: {
+                HTMLCustomAttributes: {
                   style: "width:100px;overflow-x:scroll",
                   class: "editIdea-test-custom-class",
-                  onclick: "console.log(this.$refs)",
-                },
-                cellMinWidth: 200,
-              };
-            },
-
-            addAttributes() {
-              console.log("addAttr");
-              return {
-                addRow: {
-                  renderHTML: (attributes) => {
-                    console.log("attrs");
-                    console.log(attributes);
-                    return {
-                      "data-color": attributes.color,
-                      style: `color: ${attributes.color}`,
-                    };
-                  },
-                },
-                color: {
-                  // Set the color attribute according to the value of the `data-color` attribute
-                  parseHTML: (element) => {
-                    console.log("element");
-                    console.log(element);
-                    return element.getAttribute("data-color");
-                    //return element.getAttribute("data-color");
-                  },
+                  onclick: "console.log('MyCustomAttributes')",
                 },
               };
             },
 
-            // parseHTML() {
-            //   console.log("parseHTML");
-            //   console.log(this);
-            //   return [
-            //     {
-            //       tag: "div",
-            //       contentElement: (node) => {
-            //         console.log(node);
-            //         return "button";
-            //       },
 
-            //       getAttrs: (node) => {
-            //         console.log("getAttrs");
-            //         console.log(node);
-            //         return node.className === "captioned-table" && null;
-            //       },
-            //     },
-            //   ];
-            // },
-
-            renderHTML({ node, HTMLAttributes }) {
-              console.log(node);
-              console.log("@RenderHTML");
-
-              const { schema } = node.type;
-              //console.log(schema);
-
-              console.log("HTMLAttributes");
-              console.log(node.attrs);
-              console.log(this.options.HTMLAttributes);
-
-              const test = () => console.log("hello");
-
-              // console.log(this.options.HTMLAttributes);
+            renderHTML({ HTMLAttributes }) {
               return [
                 "div",
                 mergeAttributes(this.options.HTMLAttributes, {
@@ -373,7 +239,7 @@ export default {
                 [
                   "button",
                   mergeAttributes({
-                    ...this.options.MyCustomAttributes,
+                    ...this.options.HTMLCustomAttributes,
                     ...HTMLAttributes,
                   }),
                   "+",
@@ -381,7 +247,7 @@ export default {
                 [
                   "button",
                   mergeAttributes(
-                    this.options.MyCustomAttributes,
+                    this.options.HTMLCustomAttributes,
                     HTMLAttributes
                   ),
                   "-",
