@@ -7,7 +7,7 @@
         :key="`divider${index}`"
       />
       <menu-list v-else-if="item.type === 'list'" :key="index" :item="item" />
-      <menu-grid v-else-if="item.type === 'grid'" :key="index" :item="item" />
+      <!-- <menu-grid v-else-if="item.type === 'grid'" :key="index" :item="item" /> -->
       <menu-item v-else :key="index" v-bind="item" />
     </template>
   </div>
@@ -188,76 +188,87 @@ export default {
         {
           icon: "grid-line",
           title: "table",
-          type: "grid",
-          listItems: [
-            {
-              icon: "grid-line",
-              title: "table",
-              action: () =>
-                this.editor
-                  .chain()
-                  .focus()
-                  .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-                  .run(),
-              isActive: () => this.editor.isActive("table"),
-            },
-            {
-              icon: "checkbox-blank-line",
-              title: "table-clear",
-              action: () => this.editor.chain().focus().deleteTable().run(),
-              isActive: () => this.editor.isActive("table-clear"),
-            },
-            {
-              icon: "merge-cells-vertical",
-              title: "table-merge",
-              action: () => this.editor.chain().focus().mergeOrSplit().run(),
-              isActive: () => this.editor.isActive("table-merge"),
-            },
-            {
-              icon: "heading",
-              title: "table-header-cell",
-              action: () =>
-                this.editor.chain().focus().toggleHeaderCell().run(),
-              isActive: () => this.editor.isActive("table-header-cell"),
-            },
-            {
-              icon: "insert-column-left",
-              title: "insert-column-left",
-              action: () => this.editor.chain().focus().addColumnBefore().run(),
-              isActive: () => this.editor.isActive("insert-column-left"),
-            },
-            {
-              icon: "insert-column-right",
-              title: "insert-column-right",
-              action: () => this.editor.chain().focus().addColumnAfter().run(),
-              isActive: () => this.editor.isActive("insert-column-right"),
-            },
-            {
-              icon: "delete-column",
-              title: "delete-column",
-              action: () => this.editor.chain().focus().deleteColumn().run(),
-              isActive: () => this.editor.isActive("delete-column"),
-            },
-            {
-              icon: "insert-row-top",
-              title: "insert-row-top",
-              action: () => this.editor.chain().focus().addRowBefore().run(),
-              isActive: () => this.editor.isActive("insert-row-top"),
-            },
-            {
-              icon: "insert-row-bottom",
-              title: "insert-row-bottom",
-              action: () => this.editor.chain().focus().addRowAfter().run(),
-              isActive: () => this.editor.isActive("insert-row-bottom"),
-            },
-            {
-              icon: "delete-row",
-              title: "delete-row",
-              action: () => this.editor.chain().focus().deleteRow().run(),
-              isActive: () => this.editor.isActive("delete-row"),
-            },
-          ],
+          action: () =>
+            this.editor
+              .chain()
+              .focus()
+              .insertTable({ rows: 1, cols: 3, withHeaderRow: true })
+              .run(),
+          isActive: () => this.editor.isActive("table"),
         },
+        // {
+        //   icon: "grid-line",
+        //   title: "table",
+        //   type: "grid",
+        //   listItems: [
+        //     {
+        //       icon: "grid-line",
+        //       title: "table",
+        //       action: () =>
+        //         this.editor
+        //           .chain()
+        //           .focus()
+        //           .insertTable({ rows: 1, cols: 3, withHeaderRow: true })
+        //           .run(),
+        //       isActive: () => this.editor.isActive("table"),
+        //     },
+        //     {
+        //       icon: "checkbox-blank-line",
+        //       title: "table-clear",
+        //       action: () => this.editor.chain().focus().deleteTable().run(),
+        //       isActive: () => this.editor.isActive("table-clear"),
+        //     },
+        //     {
+        //       icon: "merge-cells-vertical",
+        //       title: "table-merge",
+        //       action: () => this.editor.chain().focus().mergeOrSplit().run(),
+        //       isActive: () => this.editor.isActive("table-merge"),
+        //     },
+        //     {
+        //       icon: "heading",
+        //       title: "table-header-cell",
+        //       action: () =>
+        //         this.editor.chain().focus().toggleHeaderCell().run(),
+        //       isActive: () => this.editor.isActive("table-header-cell"),
+        //     },
+        //     {
+        //       icon: "insert-column-left",
+        //       title: "insert-column-left",
+        //       action: () => this.editor.chain().focus().addColumnBefore().run(),
+        //       isActive: () => this.editor.isActive("insert-column-left"),
+        //     },
+        //     {
+        //       icon: "insert-column-right",
+        //       title: "insert-column-right",
+        //       action: () => this.editor.chain().focus().addColumnAfter().run(),
+        //       isActive: () => this.editor.isActive("insert-column-right"),
+        //     },
+        //     {
+        //       icon: "delete-column",
+        //       title: "delete-column",
+        //       action: () => this.editor.chain().focus().deleteColumn().run(),
+        //       isActive: () => this.editor.isActive("delete-column"),
+        //     },
+        //     {
+        //       icon: "insert-row-top",
+        //       title: "insert-row-top",
+        //       action: () => this.editor.chain().focus().addRowBefore().run(),
+        //       isActive: () => this.editor.isActive("insert-row-top"),
+        //     },
+        //     {
+        //       icon: "insert-row-bottom",
+        //       title: "insert-row-bottom",
+        //       action: () => this.editor.chain().focus().addRowAfter().run(),
+        //       isActive: () => this.editor.isActive("insert-row-bottom"),
+        //     },
+        //     {
+        //       icon: "delete-row",
+        //       title: "delete-row",
+        //       action: () => this.editor.chain().focus().deleteRow().run(),
+        //       isActive: () => this.editor.isActive("delete-row"),
+        //     },
+        //   ],
+        // },
         {
           type: "divider",
         },

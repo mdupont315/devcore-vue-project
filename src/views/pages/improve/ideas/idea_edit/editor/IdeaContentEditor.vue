@@ -4,7 +4,6 @@
       <div class="editor_header_border">
         <menu-bar class="editor__header" :editor="editor" />
       </div>
-      <button @click="insertCustomTable()">TEST</button>
       <editor-content
         class="editor__content"
         :editor="editor"
@@ -45,9 +44,6 @@ import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
-import { TableView } from "./extensions/Table/tableView";
-//import { Table, TableRow, TableCell, TableHeader } from "./extensions/Table/table";
-import { VueNodeViewRenderer } from "@tiptap/vue-2";
 // import Table from "./extensions/Table"
 
 import * as Y from "yjs";
@@ -55,8 +51,6 @@ import { HocuspocusProvider } from "@hocuspocus/provider";
 import { MenuBar } from "./parts";
 import { Indent } from "./extensions/indent.js";
 import { EventHandler } from "./extensions/eventHandler.js";
-//import CustomTable from "./extensions/Table/customTable";
-import Component from "./extensions/Component.vue";
 
 import { mergeAttributes, getExtensionField, callOrReturn } from "@tiptap/core";
 /* eslint-disable */
@@ -98,15 +92,6 @@ export default {
     };
   },
   methods: {
-    insertCustomTable() {
-      this.editor
-        .chain()
-        .focus()
-        .insertTable({
-          caption: "title",
-        })
-        .run();
-    },
     focusEditor() {
       console.log("Focus!");
       this.editor.commands.focus();
@@ -154,11 +139,10 @@ export default {
             name: "CustomTable",
             addNodeView() {
               return ({ node, HTMLAttributes, getPos, editor }) => {
+                console.log("ADDING!");
 
                 const container = document.createElement("table");
-								container.className = "table-container-table"
-								container.dataset.width = "1000"
-
+                container.className = "table-container-table";
 
                 const removeRowButton = document.createElement("button");
                 const addRowButton = document.createElement("button");
@@ -177,6 +161,15 @@ export default {
 
                 const actionsColButtons = document.createElement("div");
                 actionsColButtons.className = "table-actions-colButtons";
+
+                const actionsRemoveTable = document.createElement("div");
+                const actionsRemoveTableButton =
+                  document.createElement("button");
+                actionsRemoveTableButton.appendChild(
+                  document.createTextNode("Remove")
+                );
+                actionsRemoveTable.appendChild(actionsRemoveTableButton);
+                actionsRemoveTable.className = "table-actions-removeTable";
 
                 actionsRowButtons.appendChild(addRowButton);
                 actionsRowButtons.appendChild(removeRowButton);
@@ -197,13 +190,20 @@ export default {
                 removeRowButton.addEventListener("click", (event) => {
                   this.editor.chain().focus().deleteColumn().run();
                 });
-
+                actionsRemoveTable.addEventListener("click", (event) => {
+                  this.editor.chain().focus().deleteTable().run();
+                });
 
                 const div = document.createElement("div");
                 div.className = "table-container";
 
                 container.appendChild(document.createElement("div"));
-                div.append(container, actionsRowButtons, actionsColButtons);
+                div.append(
+                  container,
+                  actionsRowButtons,
+                  actionsRemoveTable,
+                  actionsColButtons
+                );
 
                 return {
                   dom: div,
@@ -213,7 +213,6 @@ export default {
             },
 
             addOptions() {
-
               return {
                 ...this.parent?.(),
                 HTMLAttributes: {
@@ -227,7 +226,6 @@ export default {
                 },
               };
             },
-
 
             renderHTML({ HTMLAttributes }) {
               return [
@@ -577,12 +575,14 @@ export default {
 
 .table-container {
   display: flex;
-
+  max-height: 500px;
+  overflow: scroll;
   flex-wrap: wrap;
 }
 
 .table-container > table {
   width: 90%;
+  height: 90%;
 }
 
 .table-actions-colButtons {
@@ -591,10 +591,38 @@ export default {
 
 .table-actions-rowButtons > button,
 .table-actions-colButtons > button {
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
   display: flex;
   place-content: center;
   align-items: center;
+}
+.table-actions-rowButtons {
+  // position: absolute;
+  // right: 0;
+}
+.table-actions-colButtons {
+  // position: absolute;
+	// right: 50%;
+	// top: 100%;
+}
+.table-actions-colButtons {
+  width: 100px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.table-actions-removeTable {
+  width: calc(45% - 50px);
+}
+.table-actions-removeTable,
+.table-actions-rowButtons,
+.table-actions-colButtons {
+  margin-top: 10px;
+}
+
+.table-actions-removeTable > button {
+  width: 100px;
+  height: 40px;
 }
 </style>

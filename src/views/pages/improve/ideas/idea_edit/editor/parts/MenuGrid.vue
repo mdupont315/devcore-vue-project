@@ -76,7 +76,6 @@ export default {
       //  }
     },
     toggleSelection() {
-      console.log("HLELL");
       this.selectionOpen = !this.selectionOpen;
     },
   },
