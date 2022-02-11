@@ -1,11 +1,12 @@
 <template>
-  <div class="idea_editor_content" @click="focusEditor()">
+  <div class="idea_editor_content" @click="focusEditor()" id="idea_editor_content">
     <div class="editor" v-if="editor">
       <div class="editor_header_border">
         <menu-bar class="editor__header" :editor="editor" />
       </div>
       <editor-content
         class="editor__content"
+        id="editor__content"
         :editor="editor"
         ref="editor_content"
       />
@@ -137,11 +138,18 @@ export default {
           TableCell,
           Table.extend({
             name: "CustomTable",
+						contentDom: null,
+						table: null,
+						colgroup: null,
             addNodeView() {
               return ({ node, HTMLAttributes, getPos, editor }) => {
+								console.log(node)
                 console.log("ADDING!");
 
                 const container = document.createElement("table");
+
+
+
                 container.className = "table-container-table";
 
                 const removeRowButton = document.createElement("button");
@@ -178,10 +186,14 @@ export default {
                 actionsColButtons.appendChild(removeColButton);
 
                 addColButton.addEventListener("click", (event) => {
+                  const element = document.getElementById("idea_editor_content");
                   this.editor.chain().focus().addRowAfter().run();
+                  element.scrollIntoView();
                 });
                 removeColButton.addEventListener("click", (event) => {
+                  const element = document.getElementById("idea_editor_content");
                   this.editor.chain().focus().deleteRow().run();
+                  element.scrollIntoView();
                 });
 
                 addRowButton.addEventListener("click", (event) => {
@@ -196,6 +208,10 @@ export default {
 
                 const div = document.createElement("div");
                 div.className = "table-container";
+
+								console.log(container)
+
+
 
                 container.appendChild(document.createElement("div"));
                 div.append(
@@ -575,8 +591,7 @@ export default {
 
 .table-container {
   display: flex;
-  max-height: 500px;
-  overflow: scroll;
+  overflow: hidden;
   flex-wrap: wrap;
 }
 
@@ -603,8 +618,8 @@ export default {
 }
 .table-actions-colButtons {
   // position: absolute;
-	// right: 50%;
-	// top: 100%;
+  // right: 50%;
+  // top: 100%;
 }
 .table-actions-colButtons {
   width: 100px;
@@ -624,5 +639,9 @@ export default {
 .table-actions-removeTable > button {
   width: 100px;
   height: 40px;
+}
+
+.table-container-table{
+	max-height: 100px;
 }
 </style>
