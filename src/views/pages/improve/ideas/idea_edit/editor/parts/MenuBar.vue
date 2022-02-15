@@ -192,7 +192,7 @@ export default {
             this.editor
               .chain()
               .focus()
-              .insertTable({ rows: 1, cols: 3, withHeaderRow: true })
+              .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
               .run(),
           isActive: () => this.editor.isActive("table"),
         },

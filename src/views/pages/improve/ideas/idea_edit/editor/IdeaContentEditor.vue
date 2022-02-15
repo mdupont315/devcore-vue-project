@@ -1,5 +1,9 @@
 <template>
-  <div class="idea_editor_content" @click="focusEditor()" id="idea_editor_content">
+  <div
+    class="idea_editor_content"
+    @click="focusEditor()"
+    id="idea_editor_content"
+  >
     <div class="editor" v-if="editor">
       <div class="editor_header_border">
         <menu-bar class="editor__header" :editor="editor" />
@@ -40,11 +44,13 @@ import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import Highlight from "@tiptap/extension-highlight";
 import CharacterCount from "@tiptap/extension-character-count";
 import Underline from "@tiptap/extension-underline";
-
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
+//import Table from "./extensions/Table.js";
+//import TableCell from "./extensions/TableCell.js";
 import TableHeader from "@tiptap/extension-table-header";
+//import Table from "./extensions/TableCell.js";
 // import Table from "./extensions/Table"
 
 import * as Y from "yjs";
@@ -54,6 +60,62 @@ import { Indent } from "./extensions/indent.js";
 import { EventHandler } from "./extensions/eventHandler.js";
 
 import { mergeAttributes, getExtensionField, callOrReturn } from "@tiptap/core";
+import { tableEditing, columnResizing } from "prosemirror-tables";
+
+export function updateColumns(
+  node,
+  colgroup,
+  table,
+  cellMinWidth,
+  overrideCol,
+  overrideValue
+) {
+  let totalWidth = 0;
+  let fixedWidth = true;
+  let nextDOM = colgroup.firstChild;
+  const row = node.firstChild;
+
+  for (let i = 0, col = 0; i < row.childCount; i += 1) {
+    const { colspan, colwidth } = row.child(i).attrs;
+
+    for (let j = 0; j < colspan; j += 1, col += 1) {
+      const hasWidth =
+        overrideCol === col ? overrideValue : colwidth && colwidth[j];
+      const cssWidth = hasWidth ? `${hasWidth}px` : "";
+      totalWidth += hasWidth || cellMinWidth;
+
+      if (!hasWidth) {
+        fixedWidth = false;
+      }
+
+      if (!nextDOM) {
+        colgroup.appendChild(document.createElement("col")).style.width =
+          cssWidth;
+      } else {
+        if (nextDOM.style.width !== cssWidth) {
+          nextDOM.style.width = cssWidth;
+        }
+
+        nextDOM = nextDOM.nextSibling;
+      }
+    }
+  }
+
+  while (nextDOM) {
+    const after = nextDOM.nextSibling;
+    nextDOM.parentNode.removeChild(nextDOM);
+    nextDOM = after;
+  }
+
+  if (fixedWidth) {
+    table.style.width = `${totalWidth}px`;
+    table.style.minWidth = "";
+  } else {
+    table.style.width = "";
+    table.style.minWidth = `${totalWidth}px`;
+  }
+}
+
 /* eslint-disable */
 export default {
   components: {
@@ -78,8 +140,6 @@ export default {
   watch: {
     contentType: {
       handler(newVal) {
-        console.log(newVal);
-        console.log("change");
         this.initEditor();
       },
     },
@@ -94,13 +154,7 @@ export default {
   },
   methods: {
     focusEditor() {
-      console.log("Focus!");
       this.editor.commands.focus();
-      // this.editor.commands.focus();
-      //	this.editor.commands.setTextSelection(10)
-    },
-    test() {
-      console.log("test");
     },
     initEditor() {
       if (this.editor) this.editor.destroy();
@@ -137,138 +191,293 @@ export default {
           TableHeader,
           TableCell,
           Table.extend({
-            name: "CustomTable",
-						contentDom: null,
-						table: null,
-						colgroup: null,
-            addNodeView() {
-              return ({ node, HTMLAttributes, getPos, editor }) => {
-								console.log(node)
-                console.log("ADDING!");
-
-                const container = document.createElement("table");
-
-
-
-                container.className = "table-container-table";
-
-                const removeRowButton = document.createElement("button");
-                const addRowButton = document.createElement("button");
-
-                const removeColButton = document.createElement("button");
-                const addColButton = document.createElement("button");
-
-                addRowButton.appendChild(document.createTextNode("+"));
-                removeRowButton.appendChild(document.createTextNode("-"));
-
-                addColButton.appendChild(document.createTextNode("+"));
-                removeColButton.appendChild(document.createTextNode("-"));
-
-                const actionsRowButtons = document.createElement("div");
-                actionsRowButtons.className = "table-actions-rowButtons";
-
-                const actionsColButtons = document.createElement("div");
-                actionsColButtons.className = "table-actions-colButtons";
-
-                const actionsRemoveTable = document.createElement("div");
-                const actionsRemoveTableButton =
-                  document.createElement("button");
-                actionsRemoveTableButton.appendChild(
-                  document.createTextNode("Remove")
-                );
-                actionsRemoveTable.appendChild(actionsRemoveTableButton);
-                actionsRemoveTable.className = "table-actions-removeTable";
-
-                actionsRowButtons.appendChild(addRowButton);
-                actionsRowButtons.appendChild(removeRowButton);
-
-                actionsColButtons.appendChild(addColButton);
-                actionsColButtons.appendChild(removeColButton);
-
-                addColButton.addEventListener("click", (event) => {
-                  const element = document.getElementById("idea_editor_content");
-                  this.editor.chain().focus().addRowAfter().run();
-                  element.scrollIntoView();
-                });
-                removeColButton.addEventListener("click", (event) => {
-                  const element = document.getElementById("idea_editor_content");
-                  this.editor.chain().focus().deleteRow().run();
-                  element.scrollIntoView();
-                });
-
-                addRowButton.addEventListener("click", (event) => {
-                  this.editor.chain().focus().addColumnAfter().run();
-                });
-                removeRowButton.addEventListener("click", (event) => {
-                  this.editor.chain().focus().deleteColumn().run();
-                });
-                actionsRemoveTable.addEventListener("click", (event) => {
-                  this.editor.chain().focus().deleteTable().run();
-                });
-
-                const div = document.createElement("div");
-                div.className = "table-container";
-
-								console.log(container)
-
-
-
-                container.appendChild(document.createElement("div"));
-                div.append(
-                  container,
-                  actionsRowButtons,
-                  actionsRemoveTable,
-                  actionsColButtons
-                );
-
-                return {
-                  dom: div,
-                  contentDOM: container,
-                };
+            name: "table",
+            // @ts-ignore
+            addOptions() {
+              return {
+                HTMLAttributes: {},
+                resizable: true,
+                handleWidth: 5,
+                cellMinWidth: 25,
+                lastColumnResizable: true,
+                allowTableNodeSelection: false,
               };
             },
 
-            addOptions() {
-              return {
-                ...this.parent?.(),
-                HTMLAttributes: {
-                  style: "width:500px;overflow-x:scroll",
-                  class: `editIdea-test-custom-class-${this.name}`,
-                },
-                HTMLCustomAttributes: {
-                  style: "width:100px;overflow-x:scroll",
-                  class: "editIdea-test-custom-class",
-                  onclick: "console.log('MyCustomAttributes')",
-                },
-              };
+            content: "tableRow+",
+
+            tableRole: "table",
+
+            isolating: true,
+
+            group: "block",
+
+            selectable: true,
+
+            resizable: true,
+
+            parseHTML() {
+              return [{ tag: "table" }];
             },
 
             renderHTML({ HTMLAttributes }) {
               return [
-                "div",
-                mergeAttributes(this.options.HTMLAttributes, {
-                  class: "captioned-table",
-                }),
-                ["table", HTMLAttributes, ["tbody", 0]],
-                [
-                  "button",
-                  mergeAttributes({
-                    ...this.options.HTMLCustomAttributes,
-                    ...HTMLAttributes,
-                  }),
-                  "+",
-                ],
-                [
-                  "button",
-                  mergeAttributes(
-                    this.options.HTMLCustomAttributes,
-                    HTMLAttributes
-                  ),
-                  "-",
-                ],
+                "table",
+                mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+                ["tbody", 0],
               ];
             },
+
+            addNodeView() {
+              return ({ editor, node: nodeViewNode, getPos }) => {
+                let tempNoders = nodeViewNode;
+                const cellMinWidth = 40;
+                const dom = document.createElement("div");
+                dom.className = "tableWrapper";
+
+                if (editor.isEditable) {
+                  const tableDiv = document.createElement("div");
+                  tableDiv.className = "tableDivActions";
+
+                  //Remove Table
+                  const tableRemove = document.createElement("button");
+                  tableRemove.innerText = "Remove";
+                  tableRemove.className = "tableRemove-handle";
+
+                  //Row
+                  const tableAddRow = document.createElement("button");
+                  const tableRemoveRow = document.createElement("button");
+
+                  //Col
+                  const tableAddCol = document.createElement("button");
+                  const tableRemoveCol = document.createElement("button");
+
+                  tableAddRow.innerText = "Add Row";
+                  tableRemoveRow.innerText = "Remove Row";
+                  tableAddCol.innerText = "Add Col";
+                  tableRemoveCol.innerText = "Remove Col";
+
+                  tableRemove.addEventListener("click", (event) => {
+                    this.editor.chain().focus().deleteTable().run();
+                  });
+                  tableAddRow.addEventListener("click", (event) => {
+                    this.editor.chain().focus().addRowAfter().run();
+                  });
+                  tableRemoveRow.addEventListener("click", (event) => {
+                    this.editor.chain().focus().deleteRow().run();
+                  });
+                  tableAddCol.addEventListener("click", (event) => {
+                    this.editor.chain().focus().addColumnAfter().run();
+                  });
+                  tableRemoveCol.addEventListener("click", (event) => {
+                    this.editor.chain().focus().deleteColumn().run();
+                  });
+
+                  tableDiv.appendChild(tableRemove);
+                  tableDiv.appendChild(tableRemoveRow);
+                  tableDiv.appendChild(tableAddRow);
+                  tableDiv.appendChild(tableAddCol);
+                  tableDiv.appendChild(tableRemoveCol);
+                  dom.appendChild(tableDiv);
+                }
+
+                const table = dom.appendChild(document.createElement("table"));
+                const colgroup = table.appendChild(
+                  document.createElement("colgroup")
+                );
+                updateColumns(nodeViewNode, colgroup, table, cellMinWidth);
+                const contentDOM = table.appendChild(
+                  document.createElement("tbody")
+                );
+
+                return {
+                  dom,
+                  contentDOM,
+                  ignoreMutation: (mutation) =>
+                    mutation.type === "attributes" &&
+                    (mutation.target === table ||
+                      colgroup.contains(mutation.target)),
+                  update: (node) => {
+                    if (node.type !== nodeViewNode.type) {
+                      console.log("false!");
+                      return false;
+                    }
+
+                    tempNoders = node;
+                    updateColumns(tempNoders, colgroup, table, cellMinWidth);
+
+                    return true;
+                  },
+                };
+              };
+            },
+
+            addProseMirrorPlugins() {
+              const isResizable =
+                this.options.resizable && this.editor.isEditable;
+
+              return [
+                ...(isResizable
+                  ? [
+                      columnResizing({
+                        handleWidth: this.options.handleWidth,
+                        cellMinWidth: this.options.cellMinWidth,
+                        lastColumnResizable: this.options.lastColumnResizable,
+                      }),
+                    ]
+                  : []),
+                tableEditing({
+                  allowTableNodeSelection: this.options.allowTableNodeSelection,
+                }),
+              ];
+            },
+
+            extendNodeSchema(extension) {
+              const context = {
+                name: extension.name,
+                options: extension.options,
+                storage: extension.storage,
+              };
+
+              return {
+                tableRole: callOrReturn(
+                  getExtensionField(extension, "tableRole", context)
+                ),
+              };
+            },
           }),
+          // Table.extend({
+          //   name: "CustomTable",
+          //   addNodeView() {
+          //     return ({ node, HTMLAttributes, getPos, editor }) => {
+          //   		console.log(editor)
+          //   		console.log(node)
+          //       console.log("ADDING!");
+
+          //      // const container = document.createElement("table");
+          //       const container = document.createElement("table");
+          //       container.className = "table-container-table";
+
+          //       const removeRowButton = document.createElement("button");
+          //       const addRowButton = document.createElement("button");
+
+          //       const removeColButton = document.createElement("button");
+          //       const addColButton = document.createElement("button");
+
+          //       addRowButton.appendChild(document.createTextNode("+"));
+          //       removeRowButton.appendChild(document.createTextNode("-"));
+
+          //       addColButton.appendChild(document.createTextNode("+"));
+          //       removeColButton.appendChild(document.createTextNode("-"));
+
+          //       const actionsRowButtons = document.createElement("div");
+          //       actionsRowButtons.className = "table-actions-rowButtons";
+
+          //       const actionsColButtons = document.createElement("div");
+          //       actionsColButtons.className = "table-actions-colButtons";
+
+          //       const actionsRemoveTable = document.createElement("div");
+          //       const actionsRemoveTableButton =
+          //         document.createElement("button");
+          //       actionsRemoveTableButton.appendChild(
+          //         document.createTextNode("Remove")
+          //       );
+          //       actionsRemoveTable.appendChild(actionsRemoveTableButton);
+          //       actionsRemoveTable.className = "table-actions-removeTable";
+
+          //       actionsRowButtons.appendChild(addRowButton);
+          //       actionsRowButtons.appendChild(removeRowButton);
+
+          //       actionsColButtons.appendChild(addColButton);
+          //       actionsColButtons.appendChild(removeColButton);
+
+          //       addColButton.addEventListener("click", (event) => {
+          //         const element = document.getElementById("idea_editor_content");
+          //         this.editor.chain().focus().addRowAfter().run();
+          //         element.scrollIntoView();
+          //       });
+          //       removeColButton.addEventListener("click", (event) => {
+          //         const element = document.getElementById("idea_editor_content");
+          //         this.editor.chain().focus().deleteRow().run();
+          //         element.scrollIntoView();
+          //       });
+
+          //       addRowButton.addEventListener("click", (event) => {
+          //         this.editor.chain().focus().addColumnAfter().run();
+          //       });
+          //       removeRowButton.addEventListener("click", (event) => {
+          //         this.editor.chain().focus().deleteColumn().run();
+          //       });
+          //       actionsRemoveTable.addEventListener("click", (event) => {
+          //         this.editor.chain().focus().deleteTable().run();
+          //       });
+
+          //       const div = document.createElement("div");
+          //       div.className = "table-container";
+
+          //   		console.log(container)
+
+          //       container.appendChild(document.createElement("div"));
+          //       div.append(
+          //         container,
+          //         actionsRowButtons,
+          //         actionsRemoveTable,
+          //         actionsColButtons
+          //       );
+
+          //       return {
+          //         dom: div,
+          //         contentDOM: container,
+          //       };
+          //     };
+          //   },
+
+          //   addOptions() {
+          //     console.log(this)
+          //     if(this.parent){
+          //       console.log("this.parent().view")
+          //       console.log(this.parent().View)
+          //     }
+          //     return {
+          //       ...this.parent?.(),
+          //       resizable: true,
+          //       HTMLAttributes: {
+          //         style: "width:500px;overflow-x:scroll",
+          //         class: `editIdea-test-custom-class-${this.name}`,
+          //       },
+          //       HTMLCustomAttributes: {
+          //         style: "width:100px;overflow-x:scroll",
+          //         class: "editIdea-test-custom-class",
+          //         onclick: "console.log('MyCustomAttributes')",
+          //       },
+          //     };
+          //   },
+          //   renderHTML({ HTMLAttributes }) {
+          //     return [
+          //       "div",
+          //       mergeAttributes(this.options.HTMLAttributes, {
+          //         class: "captioned-table",
+          //       }),
+          //       ["table", HTMLAttributes, ["tbody", 0]],
+          //       [
+          //         "button",
+          //         mergeAttributes({
+          //           ...this.options.HTMLCustomAttributes,
+          //           ...HTMLAttributes,
+          //         }),
+          //         "+",
+          //       ],
+          //       [
+          //         "button",
+          //         mergeAttributes(
+          //           this.options.HTMLCustomAttributes,
+          //           HTMLAttributes
+          //         ),
+          //         "-",
+          //       ],
+          //     ];
+          //   },
+          // }),
           EventHandler,
           Collaboration.configure({
             document: ydoc,
@@ -641,7 +850,7 @@ export default {
   height: 40px;
 }
 
-.table-container-table{
-	max-height: 100px;
+.table-container-table {
+  max-height: 100px;
 }
 </style>
