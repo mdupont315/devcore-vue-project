@@ -7,11 +7,6 @@
       @click="overlayClick"
       style="transform: translate3d(0px, 0px, 0px)"
     >
-      <!--   position: fixed;
-        top: 0;
-        bottom: 0;
-        width: 100vw;
-        height: 120vh; -->
     </inner-overlay>
     <div class="text-right float-right">
       <confirm-button
@@ -50,9 +45,9 @@
         <col style="width: 10%" />
         <col style="width: 10%" />
         <col style="width: 10%" />
-        <col style="width: 38%" />
+        <col style="width: 40%" />
         <col style="width: 3%" />
-        <col style="width: 6%" />
+        <col style="width: 15%" />
         <col style="width: 6%" />
         <col style="width: 6%" />
       </template>
@@ -144,10 +139,11 @@
         ></issuesEffectComment
       ></template>
       <!-- loss -->
-      <template v-slot:cell(loss)="row">
+      <template v-slot:cell(loss)="row" style="white-space: nowrap">
         <span :class="{ 'text-danger': row.item.effectedMoneyTotalValue != 0 }">
           {{ getEffectedMoneyTotal(row.item) }}</span
         >
+        <span style="margin-left: 10px">{{ getHoursTotal(row.item) }}</span>
       </template>
 
       <!-- effect -->
@@ -444,6 +440,12 @@ export default {
     getEffectedMoneyTotal(item) {
       return this.$currency(item.effectedMoneyTotalValue / 100 || 0);
     },
+    getHoursTotal(item) {
+      const hoursTotal = item.issueHoursTotal;
+      if (hoursTotal < 0) {
+        return `(${this.$tc("h.count", hoursTotal)})`;
+      }
+    },
     getEffectTitle(item) {
       if (item && item.title) {
         return item.title;
@@ -588,7 +590,6 @@ export default {
             300 -
             140
         );
-        console.log("OFFSET TOP @ : " + reduceWindow);
 
         this.$emit("issuesTableOffsetTop", reduceWindow);
         this.$nextTick(() => {
@@ -669,7 +670,6 @@ export default {
         ids: this.getItems.map((i) => i.id),
       });
       await this.$store.dispatch("issue/deleteMany", deleteForm);
-      console.log(deleteForm);
       this.$emit("deletedAll", deleteForm);
     },
     async deleteItem(item) {

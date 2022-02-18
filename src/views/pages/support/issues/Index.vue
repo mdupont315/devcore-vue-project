@@ -61,7 +61,7 @@
             </div>
           </template>
 
-          <!-- loss -->
+          <!-- amount -->
           <template v-slot:cell(issues)="row">
             <div v-if="row.item.pathIssues">
               {{ row.item.pathIssues.length }}
@@ -74,6 +74,9 @@
             <span :class="{ 'text-danger': row.item.pathStats != 0 }">
               {{ $currency(getTotalIssueLoss(row.item)) }}
             </span>
+            <span style="margin-left: 10px">{{
+              pathTotalHourLoss(row.item)
+            }}</span>
           </template>
 
           <!-- actions -->
@@ -193,7 +196,7 @@
             >
               <issues-table
                 @deleted="deleted"
-								@deletedAll="deletedAll"
+                @deletedAll="deletedAll"
                 @issuesTableOffsetTop="setParentPadding"
                 :items="currentRowDetails.item.pathIssues"
                 :item="currentRowDetails.item"
@@ -333,7 +336,6 @@ export default {
       operationId = null,
       phaseId = null,
     }) {
-
       const processPath = this.processes.find((p) => p.id == processId);
       const stagePath =
         processId && processPath && processPath.stages.length > 0
@@ -348,8 +350,6 @@ export default {
         phaseId && operationsPath && operationsPath.phases.length > 0
           ? operationsPath.phases.find((p) => p.id == phaseId)
           : null;
-
-
 
       const selectedProcess = processPath.id;
       const selectedStage = stagePath ? stagePath.id : null;
@@ -390,9 +390,25 @@ export default {
         }
       }
     },
-		deletedAll(){
-			console.log("DELETED ALL!");
-		},
+    pathTotalHourLoss(item) {
+      console.log(item)
+      let pathTotalHours = 0;
+      if (item.pathIssues.length > 0) {
+        item.pathIssues.forEach((issue) => {
+					console.log("issue hours: ", issue.issueHoursTotal)
+          pathTotalHours += issue.issueHoursTotal;
+
+        });
+      }
+		console.log(pathTotalHours * 60)
+      if (pathTotalHours < 0) {
+        return `(${this.$tc("h.count", pathTotalHours)})`;
+      }
+    },
+    deletedAll() {
+      console.log("DELETED ALL!");
+      this.currentRowDetails = null;
+    },
     doesProcessPathExist(path) {
       const { stageId } = path;
       const { operationId } = path;

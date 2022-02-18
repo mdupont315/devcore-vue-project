@@ -219,6 +219,7 @@ export default {
       }
     },
     remove() {
+			console.log("removed")
       this.$emit("remove", this.identifier);
     },
     async loadProcess() {

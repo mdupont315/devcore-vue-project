@@ -87,7 +87,6 @@ export default {
   }),
   methods: {
     removeRoleCard(identifier) {
-      this.isEditing = !this.isEditing;
       this.$emit("deleteIdentifier", identifier);
     },
   },

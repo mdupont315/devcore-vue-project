@@ -43,12 +43,12 @@
     >
       <b-card
         no-body
-        style="background: transparent"
+        style="background: transparent; width: 250px"
         v-if="openState"
-        :style="{ width: tableWidth * 0.25 - 10 + 'px' }"
       >
+        <!--   :style="{ width: tableWidth * 0.25 - 10 + 'px' }" -->
         <div class="form-label-group select required">
-          <div style="background: #fff;border-radius: 5px 5px 0 0;">
+          <div style="background: #fff; border-radius: 5px 5px 0 0">
             <!-- Viewing -->
             <div
               v-if="
@@ -123,7 +123,6 @@
                   >
                     <i class="mdi mdi-close" style="font-size: 20px"></i>
                   </div>
-
 
                   <confirm-button
                     class="issueEffect_add_form-new-issue-effect-select-remove"
@@ -508,6 +507,7 @@ export default {
     },
     async removeTemplateCard(identifier) {
       const roleCard = this.itemForm.templates[identifier];
+
       if (roleCard && !roleCard.id) {
         this.itemForm.templates.splice(identifier, 1);
       } else {
@@ -515,9 +515,14 @@ export default {
           id: roleCard.id,
         });
         try {
-          await this.$store.dispatch("issueEffect/deleteTemplate", deleteForm);
+          await this.$store.dispatch(
+            "issueEffect/deleteTemplate",
+            deleteForm
+          );
         } catch (e) {
           console.log(e);
+        } finally {
+          this.itemForm.templates.splice(identifier, 1);
         }
       }
     },

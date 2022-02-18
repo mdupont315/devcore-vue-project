@@ -88,24 +88,35 @@
     <div class="issueTemplate-card__footer">
       <hr style="margin: 0" />
       <div class="issueTemplate-card__footer-summary">
-        <div class="issueTemplate-card__totals-title">
+        <div class="issueTemplate-card__totals-title" style="flex-grow: 2">
           {{ $t("Effect Loss Time") }}
         </div>
-        <div class="issueTemplate-card__totals-value">
-          {{ getLossTimeValue }}
+        <div class="issueTemplate-card__totals-value" style="flex-grow: 1">
+          <input
+            disabled
+            :value="this.input.effectTime"
+            style="outline: none; border: none; background: #fff; width: 100%;text-align: center;"
+            v-mask="'##h ##min'"
+          />
         </div>
-        <div class="issueTemplate-card__totals-total">
+        <div
+          class="issueTemplate-card__totals-total"
+          style="flex-grow: 1; min-width: 50px"
+        >
           {{ getTemplateLossPercentageTime }}
         </div>
       </div>
       <div class="issueTemplate-card__footer-summary">
-        <div class="issueTemplate-card__totals-title">
+        <div class="issueTemplate-card__totals-title" style="flex-grow: 2">
           {{ $t("Effect Loss Value") }}
         </div>
-        <div class="issueTemplate-card__totals-value">
+        <div class="issueTemplate-card__totals-value" style="flex-grow: 1">
           {{ getLossMoneyValue }}
         </div>
-        <div class="issueTemplate-card__totals-total">
+        <div
+          class="issueTemplate-card__totals-total"
+          style="flex-grow: 1; min-width: 50px"
+        >
           {{ getTemplateLossPercentageValue }}
         </div>
       </div>
@@ -154,7 +165,9 @@ export default {
       return false;
     },
     getLossTimeValue() {
-      return this.formatTime(this.input.effectTime / 100 || 0);
+      console.log(this.input.effectTime);
+      return this.formatTime(this.input.effectTime);
+      // return this.formatTime(this.input.effectTime / 100 || 0);
     },
 
     getLossMoneyValue() {
@@ -252,14 +265,23 @@ export default {
   padding: 10px;
 }
 .issueTemplate-card__totals-title {
+  max-width: 100px;
   color: #000;
   width: 100px;
 }
 .issueTemplate-card__totals-value {
   color: #4294d0;
+  flex-grow: 1;
+  display: flex;
+  align-self: center;
+  justify-content: center;
 }
 .issueTemplate-card__totals-total {
   color: #cc454b;
+  display: flex;
+  align-self: center;
+  justify-content: center;
+  min-width: 50px;
 }
 .issueTemplate-card__totals-action {
   padding-top: 10px;

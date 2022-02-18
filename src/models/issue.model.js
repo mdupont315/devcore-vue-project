@@ -115,6 +115,31 @@ export default class IssueModel extends BaseModel {
     return roleHourlyCosts;
   }
 
+  get issueHoursTotal() {
+    let totalTime = 0;
+    if (this.timeValue) {
+    //  console.log("Issue hours");
+      totalTime += this.timeValue * 0.01;
+    //  console.log(this.timeValue * 0.01);
+    }
+
+    const effect = this.effect;
+
+    if (effect && effect.templates && effect.templates.length > 0) {
+      effect.templates.forEach(template => {
+      // console.log(template.effectTime);
+        const time = template.effectTime * 0.01;
+        //issue templates display 2h 30min => 230
+
+
+       // console.log("Template hours");
+       // console.log(template.effectTime * 0.01);
+        totalTime -= time;
+      });
+    }
+    return totalTime;
+  }
+
   get effectedMoneyTotalValue() {
     let total = 0;
     if (this.moneyTotalValue) {

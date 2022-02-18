@@ -46,28 +46,7 @@
             ></b-form-input>
           </b-col>
         </b-row>
-   <!--      <b-row style="padding: 0 0 10px 10px">
-          <b-col class="col-5" style="align-self: center">{{
-            $t("Effect Loss Time")
-          }}</b-col>
-          <b-col class="col-7">
-            <b-form-input
-              v-model="getSelectedLossTime"
-              v-mask="'##h ##min'"
-              autocomplete="off"
-              :max="4"
-              :placeholder="$t('Effect Loss Unit Time')"
-              :class="{
-                'is-invalid': isTimeNotValid,
-                'is-valid': !isTimeNotValid,
-              }"
-            >
-            </b-form-input>
-            <b-form-invalid-feedback>{{
-              $displayError("effectTime", effectForm)
-            }}</b-form-invalid-feedback>
-          </b-col>
-        </b-row> -->
+
 
         <b-row>
           <b-col class="col-12">
@@ -157,15 +136,6 @@ export default {
       },
       set(input) {
         this.effectValue = input.replace(/[^0-9.]/g, "");
-      },
-    },
-    getSelectedLossTime: {
-      get() {
-        return this.formatTime(this.effectForm.effectTime);
-      },
-      set(input) {
-        var numberPattern = /\d+/g;
-        this.effectForm.effectTime = input.match(numberPattern).join("");
       },
     },
   },
