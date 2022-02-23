@@ -368,11 +368,6 @@ export default {
       },
     },
   },
-  watch: {
-    tableWidth(newHeight, oldHeight) {
-      console.log(`it changed to ${newHeight} from ${oldHeight}`);
-    },
-  },
   beforeDestroy() {
     window.removeEventListener("resize", this.onResize);
   },
