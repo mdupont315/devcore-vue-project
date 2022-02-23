@@ -118,7 +118,6 @@ export default {
   methods: {
     async setTemplate(input) {
       this.isLoading = true;
-      console.log(this.isLoading);
       this.$emit("setSelectedTemplate", input.id);
     },
     async unsetTemplate(input) {

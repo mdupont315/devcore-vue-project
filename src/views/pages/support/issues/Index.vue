@@ -104,8 +104,7 @@
                   style="
                     font-size: 1.2rem;
                     padding: 3px;
-                    min-width: min-content;
-                    max-height: 32px;
+                    min-width: 120px;
                   "
                   @click="newIdea(row)"
                   >{{ $t("New idea") }}</b-button
@@ -164,7 +163,7 @@
                 size="xs"
                 variant="action"
                 class="btn-primary btn-block text-uppercase text-bold"
-                style="font-size: 1.2rem; 3px 10px;white-space: nowrap;"
+                style="font-size: 1.2rem; 3px 10px;white-space: nowrap; min-width: 120px;"
                 @click="newIdea(row)"
                 >{{ $t("New idea") }}</b-button
               >

@@ -608,7 +608,7 @@ export default {
             element.getBoundingClientRect().bottom -
             614 -
             300 -
-            140
+            240
         );
 
         this.$emit("issuesTableOffsetTop", reduceWindow);
