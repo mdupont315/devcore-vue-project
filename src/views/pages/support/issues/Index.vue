@@ -391,22 +391,18 @@ export default {
       }
     },
     pathTotalHourLoss(item) {
-      console.log(item)
       let pathTotalHours = 0;
       if (item.pathIssues.length > 0) {
         item.pathIssues.forEach((issue) => {
-					console.log("issue hours: ", issue.issueHoursTotal)
           pathTotalHours += issue.issueHoursTotal;
 
         });
       }
-		console.log(pathTotalHours * 60)
       if (pathTotalHours < 0) {
         return `(${this.$tc("h.count", pathTotalHours)})`;
       }
     },
     deletedAll() {
-      console.log("DELETED ALL!");
       this.currentRowDetails = null;
     },
     doesProcessPathExist(path) {
@@ -470,9 +466,6 @@ export default {
       return modified.filter((issuePaths) => issuePaths.pathIssues.length > 0);
     },
     isRowOpen(index) {
-      // if(index === 0){
-      // 	return true;
-      // }
       if (this.currentRowDetails) {
         if (
           index === this.currentRowDetails.index &&

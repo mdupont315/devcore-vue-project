@@ -45,11 +45,11 @@
         <col style="width: 10%" />
         <col style="width: 10%" />
         <col style="width: 10%" />
-        <col style="width: 40%" />
-        <col style="width: 3%" />
-        <col style="width: 15%" />
-        <col style="width: 6%" />
-        <col style="width: 6%" />
+        <col style="width: 35%" />
+        <col style="width: 5%" />
+        <col style="width: 5%" />
+        <col style="width: 5%" />
+        <col style="width: 5%" />
       </template>
       <template v-slot:empty="scope">
         <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -368,16 +368,36 @@ export default {
       },
     },
   },
+  watch: {
+    tableWidth(newHeight, oldHeight) {
+      console.log(`it changed to ${newHeight} from ${oldHeight}`);
+    },
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.onResize);
+  },
   async mounted() {
     this.isLoading = true;
     await this.$store.dispatch("issueEffect/findAll");
     await this.$store.dispatch("companyRole/findAll");
     await this.$store.dispatch("user/findAll");
 
-    this.tableWidth = this.$refs.issueEffect_table?.$el.clientWidth ?? 1582;
     this.isLoading = false;
+
+		this.onResize()
+    this.$nextTick(() => {
+      window.addEventListener("resize", this.onResize);
+    });
   },
   methods: {
+    onResize() {
+      if (
+        this.$refs["issueEffect_table"] &&
+        this.$refs["issueEffect_table"].$el
+      ) {
+        this.tableWidth = this.$refs["issueEffect_table"].$el.clientWidth;
+      }
+    },
     isCurrentItemRowId(id) {
       if (this.currentItem) {
         return this.currentItem.id === id;

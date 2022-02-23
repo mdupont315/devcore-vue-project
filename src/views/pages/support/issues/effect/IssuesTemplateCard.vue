@@ -10,18 +10,7 @@
       <div style="padding-bottom: 10px; font-size: 14px">
         {{ $t("Issue specific cost") }}
       </div>
-      <!--    <div class="issueTemplate-card__footer-summary">
-        <div class="issueTemplate-card__totals-title">
-          {{ $t("Effect Loss Time") }}
-        </div>
-        <div class="issueTemplate-card__totals-value">
-          {{ getLossTimeValue }}
-        </div>
-        <div class="issueTemplate-card__totals-total">
-          {{ getTemplateLossPercentageTime }}
-        </div>
-      </div>
- -->
+
       <div class="issueTemplate-card__footer-summary">
         <div class="issueTemplate-card__totals-title">
           {{ $t("Effect Loss Value") }}
@@ -34,12 +23,25 @@
         </div>
       </div>
       <div class="issueTemplate-card__totals-action">
+				   <div v-if="input.id == issue.effect.effectId">
+          {{ $t("issueEffectTemplateActive") }}
+        </div>
         <b-button
-          v-if="input.id !== issue.effectTemplateId"
+          style="
+            width: 100%;
+            display: flex;
+            align-self: center;
+            justify-content: center;
+            height: 100%;
+          "
+         v-else
           @click="setTemplate(input)"
-          >{{ $t("Apply Issue Effect") }}</b-button
         >
-        <div v-else>{{ $t("issueEffectTemplateActive") }}</div>
+          <span v-if="!isLoading">{{ $t("Apply Issue Effect") }} </span>
+          <b-spinner v-else style="width: 20px; height: 20px"></b-spinner>
+        </b-button>
+
+
       </div>
     </div>
   </div>
@@ -58,15 +60,22 @@ export default {
       default: () => {},
     },
   },
+  data: () => ({
+    isLoading: false,
+  }),
+  watch: {
+    issue(newVal) {
+      if (newVal && this.isLoading) {
+        this.isLoading = !this.isLoading;
+      }
+    },
+  },
   computed: {
     ...mapGetters({
       processes: "process/all",
       companyRoles: "companyRole/all",
     }),
 
-    getLossTimeValue() {
-      return this.formatTime(this.input.effectTime);
-    },
     getLossMoneyValue() {
       return this.input.effectValue
         ? this.$currencyReverse(this.input.effectValue / 100)
@@ -108,21 +117,12 @@ export default {
   },
   methods: {
     async setTemplate(input) {
+      this.isLoading = true;
+      console.log(this.isLoading);
       this.$emit("setSelectedTemplate", input.id);
     },
     async unsetTemplate(input) {
       this.$emit("unsetSelectedTemplate", input.id);
-    },
-    formatTime(time) {
-      if (time) {
-        var numberPattern = /\d+/g;
-        const test = time.toString().match(numberPattern).join("");
-        return `${test.charAt(0)}${test.charAt(1)}h ${test.charAt(
-          2
-        )}${test.charAt(3)}min`;
-      } else {
-        return "00h 00min";
-      }
     },
   },
 };
@@ -170,8 +170,10 @@ export default {
   color: #cc454b;
 }
 .issueTemplate-card__totals-action {
-  padding: 20px 0 10px 0;
+  /* padding: 20px 0 10px 0; */
   display: flex;
+  width: 100px;
+  height: 30px;
   letter-spacing: 1px;
   justify-content: space-between;
 }
@@ -216,7 +218,7 @@ export default {
   justify-content: space-between;
   border-radius: 3px;
   background: #fff;
-	min-height:235px;
+  min-height: 235px;
   width: 100%;
 }
 .issueTemplate-card__subheading-title {

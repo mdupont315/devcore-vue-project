@@ -94,8 +94,14 @@
         <div class="issueTemplate-card__totals-value" style="flex-grow: 1">
           <input
             disabled
-            :value="this.input.effectTime"
-            style="outline: none; border: none; background: #fff; width: 100%;text-align: center;"
+            :value="getEffectTime"
+            style="
+              outline: none;
+              border: none;
+              background: #fff;
+              width: 100%;
+              text-align: center;
+            "
             v-mask="'##h ##min'"
           />
         </div>
@@ -155,6 +161,17 @@ export default {
       processes: "process/all",
       companyRoles: "companyRole/all",
     }),
+    getEffectTime() {
+      let effectTime = this.input.effectTime;
+      const hours = effectTime[0] + effectTime[1];
+      let minutes = Math.round(((effectTime[2] + effectTime[3]) / 100) * 60);
+      if (minutes < 10) {
+        minutes = "0" + minutes;
+      }
+
+      effectTime = hours.toString() + minutes.toString();
+      return effectTime;
+    },
     isAreaOverCardWidth() {
       const rendered = document.querySelector(
         ".issueEffect_add_form-area-items"
@@ -163,11 +180,6 @@ export default {
         return rendered.clientWidth > 160;
       }
       return false;
-    },
-    getLossTimeValue() {
-      console.log(this.input.effectTime);
-      return this.formatTime(this.input.effectTime);
-      // return this.formatTime(this.input.effectTime / 100 || 0);
     },
 
     getLossMoneyValue() {
@@ -237,21 +249,6 @@ export default {
     },
     toggle() {
       this.$emit("edit");
-    },
-    formatTime(timeInput) {
-      if (timeInput) {
-        //add leading zeros
-        var time = timeInput * 100;
-        var timeArr = [...time.toString()];
-
-        while (timeArr.length < 4) {
-          timeArr.unshift("0");
-        }
-
-        return `${timeArr[0]}${timeArr[1]}h ${timeArr[2]}${timeArr[3]}min`;
-      } else {
-        return "00h 00min";
-      }
     },
   },
 };

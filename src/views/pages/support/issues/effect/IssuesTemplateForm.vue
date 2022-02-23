@@ -151,15 +151,6 @@ export default {
         this.$emit("saveAll");
       }
     },
-    formatTime(time) {
-      if (time) {
-        var numberPattern = /\d+/g;
-        const test = time.toString().match(numberPattern).join("");
-        return `${test.charAt(0)}${test.charAt(1)}h ${test.charAt(
-          2
-        )}${test.charAt(3)}min`;
-      }
-    },
   },
 
   data: () => ({

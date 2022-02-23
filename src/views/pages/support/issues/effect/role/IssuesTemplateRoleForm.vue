@@ -72,12 +72,6 @@
             :reduce="(_stage) => _stage.id"
             :options="getProcessStages"
           ></v-select>
-          <!--      :class="{
-              'is-invalid': $validateState('stageId', roleForm) === false,
-              'is-valid': $validateState('stageId', roleForm) === true,
-            }" <b-form-invalid-feedback>{{
-            $displayError("stageId", roleForm)
-          }}</b-form-invalid-feedback> -->
         </div>
       </b-col>
       <b-col
@@ -193,23 +187,25 @@ export default {
     isSaving: false,
     storeName: "issueEffect",
   }),
-  mounted() {
-    if (this.roleForm.effectTime) {
-      var timeArr = [...this.roleForm.effectTime.toString()];
-      while (timeArr.length < 4) {
-        timeArr.unshift("0");
-      }
-      this.roleForm.effectTime = timeArr.join("");
-    }
-  },
+
   methods: {
     toggle() {
       this.$emit("edit");
+    },
+    addLeadingZeros() {
+      if (this.roleForm.effectTime) {
+        var timeArr = [...this.roleForm.effectTime.toString()];
+        while (timeArr.length < 4) {
+          timeArr.unshift("0");
+        }
+        this.roleForm.effectTime = timeArr.join("");
+      }
     },
 
     formatTime(time) {
       if (time) {
         var numberPattern = /\d+/g;
+        if (!time.toString().match(numberPattern)) return;
         const test = time.toString().match(numberPattern).join("");
         return `${test.charAt(0)}${test.charAt(1)}h ${test.charAt(
           2
@@ -219,7 +215,6 @@ export default {
       }
     },
     remove() {
-			console.log("removed")
       this.$emit("remove", this.identifier);
     },
     async loadProcess() {
@@ -246,7 +241,9 @@ export default {
       this.roleForm.effectValue = null;
     },
   },
-
+  mounted() {
+    this.addLeadingZeros();
+  },
   computed: {
     ...mapGetters({
       companyRoles: "companyRole/all",
@@ -254,14 +251,18 @@ export default {
       processes: "process/all",
     }),
     isValueNotValid() {
-      if (!this.roleForm.effectValue || this.roleForm.effectValue === 0)
+      if (!this.roleForm.effectValue || this.roleForm.effectValue === 0) {
         return false;
+      }
       if (parseFloat(this.roleForm.effectValue) < 1) {
         return true;
       }
       return false;
     },
     isTimeNotValid() {
+      if (typeof this.roleForm.effectTime == "number") {
+        return false;
+      }
       if (!this.roleForm.effectTime) return false;
       if (
         this.roleForm.effectTime.toString().length === 4 ||
@@ -314,11 +315,50 @@ export default {
     },
     getSelectedLossTime: {
       get() {
-        return this.formatTime(this.roleForm.effectTime);
+        let effectTime = this.roleForm.effectTime;
+        if (!effectTime) return;
+
+        //length to check input || number is from initial load
+        if (effectTime.length === 4 || typeof effectTime == "number") {
+          const hours = effectTime[0] + effectTime[1];
+          let minutes = Math.round(
+            ((effectTime[2] + effectTime[3]) / 100) * 60
+          );
+          if (minutes < 10) {
+            minutes = "0" + minutes;
+          }
+
+          effectTime = hours.toString() + minutes.toString();
+        }
+
+        return this.formatTime(effectTime);
       },
       set(input) {
         var numberPattern = /\d+/g;
         this.roleForm.effectTime = input.match(numberPattern).join("");
+
+        if (this.roleForm.effectTime.length === 4) {
+          const hours =
+            this.roleForm.effectTime[0] + this.roleForm.effectTime[1];
+          let minutes =
+            this.roleForm.effectTime[2] + this.roleForm.effectTime[3];
+
+          if (minutes > 59) minutes = 59;
+
+          if (parseInt(hours) + parseInt(minutes) === 0) return;
+
+          this.roleForm.effectTime = Math.round(
+            (parseInt(hours) + parseInt(minutes) / 60) * 100
+          ).toString();
+
+          if (this.roleForm.effectTime) {
+            var timeArr = [...this.roleForm.effectTime.toString()];
+            while (timeArr.length < 4) {
+              timeArr.unshift("0");
+            }
+            this.roleForm.effectTime = timeArr.join("");
+          }
+        }
       },
     },
   },
