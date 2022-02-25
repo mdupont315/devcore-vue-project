@@ -61,7 +61,7 @@ module.exports = {
   },
 
   chainWebpack: config => {
-
+    console.log(`Building app with environment: ${process.env.BASE}`)
     config.resolve.alias.set("@", path.join(__dirname, "./src"));
 
     const svgRule = config.module.rule("svg");

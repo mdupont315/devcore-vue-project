@@ -4,7 +4,8 @@
   "private": true,
   "description": "DEV CORE PROJECT",
   "scripts": {
-    "build": "vue-cli-service build --fix",
+    "buildprod": "vue-cli-service build --fix --mode production",
+    "buildstage": "vue-cli-service build --fix --mode staging",
     "lint": "vue-cli-service lint",
     "proxy": "vue-cli-service serve --fix --mode proxy",
     "start": "vue-cli-service serve --fix --mode dev",
