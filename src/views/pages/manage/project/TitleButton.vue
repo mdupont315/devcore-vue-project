@@ -57,7 +57,6 @@ export default {
   },
   methods: {
     async togglePopOver() {
-			console.log(this.item);
       this.intent = Math.random();
       this.item = {};
       this.showPopOver = !this.showPopOver;

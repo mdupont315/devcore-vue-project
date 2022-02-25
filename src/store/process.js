@@ -31,24 +31,10 @@ function loadCurrent(state, section) {
   }
   state.storage[section] = state.storage[section] || {};
 
-
   if (state.storage[section].processId) {
     current.process = state.all.find(
       p => p.id === state.storage[section].processId
     );
-  }
-  if (!current.process && state.all.length > 0) {
-    const mostRecentSectionModified = state.storage["latestModify"];
-
-
-    if (mostRecentSectionModified && mostRecentSectionModified.processId) {
-      current.process = state.all.find(
-        p => p.id == mostRecentSectionModified.processId
-      );
-    }
-    //  else {
-    //   current.process = state.all[0];
-    // }
   }
 
   if (current.process && current.process.loaded) {
@@ -302,22 +288,40 @@ const mutations = {
     state.storage = AppStorage.get("CURRENT_PROCESS");
   },
   SET_CURRENT_PROCESS(state, { section, process, stage, operation, phase }) {
-    AppStorage.set(
-      "CURRENT_PROCESS",
-      Object.assign(AppStorage.get("CURRENT_PROCESS", {}), {
-        latestModify: {
-          timestamp: new Date(),
-          section: section,
-          processId: process
-        },
-        [section]: {
-          processId: process ? process.id : null,
-          stageId: stage ? stage.id : null,
-          operationId: operation ? operation.id : null,
-          phaseId: phase ? phase.id : null
-        }
-      })
-    );
+    let localStoragedProcessPaths = AppStorage.get("CURRENT_PROCESS", {});
+
+    const currentSections = Object.keys(localStoragedProcessPaths);
+
+    if (currentSections.indexOf(section) < 0) {
+      AppStorage.set(
+        "CURRENT_PROCESS",
+        Object.assign(AppStorage.get("CURRENT_PROCESS", {}), {
+          [section]: {
+            processId: process ? process.id : null,
+            stageId: stage ? stage.id : null,
+            operationId: operation ? operation.id : null,
+            phaseId: phase ? phase.id : null
+          }
+        })
+      );
+    }
+
+    if (Object.keys(localStoragedProcessPaths).length > 0) {
+      for (const storedPath in localStoragedProcessPaths) {
+        AppStorage.set(
+          "CURRENT_PROCESS",
+          Object.assign(AppStorage.get("CURRENT_PROCESS", {}), {
+            [storedPath]: {
+              processId: process ? process.id : null,
+              stageId: stage ? stage.id : null,
+              operationId: operation ? operation.id : null,
+              phaseId: phase ? phase.id : null
+            }
+          })
+        );
+      }
+    }
+
     state.storage = AppStorage.get("CURRENT_PROCESS");
   }
 };

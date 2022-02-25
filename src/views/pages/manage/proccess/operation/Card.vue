@@ -8,29 +8,21 @@
   >
     <b-card no-body class="shadow-sm mb-3 bg-white border stage-card">
       <div v-if="item">
-        <b-card-header class="header">
+        <b-card-header class="header" style="width:100%">
           <div
             class="title pl-0"
-            style="
-              justify-content: space-between;
-              justify-items: flex-end;
-              display: flex;
-							padding: 0;
-            "
+            style="display: flex; justify-content: space-between"
           >
-            <div style="align-self: center">
               <div
                 class="h5 m-0 text-capitalize text-left text-overflow text-bold"
-                style="flex-grow: 4"
               >
                 {{ item.title }}
               </div>
-            </div>
-            <div style="display:flex">
+            <div style="display: flex">
               <div
                 class="btn-action2"
                 @click="toggleView"
-                style="margin-right: 10px;cursor:pointer"
+                style="margin-right: 10px; cursor: pointer"
               >
                 <i class="mdi mdi-eye"></i>
               </div>
@@ -38,7 +30,7 @@
                 v-if="$can('process/operation/update', item)"
                 class="btn-action2"
                 @click="toggleEdit"
-								style="cursor:pointer"
+                style="cursor: pointer"
               >
                 <i class="mdi mdi-pencil"></i>
               </div>
@@ -46,7 +38,7 @@
           </div>
         </b-card-header>
         <b-card-body class="pt-0">
-          <p class="p-0 m-0 text-gray text-justify text-multiline" style>
+          <p class="p-0 m-0 text-gray text-justify text-multiline" v-if="item.description">
             {{ item.description }}
           </p>
           <div>

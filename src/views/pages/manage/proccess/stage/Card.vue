@@ -16,16 +16,29 @@
               display: flex;
             "
           >
-            <div class="title" style="flex-grow: 5">
+            <div class="header p-0" style="width: 90%">
               <div
-                class="h4 m-0 text-capitalize text-center text-overflow text-bold"
-                style="display: flex; justify-content: center; font-size: 15px"
+                class="title pl-0"
+                style="display: flex; justify-content: space-between"
               >
-                <div>{{ item.title }}</div>
+                <div
+                  class="
+                    h5
+                    m-0
+                    text-capitalize text-left text-overflow text-bold
+                  "
+                >
+                  {{ item.title }}
+                </div>
               </div>
             </div>
             <div
-              style="cursor: pointer;align-self: center;"
+              style="
+                cursor: pointer;
+                align-self: center;
+                width: 10%;
+                margin-left: 18px;
+              "
               v-if="$can('process/stage/update', item)"
               class="btn-action"
               @click="toggleEdit"
