@@ -147,7 +147,7 @@
                               v-model="form.password"
                               v-validate="{
                                 required: this.form.changePassword,
-                                min: 4,
+                                min: 6,
                               }"
                               class="shadow-sm"
                               :state="$validateState('password')"
@@ -173,19 +173,15 @@
                               v-model="form.passwordConfirmation"
                               v-validate="{
                                 required: this.form.changePassword,
-                                min: 4,
-                                confirmed: 'password',
+                                min: 6,
+                                confirmed: $t('passwordConfirmationMatchPassword'),
                               }"
                               class="shadow-sm"
-                              :state="
-                                $validateState('passwordConfirmation') &&
-                                !form.hasError('passwordConfirmation')
-                              "
+                              :state="$validateState('passwordConfirmation')"
                               :disabled="form.busy"
                               :placeholder="$t('Password confirm')"
                               type="password"
                               name="passwordConfirmation"
-                              autocomplete="new-passwordConfirmation"
                             ></b-form-input>
                             <label for="passwordConfirmation">
                               <i class="mdi mdi-lock-question"></i>
@@ -254,6 +250,7 @@ export default {
       handler(route) {
         if (route.query.i) {
           this.intent = Math.random();
+					this.changePassword = true;
         }
       },
     },

@@ -289,6 +289,7 @@
   "yearlyCosts": "vuotuinen kustannus",
   "companyRoleId": "yrityksen rooli",
   "passwordConfirmation": "salasanan vahvistus",
+  "passwordConfirmationMatchPassword": "salasanaa",
   "Login": "Kirjaudu",
   "Password": "Salasana",
   "Email": "Sähköposti",
