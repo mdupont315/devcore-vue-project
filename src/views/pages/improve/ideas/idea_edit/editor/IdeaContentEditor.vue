@@ -131,6 +131,10 @@ export default {
       type: String,
       required: true,
     },
+    value: {
+      type: Object,
+      default: () => null,
+    },
   },
   computed: {
     ...mapGetters({
@@ -150,6 +154,7 @@ export default {
       provider: null,
       editor: null,
       status: "connecting",
+      editable: false,
     };
   },
   methods: {
@@ -176,6 +181,7 @@ export default {
       });
 
       this.editor = new Editor({
+        content: this.value,
         extensions: [
           StarterKit.configure({
             history: false,
@@ -493,6 +499,11 @@ export default {
             limit: 10000,
           }),
         ],
+        onUpdate: ({ editor }) => {
+          const json = editor.getJSON();
+          console.log(json);
+          this.$emit("input", json);
+        },
       });
 
       this.editor.commands.updateUser({

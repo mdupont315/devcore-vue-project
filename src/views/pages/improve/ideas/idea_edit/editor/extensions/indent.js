@@ -13,10 +13,10 @@ export const clamp = (val, min, max) => {
 
 const IndentProps = {
   min: 0,
-  max: 210,
+  max: 90,
 
-  more: 30,
-  less: -30
+  more: 10,
+  less: -10
 };
 
 export function isBulletListNode(node) {
@@ -92,7 +92,7 @@ export const Indent = Extension.create({
 
   defaultOptions: {
     types: ["heading", "paragraph", "heading1"],
-    indentLevels: [0, 30, 60, 90, 120, 150, 180, 210],
+    indentLevels: ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90'],
     defaultIndentLevel: 0
   },
 
@@ -104,7 +104,7 @@ export const Indent = Extension.create({
           indent: {
             default: this.options.defaultIndentLevel,
             renderHTML: attributes => ({
-              style: `margin-left: ${attributes.indent}px!important;`
+              style: `margin-left: ${attributes.indent}%!important;`
             }),
             parseHTML: element =>
               parseInt(element.style.marginLeft) ||

@@ -11,6 +11,7 @@
         <b-form
           class="idea_edit_path_container-body-process-select hide-labels"
           @keyup="$validator.validateAll()"
+          @submit.prevent="save"
           v-if="form"
         >
           <b-card no-body class="d-block">
@@ -180,7 +181,7 @@
                     :disabled="vErrors.any() || form.busy"
                     :loading="form.busy"
                     size="lg"
-                    style="height: 40px"
+                    style="height: 40px; min-width: 85px"
                     block
                     type="submit"
                     >{{ $t("Save") }}</loading-button
@@ -285,6 +286,9 @@ export default {
   }),
 
   methods: {
+		async save(){
+			this.$emit("save", this.form);
+		},
     async updateStatus() {
       this.loading = true;
       const editForm = new GQLForm({
@@ -338,6 +342,7 @@ export default {
   border-radius: 5px;
   flex-grow: 1;
   width: 25%;
+  min-width: 300px;
 }
 
 .idea_edit_path_container-header {

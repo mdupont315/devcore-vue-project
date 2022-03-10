@@ -53,7 +53,7 @@
         </b-popover>
       </div>
     </div>
-    <idea-content-editor :idea="idea" :contentType="selectedType" />
+    <idea-content-editor v-model="getIdeaContent" :idea="idea" :contentType="selectedType" />
   </div>
 </template>
 
@@ -73,6 +73,20 @@ export default {
       type: Object,
       required: false,
     },
+    value: {
+      type: Object,
+      required: false,
+    },
+  },
+  computed: {
+    getIdeaContent: {
+      get() {
+        return this.value;
+      },
+      set(value) {
+				this.$emit("input", value)
+      },
+    },
   },
   data: () => ({
     selectedType: "Cheatsheet",
@@ -91,13 +105,6 @@ export default {
     addNewIdeaTemplate() {
       if (!this.newType) return;
       this.ideaContentTypes.push({ name: this.newType });
-    },
-  },
-  computed: {
-    getCurrentEditIdea: {
-      get() {
-        return this.editIdeas.find((x) => x.userId == this.user.id);
-      },
     },
   },
 };
@@ -150,12 +157,11 @@ export default {
   height: 60px;
   padding: 20px;
   font-size: 20px;
-
 }
 .idea_edit_content_container {
   background: #fff;
   flex-grow: 3;
   border-radius: 5px;
-	width:75%
+  width: 75%;
 }
 </style>

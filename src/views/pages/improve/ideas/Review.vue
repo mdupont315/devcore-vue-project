@@ -8,14 +8,6 @@
         <span class="text-gray-lighter h4 text-white text-uppercase">{{
           testingIdeas.length
         }}</span>
-        <!-- <div
-          class="testing-reviewIdeas-header-empty"
-          v-if="testingIdeas.length == 0 && !ideaUuidOpened"
-        >
-          <p class="alert alert-warning">
-            {{ $t("There are no records for the given criteria") }}
-          </p>
-        </div> -->
       </div>
       <div class="evaluating-reviewIdeas-header">
         <span class="h4 text-white text-uppercase">
@@ -24,14 +16,6 @@
         <span class="text-gray-lighter h4 text-white text-uppercase">{{
           evaluatedIdeas.length
         }}</span>
-        <!-- <div
-          class="evaluating-reviewIdeas-header-empty"
-          v-if="evaluatedIdeas.length == 0 && !ideaUuidOpened"
-        >
-          <p class="alert alert-warning">
-            {{ $t("There are no records for the given criteria") }}
-          </p>
-        </div> -->
       </div>
     </div>
     <div v-if="currentProcessSection" style="padding-bottom: 100px">
@@ -56,7 +40,11 @@
           v-else-if="!ideaUuidOpened && !testingIdeas[index - 1]"
           style="width: 100%"
         >
-          <p class="alert alert-warning" style="margin-right:20px">
+          <p
+            class="alert alert-warning"
+            v-if="index === 1"
+            style="margin-right: 20px"
+          >
             {{ $t("There are no records for the given criteria") }}
           </p>
         </div>
@@ -73,7 +61,11 @@
           v-else-if="!ideaUuidOpened && !evaluatedIdeas[index - 1]"
           style="width: 100%"
         >
-          <p class="alert alert-warning" style="margin-left:20px">
+          <p
+            class="alert alert-warning"
+            v-if="index === 1"
+            style="margin-left: 20px"
+          >
             {{ $t("There are no records for the given criteria") }}
           </p>
         </div>
@@ -101,14 +93,7 @@ export default {
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
-      ideasInEdit: "idea/ideasInEdit",
     }),
-    currentEditIdea: {
-      get() {
-        console.log("hello");
-        return this.ideasInEdit;
-      },
-    },
     process: {
       get() {
         return this.currentProcess("ideas");
@@ -231,7 +216,7 @@ export default {
 .evaluating-reviewIdeas-header {
   padding: 10px;
   width: 100%;
-  max-width: 49%;
+  max-width: 50%;
 }
 .evaluating-reviewIdeas-header-empty,
 .testing-reviewIdeas-header-empty {
@@ -244,6 +229,15 @@ export default {
   justify-content: space-between;
   height: 40px;
 }
+
+.reviewIdeas-content-container.ideasAreInRow {
+  justify-content: end;
+}
+
+.testingIdeas-content-container.ideasAreInRow {
+  justify-content: start;
+}
+
 .ideasAreInRow {
   align-self: flex-start;
   flex-direction: row;
@@ -253,6 +247,13 @@ export default {
     max-width: 49%;
     max-height: 250px;
   }
+}
+
+.review-idea-card-testing{
+	margin-right: 10px;
+}
+.review-idea-card-evaluating{
+	margin:0 10px;
 }
 .ideasAreInColumn {
   flex-direction: column;

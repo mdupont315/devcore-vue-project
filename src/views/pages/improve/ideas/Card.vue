@@ -190,13 +190,18 @@ export default {
       allProcess: "process/all",
       ideaReplies: "ideaIssueReply/all",
       user: "auth/user",
-      editingIdea: "idea/isEditingIdea",
+      ideaInEdit: "idea/ideaInEdit",
     }),
     showDetail: {
       get() {
         let openState = false;
-        if (this.idea && this.idea.id) {
-          openState = this.editingIdea(this.idea.id);
+        if (
+          this.idea &&
+          this.idea.id &&
+          this.ideaInEdit &&
+          this.ideaInEdit.id
+        ) {
+          openState = this.ideaInEdit.id === this.idea.id;
         }
         return openState;
       },
@@ -239,15 +244,11 @@ export default {
   },
   methods: {
     async closeEdit(idea = this.idea) {
-      await this.$store.dispatch("idea/setIsEditingIdea", {
-        id: null,
-        userId: this.user.id,
-        uuid: null,
-      });
+      await this.$store.dispatch("idea/setIdeaInEdit", null);
       this.$emit("closeIdea", idea);
     },
     async openIdeaEdit(idea) {
-      await this.$store.dispatch("idea/setIsEditingIdea", {
+      await this.$store.dispatch("idea/setIdeaInEdit", {
         id: idea.id,
         userId: this.user.id,
         uuid: idea.uuid,

@@ -104,11 +104,6 @@
         v-if="currentProcess && currentComponent"
       ></component>
 
-      <!-- <div v-if="currentProcess && currentComponent">
-        <idea-review v-if="currentComponent == 'review'"></idea-review>
-        <idea-adopted v-else-if="currentComponent == 'adopted'"></idea-adopted>
-        <idea-new v-else-if="currentComponent == 'new'"></idea-new>
-      </div> -->
 
       <empty-page v-else>
         <div v-if="!currentProcess" class="h2 text-center text-white">

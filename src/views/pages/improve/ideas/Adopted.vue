@@ -57,7 +57,7 @@ export default {
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
-      editingIdea: "idea/isEditingIdea",
+      ideaInEdit: "idea/ideaInEdit",
     }),
     process: {
       get() {
@@ -107,8 +107,8 @@ export default {
   methods: {
     isEditingIdea(idea) {
       let ret = false;
-      if (idea && idea.id) {
-        ret = this.editingIdea(idea.id);
+      if (idea && idea.id && this.ideaInEdit) {
+        ret = this.ideaInEdit.id === idea.id;
       }
       return ret;
     },
