@@ -7,11 +7,6 @@
       @click="overlayClick"
       style="transform: translate3d(0px, 0px, 0px)"
     >
-      <!--   position: fixed;
-        top: 0;
-        bottom: 0;
-        width: 100vw;
-        height: 120vh; -->
     </inner-overlay>
     <div class="text-right float-right">
       <confirm-button
@@ -50,11 +45,11 @@
         <col style="width: 10%" />
         <col style="width: 10%" />
         <col style="width: 10%" />
-        <col style="width: 38%" />
-        <col style="width: 3%" />
-        <col style="width: 6%" />
-        <col style="width: 6%" />
-        <col style="width: 6%" />
+        <col style="width: 35%" />
+        <col style="width: 5%" />
+        <col style="width: 5%" />
+        <col style="width: 5%" />
+        <col style="width: 5%" />
       </template>
       <template v-slot:empty="scope">
         <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -144,10 +139,11 @@
         ></issuesEffectComment
       ></template>
       <!-- loss -->
-      <template v-slot:cell(loss)="row">
+      <template v-slot:cell(loss)="row" style="white-space: nowrap">
         <span :class="{ 'text-danger': row.item.effectedMoneyTotalValue != 0 }">
           {{ getEffectedMoneyTotal(row.item) }}</span
         >
+        <span style="margin-left: 10px">{{ getHoursTotal(row.item) }}</span>
       </template>
 
       <!-- effect -->
@@ -372,16 +368,31 @@ export default {
       },
     },
   },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.onResize);
+  },
   async mounted() {
     this.isLoading = true;
     await this.$store.dispatch("issueEffect/findAll");
     await this.$store.dispatch("companyRole/findAll");
     await this.$store.dispatch("user/findAll");
 
-    this.tableWidth = this.$refs.issueEffect_table?.$el.clientWidth ?? 1582;
     this.isLoading = false;
+
+		this.onResize()
+    this.$nextTick(() => {
+      window.addEventListener("resize", this.onResize);
+    });
   },
   methods: {
+    onResize() {
+      if (
+        this.$refs["issueEffect_table"] &&
+        this.$refs["issueEffect_table"].$el
+      ) {
+        this.tableWidth = this.$refs["issueEffect_table"].$el.clientWidth;
+      }
+    },
     isCurrentItemRowId(id) {
       if (this.currentItem) {
         return this.currentItem.id === id;
@@ -443,6 +454,12 @@ export default {
     },
     getEffectedMoneyTotal(item) {
       return this.$currency(item.effectedMoneyTotalValue / 100 || 0);
+    },
+    getHoursTotal(item) {
+      const hoursTotal = item.issueHoursTotal;
+      if (hoursTotal < 0) {
+        return `(${this.$tc("h.count", hoursTotal)})`;
+      }
     },
     getEffectTitle(item) {
       if (item && item.title) {
@@ -586,9 +603,8 @@ export default {
             element.getBoundingClientRect().bottom -
             614 -
             300 -
-            140
+            190
         );
-        console.log("OFFSET TOP @ : " + reduceWindow);
 
         this.$emit("issuesTableOffsetTop", reduceWindow);
         this.$nextTick(() => {
@@ -669,7 +685,6 @@ export default {
         ids: this.getItems.map((i) => i.id),
       });
       await this.$store.dispatch("issue/deleteMany", deleteForm);
-      console.log(deleteForm);
       this.$emit("deletedAll", deleteForm);
     },
     async deleteItem(item) {

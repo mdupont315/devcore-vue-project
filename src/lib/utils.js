@@ -155,7 +155,7 @@ export async function loadApp() {
   // init the session store
   try {
     await store.dispatch("auth/init");
-    var getsession = await store.dispatch("auth/getSession");
+    await store.dispatch("auth/getSession");
     try {
       if (store.getters["auth/user"]) {
         await store.dispatch("app/load");
@@ -174,11 +174,7 @@ export async function loadApp() {
           return;
         }
 
-        // if (store.getters["process/current"]) {
-        //     await store.dispatch("process/findById", {
-        //         id: store.getters["process/current"].process.id
-        //     })
-        // }
+
       } else {
         router.replace("/login").catch(() => {});
       }

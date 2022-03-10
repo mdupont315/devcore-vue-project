@@ -111,6 +111,8 @@ const actions = {
         id: form.id
       }
     });
+    console.log(context)
+    console.log(result)
     return result.data.issueEffectTemplateDelete;
   },
 

@@ -114,7 +114,7 @@
             <b-col>
               <b-card
                 :key="intent"
-                :class="user.mustChangePassword ? 'shake' : ''"
+                :class="user.mustChangePassword ? 'shake-password' : ''"
                 class="p-0 border"
                 style="overflow: hidden"
                 no-body
@@ -135,7 +135,7 @@
                   <b-collapse
                     id="changePasswordCollapse"
                     :visible="form.changePassword || user.mustChangePassword"
-                    class="shake"
+                    class="shake-password"
                   >
                     <b-card-body>
                       <b-row>
@@ -147,7 +147,7 @@
                               v-model="form.password"
                               v-validate="{
                                 required: this.form.changePassword,
-                                min: 4,
+                                min: 6,
                               }"
                               class="shadow-sm"
                               :state="$validateState('password')"
@@ -173,19 +173,15 @@
                               v-model="form.passwordConfirmation"
                               v-validate="{
                                 required: this.form.changePassword,
-                                min: 4,
-                                confirmed: 'password',
+                                min: 6,
+                                confirmed: $t('passwordConfirmationMatchPassword'),
                               }"
                               class="shadow-sm"
-                              :state="
-                                $validateState('passwordConfirmation') &&
-                                !form.hasError('passwordConfirmation')
-                              "
+                              :state="$validateState('passwordConfirmation')"
                               :disabled="form.busy"
                               :placeholder="$t('Password confirm')"
                               type="password"
                               name="passwordConfirmation"
-                              autocomplete="new-passwordConfirmation"
                             ></b-form-input>
                             <label for="passwordConfirmation">
                               <i class="mdi mdi-lock-question"></i>
@@ -254,6 +250,7 @@ export default {
       handler(route) {
         if (route.query.i) {
           this.intent = Math.random();
+					this.changePassword = true;
         }
       },
     },
@@ -283,7 +280,7 @@ export default {
 </script>
 
 <style scoped>
-.shake {
+.shake-password {
   animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
   transform: translate3d(0, 0, 0);
 }

@@ -44,7 +44,7 @@
               <b-form-input
                 id="password"
                 v-model="form.password"
-                v-validate="'required|min:4'"
+                v-validate="'required|min:6'"
                 :state="$validateState('password', form)"
                 :disabled="form.busy"
                 :placeholder="$t('Password')"

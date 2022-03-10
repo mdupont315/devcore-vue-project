@@ -275,7 +275,7 @@
             size="lg"
             block
             type="submit"
-            :disabled="vErrors.any() || form.busy || ifEditAndFinished"
+            :disabled="vErrors.any() || form.busy"
             :loading="form.busy"
             variant="primary"
             >{{ $t("Save changes") }}</loading-button
@@ -419,15 +419,15 @@ export default {
         if (val.length < 15) this.budget = val;
       },
     },
-    ifEditAndFinished: {
-      get() {
-        if (this.stage) {
-          return this.mode == "edit" ? this.stage.status === "FINISHED" : false;
-        } else {
-          return false;
-        }
-      },
-    },
+    // ifEditAndFinished: {
+    //   get() {
+    //     if (this.stage) {
+    //       return this.mode == "edit" ? this.stage.status === "FINISHED" : false;
+    //     } else {
+    //       return false;
+    //     }
+    //   },
+    // },
     getAvailableOrAllStages: {
       get() {
         return this.filteredProjects.filter(

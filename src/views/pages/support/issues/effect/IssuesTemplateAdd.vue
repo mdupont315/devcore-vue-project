@@ -33,22 +33,22 @@
       :target="() => $refs[`issueEffectAddBtn${issue.id}`]"
       triggers="click"
       :show="openState && isSelectionOpen"
-      :offset="tableWidth * 0.1"
+      :offset="75"
       boundary="window"
       @click="closeIt"
       placement="top"
       class="form-popover"
-      boundary-padding="100"
+      boundary-padding="5"
       custom-class="issueEffectAddForm-form-popover"
     >
       <b-card
         no-body
-        style="background: transparent"
+        style="background: transparent; width: 252px; margin-left: 10px"
         v-if="openState"
-        :style="{ width: tableWidth * 0.25 - 10 + 'px' }"
       >
+        <!--   -->
         <div class="form-label-group select required">
-          <div style="background: #fff;border-radius: 5px 5px 0 0;">
+          <div style="background: #fff; border-radius: 3px">
             <!-- Viewing -->
             <div
               v-if="
@@ -75,7 +75,7 @@
                   class="issueEffect_add_form-new-issue-effect-select-delete"
                 >
                   <div
-                    @click="toggleIssueTemplateForm('select', null)"
+                    @click="toggleOverlay"
                     class="issueEffect_add_form-new-issue-effect-select-back"
                   >
                     <i class="mdi mdi-close" style="font-size: 20px"></i>
@@ -90,9 +90,10 @@
                     :showOverlay="false"
                     :btnStyle="'display:flex;flex-direction:row;background:#fff;border:none;color:#000;align-items:center;box-shadow: none;'"
                   >
-                    <icoEffectDelete width="16" height="16" /><span>{{
-                      $t("Issue Effect Templates Remove")
-                    }}</span>
+                    <icoEffectDelete width="16" height="16" /><span
+                      style="white-space: nowrap"
+                      >{{ $t("Issue Effect Templates Remove") }}</span
+                    >
                   </confirm-button>
                 </div>
                 <div class="issueEffect_add_form-new-issue-effect-select-edit">
@@ -118,12 +119,11 @@
                   class="issueEffect_add_form-new-issue-effect-select-delete"
                 >
                   <div
-                    @click="toggleIssueTemplateForm(formType, null)"
+                    @click="toggleOverlay"
                     class="issueEffect_add_form-new-issue-effect-select-back"
                   >
                     <i class="mdi mdi-close" style="font-size: 20px"></i>
                   </div>
-
 
                   <confirm-button
                     class="issueEffect_add_form-new-issue-effect-select-remove"
@@ -138,17 +138,6 @@
                       $t("Issue Effect Templates Remove")
                     }}</span>
                   </confirm-button>
-
-                  <!-- <div
-                    class="issueEffect_add_form-new-issue-effect-select-remove"
-                    @click="deleteItems(itemForm)"
-                  >
-                    <icoEffectDelete
-                      width="16"
-                      height="16"
-                      ref="issueEffectTemplateRemoveIcon"
-                    /><span>{{ $t("Issue Effect Templates Remove") }}</span>
-                  </div> -->
                 </div>
                 <div
                   class="issueEffect_add_form-new-issue-effect-select-edit"
@@ -195,6 +184,7 @@
             </div>
             <div
               style="overflow: scroll; max-height: 230px"
+							:key="intent"
               v-if="
                 !issueEffectIsCreating &&
                 !issueEffectIsSelecting &&
@@ -372,9 +362,9 @@ export default {
     },
     getItems() {
       // return master templates unless replacable with edited one
-
       if (this.issue.effect) {
         //get active from issue
+
         if (this.issue.effect.effectId) {
           const itemsFiltered = this.items.filter(
             (x) =>
@@ -386,6 +376,7 @@ export default {
           );
 
           const uniques = [...itemsUnique, this.issue.effect];
+
           return [
             ...new Set(
               uniques.sort(
@@ -398,10 +389,12 @@ export default {
             (x) => x.issueActiveId == this.issue.id
           );
           if (active) {
+
             return [
               ...new Set(this.items.filter((x) => x.id != active.effectId)),
             ];
           }
+
           return [...new Set(this.items)];
         }
       }
@@ -428,6 +421,7 @@ export default {
   },
   data: () => ({
     storeName: "issueEffect",
+		intent: Math.random(),
     isSelectionOpen: null,
     loadingIndex: null,
     inputsAreNotValid: false,
@@ -508,6 +502,7 @@ export default {
     },
     async removeTemplateCard(identifier) {
       const roleCard = this.itemForm.templates[identifier];
+
       if (roleCard && !roleCard.id) {
         this.itemForm.templates.splice(identifier, 1);
       } else {
@@ -518,6 +513,8 @@ export default {
           await this.$store.dispatch("issueEffect/deleteTemplate", deleteForm);
         } catch (e) {
           console.log(e);
+        } finally {
+          this.itemForm.templates.splice(identifier, 1);
         }
       }
     },
@@ -549,6 +546,7 @@ export default {
       this.loadingIndex = loadingIndex;
       this.initForm = null;
       let effect = this.defaultForm;
+			this.intent = Math.random()
       if (item) {
         try {
           effect = await this.$store.dispatch("issueEffect/findById", {
@@ -796,15 +794,20 @@ export default {
   align-items: center;
 }
 
-.issueEffect_add_form-new-issue-effect-select-back {
+/* .issueEffect_add_form-new-issue-effect-select-back {
   min-width: 60px;
-}
+} */
 
 .issueEffect_add_form_templates-item-selected-title {
   flex-grow: 20;
   font-weight: 500;
   padding: 10px;
   width: 100%;
+  max-width: 140px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  height: 100%;
 }
 
 .issue_effect_add_icon.issue_effect_add_icon-close {

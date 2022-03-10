@@ -88,24 +88,41 @@
     <div class="issueTemplate-card__footer">
       <hr style="margin: 0" />
       <div class="issueTemplate-card__footer-summary">
-        <div class="issueTemplate-card__totals-title">
+        <div class="issueTemplate-card__totals-title" style="flex-grow: 2">
           {{ $t("Effect Loss Time") }}
         </div>
-        <div class="issueTemplate-card__totals-value">
-          {{ getLossTimeValue }}
+        <div class="issueTemplate-card__totals-value" style="flex-grow: 1">
+          <input
+            disabled
+            :value="getEffectTime"
+            style="
+              outline: none;
+              border: none;
+              background: #fff;
+              width: 100%;
+              text-align: center;
+            "
+            v-mask="'##h ##min'"
+          />
         </div>
-        <div class="issueTemplate-card__totals-total">
+        <div
+          class="issueTemplate-card__totals-total"
+          style="flex-grow: 1; min-width: 50px"
+        >
           {{ getTemplateLossPercentageTime }}
         </div>
       </div>
       <div class="issueTemplate-card__footer-summary">
-        <div class="issueTemplate-card__totals-title">
+        <div class="issueTemplate-card__totals-title" style="flex-grow: 2">
           {{ $t("Effect Loss Value") }}
         </div>
-        <div class="issueTemplate-card__totals-value">
+        <div class="issueTemplate-card__totals-value" style="flex-grow: 1">
           {{ getLossMoneyValue }}
         </div>
-        <div class="issueTemplate-card__totals-total">
+        <div
+          class="issueTemplate-card__totals-total"
+          style="flex-grow: 1; min-width: 50px"
+        >
           {{ getTemplateLossPercentageValue }}
         </div>
       </div>
@@ -144,6 +161,17 @@ export default {
       processes: "process/all",
       companyRoles: "companyRole/all",
     }),
+    getEffectTime() {
+      let effectTime = this.input.effectTime;
+      const hours = effectTime[0] + effectTime[1];
+      let minutes = Math.round(((effectTime[2] + effectTime[3]) / 100) * 60);
+      if (minutes < 10) {
+        minutes = "0" + minutes;
+      }
+
+      effectTime = hours.toString() + minutes.toString();
+      return effectTime;
+    },
     isAreaOverCardWidth() {
       const rendered = document.querySelector(
         ".issueEffect_add_form-area-items"
@@ -152,9 +180,6 @@ export default {
         return rendered.clientWidth > 160;
       }
       return false;
-    },
-    getLossTimeValue() {
-      return this.formatTime(this.input.effectTime / 100 || 0);
     },
 
     getLossMoneyValue() {
@@ -225,21 +250,6 @@ export default {
     toggle() {
       this.$emit("edit");
     },
-    formatTime(timeInput) {
-      if (timeInput) {
-        //add leading zeros
-        var time = timeInput * 100;
-        var timeArr = [...time.toString()];
-
-        while (timeArr.length < 4) {
-          timeArr.unshift("0");
-        }
-
-        return `${timeArr[0]}${timeArr[1]}h ${timeArr[2]}${timeArr[3]}min`;
-      } else {
-        return "00h 00min";
-      }
-    },
   },
 };
 </script>
@@ -252,14 +262,23 @@ export default {
   padding: 10px;
 }
 .issueTemplate-card__totals-title {
+  max-width: 100px;
   color: #000;
   width: 100px;
 }
 .issueTemplate-card__totals-value {
   color: #4294d0;
+  flex-grow: 1;
+  display: flex;
+  align-self: center;
+  justify-content: center;
 }
 .issueTemplate-card__totals-total {
   color: #cc454b;
+  display: flex;
+  align-self: center;
+  justify-content: center;
+  min-width: 50px;
 }
 .issueTemplate-card__totals-action {
   padding-top: 10px;
