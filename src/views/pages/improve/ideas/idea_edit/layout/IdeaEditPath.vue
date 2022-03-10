@@ -264,7 +264,8 @@ export default {
   },
   async mounted() {
     this.form.id = this.idea.id;
-    this.form.type = this.idea.type;
+		this.form.processId = this.idea.processId;
+    this.form.type = "idea";
     this.form.stageId = this.idea.stageId;
     this.form.operationId = this.idea.operationId;
     this.form.phaseId = this.idea.phaseId;
@@ -282,13 +283,18 @@ export default {
       phaseId: null,
       description: null,
       title: null,
+			type: null
     }),
   }),
 
   methods: {
-		async save(){
-			this.$emit("save", this.form);
-		},
+    async save() {
+      await this.$validator.validateAll();
+      if (!this.vErrors.any()) {
+        this.$validator.reset();
+        this.$emit("save", this.form);
+      }
+    },
     async updateStatus() {
       this.loading = true;
       const editForm = new GQLForm({

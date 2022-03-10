@@ -250,7 +250,6 @@ export default {
 }
 
 .review-idea-card-testing{
-	margin-right: 10px;
 }
 .review-idea-card-evaluating{
 	margin:0 10px;

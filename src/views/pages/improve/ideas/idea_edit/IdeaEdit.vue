@@ -47,7 +47,7 @@ export default {
   },
   methods: {
     async saveIdea(form) {
-      await this.$store.dispatch("idea/create", form);
+      await this.$store.dispatch(`idea/update`, form);
     },
     closeIdeaEdit() {
       this.$emit("close");

@@ -71,9 +71,11 @@ const actions = {
         id: form.id
       }
     });
-    const role = new Idea().deserialize(result.data.ideaUpdate);
+    const idea = new Idea().deserialize(result.data.ideaUpdate);
+    console.log(idea)
+    context.commit("SET_ITEM", idea);
     // await context.dispatch('findAll', { force: true });
-    return role;
+    return idea;
   },
 
   async changeStatus(context, form) {
