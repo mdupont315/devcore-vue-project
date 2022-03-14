@@ -75,10 +75,10 @@ export function updateColumns(
 }
 
 export default class ContentEditor {
-  constructor(editable, value, ...extensions) {
-    this.editor = null;
+  constructor(editable, value, options) {
     this.editable = editable;
     this.content = value;
+    this.options = options;
     this.extensions = [
       StarterKit.configure({
         history: false
@@ -283,6 +283,20 @@ export default class ContentEditor {
         limit: 10000
       })
     ];
+    this.editor = this.getEditorInstance();
+
+  }
+
+  getEditorInstance(){
+    return new Editor({
+      editable: false,
+      content: this.content,
+      extensions: this.extensions,
+      onUpdate: ({ editor }) => {
+        const json = editor.getJSON();
+        this.options.onUpdate(json)
+      }
+    });
   }
 
   *getExtensions() {
@@ -296,17 +310,3 @@ export default class ContentEditor {
   }
 }
 
-const createEditorInstance = () => {
-  console.log("ditorInstance!");
-  this.editor = new Editor({
-    editable: this.editable,
-    content: this.content,
-    extensions: this.extensions,
-    onUpdate: ({ editor }) => {
-      const json = editor.getJSON();
-      this.$emit("input", json);
-    }
-  });
-};
-
-export { createEditorInstance };

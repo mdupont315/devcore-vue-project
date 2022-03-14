@@ -164,7 +164,7 @@
                   "
                   variant="primary"
                   size="lg"
-                  :loading="mutateForm.busy || loading"
+                  :loading="isLoading"
                   @click="updateStatus"
                   >{{ $t("Test") }}</loading-button
                 >
@@ -175,15 +175,15 @@
                   "
                   variant="primary"
                   size="lg"
-                  :loading="mutateForm.busy || loading"
+                  :loading="isLoading"
                   style="height: 40px"
                   @click="updateStatus"
                   >{{ $t("Adopt") }}</loading-button
                 >
                 <b-col>
                   <loading-button
-                    :disabled="vErrors.any() || mutateForm.busy"
-                    :loading="mutateForm.busy"
+                    :disabled="vErrors.any() || isLoading"
+                    :loading="isLoading"
                     size="lg"
                     style="height: 40px; min-width: 85px"
                     block
@@ -229,6 +229,10 @@ export default {
       type: Object,
       required: false,
     },
+		isLoading: {
+			type: Boolean,
+			default: false
+		}
   },
   computed: {
     ...mapGetters({
@@ -282,7 +286,6 @@ export default {
   },
   data: () => ({
     section: "ideas",
-    loading: false,
   }),
 
   methods: {
@@ -294,9 +297,7 @@ export default {
       }
     },
     async updateStatus() {
-      this.loading = true;
       this.$emit("updateStatus");
-      this.loading = false;
     },
     async deleteItem() {
       this.$emit("deleteIdea");

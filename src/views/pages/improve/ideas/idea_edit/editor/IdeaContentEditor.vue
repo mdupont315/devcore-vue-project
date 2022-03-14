@@ -37,91 +37,13 @@
 	<script>
 import { mapGetters } from "vuex";
 
-import { Editor, EditorContent } from "@tiptap/vue-2";
-import StarterKit from "@tiptap/starter-kit";
-import Collaboration from "@tiptap/extension-collaboration";
-import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
-import Highlight from "@tiptap/extension-highlight";
-import CharacterCount from "@tiptap/extension-character-count";
-import Underline from "@tiptap/extension-underline";
-import Table from "@tiptap/extension-table";
-import TableRow from "@tiptap/extension-table-row";
-import TableCell from "@tiptap/extension-table-cell";
-//import Table from "./extensions/Table.js";
-//import TableCell from "./extensions/TableCell.js";
-import TableHeader from "@tiptap/extension-table-header";
-//import Table from "./extensions/TableCell.js";
-// import Table from "./extensions/Table"
-import Text from "@tiptap/extension-text";
-import TextStyle from "@tiptap/extension-text-style";
-import { Color } from "@tiptap/extension-color";
+import { EditorContent } from "@tiptap/vue-2";
 
 import * as Y from "yjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { MenuBar } from "./parts";
-import { Indent } from "./extensions/indent.js";
-import { EventHandler } from "./extensions/eventHandler.js";
-import { CustomStyle } from "./extensions/CustomStyle.js";
 
-import { mergeAttributes, getExtensionField, callOrReturn } from "@tiptap/core";
-import { tableEditing, columnResizing } from "prosemirror-tables";
-
-import EditorInstance from "./EditorLoader.js"
-
-
-export function updateColumns(
-  node,
-  colgroup,
-  table,
-  cellMinWidth,
-  overrideCol,
-  overrideValue
-) {
-  let totalWidth = 0;
-  let fixedWidth = true;
-  let nextDOM = colgroup.firstChild;
-  const row = node.firstChild;
-
-  for (let i = 0, col = 0; i < row.childCount; i += 1) {
-    const { colspan, colwidth } = row.child(i).attrs;
-
-    for (let j = 0; j < colspan; j += 1, col += 1) {
-      const hasWidth =
-        overrideCol === col ? overrideValue : colwidth && colwidth[j];
-      const cssWidth = hasWidth ? `${hasWidth}px` : "";
-      totalWidth += hasWidth || cellMinWidth;
-
-      if (!hasWidth) {
-        fixedWidth = false;
-      }
-
-      if (!nextDOM) {
-        colgroup.appendChild(document.createElement("col")).style.width =
-          cssWidth;
-      } else {
-        if (nextDOM.style.width !== cssWidth) {
-          nextDOM.style.width = cssWidth;
-        }
-
-        nextDOM = nextDOM.nextSibling;
-      }
-    }
-  }
-
-  while (nextDOM) {
-    const after = nextDOM.nextSibling;
-    nextDOM.parentNode.removeChild(nextDOM);
-    nextDOM = after;
-  }
-
-  if (fixedWidth) {
-    table.style.width = `${totalWidth}px`;
-    table.style.minWidth = "";
-  } else {
-    table.style.width = "";
-    table.style.minWidth = `${totalWidth}px`;
-  }
-}
+import ContentEditor from "./EditorLoader.js";
 
 /* eslint-disable */
 export default {
@@ -142,15 +64,22 @@ export default {
       type: Object,
       default: () => {},
     },
+    isEditable: {
+      type: Boolean,
+      default: () => false,
+    },
   },
   computed: {
     ...mapGetters({
       user: "auth/user",
     }),
   },
- watch: {
-    editable() {
-      this.editor.setEditable(this.editable)
+  watch: {
+    isEditable() {
+      console.log("Set editor editable: ");
+      console.log(this.isEditable);
+      this.editable = this.isEditable;
+      this.editor.setEditable(this.editable);
     },
   },
 
@@ -159,7 +88,7 @@ export default {
       provider: null,
       editor: null,
       status: "connecting",
-      editable: true,
+      editable: false,
     };
   },
   methods: {
@@ -169,220 +98,37 @@ export default {
     initEditor() {
       if (this.editor) this.editor.destroy();
       if (this.provider) this.editor.destroy();
-      const ydoc = new Y.Doc();
+      // const ydoc = new Y.Doc();
 
-      this.provider = new HocuspocusProvider({
-        document: ydoc,
-        url: "ws://127.0.0.1:1234",
-        name: `collaboration/${this.contentType}/${this.idea.id}`,
-        onAwarenessUpdate: ({ states }) => {
-          this.currentStates = states;
-        },
-        broadcast: false,
+      // this.provider = new HocuspocusProvider({
+      //   document: ydoc,
+      //   url: "ws://127.0.0.1:1234",
+      //   name: `collaboration/${this.contentType}/${this.idea.id}`,
+      //   onAwarenessUpdate: ({ states }) => {
+      //     this.currentStates = states;
+      //   },
+      //   broadcast: false,
+      // });
+
+      // this.provider.on("status", (event) => {
+      //   this.status = event.status;
+      // });
+
+      const editorInstance = new ContentEditor(this.editable, this.value, {
+        onUpdate: (value) => this.$emit("input", value),
       });
 
-      this.provider.on("status", (event) => {
-        this.status = event.status;
-      });
+      this.editor = editorInstance.editor;
+      this.$emit("initialized");
+      //this.editable = true;
 
+      console.log(this.editor);
+      //this.editable = true;
+      //this.editor.setEditable(this.editable);
 
-      this.editor = new Editor({
-				editable: this.editable,
-        content: this.value,
-        extensions: [
-          StarterKit.configure({
-            history: false,
-          }),
-          Text,
-          TextStyle,
-					CustomStyle,
-          Color,
-          Indent,
-          Highlight,
-          Underline,
-          TableRow,
-          TableHeader,
-          TableCell,
-          Table.extend({
-            name: "table",
-            // @ts-ignore
-            addOptions() {
-              return {
-                HTMLAttributes: {},
-                resizable: true,
-                handleWidth: 5,
-                cellMinWidth: 25,
-                lastColumnResizable: false,
-                allowTableNodeSelection: false,
-              };
-            },
-
-            content: "tableRow+",
-
-            tableRole: "table",
-
-            isolating: true,
-
-            group: "block",
-
-            selectable: true,
-
-            resizable: true,
-
-            parseHTML() {
-              return [{ tag: "table" }];
-            },
-
-            renderHTML({ HTMLAttributes }) {
-              return [
-                "table",
-                mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-                ["tbody", 0],
-              ];
-            },
-
-            addNodeView() {
-              return ({ editor, node: nodeViewNode, getPos }) => {
-                let tempNoders = nodeViewNode;
-                const cellMinWidth = 40;
-                const dom = document.createElement("div");
-                dom.className = "tableWrapper";
-
-                if (editor.isEditable) {
-                  const tableDiv = document.createElement("div");
-                  tableDiv.className = "tableDivActions";
-
-                  //Remove Table
-                  const tableRemove = document.createElement("button");
-                  tableRemove.innerText = "Remove";
-                  tableRemove.className = "tableRemove-handle";
-
-                  //Row
-                  const tableAddRow = document.createElement("button");
-                  const tableRemoveRow = document.createElement("button");
-
-                  //Col
-                  const tableAddCol = document.createElement("button");
-                  const tableRemoveCol = document.createElement("button");
-
-                  tableAddRow.innerText = "Add Row";
-                  tableRemoveRow.innerText = "Remove Row";
-                  tableAddCol.innerText = "Add Col";
-                  tableRemoveCol.innerText = "Remove Col";
-
-                  tableRemove.addEventListener("click", (event) => {
-                    this.editor.chain().focus().deleteTable().run();
-                  });
-                  tableAddRow.addEventListener("click", (event) => {
-                    this.editor.chain().focus().addRowAfter().run();
-                  });
-                  tableRemoveRow.addEventListener("click", (event) => {
-                    this.editor.chain().focus().deleteRow().run();
-                  });
-                  tableAddCol.addEventListener("click", (event) => {
-                    this.editor.chain().focus().addColumnAfter().run();
-                  });
-                  tableRemoveCol.addEventListener("click", (event) => {
-                    this.editor.chain().focus().deleteColumn().run();
-                  });
-
-                  tableDiv.appendChild(tableRemove);
-                  tableDiv.appendChild(tableRemoveRow);
-                  tableDiv.appendChild(tableAddRow);
-                  tableDiv.appendChild(tableAddCol);
-                  tableDiv.appendChild(tableRemoveCol);
-                  dom.appendChild(tableDiv);
-                }
-
-                const table = dom.appendChild(document.createElement("table"));
-                const colgroup = table.appendChild(
-                  document.createElement("colgroup")
-                );
-                updateColumns(nodeViewNode, colgroup, table, cellMinWidth);
-                const contentDOM = table.appendChild(
-                  document.createElement("tbody")
-                );
-
-                return {
-                  dom,
-                  contentDOM,
-                  ignoreMutation: (mutation) =>
-                    mutation.type === "attributes" &&
-                    (mutation.target === table ||
-                      colgroup.contains(mutation.target)),
-                  update: (node) => {
-                    if (node.type !== nodeViewNode.type) {
-                      console.log("false!");
-                      return false;
-                    }
-
-                    tempNoders = node;
-                    updateColumns(tempNoders, colgroup, table, cellMinWidth);
-
-                    return true;
-                  },
-                };
-              };
-            },
-
-            addProseMirrorPlugins() {
-              const isResizable =
-                this.options.resizable && this.editor.isEditable;
-
-              return [
-                ...(isResizable
-                  ? [
-                      columnResizing({
-                        handleWidth: this.options.handleWidth,
-                        cellMinWidth: this.options.cellMinWidth,
-                        lastColumnResizable: this.options.lastColumnResizable,
-                      }),
-                    ]
-                  : []),
-                tableEditing({
-                  allowTableNodeSelection: this.options.allowTableNodeSelection,
-                }),
-              ];
-            },
-
-            extendNodeSchema(extension) {
-              const context = {
-                name: extension.name,
-                options: extension.options,
-                storage: extension.storage,
-              };
-
-              return {
-                tableRole: callOrReturn(
-                  getExtensionField(extension, "tableRole", context)
-                ),
-              };
-            },
-          }),
-          EventHandler,
-          Collaboration.configure({
-            document: ydoc,
-          }),
-          CollaborationCursor.configure({
-            provider: this.provider,
-            user: {
-              name: null,
-              color: "#958DF1",
-            },
-          }),
-          CharacterCount.configure({
-            limit: 10000,
-          }),
-        ],
-        onUpdate: ({ editor }) => {
-          const json = editor.getJSON();
-          this.$emit("input", json);
-        },
-      });
-
-      this.editor.commands.updateUser({
-        name: `${this.user.firstName} ${this.user.lastName}`,
-      });
+      // this.editor.commands.updateUser({
+      //   name: `${this.user.firstName} ${this.user.lastName}`,
+      // });
     },
   },
 
@@ -711,8 +457,8 @@ export default {
   // right: 0;
 }
 
-.tableWrapper{
-	max-width: 100%
+.tableWrapper {
+  max-width: 100%;
 }
 .table-actions-colButtons {
   // position: absolute;

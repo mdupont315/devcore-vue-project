@@ -2,7 +2,8 @@
   <div class="idea_edit_container">
     <idea-edit-content
       :user="user"
-      :idea="idea"
+      :idea="getIdea"
+      :isLoading="isLoading || ideaForm.busy || contentForm.busy"
       v-model="getIdeaContent"
     ></idea-edit-content>
     <idea-edit-path
@@ -10,8 +11,9 @@
       @save="saveIdeaVersion"
       @deleteIdea="deleteIdeaVersion"
       @updateStatus="updateIdeaVersionStatus"
+			:isLoading="isLoading || ideaForm.busy || contentForm.busy"
       v-model="getIdeaPath"
-      :idea="idea"
+      :idea="getIdea"
     ></idea-edit-path>
   </div>
 </template>
@@ -27,13 +29,17 @@ export default {
     "idea-edit-path": IdeaEditPath,
   },
   created() {
-    if (this.idea.ideaContent && this.idea.ideaContent.markup) {
-      this.contentForm.id = this.idea.ideaContent.id;
-      this.contentForm.version = this.idea.ideaContent.version;
-      this.contentForm.markup = this.idea.ideaContent.markup;
-    }
+    this.setContentForm(this.idea);
+  },
+  watch: {
+    idea: {
+      handler(newVal) {
+        // this.setContentForm(newVal);
+      },
+    },
   },
   data: () => ({
+    isLoading: false,
     contentForm: new GQLForm({
       id: undefined,
       markup: null,
@@ -50,14 +56,12 @@ export default {
       title: null,
       type: null,
     }),
+    test: null,
   }),
-  mounted() {
-    const input = Object.assign(this.idea, {});
-    Object.keys(this.ideaForm.fields || {})
-      .filter((key) => key in input)
-      .forEach((key) => {
-        this.ideaForm[key] = input[key];
-      });
+  async mounted() {
+    const mapTo = this.ideaForm;
+    const mapFrom = Object.assign(this.idea, {});
+    this.formFieldMapper(mapTo, mapFrom);
   },
   props: {
     idea: {
@@ -70,6 +74,15 @@ export default {
     },
   },
   computed: {
+    getIdea: {
+      get() {
+        return this.idea;
+      },
+      set(val) {
+        console.log(val);
+        this.test = val;
+      },
+    },
     getIdeaPath: {
       get() {
         return this.ideaForm;
@@ -90,7 +103,25 @@ export default {
     },
   },
   methods: {
+    formFieldMapper(mapTo, mapFrom) {
+      Object.keys(mapTo.fields || {})
+        .filter((key) => key in mapFrom)
+        .forEach((key) => {
+          console.log(key);
+          mapTo[key] = mapFrom[key];
+        });
+    },
+    setContentForm(idea) {
+      if (idea.ideaContent && idea.ideaContent.markup) {
+        console.log("CREATED!");
+        this.contentForm.id = idea.ideaContent.id;
+        this.contentForm.version = idea.ideaContent.version;
+        this.contentForm.markup = idea.ideaContent.markup;
+        //  this.isLoading = false;
+      }
+    },
     async saveIdeaVersion() {
+      this.isLoading = true;
       try {
         const ideaSave = await this.$store.dispatch(
           `idea/update`,
@@ -98,20 +129,35 @@ export default {
         );
         if (ideaSave && ideaSave.id) {
           this.contentForm.ideaId = ideaSave.id;
-
+          let ideaContent = null;
           if (this.contentForm.id) {
-            await this.$store.dispatch(`ideaContent/update`, this.contentForm);
+            this.contentForm.ideaId = this.idea.id;
+            ideaContent = await this.$store.dispatch(
+              `ideaContent/update`,
+              this.contentForm
+            );
+						console.log("HELLO WORLD")
+            console.log(ideaContent);
           } else {
-            await this.$store.dispatch(`ideaContent/create`, this.contentForm);
+            ideaContent = await this.$store.dispatch(
+              `ideaContent/create`,
+              this.contentForm
+            );
+            const mapTo = this.contentForm;
+            const mapFrom = Object.assign(ideaContent, {});
+            this.formFieldMapper(mapTo, mapFrom);
           }
         }
       } catch (e) {
         console.log(e);
       } finally {
+        this.ideaForm.busy = true;
         await this.$store.dispatch("idea/findById", {
           id: this.idea.id,
           force: true,
         });
+        this.ideaForm.busy = false;
+        this.isLoading = false;
       }
     },
     async updateIdeaVersionStatus() {

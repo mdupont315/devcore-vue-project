@@ -53,7 +53,10 @@
         </b-popover>
       </div>
     </div>
-    <idea-content-editor v-model="getIdeaContent" :idea="idea" :contentType="selectedType" />
+    <idea-content-editor
+		:isEditable="!isLoading && initialized"
+		@initialized="initialized = true"
+		v-model="getIdeaContent" :idea="idea" :contentType="selectedType" />
   </div>
 </template>
 
@@ -77,6 +80,10 @@ export default {
       type: Object,
       required: false,
     },
+    isLoading: {
+      type: Boolean,
+      default: true,
+    },
   },
   computed: {
     getIdeaContent: {
@@ -94,6 +101,7 @@ export default {
     selectedType: "Cheatsheet",
     selectingType: false,
     newType: "",
+		initialized: false,
     ideaContentTypes: [
       { name: "Cheatsheet" },
       { name: "Learn" },
@@ -165,5 +173,6 @@ export default {
   flex-grow: 3;
   border-radius: 5px;
   width: 75%;
+	overflow:hidden
 }
 </style>
