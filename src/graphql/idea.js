@@ -20,6 +20,11 @@ export const IDEA_FRAGMENT = gql`
     updatedAt
     replied
     uuid
+    ideaContent {
+      id
+      version
+      markup
+    }
     comments {
       id
       description,

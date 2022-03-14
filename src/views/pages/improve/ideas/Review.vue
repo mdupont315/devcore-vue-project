@@ -27,15 +27,20 @@
           thisOrNextOpen(index - 1) ? 'ideasAreInColumn' : 'ideasAreInRow'
         "
       >
-        <idea-card
+        <div
           v-if="testingIdeas[index - 1]"
-          class="review-idea-card review-idea-card-testing"
-          :id="`idea-id-${testingIdeas[index - 1].uuid}`"
-          :ref="`idea-ref-${testingIdeas[index - 1].uuid}`"
-          @openIdea="ideaOpened"
-          @closeIdea="ideaClosed"
-          :idea="testingIdeas[index - 1]"
-        ></idea-card>
+          style="width: 100%"
+          class="review-idea-card-testing-container"
+        >
+          <idea-card
+            class="review-idea-card review-idea-card-testing"
+            :id="`idea-id-${testingIdeas[index - 1].uuid}`"
+            :ref="`idea-ref-${testingIdeas[index - 1].uuid}`"
+            @openIdea="ideaOpened"
+            @closeIdea="ideaClosed"
+            :idea="testingIdeas[index - 1]"
+          ></idea-card>
+        </div>
         <div
           v-else-if="!ideaUuidOpened && !testingIdeas[index - 1]"
           style="width: 100%"
@@ -48,15 +53,20 @@
             {{ $t("There are no records for the given criteria") }}
           </p>
         </div>
-        <idea-card
+        <div
           v-if="evaluatedIdeas[index - 1]"
-          class="review-idea-card review-idea-card-evaluating"
-          :id="`idea-id-${evaluatedIdeas[index - 1].uuid}`"
-          :ref="`idea-ref-${evaluatedIdeas[index - 1].uuid}`"
-          @openIdea="ideaOpened"
-          @closeIdea="ideaClosed"
-          :idea="evaluatedIdeas[index - 1]"
-        ></idea-card>
+          style="width: 100%"
+          class="review-idea-card-evaluating-container"
+        >
+          <idea-card
+            class="review-idea-card review-idea-card-evaluating"
+            :id="`idea-id-${evaluatedIdeas[index - 1].uuid}`"
+            :ref="`idea-ref-${evaluatedIdeas[index - 1].uuid}`"
+            @openIdea="ideaOpened"
+            @closeIdea="ideaClosed"
+            :idea="evaluatedIdeas[index - 1]"
+          ></idea-card>
+        </div>
         <div
           v-else-if="!ideaUuidOpened && !evaluatedIdeas[index - 1]"
           style="width: 100%"
@@ -231,7 +241,7 @@ export default {
 }
 
 .reviewIdeas-content-container.ideasAreInRow {
-  justify-content: end;
+  justify-content: space-between;
 }
 
 .testingIdeas-content-container.ideasAreInRow {
@@ -242,23 +252,38 @@ export default {
   align-self: flex-start;
   flex-direction: row;
   justify-content: space-between;
-  & > .review-idea-card {
+  & > div > .review-idea-card {
     width: 100%;
-    max-width: 49%;
+    max-width: 820px;
     max-height: 250px;
   }
 }
 
-.review-idea-card-testing{
+.ideasAreInRow > .review-idea-card-evaluating-container {
+  display: flex;
+  justify-content: flex-end;
 }
-.review-idea-card-evaluating{
-	margin:0 10px;
+
+.ideasAreInRow > .review-idea-card-testing-container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.ideasAreInColumn > .review-idea-card-evaluating-container > .idea-card-shrunk {
+  float: right;
+}
+
+// .review-idea-card-evaluating {
+//   margin-left: 15px;
+// }
+.review-idea-card-testing {
+  margin-right: 10px;
 }
 .ideasAreInColumn {
   flex-direction: column;
   align-self: flex-start;
-  > .idea-card-shrunk {
-    max-width: 49%;
+  > div > .idea-card-shrunk {
+    max-width: 820px;
     width: 100%;
     &.review-idea-card-testing {
       align-self: start;
@@ -268,7 +293,7 @@ export default {
     }
   }
 
-  > .idea-card-expanded {
+  > div > .idea-card-expanded {
     align-self: center;
     max-width: 100%;
     width: 100%;

@@ -5,8 +5,7 @@
     class="mb-3 idea-card"
     :class="showDetail ? 'idea-card-expanded' : 'idea-card-shrunk'"
   >
-    <b-col cols="12">
-      <div v-if="!showDetail" class="idea_card_container">
+      <div class="idea_card_container" v-if="!showDetail">
         <b-card-header class="bg-white border-0">
           <div style="line-height: 1em">
             <nav aria-label="breadcrumb" class="m-0 p-0 d-inline-block">
@@ -138,15 +137,12 @@
           </div>
         </b-card-footer>
       </div>
-    </b-col>
-    <b-row style="max-width: 100%">
       <idea-edit
         v-if="showDetail"
         @close="closeEdit"
         :idea="idea"
         :ref="`ideaEdit-${idea.id}`"
       ></idea-edit>
-    </b-row>
   </b-card>
 </template>
 <script>

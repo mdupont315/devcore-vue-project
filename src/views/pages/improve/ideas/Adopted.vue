@@ -140,7 +140,6 @@ export default {
 
 .adopted-idea_card_expanded {
   width: 100%;
-  margin: 0 20px 20px 20px;
 }
 
 .adoptedIdeas-idea-count {

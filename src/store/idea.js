@@ -64,6 +64,8 @@ const actions = {
   },
 
   async update(context, form) {
+    console.log(form)
+
     form.type = "PROCESS";
     const result = await form.mutate({
       mutation: IDEA.update,

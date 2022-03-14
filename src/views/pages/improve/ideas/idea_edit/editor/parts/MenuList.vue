@@ -2,19 +2,20 @@
   <div>
     <button
       class="menu-list"
+			tabindex="0"
       :class="{ 'is-active': selectionOpen }"
       @click="toggleSelection()"
       ref="menuListButtonHeading"
       :title="item.title"
     >
       <svg class="remix">
-        <use :xlink:href="`${remixiconUrl}#ri-${item.icon}`" />
+        <use :xlink:href="`${remixiconUrl}#ri-${activeIcon}`" />
       </svg>
     </button>
     <b-popover
-      :show="selectionOpen"
+      :show.sync="selectionOpen"
       class="menu-list-items"
-      triggers="click blur"
+      triggers="hover blur"
       boundary="window"
       :target="() => $refs.menuListButtonHeading"
       placement="bottom"
@@ -52,6 +53,10 @@ export default {
   props: {
     item: {
       type: Object,
+      required: true,
+    },
+    activeIcon: {
+      type: String,
       required: true,
     },
   },

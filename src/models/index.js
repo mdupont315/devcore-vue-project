@@ -30,3 +30,4 @@ export { default as IssueEffect } from "./issueeffect";
 export { default as IssueEffectTemplate } from "./issueeffecttemplate.model";
 export { default as IdeaIssueReply } from "./ideaissue.reply.model";
 export { default as Experience } from "./experience.model";
+export { default as IdeaContent } from "./ideacontent.model";

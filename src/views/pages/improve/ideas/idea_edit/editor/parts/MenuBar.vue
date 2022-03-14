@@ -6,7 +6,12 @@
         v-if="item.type === 'divider'"
         :key="`divider${index}`"
       />
-      <menu-list v-else-if="item.type === 'list'" :key="index" :item="item" />
+      <menu-list
+        v-else-if="item.type === 'list'"
+        :key="index"
+        :item="item"
+        :activeIcon="activeHeading"
+      />
       <!-- <menu-grid v-else-if="item.type === 'grid'" :key="index" :item="item" /> -->
       <menu-item v-else :key="index" v-bind="item" />
     </template>
@@ -16,13 +21,13 @@
 <script>
 import MenuItem from "./MenuItem.vue";
 import MenuList from "./MenuList.vue";
-import MenuGrid from "./MenuGrid.vue";
+// import MenuGrid from "./MenuGrid.vue";
 
 export default {
   components: {
     MenuItem,
     MenuList,
-    MenuGrid,
+    // MenuGrid,
   },
 
   props: {
@@ -33,6 +38,7 @@ export default {
   },
   data() {
     return {
+      activeHeading: "h-3",
       items: [
         {
           icon: "menu-line",
@@ -42,44 +48,35 @@ export default {
             {
               icon: "h-1",
               title: "Heading 1",
-              action: () =>
-                this.editor.chain().focus().toggleHeading({ level: 1 }).run(),
+              action: () => {
+                this.editor.commands.setTitleText({
+                  color: "#000",
+                  fontSize: 20,
+                });
+                this.activeHeading = "h-1";
+              },
               isActive: () => this.editor.isActive("heading", { level: 1 }),
             },
             {
-              icon: "h-2",
+              icon: "h-3",
               title: "Heading 2",
-              action: () =>
-                this.editor.chain().focus().toggleHeading({ level: 2 }).run(),
+              action: () => {
+                this.editor.commands.setTitleText({
+                  color: "#4294d0",
+                  fontSize: 14,
+                });
+                this.activeHeading = "h-2";
+              },
               isActive: () => this.editor.isActive("heading", { level: 2 }),
             },
             {
               icon: "h-3",
               title: "Heading 3",
-              action: () =>
-                this.editor.chain().focus().toggleHeading({ level: 3 }).run(),
+              action: () => {
+                this.editor.commands.unsetFontSize();
+                this.activeHeading = "h-3";
+              },
               isActive: () => this.editor.isActive("heading", { level: 3 }),
-            },
-            {
-              icon: "h-4",
-              title: "Heading 4",
-              action: () =>
-                this.editor.chain().focus().toggleHeading({ level: 4 }).run(),
-              isActive: () => this.editor.isActive("heading", { level: 4 }),
-            },
-            {
-              icon: "h-5",
-              title: "Heading 5",
-              action: () =>
-                this.editor.chain().focus().toggleHeading({ level: 5 }).run(),
-              isActive: () => this.editor.isActive("heading", { level: 5 }),
-            },
-            {
-              icon: "h-6",
-              title: "Heading 6",
-              action: () =>
-                this.editor.chain().focus().toggleHeading({ level: 6 }).run(),
-              isActive: () => this.editor.isActive("heading", { level: 6 }),
             },
           ],
         },

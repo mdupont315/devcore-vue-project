@@ -52,15 +52,22 @@ import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 //import Table from "./extensions/TableCell.js";
 // import Table from "./extensions/Table"
+import Text from "@tiptap/extension-text";
+import TextStyle from "@tiptap/extension-text-style";
+import { Color } from "@tiptap/extension-color";
 
 import * as Y from "yjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { MenuBar } from "./parts";
 import { Indent } from "./extensions/indent.js";
 import { EventHandler } from "./extensions/eventHandler.js";
+import { CustomStyle } from "./extensions/CustomStyle.js";
 
 import { mergeAttributes, getExtensionField, callOrReturn } from "@tiptap/core";
 import { tableEditing, columnResizing } from "prosemirror-tables";
+
+import EditorInstance from "./EditorLoader.js"
+
 
 export function updateColumns(
   node,
@@ -133,7 +140,7 @@ export default {
     },
     value: {
       type: Object,
-      default: () => null,
+      default: () => {},
     },
   },
   computed: {
@@ -141,11 +148,9 @@ export default {
       user: "auth/user",
     }),
   },
-  watch: {
-    contentType: {
-      handler(newVal) {
-        this.initEditor();
-      },
+ watch: {
+    editable() {
+      this.editor.setEditable(this.editable)
     },
   },
 
@@ -154,7 +159,7 @@ export default {
       provider: null,
       editor: null,
       status: "connecting",
-      editable: false,
+      editable: true,
     };
   },
   methods: {
@@ -180,17 +185,19 @@ export default {
         this.status = event.status;
       });
 
+
       this.editor = new Editor({
+				editable: this.editable,
         content: this.value,
         extensions: [
           StarterKit.configure({
             history: false,
           }),
-          Indent.configure({
-            types: ["listItem", "paragraph", "heading"],
-            minLevel: 0,
-            maxLevel: 8,
-          }),
+          Text,
+          TextStyle,
+					CustomStyle,
+          Color,
+          Indent,
           Highlight,
           Underline,
           TableRow,
@@ -205,7 +212,7 @@ export default {
                 resizable: true,
                 handleWidth: 5,
                 cellMinWidth: 25,
-                lastColumnResizable: true,
+                lastColumnResizable: false,
                 allowTableNodeSelection: false,
               };
             },
@@ -352,138 +359,6 @@ export default {
               };
             },
           }),
-          // Table.extend({
-          //   name: "CustomTable",
-          //   addNodeView() {
-          //     return ({ node, HTMLAttributes, getPos, editor }) => {
-          //   		console.log(editor)
-          //   		console.log(node)
-          //       console.log("ADDING!");
-
-          //      // const container = document.createElement("table");
-          //       const container = document.createElement("table");
-          //       container.className = "table-container-table";
-
-          //       const removeRowButton = document.createElement("button");
-          //       const addRowButton = document.createElement("button");
-
-          //       const removeColButton = document.createElement("button");
-          //       const addColButton = document.createElement("button");
-
-          //       addRowButton.appendChild(document.createTextNode("+"));
-          //       removeRowButton.appendChild(document.createTextNode("-"));
-
-          //       addColButton.appendChild(document.createTextNode("+"));
-          //       removeColButton.appendChild(document.createTextNode("-"));
-
-          //       const actionsRowButtons = document.createElement("div");
-          //       actionsRowButtons.className = "table-actions-rowButtons";
-
-          //       const actionsColButtons = document.createElement("div");
-          //       actionsColButtons.className = "table-actions-colButtons";
-
-          //       const actionsRemoveTable = document.createElement("div");
-          //       const actionsRemoveTableButton =
-          //         document.createElement("button");
-          //       actionsRemoveTableButton.appendChild(
-          //         document.createTextNode("Remove")
-          //       );
-          //       actionsRemoveTable.appendChild(actionsRemoveTableButton);
-          //       actionsRemoveTable.className = "table-actions-removeTable";
-
-          //       actionsRowButtons.appendChild(addRowButton);
-          //       actionsRowButtons.appendChild(removeRowButton);
-
-          //       actionsColButtons.appendChild(addColButton);
-          //       actionsColButtons.appendChild(removeColButton);
-
-          //       addColButton.addEventListener("click", (event) => {
-          //         const element = document.getElementById("idea_editor_content");
-          //         this.editor.chain().focus().addRowAfter().run();
-          //         element.scrollIntoView();
-          //       });
-          //       removeColButton.addEventListener("click", (event) => {
-          //         const element = document.getElementById("idea_editor_content");
-          //         this.editor.chain().focus().deleteRow().run();
-          //         element.scrollIntoView();
-          //       });
-
-          //       addRowButton.addEventListener("click", (event) => {
-          //         this.editor.chain().focus().addColumnAfter().run();
-          //       });
-          //       removeRowButton.addEventListener("click", (event) => {
-          //         this.editor.chain().focus().deleteColumn().run();
-          //       });
-          //       actionsRemoveTable.addEventListener("click", (event) => {
-          //         this.editor.chain().focus().deleteTable().run();
-          //       });
-
-          //       const div = document.createElement("div");
-          //       div.className = "table-container";
-
-          //   		console.log(container)
-
-          //       container.appendChild(document.createElement("div"));
-          //       div.append(
-          //         container,
-          //         actionsRowButtons,
-          //         actionsRemoveTable,
-          //         actionsColButtons
-          //       );
-
-          //       return {
-          //         dom: div,
-          //         contentDOM: container,
-          //       };
-          //     };
-          //   },
-
-          //   addOptions() {
-          //     console.log(this)
-          //     if(this.parent){
-          //       console.log("this.parent().view")
-          //       console.log(this.parent().View)
-          //     }
-          //     return {
-          //       ...this.parent?.(),
-          //       resizable: true,
-          //       HTMLAttributes: {
-          //         style: "width:500px;overflow-x:scroll",
-          //         class: `editIdea-test-custom-class-${this.name}`,
-          //       },
-          //       HTMLCustomAttributes: {
-          //         style: "width:100px;overflow-x:scroll",
-          //         class: "editIdea-test-custom-class",
-          //         onclick: "console.log('MyCustomAttributes')",
-          //       },
-          //     };
-          //   },
-          //   renderHTML({ HTMLAttributes }) {
-          //     return [
-          //       "div",
-          //       mergeAttributes(this.options.HTMLAttributes, {
-          //         class: "captioned-table",
-          //       }),
-          //       ["table", HTMLAttributes, ["tbody", 0]],
-          //       [
-          //         "button",
-          //         mergeAttributes({
-          //           ...this.options.HTMLCustomAttributes,
-          //           ...HTMLAttributes,
-          //         }),
-          //         "+",
-          //       ],
-          //       [
-          //         "button",
-          //         mergeAttributes(
-          //           this.options.HTMLCustomAttributes,
-          //           HTMLAttributes
-          //         ),
-          //         "-",
-          //       ],
-          //     ];
-          //   },
-          // }),
           EventHandler,
           Collaboration.configure({
             document: ydoc,
@@ -501,7 +376,6 @@ export default {
         ],
         onUpdate: ({ editor }) => {
           const json = editor.getJSON();
-          console.log(json);
           this.$emit("input", json);
         },
       });
@@ -835,6 +709,10 @@ export default {
 .table-actions-rowButtons {
   // position: absolute;
   // right: 0;
+}
+
+.tableWrapper{
+	max-width: 100%
 }
 .table-actions-colButtons {
   // position: absolute;

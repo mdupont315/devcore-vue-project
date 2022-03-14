@@ -81,6 +81,8 @@ export default {
   computed: {
     getIdeaContent: {
       get() {
+				console.log("this.value")
+				console.log(this.value)
         return this.value;
       },
       set(value) {
