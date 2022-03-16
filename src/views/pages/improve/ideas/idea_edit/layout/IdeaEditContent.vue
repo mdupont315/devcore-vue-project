@@ -7,29 +7,34 @@
           ref="btnNewIdeaTemplate"
           style="overflow: hidden; min-width: 100px"
         >
-          {{ selectedType }}</b-button
-        >
+          <span v-if="!isLoading">{{ getIdeaContent.contentType }}</span>
+          <b-spinner v-else style="width: 15px; height: 15px" />
+        </b-button>
+
         <b-popover
           ref="popover"
           :target="() => $refs.btnNewIdeaTemplate"
           placement="bottom"
           class="idea-template-select"
-          triggers="click"
+          triggers="click blur"
         >
-          <b-card no-body style="width: 150px">
-            <b-card-body>
+          <b-card no-body style="width: 100px">
+            <b-card-body style="padding: 0">
               <div>
                 <div
-                  v-for="(item, index) in ideaContentTypes"
+                  v-for="(item, index) in ideaContentCategories"
                   :key="index"
                   class="idea-template-select-item"
+                  :class="{
+                    'is-active': getIdeaContent.contentType === item.name,
+                  }"
                   style="color: #4294d0"
-                  @click="setTypeActive(item)"
+                  @click="changeContentType(item)"
                 >
                   {{ item.name }}
                 </div>
               </div>
-              <div>
+              <!-- <div>
                 <div class="idea-template-create-item">
                   <b-form-input
                     v-model="newType"
@@ -47,16 +52,23 @@
                     <i class="mdi mdi-plus"></i>
                   </b-button>
                 </div>
-              </div>
+              </div> -->
             </b-card-body>
           </b-card>
         </b-popover>
       </div>
     </div>
     <idea-content-editor
-		:isEditable="!isLoading && initialized"
-		@initialized="initialized = true"
-		v-model="getIdeaContent" :idea="idea" :contentType="selectedType" />
+      v-if="!isLoading"
+      :isEditable="isEditable"
+      v-model="getIdeaContent"
+      :idea="idea"
+      @initialized="isEditable = true"
+      :contentType="contentType"
+    />
+    <div v-else class="ideaContent-empty-spinner">
+      <b-spinner />
+    </div>
   </div>
 </template>
 
@@ -80,6 +92,11 @@ export default {
       type: Object,
       required: false,
     },
+    ideaContentCategories: {
+      type: Array,
+      required: true,
+      default: () => [],
+    },
     isLoading: {
       type: Boolean,
       default: true,
@@ -88,40 +105,60 @@ export default {
   computed: {
     getIdeaContent: {
       get() {
-				console.log("this.value")
-				console.log(this.value)
-        return this.value;
+        console.log(this.value);
+        return {
+          contentType: this.value.contentType,
+          markup: this.value.markup,
+        };
       },
       set(value) {
-				this.$emit("input", value)
+        console.log(value);
+        this.$emit("input", value);
       },
     },
   },
   data: () => ({
-    selectedType: "Cheatsheet",
+    contentType: "Cheatsheet",
     selectingType: false,
+    isEditable: false,
     newType: "",
-		initialized: false,
-    ideaContentTypes: [
-      { name: "Cheatsheet" },
-      { name: "Learn" },
-      { name: "Custom" },
-    ],
   }),
   methods: {
-    setTypeActive(item) {
-      this.selectedType = item.name;
+    changeContentType(item) {
+			console.log(this.getIdeaContent.markup)
+			// EMIT MARKUP TO SAVE LOCAL CHANGES
+		//	this.$emit("")
+      this.$emit("selectedType", item);
     },
-    addNewIdeaTemplate() {
-      if (!this.newType) return;
-      this.ideaContentTypes.push({ name: this.newType });
-    },
+    // addNewIdeaTemplate() {
+    //   if (!this.newType) return;
+    //   this.ideaContentCategories.push({ name: this.newType });
+    // },
   },
 };
 </script>
 
 
 <style lang="scss">
+.idea-template-select-item.is-active {
+  background: #f8f8f8;
+  color: #fff;
+}
+
+.idea-template-select-item:hover {
+  background: lightgray;
+  color: #fff;
+}
+
+.ideaContent-empty-spinner {
+  text-align: center;
+  margin-top: 250px;
+  & > span {
+    width: 40px;
+    height: 40px;
+    background: "#fff";
+  }
+}
 .idea-template-create-item {
   display: flex;
   justify-content: space-between;
@@ -152,6 +189,7 @@ export default {
   font-size: 16px;
   width: 100%;
   padding-left: 10px;
+  cursor: pointer;
 }
 
 .selectedIdeaContentType button {
@@ -173,6 +211,6 @@ export default {
   flex-grow: 3;
   border-radius: 5px;
   width: 75%;
-	overflow:hidden
+  overflow: hidden;
 }
 </style>

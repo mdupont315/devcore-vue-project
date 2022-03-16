@@ -289,13 +289,13 @@ export default class ContentEditor {
 
   getEditorInstance(){
     return new Editor({
-      editable: false,
+      editable: this.editable,
       content: this.content,
       extensions: this.extensions,
       onUpdate: ({ editor }) => {
         const json = editor.getJSON();
         this.options.onUpdate(json)
-      }
+      },
     });
   }
 

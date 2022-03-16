@@ -1,9 +1,11 @@
 <template>
   <div class="idea_edit_path_container">
     <div class="idea_edit_path_container-header">
-      <div class="idea_edit_path_container-header-title">Edit instruction</div>
+      <div class="idea_edit_path_container-header-title">
+        {{ $t("Edit idea") }}
+      </div>
       <div class="idea_edit_path_container-header-close">
-        <button @click="closeIdeaEdit">Close</button>
+        <button @click="closeIdeaEdit">{{ $t("close") }}</button>
       </div>
     </div>
     <div class="idea_edit_path_container-body">
@@ -21,7 +23,7 @@
                   <div
                     class="idea_edit_path_container-body-process-select-title"
                   >
-                    STAGE
+                    {{ $t("stage") }}
                   </div>
                   <v-select
                     v-model="mutateForm.stageId"
@@ -52,7 +54,7 @@
                   <div
                     class="idea_edit_path_container-body-process-select-title"
                   >
-                    OPERATION
+                    {{ $t("operation") }}
                   </div>
                   <v-select
                     v-model="mutateForm.operationId"
@@ -84,7 +86,7 @@
                   <div
                     class="idea_edit_path_container-body-process-select-title"
                   >
-                    PHASE
+                    {{ $t("phase") }}
                   </div>
                   <v-select
                     v-model="mutateForm.phaseId"
@@ -110,7 +112,7 @@
                   <div
                     class="idea_edit_path_container-body-process-select-title"
                   >
-                    INSTRUCTION TITLE
+                    {{ $t("Instruction title") }}
                   </div>
                   <b-form-input
                     id="title"
@@ -134,7 +136,7 @@
                   <div
                     class="idea_edit_path_container-body-process-select-title"
                   >
-                    INSTRUCTION DESCRIPTION
+                    {{ $t("Instruction description") }}
                   </div>
                   <b-form-textarea
                     id="description"
@@ -229,10 +231,10 @@ export default {
       type: Object,
       required: false,
     },
-		isLoading: {
-			type: Boolean,
-			default: false
-		}
+    isLoading: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     ...mapGetters({
@@ -317,6 +319,12 @@ export default {
 </script>
 
 <style scoped>
+.idea_edit_path_container-header-title,
+.idea_edit_path_container-header-close,
+.idea_edit_path_container-body-process-select-title {
+  text-transform: uppercase;
+}
+
 .idea_edit_path_container {
   background: #fff;
   height: 100%;

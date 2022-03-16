@@ -3,7 +3,9 @@
     <idea-edit-content
       :user="user"
       :idea="getIdea"
+      :ideaContentCategories="ideaContentCategories"
       :isLoading="isLoading || ideaForm.busy || contentForm.busy"
+      @selectedType="setContentType"
       v-model="getIdeaContent"
     ></idea-edit-content>
     <idea-edit-path
@@ -11,7 +13,7 @@
       @save="saveIdeaVersion"
       @deleteIdea="deleteIdeaVersion"
       @updateStatus="updateIdeaVersionStatus"
-			:isLoading="isLoading || ideaForm.busy || contentForm.busy"
+      :isLoading="isLoading || ideaForm.busy || contentForm.busy"
       v-model="getIdeaPath"
       :idea="getIdea"
     ></idea-edit-path>
@@ -22,30 +24,36 @@
 import IdeaEditContent from "./layout/IdeaEditContent.vue";
 import IdeaEditPath from "./layout/IdeaEditPath.vue";
 import GQLForm from "@/lib/gqlform";
+import { mapGetters } from "vuex";
 
 export default {
   components: {
     "idea-edit-content": IdeaEditContent,
     "idea-edit-path": IdeaEditPath,
   },
-  created() {
-    this.setContentForm(this.idea);
-  },
-  watch: {
-    idea: {
-      handler(newVal) {
-        // this.setContentForm(newVal);
+  async created() {
+    // await this.$store.dispatch("ideaContent/findAll", { force: true });
+    this.isLoading = true;
+    this.filter = {
+      data: {
+        where: {
+          field: "idea_id",
+          op: "eq",
+          value: this.idea.id,
+        },
       },
-    },
+    };
+    await this.$store.dispatch("ideaContent/findAll", {
+      filter: this.filter,
+      force: true,
+    });
+
+    await this.initializeForms();
+    this.isLoading = false;
   },
   data: () => ({
-    isLoading: false,
-    contentForm: new GQLForm({
-      id: undefined,
-      markup: null,
-      ideaId: null,
-      version: 1,
-    }),
+    filter: null,
+    selectedCategoryIndex: 0,
     ideaForm: new GQLForm({
       id: undefined,
       processId: null,
@@ -56,13 +64,49 @@ export default {
       title: null,
       type: null,
     }),
-    test: null,
+    contentForm: new GQLForm({
+      id: undefined,
+      markup: null,
+      ideaId: null,
+      version: 1,
+      contentType: null,
+    }),
+
+    ideaContentCategories: [
+      {
+        name: "Cheatsheet",
+        contentForm: new GQLForm({
+          id: undefined,
+          markup: null,
+          ideaId: null,
+          version: 1,
+          contentType: null,
+        }),
+      },
+      {
+        name: "Learn",
+        contentForm: new GQLForm({
+          id: undefined,
+          markup: null,
+          ideaId: null,
+          version: 1,
+          contentType: null,
+        }),
+      },
+      {
+        name: "Custom",
+        contentForm: new GQLForm({
+          id: undefined,
+          markup: null,
+          ideaId: null,
+          version: 1,
+          contentType: null,
+        }),
+      },
+    ],
+
+    isLoading: false,
   }),
-  async mounted() {
-    const mapTo = this.ideaForm;
-    const mapFrom = Object.assign(this.idea, {});
-    this.formFieldMapper(mapTo, mapFrom);
-  },
   props: {
     idea: {
       type: Object,
@@ -74,50 +118,72 @@ export default {
     },
   },
   computed: {
+    ...mapGetters({
+      ideaContents: "ideaContent/all",
+    }),
     getIdea: {
       get() {
         return this.idea;
-      },
-      set(val) {
-        console.log(val);
-        this.test = val;
       },
     },
     getIdeaPath: {
       get() {
         return this.ideaForm;
       },
-      set(value) {
-        this.ideaForm = new GQLForm({
-          ...value,
-        });
-      },
     },
     getIdeaContent: {
       get() {
-        return JSON.parse(this.contentForm.markup);
+				console.log(this.ideaForm)
+        const contentForm =
+          this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+        return {
+          contentType: contentForm.contentType,
+          markup: JSON.parse(contentForm.markup),
+        };
       },
       set(value) {
-        this.contentForm.markup = JSON.stringify(value);
+        const contentForm =
+          this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+        contentForm.markup = JSON.stringify(value.markup);
+        contentForm.contentType = value.contentType;
       },
     },
   },
   methods: {
+    setContentType(item) {
+      this.isLoading = true;
+      this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
+        (content) => content.name === item.name
+      );
+      this.$nextTick(() => {
+        this.isLoading = false;
+      });
+    },
     formFieldMapper(mapTo, mapFrom) {
       Object.keys(mapTo.fields || {})
         .filter((key) => key in mapFrom)
         .forEach((key) => {
-          console.log(key);
           mapTo[key] = mapFrom[key];
         });
     },
-    setContentForm(idea) {
-      if (idea.ideaContent && idea.ideaContent.markup) {
-        console.log("CREATED!");
-        this.contentForm.id = idea.ideaContent.id;
-        this.contentForm.version = idea.ideaContent.version;
-        this.contentForm.markup = idea.ideaContent.markup;
-        //  this.isLoading = false;
+    async initializeForms() {
+      this.ideaFormFieldMapper();
+      this.ideaContentFormFieldMapper();
+    },
+    ideaFormFieldMapper() {
+      const mapToIdea = this.ideaForm;
+      const mapFromIdea = Object.assign(this.idea, {});
+      this.formFieldMapper(mapToIdea, mapFromIdea);
+    },
+    ideaContentFormFieldMapper() {
+      if (this.idea && this.idea.ideaContentId) {
+        this.ideaContents.map((content) => {
+          const mapToCategory = this.ideaContentCategories.find(
+            (category) => category.name === content.contentType
+          );
+          const mapFromIdeaContent = Object.assign(content, {});
+          this.formFieldMapper(mapToCategory.contentForm, mapFromIdeaContent);
+        });
       }
     },
     async saveIdeaVersion() {
@@ -130,20 +196,20 @@ export default {
         if (ideaSave && ideaSave.id) {
           this.contentForm.ideaId = ideaSave.id;
           let ideaContent = null;
-          if (this.contentForm.id) {
+          const contentForm =
+            this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+          if (contentForm.id) {
             this.contentForm.ideaId = this.idea.id;
             ideaContent = await this.$store.dispatch(
               `ideaContent/update`,
-              this.contentForm
+              contentForm
             );
-						console.log("HELLO WORLD")
-            console.log(ideaContent);
           } else {
             ideaContent = await this.$store.dispatch(
               `ideaContent/create`,
-              this.contentForm
+              contentForm
             );
-            const mapTo = this.contentForm;
+            const mapTo = contentForm;
             const mapFrom = Object.assign(ideaContent, {});
             this.formFieldMapper(mapTo, mapFrom);
           }
@@ -151,12 +217,6 @@ export default {
       } catch (e) {
         console.log(e);
       } finally {
-        this.ideaForm.busy = true;
-        await this.$store.dispatch("idea/findById", {
-          id: this.idea.id,
-          force: true,
-        });
-        this.ideaForm.busy = false;
         this.isLoading = false;
       }
     },

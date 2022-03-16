@@ -75,11 +75,11 @@ export default {
     }),
   },
   watch: {
-    isEditable() {
-      console.log("Set editor editable: ");
-      console.log(this.isEditable);
-      this.editable = this.isEditable;
-      this.editor.setEditable(this.editable);
+    isEditable: {
+      handler(newVal) {
+        this.editor.setEditable(newVal);
+        if (newVal) this.focusEditor();
+      },
     },
   },
 
@@ -88,7 +88,6 @@ export default {
       provider: null,
       editor: null,
       status: "connecting",
-      editable: false,
     };
   },
   methods: {
@@ -114,15 +113,24 @@ export default {
       //   this.status = event.status;
       // });
 
-      const editorInstance = new ContentEditor(this.editable, this.value, {
-        onUpdate: (value) => this.$emit("input", value),
-      });
+			console.log(this.value)
+
+      const editorInstance = new ContentEditor(
+        this.isEditable,
+        this.value.markup,
+        {
+          onUpdate: (content) =>
+            this.$emit("input", {
+							contentType: this.value.contentType,
+              markup: content
+            }),
+        }
+      );
 
       this.editor = editorInstance.editor;
       this.$emit("initialized");
       //this.editable = true;
 
-      console.log(this.editor);
       //this.editable = true;
       //this.editor.setEditable(this.editable);
 
@@ -135,10 +143,10 @@ export default {
   mounted() {
     this.initEditor();
   },
+  beforeDestroy() {
 
-  beforeUnmount() {
     this.editor.destroy();
-    this.provider.destroy();
+    // this.provider.destroy();
   },
 };
 </script>

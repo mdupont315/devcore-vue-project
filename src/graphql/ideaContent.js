@@ -6,6 +6,7 @@ export const IDEA_CONTENT_FRAGMENT = gql`
     id,
     markup,
     ideaId,
+    contentType,
     version,
     createdAt,
     updatedAt

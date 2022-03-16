@@ -57,14 +57,14 @@
               v-validate="'required'"
               label="title"
               :disabled="form.status != 'NEW'"
-              data-vv-name="stage_id"
+              data-vv-name="stage"
               :placeholder="$t('Stage')"
               :reduce="(stage) => stage.id"
               :options="process.process.stages"
               class="text-capitalize"
               :class="{
-                'is-invalid': $validateState('stage_id', form) === false,
-                'is-valid': $validateState('stage_id', form) === true,
+                'is-invalid': $validateState('stage', form) === false,
+                'is-valid': $validateState('stage', form) === true,
               }"
               @input="changeStage"
             ></v-select>

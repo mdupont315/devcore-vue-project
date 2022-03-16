@@ -1,23 +1,21 @@
 <template>
   <div>
-    <button
+    <b-button
       class="menu-list"
-			tabindex="0"
-      :class="{ 'is-active': selectionOpen }"
-      @click="toggleSelection()"
-      ref="menuListButtonHeading"
       :title="item.title"
+      ref="btnMenuListPopover"
+      tabindex="0"
+      :class="{ 'is-active': selectionOpen }"
     >
       <svg class="remix">
         <use :xlink:href="`${remixiconUrl}#ri-${activeIcon}`" />
       </svg>
-    </button>
+    </b-button>
     <b-popover
-      :show.sync="selectionOpen"
+      ref="menuList-popover"
       class="menu-list-items"
-      triggers="hover blur"
-      boundary="window"
-      :target="() => $refs.menuListButtonHeading"
+      triggers="click blur"
+      :target="() => $refs.btnMenuListPopover"
       placement="bottom"
     >
       <b-card no-body style="align-items: center; width: 150px">
@@ -29,6 +27,7 @@
           :class="{ 'is-active': activeHeadingIndex == index }"
           :style="{
             'font-size': getHeadingFontSize(listItem),
+            color: getHeadingColor(listItem),
           }"
         >
           {{ listItem.title }}
@@ -45,9 +44,6 @@ const fontLevels = {
   "Heading 1": 1,
   "Heading 2": 2,
   "Heading 3": 3,
-  "Heading 4": 4,
-  "Heading 5": 5,
-  "Heading 6": 6,
 };
 export default {
   props: {
@@ -79,23 +75,29 @@ export default {
       if (!item || !item.title) return;
       let ret = "1rem";
       switch (fontLevels[item.title]) {
-        case 6:
-          ret = "1rem";
-          break;
-        case 5:
-          ret = "1.25rem";
-          break;
-        case 4:
-          ret = "1.5rem";
-          break;
         case 3:
-          ret = "1.75rem";
+          ret = "12px";
           break;
         case 2:
-          ret = "2.25rem";
+          ret = "14px";
           break;
         case 1:
-          ret = "2.5rem";
+          ret = "20px";
+      }
+      return ret;
+    },
+    getHeadingColor(item) {
+      if (!item || !item.title) return;
+      let ret = "1rem";
+      switch (fontLevels[item.title]) {
+        case 3:
+          ret = "#000";
+          break;
+        case 2:
+          ret = "#4294d0";
+          break;
+        case 1:
+          ret = "#0D0D0D";
       }
       return ret;
     },
@@ -113,12 +115,12 @@ export default {
 
 <style lang="scss">
 .menu-list-item.is-active {
-  background: #4294d0;
+  background: "#f8f8f8";
   color: #fff;
 }
 
 .menu-list-item:hover {
-  background: #4294d0;
+  background: lightgray;
   color: #fff;
 }
 
@@ -139,7 +141,7 @@ export default {
   height: 100%;
   width: 1.75rem;
   height: 1.75rem;
-	display: flex;
+  display: flex;
   z-index: 1;
   color: #0d0d0d;
   border: none;
