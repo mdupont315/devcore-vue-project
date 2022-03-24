@@ -40,20 +40,20 @@ export default {
   components: {
     "idea-card": IdeaCard,
   },
-  mounted() {
-    if (this.$router.currentRoute.query) {
-      if (this.$router.currentRoute.query.uuid) {
-        const { uuid } = this.$router.currentRoute.query;
-        this.$nextTick(() => {
-          const ideaSelector = `idea-id-${uuid}`;
-          const element = document.getElementById(ideaSelector);
-          if (element) {
-            element.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-        });
-      }
-    }
-  },
+  // mounted() {
+  //   if (this.$router.currentRoute.query) {
+  //     if (this.$router.currentRoute.query.uuid) {
+  //       const { uuid } = this.$router.currentRoute.query;
+  //       this.$nextTick(() => {
+  //         const ideaSelector = `idea-id-${uuid}`;
+  //         const element = document.getElementById(ideaSelector);
+  //         if (element) {
+  //           element.scrollIntoView({ behavior: "smooth", block: "center" });
+  //         }
+  //       });
+  //     }
+  //   }
+  // },
   computed: {
     ...mapGetters({
       currentProcess: "process/current",

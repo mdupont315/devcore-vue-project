@@ -14,7 +14,7 @@
     <b-popover
       ref="menuList-popover"
       class="menu-list-items"
-      triggers="click blur"
+      triggers="hover blur"
       :target="() => $refs.btnMenuListPopover"
       placement="bottom"
     >

@@ -1,22 +1,25 @@
 <template>
-  <div class="idea_edit_container">
-    <idea-edit-content
-      :user="user"
-      :idea="getIdea"
-      :ideaContentCategories="ideaContentCategories"
-      :isLoading="isLoading || ideaForm.busy || contentForm.busy"
-      @selectedType="setContentType"
-      v-model="getIdeaContent"
-    ></idea-edit-content>
-    <idea-edit-path
-      @close="closeIdeaEdit"
-      @save="saveIdeaVersion"
-      @deleteIdea="deleteIdeaVersion"
-      @updateStatus="updateIdeaVersionStatus"
-      :isLoading="isLoading || ideaForm.busy || contentForm.busy"
-      v-model="getIdeaPath"
-      :idea="getIdea"
-    ></idea-edit-path>
+  <div>
+    <div class="idea_edit_container" v-if="getIdea">
+      <idea-edit-content
+        :user="user"
+        :idea="getIdea"
+        :ideaContentCategories="ideaContentCategories"
+        :isLoading="isLoading"
+        :selectedCategoryIndex="selectedCategoryIndex"
+        @selectedType="setContentType"
+        v-model="getIdeaContent"
+      ></idea-edit-content>
+      <idea-edit-path
+        @close="closeIdeaEdit"
+        @save="saveIdeaVersion"
+        @deleteIdea="deleteIdeaVersion"
+        @updateStatus="updateIdeaVersionStatus"
+        :isLoading="isLoading"
+        v-model="getIdeaPath"
+        :idea="getIdea"
+      ></idea-edit-path>
+    </div>
   </div>
 </template>
 
@@ -39,7 +42,7 @@ export default {
         where: {
           field: "idea_id",
           op: "eq",
-          value: this.idea.id,
+          value: this.getIdea.id,
         },
       },
     };
@@ -120,10 +123,12 @@ export default {
   computed: {
     ...mapGetters({
       ideaContents: "ideaContent/all",
+      ideaInEdit: "idea/ideaInEdit",
     }),
     getIdea: {
       get() {
-        return this.idea;
+        console.log(this.ideaInEdit);
+        return this.ideaInEdit.editIdea;
       },
     },
     getIdeaPath: {
@@ -133,7 +138,6 @@ export default {
     },
     getIdeaContent: {
       get() {
-				console.log(this.ideaForm)
         const contentForm =
           this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
         return {
@@ -160,11 +164,14 @@ export default {
       });
     },
     formFieldMapper(mapTo, mapFrom) {
+      console.log(mapFrom);
       Object.keys(mapTo.fields || {})
         .filter((key) => key in mapFrom)
         .forEach((key) => {
           mapTo[key] = mapFrom[key];
         });
+
+      console.log(mapTo);
     },
     async initializeForms() {
       this.ideaFormFieldMapper();
@@ -172,11 +179,12 @@ export default {
     },
     ideaFormFieldMapper() {
       const mapToIdea = this.ideaForm;
-      const mapFromIdea = Object.assign(this.idea, {});
+      console.log(this.getIdea.stageId);
+      const mapFromIdea = Object.assign(this.getIdea, {});
       this.formFieldMapper(mapToIdea, mapFromIdea);
     },
     ideaContentFormFieldMapper() {
-      if (this.idea && this.idea.ideaContentId) {
+      if (this.getIdea && this.getIdea.ideaContentId) {
         this.ideaContents.map((content) => {
           const mapToCategory = this.ideaContentCategories.find(
             (category) => category.name === content.contentType
@@ -189,22 +197,31 @@ export default {
     async saveIdeaVersion() {
       this.isLoading = true;
       try {
+					console.log(this.ideaForm)
         const ideaSave = await this.$store.dispatch(
           `idea/update`,
           this.ideaForm
         );
+
+
+        console.log(ideaSave);
         if (ideaSave && ideaSave.id) {
-          this.contentForm.ideaId = ideaSave.id;
           let ideaContent = null;
           const contentForm =
             this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+
+          contentForm.ideaId = ideaSave.id;
+					contentForm.contentType = this.ideaContentCategories[this.selectedCategoryIndex].name
+
           if (contentForm.id) {
-            this.contentForm.ideaId = this.idea.id;
+						console.log("UPDATING!")
+						console.log(contentForm)
             ideaContent = await this.$store.dispatch(
               `ideaContent/update`,
               contentForm
             );
           } else {
+            console.log("CREATING!");
             ideaContent = await this.$store.dispatch(
               `ideaContent/create`,
               contentForm
@@ -221,17 +238,15 @@ export default {
       }
     },
     async updateIdeaVersionStatus() {
-      this.form.busy = true;
       const editForm = new GQLForm({
-        id: this.idea.id,
-        status: this.idea.status === "NEW" ? "TESTING" : "ADOPTED",
+        id: this.getIdea.id,
+        status: this.getIdea.status === "NEW" ? "TESTING" : "ADOPTED",
       });
       await this.$store.dispatch(`idea/changeStatus`, editForm);
       this.$store.dispatch(`idea/findByProcess`, {
-        id: this.idea.processId,
+        id: this.getIdea.processId,
         force: true,
       });
-      this.form.busy = false;
       this.closeIdeaEdit();
     },
     async deleteIdeaVersion() {
@@ -250,12 +265,14 @@ export default {
       });
       this.form.busy = false;
     },
-    closeIdeaEdit() {
+    async closeIdeaEdit() {
       this.$emit("close");
+      await this.$store.dispatch("idea/setIdeaInEdit", null);
     },
   },
 };
 </script>
+
 
 <style scoped>
 .idea_edit_container {

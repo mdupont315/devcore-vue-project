@@ -104,7 +104,6 @@
         v-if="currentProcess && currentComponent"
       ></component>
 
-
       <empty-page v-else>
         <div v-if="!currentProcess" class="h2 text-center text-white">
           {{ $t("Just the empty space...") }}
@@ -143,7 +142,6 @@ export default {
   },
   data: () => ({
     currentComponent: null,
-    storeName: "idea",
   }),
 
   computed: {
@@ -301,22 +299,45 @@ export default {
         this.$refs[ref].$el.click();
       }
     });
+
+    EventBus.$on("idea/currentIdea", (data) => {
+      if (data.form) {
+        this.currentComponent = (data) => import("./idea_edit/IdeaEdit.vue");
+      } else {
+        this.loadComponent();
+      }
+    });
+
     if (
       this.$router.currentRoute.query &&
       Object.keys(this.$router.currentRoute.query).length > 0
     ) {
-      await this.goToIdea();
+      await this.goToIdeaByQuery();
     }
   },
   methods: {
-    async goToIdea() {
-      const query = {
-        processId: this.$router.currentRoute.query.processId ?? null,
-        stageId: this.$router.currentRoute.query.stageId ?? null,
-        operationId: this.$router.currentRoute.query.operationId ?? null,
-        phaseId: this.$router.currentRoute.query.phaseId ?? null,
-      };
-      await this.navigateToIdea(query);
+    async goToIdeaByQuery() {
+      // Navigated through link
+      if (this.$router.currentRoute.query) {
+        const query = {
+          processId: this.$router.currentRoute.query.processId ?? null,
+          stageId: this.$router.currentRoute.query.stageId ?? null,
+          operationId: this.$router.currentRoute.query.operationId ?? null,
+          phaseId: this.$router.currentRoute.query.phaseId ?? null,
+          ideaId: this.$router.currentRoute.query.ideaId ?? null,
+        };
+        await this.navigateToIdea(query);
+        const editIdea = await this.$store.dispatch("idea/findById", {
+          id: query.ideaId,
+          force: true,
+        });
+        await this.$store.dispatch("idea/setIdeaInEdit", {
+          editIdeaMeta: {
+            editStartedAt: new Date().getTime(),
+          },
+          editIdea,
+        });
+      }
     },
     async navigateToIdea({
       processId = null,
@@ -347,7 +368,6 @@ export default {
           phase: phasePath,
         });
 
-
         let tab = "New";
 
         if (
@@ -357,7 +377,7 @@ export default {
           tab = this.$router.currentRoute.params.type;
         }
 
-        await this.$store.dispatch(`${this.storeName}/setTab`, {
+        await this.$store.dispatch(`idea/setIdeaTab`, {
           tab: tab,
         });
       }
@@ -420,8 +440,19 @@ export default {
           break;
       }
     },
+
+    //  <idea-edit
+    //   v-if="showDetail"
+    //   @close="closeEdit"
+    //   :idea="idea"
+    //   :ref="`ideaEdit-${idea.id}`"
+    // ></idea-edit>
+
     async loadComponent() {
+      console.log("LOADING!");
       //this.currentComponent = type;
+      console.log(this.$route.params);
+      console.log(this.$route);
       this.currentComponent = () =>
         import(
           "./" +

@@ -1,5 +1,5 @@
 <template>
-  <router-view></router-view>
+    <router-view></router-view>
 </template>
 <script>
 export default {
@@ -7,9 +7,9 @@ export default {
     currentComponent: null,
   }),
   async mounted() {
-  //  await this.$store.dispatch("processStage/findAll");
-  //  await this.$store.dispatch("processOperation/findAll");
-  //  await this.$store.dispatch("processPhase/findAll");
+    //  await this.$store.dispatch("processStage/findAll");
+    //  await this.$store.dispatch("processOperation/findAll");
+    //  await this.$store.dispatch("processPhase/findAll");
   },
 };
 </script>

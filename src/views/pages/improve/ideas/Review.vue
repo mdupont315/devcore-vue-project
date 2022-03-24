@@ -91,15 +91,15 @@ export default {
   components: {
     "idea-card": IdeaCard,
   },
-  mounted() {
-    if (this.$router.currentRoute.query) {
-      if (this.$router.currentRoute.query.uuid) {
-        const { uuid } = this.$router.currentRoute.query;
-        this.scrollToElement(uuid);
-        this.ideaUuidOpened = uuid;
-      }
-    }
-  },
+  // mounted() {
+  //   if (this.$router.currentRoute.query) {
+  //     if (this.$router.currentRoute.query.uuid) {
+  //       const { uuid } = this.$router.currentRoute.query;
+  //       this.scrollToElement(uuid);
+  //       this.ideaUuidOpened = uuid;
+  //     }
+  //   }
+  // },
   computed: {
     ...mapGetters({
       currentProcess: "process/current",

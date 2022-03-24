@@ -4,9 +4,13 @@
       <div class="idea_edit_path_container-header-title">
         {{ $t("Edit idea") }}
       </div>
-      <div class="idea_edit_path_container-header-close">
-        <button @click="closeIdeaEdit">{{ $t("close") }}</button>
-      </div>
+      <div class="idea_edit_path_container-header-close"></div>
+      <b-button
+        style="overflow: hidden; min-width: 100px"
+        @click="closeIdeaEdit"
+      >
+        <span> {{ $t("close") }} </span>
+      </b-button>
     </div>
     <div class="idea_edit_path_container-body">
       <div class="idea_edit_path_container-body-process">
@@ -17,7 +21,7 @@
           v-if="mutateForm"
         >
           <b-card no-body class="d-block">
-            <b-card-body class="p-0">
+            <b-card-body class="p-0 ideaEditPath-form-fields">
               <div class="form-group">
                 <div class="form-label-group select required">
                   <div
@@ -157,7 +161,7 @@
                 </div>
               </div>
             </b-card-body>
-            <b-card-footer>
+            <b-card-footer class="ideaEditPath-form-actions">
               <b-row>
                 <loading-button
                   v-if="
@@ -246,7 +250,6 @@ export default {
         return this.value;
       },
       set(value) {
-        console.log(value);
         this.$emit("input", value);
       },
     },
@@ -318,7 +321,27 @@ export default {
 };
 </script>
 
+
 <style scoped>
+.idea_edit_path_container-body {
+  height: 100%;
+}
+
+.idea_edit_path_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+}
+
+.ideaEditPath-form-fields {
+  overflow-y: scroll;
+  max-height: 50vh;
+}
+
+.idea_edit_path_container-header-title {
+  padding: 20px;
+}
+
 .idea_edit_path_container-header-title,
 .idea_edit_path_container-header-close,
 .idea_edit_path_container-body-process-select-title {
@@ -326,11 +349,10 @@ export default {
 }
 
 .idea_edit_path_container {
-  background: #fff;
+  overflow: hidden;
   height: 100%;
   margin-left: 15px;
   border-radius: 5px;
-  flex-grow: 1;
   width: 25%;
   min-width: 300px;
 }
@@ -340,13 +362,18 @@ export default {
   justify-content: space-between;
   height: 60px;
   border-bottom: 1px solid lightgray;
-  padding: 20px;
+  background: #fff;
+}
+.idea_edit_path_container-header > button {
+  margin: 20px 20px 10px 20px;
 }
 
 .idea_edit_path_container-body-process-select {
   list-style-type: none;
   padding: 20px;
   height: calc(100% - 60px);
+  border-radius: 3px;
+  background: #fff;
 }
 
 .idea_edit_path_container-body-process-select-title {

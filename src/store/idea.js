@@ -41,17 +41,20 @@ const getters = {
 };
 
 const actions = {
-  // async setIsEditingIdea(context, form) {
-  //   context.commit("IS_EDITING_IDEA", form);
-  // },
+
   async setIdeaInEdit(context, form) {
+    EventBus.$emit("idea/currentIdea", {
+      form
+    });
+
     context.commit("SET_EDITING_IDEA", form);
   },
 
-  async setTab(context, form) {
+  async setIdeaTab(context, form) {
     EventBus.$emit("idea/currentTab", {
       form
     });
+
     context.commit("SET_CURRENT_TAB", form);
   },
   async create(context, form) {
@@ -64,7 +67,6 @@ const actions = {
   },
 
   async update(context, form) {
-    console.log(form)
 
     form.type = "PROCESS";
     const result = await form.mutate({
@@ -74,7 +76,6 @@ const actions = {
       }
     });
     const idea = new Idea().deserialize(result.data.ideaUpdate);
-    console.log(idea)
     context.commit("SET_ITEM", idea);
     // await context.dispatch('findAll', { force: true });
     return idea;
@@ -254,17 +255,6 @@ const actions = {
 };
 
 const mutations = {
-  // IS_EDITING_IDEA(state, value) {
-  //   if (value) {
-  //     if (value.id) {
-  //       state.isEditingIdea.push(value);
-  //     } else {
-  //       state.isEditingIdea = [
-  //         ...state.isEditingIdea.filter(x => x.userId !== value.userId)
-  //       ];
-  //     }
-  //   }
-  // },
   SET_EDITING_IDEA(state, value) {
     state.ideaInEdit = value;
   },

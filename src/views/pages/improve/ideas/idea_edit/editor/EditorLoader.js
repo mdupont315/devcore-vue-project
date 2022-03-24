@@ -6,11 +6,14 @@ import Highlight from "@tiptap/extension-highlight";
 import CharacterCount from "@tiptap/extension-character-count";
 import Underline from "@tiptap/extension-underline";
 import Table from "@tiptap/extension-table";
+import Gapcursor from "@tiptap/extension-gapcursor";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import Text from "@tiptap/extension-text";
 import TextStyle from "@tiptap/extension-text-style";
+import History from "@tiptap/extension-history";
+import FontFamily from "@tiptap/extension-font-family";
 import { Color } from "@tiptap/extension-color";
 
 import { Indent } from "./extensions/indent.js";
@@ -83,6 +86,10 @@ export default class ContentEditor {
       StarterKit.configure({
         history: false
       }),
+      History.configure({ depth: 10 }),
+      FontFamily.configure({
+        types: ["textStyle"]
+      }),
       Text,
       TextStyle,
       CustomStyle,
@@ -93,6 +100,7 @@ export default class ContentEditor {
       TableRow,
       TableHeader,
       TableCell,
+      Gapcursor,
       Table.extend({
         name: "table",
         // @ts-ignore
@@ -156,9 +164,16 @@ export default class ContentEditor {
               const tableRemoveCol = document.createElement("button");
 
               tableAddRow.innerText = "Add Row";
+              tableAddRow.className = "tableAddRow-handle";
+
               tableRemoveRow.innerText = "Remove Row";
+              tableRemoveRow.className = "tableRemoveRow-handle";
+
               tableAddCol.innerText = "Add Col";
+              tableAddCol.className = "tableAddCol-handle";
+
               tableRemoveCol.innerText = "Remove Col";
+              tableRemoveCol.className = "tableRemoveCol-handle";
 
               tableRemove.addEventListener("click", event => {
                 this.editor
@@ -222,7 +237,6 @@ export default class ContentEditor {
                   colgroup.contains(mutation.target)),
               update: node => {
                 if (node.type !== nodeViewNode.type) {
-                  console.log("false!");
                   return false;
                 }
 
@@ -284,18 +298,17 @@ export default class ContentEditor {
       })
     ];
     this.editor = this.getEditorInstance();
-
   }
 
-  getEditorInstance(){
+  getEditorInstance() {
     return new Editor({
       editable: this.editable,
       content: this.content,
       extensions: this.extensions,
       onUpdate: ({ editor }) => {
         const json = editor.getJSON();
-        this.options.onUpdate(json)
-      },
+        this.options.onUpdate(json);
+      }
     });
   }
 
@@ -309,4 +322,3 @@ export default class ContentEditor {
     return this.editor;
   }
 }
-

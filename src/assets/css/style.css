@@ -2,7 +2,25 @@
 @font-face {
     font-family: FuturaBQ;
     src: url(../fonts/FuturaBQ.woff) format("woff");
-  }/*!
+  }
+
+
+	@font-face {
+    font-family: FuturaBold;
+    src: url(../fonts/Futura-Bold.woff) format("woff");
+  }
+
+	@font-face {
+    font-family: FuturaMedium;
+    src: url(../fonts/Futura-Medium.woff) format("woff");
+  }
+
+	@font-face {
+    font-family: FuturaLight;
+    src: url(../fonts/Futura-Light.woff) format("woff");
+  }
+
+	/*!
    * Bootstrap v4.5.0 (https://getbootstrap.com/)
    * Copyright 2011-2020 The Bootstrap Authors
    * Copyright 2011-2020 Twitter, Inc.

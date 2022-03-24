@@ -1,13 +1,13 @@
 <template>
   <div class="idea_edit_content_container">
     <div class="idea_edit_content_container_content-header">
-      <div>Instruction content</div>
-      <div>
+      <div class="idea_edit_content_container_content-header-title">{{idea.title}}</div>
+      <div class="idea_edit_content_container_content-header-button">
         <b-button
           ref="btnNewIdeaTemplate"
           style="overflow: hidden; min-width: 100px"
         >
-          <span v-if="!isLoading">{{ getIdeaContent.contentType }}</span>
+          <span v-if="!isLoading">{{ ideaContentCategories[selectedCategoryIndex].name }}</span>
           <b-spinner v-else style="width: 15px; height: 15px" />
         </b-button>
 
@@ -101,13 +101,16 @@ export default {
       type: Boolean,
       default: true,
     },
+    selectedCategoryIndex: {
+      type: Number,
+      default: 0,
+    },
   },
   computed: {
     getIdeaContent: {
       get() {
-        console.log(this.value);
         return {
-          contentType: this.value.contentType,
+          contentType: this.ideaContentCategories[this.selectedCategoryIndex].name,
           markup: this.value.markup,
         };
       },
@@ -125,7 +128,6 @@ export default {
   }),
   methods: {
     changeContentType(item) {
-			console.log(this.getIdeaContent.markup)
 			// EMIT MARKUP TO SAVE LOCAL CHANGES
 		//	this.$emit("")
       this.$emit("selectedType", item);
@@ -202,15 +204,22 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.idea_edit_content_container_content-header-title{
   height: 60px;
   padding: 20px;
   font-size: 20px;
 }
+
+.idea_edit_content_container_content-header-button {
+	margin: 20px 20px 10px 20px;
+}
 .idea_edit_content_container {
-  background: #fff;
-  flex-grow: 3;
-  border-radius: 5px;
+	  background: #fff;
+  border-radius: 3px;
   width: 75%;
   overflow: hidden;
 }
+
 </style>

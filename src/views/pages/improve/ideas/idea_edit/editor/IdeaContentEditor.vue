@@ -113,8 +113,6 @@ export default {
       //   this.status = event.status;
       // });
 
-			console.log(this.value)
-
       const editorInstance = new ContentEditor(
         this.isEditable,
         this.value.markup,
@@ -165,7 +163,7 @@ export default {
 .idea_editor_content {
   background: #fff;
   flex-grow: 1;
-  border-radius: 5px;
+  border-radius: 3px;
   max-height: calc(100% - 60px);
   height: 100%;
 }

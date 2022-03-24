@@ -429,7 +429,7 @@ export default {
           tab = this.$router.currentRoute.params.type;
         }
 
-        await this.$store.dispatch(`${this.storeName}/setTab`, {
+        await this.$store.dispatch(`${this.storeName}/setIdeaTab`, {
           tab: tab,
         });
       }

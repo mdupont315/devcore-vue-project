@@ -404,7 +404,7 @@ export default {
             await this.$store.dispatch(`${this.storeName}/update`, this.form);
           } else {
             await this.$store.dispatch(`${this.storeName}/create`, this.form);
-            await this.$store.dispatch(`${this.storeName}/setTab`, {
+            await this.$store.dispatch(`${this.storeName}/setIdeaTab`, {
               tab: "New",
             });
           }

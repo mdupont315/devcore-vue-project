@@ -1,4 +1,3 @@
-
 import Vue from "vue";
 import VueRouter from "vue-router";
 import guest from "@/middlewares/guest";
@@ -8,7 +7,6 @@ import store from "../store";
 Vue.use(VueRouter);
 
 const routes = [
-
   {
     path: "/login",
     name: "login",
@@ -112,7 +110,7 @@ const routes = [
     },
     children: [
       {
-        path: "ideas/:type?",
+        path: "ideas/:type?/:ideaId?",
         name: "ideas",
         component: () =>
           import(
@@ -132,7 +130,32 @@ const routes = [
             import(
               /* webpackChunkName: "manage" */ "@/views/pages/improve/ideas/CentralBar"
             )
-        }
+        },
+        // children: [
+        //   {
+        //     path: "edit/:ideaId?",
+        //     name: "edit-idea",
+        //     component: () =>
+        //       import(
+        //         /* webpackChunkName: "improve" */ "@/views/pages/improve/ideas/idea_edit/Index"
+        //       ),
+        //       meta: {
+        //         middleware: [auth],
+        //         title: "Ideas",
+        //         permissions: "improve/idea/manage",
+        //         layout: "default-layout",
+        //         titleButton: () =>
+        //           import(
+        //             /* webpackChunkName: "improve" */ "@/views/pages/improve/ideas/TitleButton"
+        //           ),
+        //         // topRight: () => import(/* webpackChunkName: "improve" */'@/views/pages/manage/proccess/SearchBar'),
+        //         topCentral: () =>
+        //           import(
+        //             /* webpackChunkName: "manage" */ "@/views/pages/improve/ideas/CentralBar"
+        //           )
+        //       },
+        //   }
+        // ]
       },
       {
         path: "tool-ideas/:type?",
@@ -246,9 +269,9 @@ const routes = [
         meta: {
           middleware: [auth],
           title: "Engage",
-          permissions: "core/support/engage/manage",
+          permissions: "core/support/engage/manage"
           // titleButton: () => import(/* webpackChunkName: "manage" */'@/views/pages/manage/proccess/TitleButton'),
-         // topCentral: () =>
+          // topCentral: () =>
           //  import(
           //    /* webpackChunkName: "manage" */ "@/views/pages/support/engage/CentralBar"
           //  )
@@ -471,7 +494,7 @@ const routes = [
 const router = new VueRouter({
   mode: "history",
 
- // base: process.env.BASE_URL,
+  // base: process.env.BASE_URL,
   routes
 });
 

@@ -47,36 +47,43 @@ export default {
           listItems: [
             {
               icon: "h-1",
-              title: "Heading 1",
+              title: "Chapter",
               action: () => {
-                this.editor.commands.setTitleText({
-                  color: "#000",
-                  fontSize: 20,
-                });
+                this.editor.commands.setChapterText();
+                this.editor.commands.setFontFamily("FuturaBold");
                 this.activeHeading = "h-1";
               },
               isActive: () => this.editor.isActive("heading", { level: 1 }),
             },
             {
-              icon: "h-3",
-              title: "Heading 2",
+              icon: "h-2",
+              title: "Title",
               action: () => {
-                this.editor.commands.setTitleText({
-                  color: "#4294d0",
-                  fontSize: 14,
-                });
+                this.editor.commands.setTitleText();
+                this.editor.commands.setFontFamily("FuturaMedium");
                 this.activeHeading = "h-2";
               },
               isActive: () => this.editor.isActive("heading", { level: 2 }),
             },
             {
               icon: "h-3",
-              title: "Heading 3",
+              title: "Subtitle",
               action: () => {
-                this.editor.commands.unsetFontSize();
-                this.activeHeading = "h-3";
+                this.editor.commands.setSubTitleText();
+                this.editor.commands.setFontFamily("FuturaMedium");
+                this.activeHeading = "h-2";
               },
               isActive: () => this.editor.isActive("heading", { level: 3 }),
+            },
+            {
+              icon: "paragraph",
+              title: "Paragraph",
+              action: () => {
+                this.editor.commands.setParagraphText();
+                this.editor.commands.setFontFamily("FuturaLight");
+                this.activeHeading = "h-4";
+              },
+              isActive: () => this.editor.isActive("heading", { level: 4 }),
             },
           ],
         },
@@ -99,12 +106,12 @@ export default {
         //   action: () => this.editor.chain().focus().toggleUnderline().run(),
         //   isActive: () => this.editor.isActive('underline'),
         // },
-        {
-          icon: "strikethrough",
-          title: "Strike",
-          action: () => this.editor.chain().focus().toggleStrike().run(),
-          isActive: () => this.editor.isActive("strike"),
-        },
+        // {
+        //   icon: "strikethrough",
+        //   title: "Strike",
+        //   action: () => this.editor.chain().focus().toggleStrike().run(),
+        //   isActive: () => this.editor.isActive("strike"),
+        // },
         // {
         //   icon: "mark-pen-line",
         //   title: "Highlight",
@@ -122,40 +129,40 @@ export default {
         //   isActive: () => this.editor.isActive("paragraph"),
         // },
 
-        {
-          icon: "indent-increase",
-          title: "Indent",
-          action: () => {
-            if (
-              !(
-                this.editor.isActive("bulletList") ||
-                this.editor.isActive("orderedList")
-              )
-            ) {
-              console.log(this.editor);
-              this.editor.commands.indent();
-              //  this.editor.commands.focus();
-            }
-          },
-          isActive: () => this.editor.isActive("indent"),
-        },
-        {
-          icon: "indent-decrease",
-          title: "Outdent",
-          action: () => {
-            if (
-              !(
-                this.editor.isActive("bulletList") ||
-                this.editor.isActive("orderedList")
-              )
-            ) {
-              console.log(this.editor);
-              this.editor.commands.outdent();
-              //  this.editor.commands.focus();
-            }
-          },
-          isActive: () => this.editor.isActive("outdent"),
-        },
+        // {
+        //   icon: "indent-increase",
+        //   title: "Indent",
+        //   action: () => {
+        //     if (
+        //       !(
+        //         this.editor.isActive("bulletList") ||
+        //         this.editor.isActive("orderedList")
+        //       )
+        //     ) {
+        //       console.log(this.editor);
+        //       this.editor.commands.indent();
+        //       //  this.editor.commands.focus();
+        //     }
+        //   },
+        //   isActive: () => this.editor.isActive("indent"),
+        // },
+        // {
+        //   icon: "indent-decrease",
+        //   title: "Outdent",
+        //   action: () => {
+        //     if (
+        //       !(
+        //         this.editor.isActive("bulletList") ||
+        //         this.editor.isActive("orderedList")
+        //       )
+        //     ) {
+        //       console.log(this.editor);
+        //       this.editor.commands.outdent();
+        //       //  this.editor.commands.focus();
+        //     }
+        //   },
+        //   isActive: () => this.editor.isActive("outdent"),
+        // },
         {
           icon: "list-unordered",
           title: "Bullet List",
@@ -274,25 +281,25 @@ export default {
           title: "Hard Break",
           action: () => this.editor.chain().focus().setHardBreak().run(),
         },
-        {
-          icon: "format-clear",
-          title: "Clear Format",
-          action: () =>
-            this.editor.chain().focus().clearNodes().unsetAllMarks().run(),
-        },
+        // {
+        //   icon: "format-clear",
+        //   title: "Clear Format",
+        //   action: () =>
+        //     this.editor.chain().focus().clearNodes().unsetAllMarks().run(),
+        // },
         {
           type: "divider",
         },
-        {
-          icon: "arrow-go-back-line",
-          title: "Undo",
-          action: () => this.editor.chain().focus().undo().run(),
-        },
-        {
-          icon: "arrow-go-forward-line",
-          title: "Redo",
-          action: () => this.editor.chain().focus().redo().run(),
-        },
+        // {
+        //   icon: "arrow-go-back-line",
+        //   title: "Undo",
+        //   action: () => this.editor.chain().focus().undo().run(),
+        // },
+        // {
+        //   icon: "arrow-go-forward-line",
+        //   title: "Redo",
+        //   action: () => this.editor.chain().focus().redo().run(),
+        // },
       ],
     };
   },

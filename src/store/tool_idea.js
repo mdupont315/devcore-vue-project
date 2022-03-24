@@ -36,7 +36,7 @@ const getters = {
 };
 
 const actions = {
-  async setTab(context, form) {
+  async setIdeaTab(context, form) {
     EventBus.$emit("tool_idea/currentTab", {
       form
     });
