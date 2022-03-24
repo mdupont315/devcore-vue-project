@@ -195,28 +195,33 @@ export const CustomTable = Table.extend({
 
       const dom = getElementWithAttributes('div', { class: 'tableWrapper' })
 
-      const tableFirstRow = getElementWithAttributes('div', { class: 'table-first-row' })
+      const table = document.createElement("table")
 
-      const tableSecondRow = getElementWithAttributes('div', { class: 'table-second-row' })
+      if (editor.isEditable) {
+        const tableFirstRow = getElementWithAttributes('div', { class: 'table-first-row' })
 
-      tableSecondRow.appendChild(getDeleteTableButton(editor))
-      tableSecondRow.appendChild(getColControlButtons(editor))
-      tableSecondRow.appendChild(getElementWithAttributes('div', {}))
+        const tableSecondRow = getElementWithAttributes('div', { class: 'table-second-row' })
 
-      const tableLeftContainer = getElementWithAttributes('section', { class: 'tableLeftSection' })
+        tableSecondRow.appendChild(getDeleteTableButton(editor))
+        tableSecondRow.appendChild(getColControlButtons(editor))
+        tableSecondRow.appendChild(getElementWithAttributes('div', {}))
 
-      const tableRightContainer = getElementWithAttributes('section', { class: 'tableRightSection' })
+        const tableLeftContainer = getElementWithAttributes('section', { class: 'tableLeftSection' })
 
-      tableRightContainer.appendChild(getRowControlButtons(editor))
+        const tableRightContainer = getElementWithAttributes('section', { class: 'tableRightSection' })
 
-      const table = tableLeftContainer.appendChild(document.createElement("table"));
+        tableRightContainer.appendChild(getRowControlButtons(editor))
 
-      tableFirstRow.appendChild(tableLeftContainer)
-      tableFirstRow.appendChild(tableRightContainer)
+        tableFirstRow.appendChild(tableLeftContainer)
+        tableFirstRow.appendChild(tableRightContainer)
 
-      dom.appendChild(tableFirstRow)
+        dom.appendChild(tableFirstRow)
+        dom.appendChild(tableSecondRow)
 
-      dom.appendChild(tableSecondRow)
+        tableLeftContainer.appendChild(table);
+      } else {
+        dom.appendChild(table)
+      }
 
       const colgroup = table.appendChild(document.createElement("colgroup"));
 
