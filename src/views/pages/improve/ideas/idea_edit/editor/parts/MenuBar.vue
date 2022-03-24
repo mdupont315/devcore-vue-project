@@ -276,11 +276,11 @@ export default {
         {
           type: "divider",
         },
-        {
-          icon: "text-wrap",
-          title: "Hard Break",
-          action: () => this.editor.chain().focus().setHardBreak().run(),
-        },
+        // {
+        //   icon: "text-wrap",
+        //   title: "Hard Break",
+        //   action: () => this.editor.chain().focus().setHardBreak().run(),
+        // },
         // {
         //   icon: "format-clear",
         //   title: "Clear Format",
