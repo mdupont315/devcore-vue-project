@@ -63,6 +63,7 @@
       :isEditable="isEditable"
       v-model="getIdeaContent"
       :idea="idea"
+			@fileAdded="setFile"
       @initialized="isEditable = true"
       :contentType="contentType"
     />
@@ -127,6 +128,9 @@ export default {
     newType: "",
   }),
   methods: {
+		setFile(file){
+			this.$emit("fileAdded", file)
+		},
     changeContentType(item) {
 			// EMIT MARKUP TO SAVE LOCAL CHANGES
 		//	this.$emit("")

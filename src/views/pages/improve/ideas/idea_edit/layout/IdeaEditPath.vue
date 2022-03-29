@@ -13,6 +13,13 @@
       </b-button>
     </div>
     <div class="idea_edit_path_container-body">
+      <div
+        v-if="idea.hasReviews"
+        class="bg-gray d-flex flex-column justify-content-center"
+        style="min-height: 200px"
+      >
+        <report-chart :idea="idea"></report-chart>
+      </div>
       <div class="idea_edit_path_container-body-process">
         <b-form
           class="idea_edit_path_container-body-process-select hide-labels"
@@ -21,7 +28,8 @@
           v-if="mutateForm"
         >
           <b-card no-body class="d-block">
-            <b-card-body class="p-0 ideaEditPath-form-fields">
+            <b-card-body class="p-0 ideaEditPath-form-fields" :style="idea.hasReviews ? 'max-height:25vh;' : 'max-height:50vh'"
+>
               <div class="form-group">
                 <div class="form-label-group select required">
                   <div
@@ -110,6 +118,30 @@
                   <label for="operation">{{ $t("Operation") }}</label>
                   <b-form-invalid-feedback>{{
                     $displayError("operation_id", mutateForm)
+                  }}</b-form-invalid-feedback>
+                </div>
+                <div class="form-label-group select">
+                  <div
+                    class="idea_edit_path_container-body-process-select-title"
+                  >
+                    {{ $t("tool") }}
+                  </div>
+                  <v-select
+                    v-model="mutateForm.companyToolId"
+                    label="name"
+                    data-vv-name="tool"
+                    :placeholder="$t('Tool')"
+                    :reduce="(tool) => tool.id"
+                    :options="tools"
+                    class="text-capitalize"
+                    :class="{
+                      'is-invalid': $validateState('tool', mutateForm) === false,
+                      'is-valid': $validateState('tool', mutateForm) === true,
+                    }"
+                  ></v-select>
+                  <label for="stage">{{ $t("Tool") }}</label>
+                  <b-form-invalid-feedback>{{
+                    $displayError("tool", mutateForm)
                   }}</b-form-invalid-feedback>
                 </div>
                 <div class="form-group">
@@ -225,7 +257,12 @@
 
 	<script>
 import { mapGetters } from "vuex";
+import IdeaReportChart from "../../IdeaReportChart.vue";
+
 export default {
+  components: {
+    "report-chart": IdeaReportChart,
+  },
   props: {
     idea: {
       type: Object,
@@ -243,6 +280,8 @@ export default {
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
+      currentTool: "companyTool/current",
+      tools: "companyTool/all",
     }),
 
     mutateForm: {
@@ -330,12 +369,11 @@ export default {
 .idea_edit_path_container {
   display: flex;
   flex-direction: column;
-  justify-content: start;
 }
 
 .ideaEditPath-form-fields {
   overflow-y: scroll;
-  max-height: 50vh;
+
 }
 
 .idea_edit_path_container-header-title {

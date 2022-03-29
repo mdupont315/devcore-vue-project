@@ -157,29 +157,29 @@ const routes = [
         //   }
         // ]
       },
-      {
-        path: "tool-ideas/:type?",
-        name: "tool-ideas",
-        component: () =>
-          import(
-            /* webpackChunkName: "improve" */ "@/views/pages/improve/tool_ideas/Index"
-          ),
+      // {
+      //   path: "tool-ideas/:type?",
+      //   name: "tool-ideas",
+      //   component: () =>
+      //     import(
+      //       /* webpackChunkName: "improve" */ "@/views/pages/improve/tool_ideas/Index"
+      //     ),
 
-        meta: {
-          middleware: [auth],
-          title: "Tool Ideas",
-          permissions: "improve/idea/manage",
-          titleButton: () =>
-            import(
-              /* webpackChunkName: "improve" */ "@/views/pages/improve/tool_ideas/TitleButton"
-            ),
-          // topRight: () => import(/* webpackChunkName: "improve" */'@/views/pages/manage/proccess/SearchBar'),
-          topCentral: () =>
-            import(
-              /* webpackChunkName: "manage" */ "@/views/pages/improve/tool_ideas/CentralBar"
-            )
-        }
-      }
+      //   meta: {
+      //     middleware: [auth],
+      //     title: "Tool Ideas",
+      //     permissions: "improve/idea/manage",
+      //     titleButton: () =>
+      //       import(
+      //         /* webpackChunkName: "improve" */ "@/views/pages/improve/tool_ideas/TitleButton"
+      //       ),
+      //     // topRight: () => import(/* webpackChunkName: "improve" */'@/views/pages/manage/proccess/SearchBar'),
+      //     topCentral: () =>
+      //       import(
+      //         /* webpackChunkName: "manage" */ "@/views/pages/improve/tool_ideas/CentralBar"
+      //       )
+      //   }
+      // }
     ]
   },
   {
@@ -202,8 +202,6 @@ const routes = [
           middleware: [auth],
           title: "General",
           permissions: "process/process/manage",
-          // titleButton: () => import(/* webpackChunkName: "manage" */'@/views/pages/anal/proccess/TitleButton'),
-          // topRight: () => import(/* webpackChunkName: "manage" */'@/views/pages/manage/proccess/SearchBar'),
           topCentral: () =>
             import(
               /* webpackChunkName: "manage" */ "@/views/pages/analysis/views/CentralBar"

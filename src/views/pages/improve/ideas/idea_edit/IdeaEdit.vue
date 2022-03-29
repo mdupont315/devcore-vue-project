@@ -7,6 +7,7 @@
         :ideaContentCategories="ideaContentCategories"
         :isLoading="isLoading"
         :selectedCategoryIndex="selectedCategoryIndex"
+				@fileAdded="setFile"
         @selectedType="setContentType"
         v-model="getIdeaContent"
       ></idea-edit-content>
@@ -46,6 +47,7 @@ export default {
         },
       },
     };
+    await this.$store.dispatch("companyTool/findAll");
     await this.$store.dispatch("ideaContent/findAll", {
       filter: this.filter,
       force: true,
@@ -63,6 +65,8 @@ export default {
       stageId: null,
       operationId: null,
       phaseId: null,
+      companyToolId: null,
+      file: [],
       description: null,
       title: null,
       type: null,
@@ -154,6 +158,10 @@ export default {
     },
   },
   methods: {
+		setFile(file) {
+			this.ideaForm.file = file
+			this.saveIdeaVersion()
+		},
     setContentType(item) {
       this.isLoading = true;
       this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
@@ -194,28 +202,30 @@ export default {
         });
       }
     },
-    async saveIdeaVersion() {
-      this.isLoading = true;
-      try {
-					console.log(this.ideaForm)
-        const ideaSave = await this.$store.dispatch(
+		async saveIdea(){
+			 const ideaSave = await this.$store.dispatch(
           `idea/update`,
           this.ideaForm
         );
+				return ideaSave
+		},
+    async saveIdeaVersion() {
+      this.isLoading = true;
+      try {
+				const ideaSave = await this.saveIdea()
 
-
-        console.log(ideaSave);
         if (ideaSave && ideaSave.id) {
           let ideaContent = null;
           const contentForm =
             this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
 
           contentForm.ideaId = ideaSave.id;
-					contentForm.contentType = this.ideaContentCategories[this.selectedCategoryIndex].name
+          contentForm.contentType =
+            this.ideaContentCategories[this.selectedCategoryIndex].name;
 
           if (contentForm.id) {
-						console.log("UPDATING!")
-						console.log(contentForm)
+            console.log("UPDATING!");
+            console.log(contentForm);
             ideaContent = await this.$store.dispatch(
               `ideaContent/update`,
               contentForm
@@ -231,6 +241,7 @@ export default {
             this.formFieldMapper(mapTo, mapFrom);
           }
         }
+				return ideaSave
       } catch (e) {
         console.log(e);
       } finally {
@@ -277,6 +288,8 @@ export default {
 <style scoped>
 .idea_edit_container {
   width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
   height: 100%;
   margin-top: 0px;
   min-height: 80vh;

@@ -137,12 +137,6 @@
         </div>
       </b-card-footer>
     </div>
-    <!-- <idea-edit
-      v-if="showDetail"
-      @close="closeEdit"
-      :idea="idea"
-      :ref="`ideaEdit-${idea.id}`"
-    ></idea-edit> -->
   </b-card>
 </template>
 <script>
@@ -151,7 +145,6 @@ import { mapGetters } from "vuex";
 import IdeaEdit from "./idea_edit/IdeaEdit.vue";
 import feedbackForm from "../../../../components/global/FeedbackForm.vue";
 import GQLForm from "@/lib/gqlform";
-import { Idea } from "@/models";
 
 /* eslint-disable */
 export default {
@@ -246,8 +239,10 @@ export default {
     //   this.$emit("closeIdea", idea);
     // },
     async openIdeaEdit(idea) {
-			console.log("_______________")
+      console.log("_______________");
       const editIdea = Object.assign(idea, {});
+
+      console.log(idea);
 
       await this.$store.dispatch("idea/setIdeaInEdit", {
         editIdeaMeta: {
@@ -308,21 +303,18 @@ export default {
     },
     async toggleIdea() {
       if (this.idea) {
-        await this.openIdeaEdit(this.idea);
+        await this.$store.dispatch("process/setCurrentProcess", {
+          section: "ideas",
+          process: this.process,
+          stage: this.stage,
+          operation: this.operation,
+          phase: this.phase,
+        });
 
-        // if (this.showDetail) {
-        //   this.$nextTick(() => {
-        //     console.log(this.$refs);
-        //     this.$refs[`ideaEdit-${this.idea.id}`].$el.scrollIntoView();
-        //     document.getElementById("main-content").scrollTop -= 55;
-        //     // document.getElementById("main-content").style.overflowY="hidden";
-        //   });
-        // } else {
-        //   document.getElementById("main-content").style.overflowY = "auto";
-        // }
+        await this.openIdeaEdit(this.idea);
       }
     },
-    breadcrumbClick(event, section) {
+    async breadcrumbClick(event, section) {
       event.preventDefault();
       switch (section) {
         case "process":
@@ -362,6 +354,7 @@ export default {
           });
           break;
       }
+
     },
   },
 };

@@ -122,6 +122,12 @@ export default {
           type: "divider",
         },
 
+        {
+          icon: "gallery-upload",
+          title: "upload",
+          action: () => this.editor.chain().focus().setParagraph().run(),
+          isActive: () => this.editor.isActive("paragraph"),
+        },
         // {
         //   icon: "paragraph",
         //   title: "Paragraph",
@@ -273,9 +279,7 @@ export default {
         //     },
         //   ],
         // },
-        {
-          type: "divider",
-        },
+
         // {
         //   icon: "text-wrap",
         //   title: "Hard Break",
@@ -287,9 +291,7 @@ export default {
         //   action: () =>
         //     this.editor.chain().focus().clearNodes().unsetAllMarks().run(),
         // },
-        {
-          type: "divider",
-        },
+
         // {
         //   icon: "arrow-go-back-line",
         //   title: "Undo",

@@ -72,7 +72,9 @@ export const CustomStyle = Extension.create({
             default: null,
             renderHTML: attributes => {
               if (!attributes.color) {
-                return {};
+                return {
+                  style: `color:${paragraphText.color}`
+                };
               }
               return {
                 style: `color:${attributes.color}`
@@ -83,7 +85,9 @@ export const CustomStyle = Extension.create({
             default: null,
             renderHTML: attributes => {
               if (!attributes.fontSize) {
-                return {};
+                return {
+                  style: `color:${paragraphText.fontSize}`
+                };
               }
               return {
                 style:`font-size: ${attributes.fontSize}px`
@@ -94,9 +98,10 @@ export const CustomStyle = Extension.create({
             default: null,
             renderHTML: attributes => {
               const dataText = `${attributes.dataAttr}-${getUuid()}`
-              console.log(dataText)
               if (!attributes.dataAttr) {
-                return {};
+                return {
+                  'data-text':`${paragraphText.dataAttr}-${getUuid()}`
+                };
               }
               return {
                 'data-text':dataText

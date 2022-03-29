@@ -133,7 +133,7 @@ export default {
   },
 
   async mounted() {
-    var result = await this.$store.dispatch("companyTool/findAll");
+    await this.$store.dispatch("companyTool/findAll");
     if (this.value) {
       this.dataValue = this.value.filter(
         (o) => this.tools.find((u) => u.id === o) != null

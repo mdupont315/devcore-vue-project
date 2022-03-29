@@ -14,8 +14,8 @@ import Text from "@tiptap/extension-text";
 import TextStyle from "@tiptap/extension-text-style";
 import History from "@tiptap/extension-history";
 import FontFamily from "@tiptap/extension-font-family";
+import { Image } from "./extensions/Image";
 import { Color } from "@tiptap/extension-color";
-
 import { Indent } from "./extensions/indent.js";
 import { EventHandler } from "./extensions/eventHandler.js";
 import { CustomStyle } from "./extensions/CustomStyle.js";
@@ -78,10 +78,11 @@ export function updateColumns(
 }
 
 export default class ContentEditor {
-  constructor(editable, value, options) {
+  constructor(editable, value, options, upload) {
     this.editable = editable;
     this.content = value;
     this.options = options;
+    this.upload = upload;
     this.extensions = [
       StarterKit.configure({
         history: false
@@ -101,6 +102,7 @@ export default class ContentEditor {
       TableHeader,
       TableCell,
       Gapcursor,
+      Image(this.upload),
       Table.extend({
         name: "table",
         // @ts-ignore
@@ -298,6 +300,8 @@ export default class ContentEditor {
       })
     ];
     this.editor = this.getEditorInstance();
+    this.editor.commands.setParagraphText();
+    this.editor.commands.setFontFamily("FuturaLight");
   }
 
   getEditorInstance() {

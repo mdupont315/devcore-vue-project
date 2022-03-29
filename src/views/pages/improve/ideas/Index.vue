@@ -408,7 +408,8 @@ export default {
         (name === "new" && !this.$route.params.type)
       );
     },
-    breadcrumbClick(event, section) {
+    async breadcrumbClick(event, section) {
+			console.log("CLICKED")
       event.preventDefault();
       switch (section) {
         case "process":
@@ -439,6 +440,7 @@ export default {
           });
           break;
       }
+			 await this.$store.dispatch("idea/setIdeaInEdit", null);
     },
 
     //  <idea-edit

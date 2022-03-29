@@ -30,15 +30,15 @@ export default function getItems(user) {
           },
           permissions: "process/process/manage"
         },
-        {
-          title: i18n.t("Tool Instructions"),
-          name: "tool-ideas",
-          icon: "mdi-lightbulb-on",
-          url: {
-            name: "tool-ideas"
-          },
-          permissions: "process/process/manage"
-        }
+        // {
+        //   title: i18n.t("Tool Instructions"),
+        //   name: "tool-ideas",
+        //   icon: "mdi-lightbulb-on",
+        //   url: {
+        //     name: "tool-ideas"
+        //   },
+        //   permissions: "process/process/manage"
+        // }
       ]
     },
     {

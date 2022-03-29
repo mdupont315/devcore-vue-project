@@ -4,10 +4,12 @@
     @click="focusEditor()"
     id="idea_editor_content"
   >
+
     <div class="editor" v-if="editor">
       <div class="editor_header_border">
         <menu-bar class="editor__header" :editor="editor" />
       </div>
+			<button @click="test">upload</button>
       <editor-content
         class="editor__content"
         id="editor__content"
@@ -91,6 +93,11 @@ export default {
     };
   },
   methods: {
+		test(){
+			console.log("TEST")
+			console.log(this.editor.commands)
+			this.editor.commands.setImageUrls("wtfsfasafs")
+		},
     focusEditor() {
       this.editor.commands.focus();
     },
@@ -113,16 +120,25 @@ export default {
       //   this.status = event.status;
       // });
 
+      const addFile = async (file) => {
+        //this.$emit("fileAdded", file);
+				console.log(file)
+				this.$emit("fileAdded", file)
+
+        return "http://homestead.test/images/users/17/0x0/Xoc9YBHW1omOharJUn0sltukzi16ncAd9P41DjD8.jpg";
+      };
+
       const editorInstance = new ContentEditor(
         this.isEditable,
         this.value.markup,
         {
           onUpdate: (content) =>
             this.$emit("input", {
-							contentType: this.value.contentType,
-              markup: content
+              contentType: this.value.contentType,
+              markup: content,
             }),
-        }
+        },
+        addFile
       );
 
       this.editor = editorInstance.editor;
@@ -142,7 +158,6 @@ export default {
     this.initEditor();
   },
   beforeDestroy() {
-
     this.editor.destroy();
     // this.provider.destroy();
   },
@@ -465,6 +480,7 @@ export default {
 
 .tableWrapper {
   max-width: 100%;
+  font-size: 12px;
 }
 .table-actions-colButtons {
   // position: absolute;
