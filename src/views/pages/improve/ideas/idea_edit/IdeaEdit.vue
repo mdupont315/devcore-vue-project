@@ -7,8 +7,9 @@
         :ideaContentCategories="ideaContentCategories"
         :isLoading="isLoading"
         :selectedCategoryIndex="selectedCategoryIndex"
-				@fileAdded="setFile"
+        @fileAdded="setFile"
         @selectedType="setContentType"
+        :isSaving="isSaving"
         v-model="getIdeaContent"
       ></idea-edit-content>
       <idea-edit-path
@@ -58,15 +59,17 @@ export default {
   },
   data: () => ({
     filter: null,
-    selectedCategoryIndex: 0,
+    isSaving: false,
+    selectedCategoryIndex: 2,
     ideaForm: new GQLForm({
       id: undefined,
       processId: null,
       stageId: null,
       operationId: null,
       phaseId: null,
-      companyToolId: null,
       file: [],
+      removeFile: false,
+      companyToolId: null,
       description: null,
       title: null,
       type: null,
@@ -113,6 +116,7 @@ export default {
     ],
 
     isLoading: false,
+    files: [],
   }),
   props: {
     idea: {
@@ -131,7 +135,6 @@ export default {
     }),
     getIdea: {
       get() {
-        console.log(this.ideaInEdit);
         return this.ideaInEdit.editIdea;
       },
     },
@@ -158,10 +161,12 @@ export default {
     },
   },
   methods: {
-		setFile(file) {
-			this.ideaForm.file = file
-			this.saveIdeaVersion()
-		},
+    async setFile(file) {
+      const items = [...this.files, file];
+			console.log(items)
+      this.files = items;
+      // await this.saveIdeaVersion();
+    },
     setContentType(item) {
       this.isLoading = true;
       this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
@@ -172,7 +177,6 @@ export default {
       });
     },
     formFieldMapper(mapTo, mapFrom) {
-      console.log(mapFrom);
       Object.keys(mapTo.fields || {})
         .filter((key) => key in mapFrom)
         .forEach((key) => {
@@ -202,36 +206,53 @@ export default {
         });
       }
     },
-		async saveIdea(){
-			 const ideaSave = await this.$store.dispatch(
-          `idea/update`,
-          this.ideaForm
-        );
-				return ideaSave
-		},
+    setFileUrls(content, files) {
+      const parsedContent = JSON.parse(content);
+
+      parsedContent.content.forEach((node) => {
+        if (node.type === "image") {
+          const setImageName = node.attrs.title;
+          const fileInIdea = files.find((file) => file.title === setImageName);
+          if (fileInIdea) {
+            node.attrs.src = fileInIdea.url;
+          }
+        }
+      });
+
+      return JSON.stringify(parsedContent);
+    },
+    async saveIdea() {
+      this.ideaForm.fields.file = this.files;
+      const ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
+      return ideaSave;
+    },
     async saveIdeaVersion() {
       this.isLoading = true;
+      this.isSaving = true;
       try {
-				const ideaSave = await this.saveIdea()
-
+        const ideaSave = await this.saveIdea();
         if (ideaSave && ideaSave.id) {
           let ideaContent = null;
+
           const contentForm =
             this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+          let markup = contentForm.markup;
+
+          if (ideaSave.files.length > 0) {
+            markup = this.setFileUrls(markup, ideaSave.files);
+          }
 
           contentForm.ideaId = ideaSave.id;
+          contentForm.markup = markup;
           contentForm.contentType =
             this.ideaContentCategories[this.selectedCategoryIndex].name;
 
           if (contentForm.id) {
-            console.log("UPDATING!");
-            console.log(contentForm);
             ideaContent = await this.$store.dispatch(
               `ideaContent/update`,
               contentForm
             );
           } else {
-            console.log("CREATING!");
             ideaContent = await this.$store.dispatch(
               `ideaContent/create`,
               contentForm
@@ -241,10 +262,11 @@ export default {
             this.formFieldMapper(mapTo, mapFrom);
           }
         }
-				return ideaSave
+        return ideaSave;
       } catch (e) {
         console.log(e);
       } finally {
+        this.isSaving = false;
         this.isLoading = false;
       }
     },

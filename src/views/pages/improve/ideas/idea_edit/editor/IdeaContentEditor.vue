@@ -4,12 +4,10 @@
     @click="focusEditor()"
     id="idea_editor_content"
   >
-
     <div class="editor" v-if="editor">
       <div class="editor_header_border">
         <menu-bar class="editor__header" :editor="editor" />
       </div>
-			<button @click="test">upload</button>
       <editor-content
         class="editor__content"
         id="editor__content"
@@ -41,8 +39,8 @@ import { mapGetters } from "vuex";
 
 import { EditorContent } from "@tiptap/vue-2";
 
-import * as Y from "yjs";
-import { HocuspocusProvider } from "@hocuspocus/provider";
+// import * as Y from "yjs";
+// import { HocuspocusProvider } from "@hocuspocus/provider";
 import { MenuBar } from "./parts";
 
 import ContentEditor from "./EditorLoader.js";
@@ -70,6 +68,10 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    isSaving: {
+      type: Boolean,
+      default: () => false,
+    },
   },
   computed: {
     ...mapGetters({
@@ -83,6 +85,11 @@ export default {
         if (newVal) this.focusEditor();
       },
     },
+    isSaving: {
+      handler(newVal) {
+        if (newVal) this.test()
+      },
+    },
   },
 
   data() {
@@ -93,37 +100,17 @@ export default {
     };
   },
   methods: {
-		test(){
-			console.log("TEST")
-			console.log(this.editor.commands)
-			this.editor.commands.setImageUrls("wtfsfasafs")
-		},
     focusEditor() {
       this.editor.commands.focus();
     },
     initEditor() {
       if (this.editor) this.editor.destroy();
       if (this.provider) this.editor.destroy();
-      // const ydoc = new Y.Doc();
-
-      // this.provider = new HocuspocusProvider({
-      //   document: ydoc,
-      //   url: "ws://127.0.0.1:1234",
-      //   name: `collaboration/${this.contentType}/${this.idea.id}`,
-      //   onAwarenessUpdate: ({ states }) => {
-      //     this.currentStates = states;
-      //   },
-      //   broadcast: false,
-      // });
-
-      // this.provider.on("status", (event) => {
-      //   this.status = event.status;
-      // });
 
       const addFile = async (file) => {
         //this.$emit("fileAdded", file);
-				console.log(file)
-				this.$emit("fileAdded", file)
+        console.log(file);
+        this.$emit("fileAdded", file);
 
         return "http://homestead.test/images/users/17/0x0/Xoc9YBHW1omOharJUn0sltukzi16ncAd9P41DjD8.jpg";
       };
@@ -480,7 +467,57 @@ export default {
 
 .tableWrapper {
   max-width: 100%;
-  font-size: 12px;
+
+  .table-first-row {
+    display: flex;
+    width: 100%;
+    gap: 4px;
+
+    .tableLeftSection {
+      width: 90%;
+    }
+
+    .tableRightSection {
+      display: flex;
+      align-items: center;
+
+      .row-control-button-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+      }
+    }
+  }
+
+  .table-second-row {
+    padding-top: 1em;
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+
+    .delete-table-button {
+      background-color: transparent;
+      color: red;
+      border: 1px solid gray;
+    }
+
+    .col-control-button-container {
+      display: flex;
+      flex-direction: row;
+      gap: 1em;
+    }
+  }
+
+  .table-control-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px dashed gray;
+    color: gray;
+    background-color: transparent;
+    height: 3em;
+    width: 3em;
+  }
 }
 .table-actions-colButtons {
   // position: absolute;
@@ -509,5 +546,35 @@ export default {
 
 .table-container-table {
   max-height: 100px;
+}
+
+[data-tooltip] {
+  position: relative;
+}
+[data-tooltip]:hover::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 4px 6px 0 6px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.7) transparent transparent transparent;
+  z-index: 100;
+}
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  transform: translateX(-50%) translateY(-100%);
+  background: rgba(0, 0, 0, 0.7);
+  text-align: center;
+  color: #fff;
+  padding: 4px 2px;
+  font-size: 12px;
+  min-width: 80px;
+  border-radius: 5px;
+  pointer-events: none;
 }
 </style>

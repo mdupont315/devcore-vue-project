@@ -405,6 +405,7 @@ export default {
           } else {
 						console.log(this.form)
             await this.$store.dispatch(`${this.storeName}/create`, this.form);
+						console.log(this.form)
             await this.$store.dispatch(`${this.storeName}/setIdeaTab`, {
               tab: "New",
             });

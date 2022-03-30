@@ -15,21 +15,32 @@
       <!-- <menu-grid v-else-if="item.type === 'grid'" :key="index" :item="item" /> -->
       <menu-item v-else :key="index" v-bind="item" />
     </template>
+    <drop-area
+      v-if="dropAreaOpen"
+      @close="toggleDropArea"
+      :editor="editor"
+    ></drop-area>
   </div>
 </template>
 
 <script>
 import MenuItem from "./MenuItem.vue";
 import MenuList from "./MenuList.vue";
+import DropArea from "./DropArea";
 // import MenuGrid from "./MenuGrid.vue";
 
 export default {
   components: {
     MenuItem,
     MenuList,
+    "drop-area": DropArea,
     // MenuGrid,
   },
-
+  methods: {
+    toggleDropArea() {
+      this.dropAreaOpen = !this.dropAreaOpen;
+    },
+  },
   props: {
     editor: {
       type: Object,
@@ -38,6 +49,7 @@ export default {
   },
   data() {
     return {
+      dropAreaOpen: false,
       activeHeading: "h-3",
       items: [
         {
@@ -123,10 +135,9 @@ export default {
         },
 
         {
-          icon: "gallery-upload",
-          title: "upload",
-          action: () => this.editor.chain().focus().setParagraph().run(),
-          isActive: () => this.editor.isActive("paragraph"),
+          icon: "image-line",
+          title: "Image",
+          action: () => this.toggleDropArea(),
         },
         // {
         //   icon: "paragraph",

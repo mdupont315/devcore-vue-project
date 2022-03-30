@@ -1,6 +1,6 @@
 import { Node, nodeInputRule, mergeAttributes, inputRegex } from "@tiptap/core";
 
-import { uploadImagePlugin } from "./uploadImage";
+import { uploadFilePlugin } from "./uploadFile";
 
 /**
  * Tiptap Extension to upload images
@@ -17,8 +17,7 @@ import { uploadImagePlugin } from "./uploadImage";
 
 const IMAGE_INPUT_REGEX = /!\[(.+|:?)\]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
 
-export const Image = uploadFn => {
-  console.log(uploadFn);
+export const File = uploadFn => {
   return Node.create({
     name: "image",
 
@@ -36,6 +35,7 @@ export const Image = uploadFn => {
     },
 
     draggable: true,
+    atom: true,
 
     addAttributes() {
       return {
@@ -47,6 +47,9 @@ export const Image = uploadFn => {
         },
         title: {
           default: null
+        },
+        href: {
+          default: null
         }
       };
     },
@@ -56,19 +59,51 @@ export const Image = uploadFn => {
         getAttrs: dom => {
           if (typeof dom === "string") return {};
 
+          console.log("parseHTML test");
+
           const obj = {
             src: dom.getAttribute("src"),
+            href: dom.getAttribute("href"),
             title: dom.getAttribute("title"),
             alt: dom.getAttribute("alt")
           };
           return obj;
         }
+      },
+      {
+        tag: "a",
+        getAttrs: dom => {
+          if (typeof dom === "string") return {};
+
+          console.log("parseHTML wrapper");
+
+          const obj = {
+            src: dom.getAttribute("src"),
+            href: dom.getAttribute("href"),
+            title: dom.getAttribute("title"),
+            alt: dom.getAttribute("alt"),
+            "data-test": "test"
+          };
+          return obj;
+        },
+        addAttributes() {
+          return {
+            href: "test"
+          };
+        }
       }
     ],
     renderHTML: ({ HTMLAttributes, node }) => {
-      console.log(node);
+      console.log("render");
       console.log(HTMLAttributes);
-      return ["img", mergeAttributes(HTMLAttributes)];
+      console.log(node);
+
+      const { href, title, src, alt } = HTMLAttributes;
+      if (HTMLAttributes.href) {
+        console.log(mergeAttributes(HTMLAttributes));
+        return ["a", { href }, ["img", { title, src, alt }, 0]];
+      }
+      return ["img", { title, src, alt }];
     },
 
     addCommands() {
@@ -84,35 +119,6 @@ export const Image = uploadFn => {
 
           console.log(" SET IMAGE ");
           return dispatch?.(transaction);
-        },
-        setImageUrls: attrs => ({
-          tr,
-          state,
-          dispatch,
-          view,
-          node,
-          commands
-        }) => {
-          const { doc } = state;
-
-          const fileName = "mobileview.PNG";
-          doc.descendants((node, pos) => {
-            if (node.type.name === "image") {
-              console.log(node);
-              // node.attrs.src =
-              //   "http://homestead.test/images/users/17/0x0/Xoc9YBHW1omOharJUn0sltukzi16ncAd9P41DjD8.jpg";
-              // // console.log("node");
-              // // console.log(node);
-
-              const from = pos;
-              const to = pos + node.nodeSize;
-              const transaction = view.state.tr.deleteRange(from, to);
-
-              view.dispatch(transaction);
-              return true;
-            }
-            return false;
-          });
         }
       };
     },
@@ -130,7 +136,7 @@ export const Image = uploadFn => {
       ];
     },
     addProseMirrorPlugins() {
-      return [uploadImagePlugin(uploadFn)];
+      return [uploadFilePlugin(uploadFn)];
     }
   });
 };

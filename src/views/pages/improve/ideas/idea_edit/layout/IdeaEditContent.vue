@@ -1,13 +1,18 @@
 <template>
   <div class="idea_edit_content_container">
     <div class="idea_edit_content_container_content-header">
-      <div class="idea_edit_content_container_content-header-title">{{idea.title}}</div>
+      <div class="idea_edit_content_container_content-header-title">
+        {{ idea.title }}
+      </div>
       <div class="idea_edit_content_container_content-header-button">
         <b-button
+          v-show="false"
           ref="btnNewIdeaTemplate"
           style="overflow: hidden; min-width: 100px"
         >
-          <span v-if="!isLoading">{{ ideaContentCategories[selectedCategoryIndex].name }}</span>
+          <span v-if="!isLoading">{{
+            ideaContentCategories[selectedCategoryIndex].name
+          }}</span>
           <b-spinner v-else style="width: 15px; height: 15px" />
         </b-button>
 
@@ -63,7 +68,8 @@
       :isEditable="isEditable"
       v-model="getIdeaContent"
       :idea="idea"
-			@fileAdded="setFile"
+      :isSaving="isSaving"
+      @fileAdded="setFile"
       @initialized="isEditable = true"
       :contentType="contentType"
     />
@@ -102,6 +108,10 @@ export default {
       type: Boolean,
       default: true,
     },
+    isSaving: {
+      type: Boolean,
+      default: true,
+    },
     selectedCategoryIndex: {
       type: Number,
       default: 0,
@@ -111,7 +121,8 @@ export default {
     getIdeaContent: {
       get() {
         return {
-          contentType: this.ideaContentCategories[this.selectedCategoryIndex].name,
+          contentType:
+            this.ideaContentCategories[this.selectedCategoryIndex].name,
           markup: this.value.markup,
         };
       },
@@ -122,18 +133,18 @@ export default {
     },
   },
   data: () => ({
-    contentType: "Cheatsheet",
+    contentType: "Custom",
     selectingType: false,
     isEditable: false,
     newType: "",
   }),
   methods: {
-		setFile(file){
-			this.$emit("fileAdded", file)
-		},
+    setFile(file) {
+      this.$emit("fileAdded", file);
+    },
     changeContentType(item) {
-			// EMIT MARKUP TO SAVE LOCAL CHANGES
-		//	this.$emit("")
+      // EMIT MARKUP TO SAVE LOCAL CHANGES
+      //	this.$emit("")
       this.$emit("selectedType", item);
     },
     // addNewIdeaTemplate() {
@@ -210,20 +221,19 @@ export default {
   align-items: center;
 }
 
-.idea_edit_content_container_content-header-title{
+.idea_edit_content_container_content-header-title {
   height: 60px;
   padding: 20px;
   font-size: 20px;
 }
 
 .idea_edit_content_container_content-header-button {
-	margin: 20px 20px 10px 20px;
+  margin: 20px 20px 10px 20px;
 }
 .idea_edit_content_container {
-	  background: #fff;
+  background: #fff;
   border-radius: 3px;
   width: 75%;
   overflow: hidden;
 }
-
 </style>
