@@ -53,6 +53,7 @@ export const uploadFilePlugin = addFile => {
 
       //   return false;
       // },
+
       handleDOMEvents: {
         drop(view, event) {
           const hasFiles = event.dataTransfer?.files?.length;
@@ -63,7 +64,6 @@ export const uploadFilePlugin = addFile => {
 
           const data = Array.from(event.dataTransfer?.files ?? []);
 
-          console.log(data);
           const images = data.filter(file => /image/i.test(file.type));
 
           event.preventDefault();
@@ -74,16 +74,16 @@ export const uploadFilePlugin = addFile => {
               top: event.clientY
             });
 
-            console.log("schemanodes:", schema.nodes)
             data.forEach(async item => {
               addFile(item);
+              console.log(item)
               const reader = new FileReader();
               reader.onload = readerEvent => {
                 const node = schema.nodes.image.create({
                   src: readerEvent.target?.result,
-                  href:
-                    "http://homestead.test/resources/ideas/f40eb735-13cd-42e7-89f2-747cf15f69f3?id=641abeb4-b33f-4bde-872d-f2f47e0c634a",
-                  title: item.name
+                  title: item.name,
+                  type: item.type,
+                  preview: false
                 });
                 const transaction = view.state.tr.insert(coordinates.pos, node);
                 view.dispatch(transaction);
@@ -94,7 +94,6 @@ export const uploadFilePlugin = addFile => {
           }
 
           const { schema } = view.state;
-          console.log(schema.nodes);
 
           const coordinates = view.posAtCoords({
             left: event.clientX,
@@ -106,7 +105,9 @@ export const uploadFilePlugin = addFile => {
             reader.onload = readerEvent => {
               const node = schema.nodes.image.create({
                 src: readerEvent.target?.result,
-                title: image.name
+                title: image.name,
+                type: image.type,
+                preview: true
               });
               const transaction = view.state.tr.insert(coordinates.pos, node);
               view.dispatch(transaction);

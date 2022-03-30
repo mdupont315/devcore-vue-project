@@ -69,6 +69,7 @@ export default {
       phaseId: null,
       file: [],
       removeFile: false,
+      removeFileIds: [],
       companyToolId: null,
       description: null,
       title: null,
@@ -132,6 +133,7 @@ export default {
     ...mapGetters({
       ideaContents: "ideaContent/all",
       ideaInEdit: "idea/ideaInEdit",
+      ideas: "idea/all",
     }),
     getIdea: {
       get() {
@@ -161,9 +163,16 @@ export default {
     },
   },
   methods: {
+    // TODO: Get all files in idea in idea.files.
+    // initialize this.files with that data.
+    // all nodes that that were removed can be synced with this.ideas
+    // / OR
+    // add items to removeFileIds (the files that actually need to removed
+    // More efficient
     async setFile(file) {
       const items = [...this.files, file];
-			console.log(items)
+
+      console.log(items);
       this.files = items;
       // await this.saveIdeaVersion();
     },
@@ -182,8 +191,6 @@ export default {
         .forEach((key) => {
           mapTo[key] = mapFrom[key];
         });
-
-      console.log(mapTo);
     },
     async initializeForms() {
       this.ideaFormFieldMapper();
@@ -191,7 +198,6 @@ export default {
     },
     ideaFormFieldMapper() {
       const mapToIdea = this.ideaForm;
-      console.log(this.getIdea.stageId);
       const mapFromIdea = Object.assign(this.getIdea, {});
       this.formFieldMapper(mapToIdea, mapFromIdea);
     },
@@ -213,8 +219,15 @@ export default {
         if (node.type === "image") {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
+
           if (fileInIdea) {
-            node.attrs.src = fileInIdea.url;
+            if (node.attrs.preview) {
+              node.attrs.src = fileInIdea.url;
+              node.attrs.id = fileInIdea.uri;
+            } else {
+              node.attrs.href = fileInIdea.url;
+              node.attrs.id = fileInIdea.uri;
+            }
           }
         }
       });
@@ -223,13 +236,37 @@ export default {
     },
     async saveIdea() {
       this.ideaForm.fields.file = this.files;
+
+      if (this.ideaForm.fields.file.length === 0) {
+        this.ideaForm.removeFile = true;
+      }
       const ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
       return ideaSave;
+    },
+    getImageNodesFromContent() {
+      const { markup } = this.getIdeaContent;
+      const imageNodes =
+        markup?.content.filter((node) => node.type === "image") ?? [];
+      return imageNodes;
     },
     async saveIdeaVersion() {
       this.isLoading = true;
       this.isSaving = true;
       try {
+        //Sync files in server with files in content
+        const fileNodesInContent = this.getImageNodesFromContent();
+
+        const uploadedFilesInContent = fileNodesInContent.filter(
+          (node) => node.attrs.id
+        );
+        const uploadedFiles = uploadedFilesInContent.map(
+          (node) => node.attrs.id
+        );
+        const removeFiles = this.getIdea.files.filter(
+          (file) => !uploadedFiles.includes(file.uri)
+        );
+        this.ideaForm.removeFileIds = removeFiles.map((file) => file.id) ?? [];
+
         const ideaSave = await this.saveIdea();
         if (ideaSave && ideaSave.id) {
           let ideaContent = null;
@@ -241,7 +278,6 @@ export default {
           if (ideaSave.files.length > 0) {
             markup = this.setFileUrls(markup, ideaSave.files);
           }
-
           contentForm.ideaId = ideaSave.id;
           contentForm.markup = markup;
           contentForm.contentType =

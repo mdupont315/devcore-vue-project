@@ -20,7 +20,6 @@ const IMAGE_INPUT_REGEX = /!\[(.+|:?)\]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
 export const File = uploadFn => {
   return Node.create({
     name: "image",
-
     defaultOptions: {
       inline: false,
       HTMLAttributes: {}
@@ -35,7 +34,6 @@ export const File = uploadFn => {
     },
 
     draggable: true,
-    atom: true,
 
     addAttributes() {
       return {
@@ -50,6 +48,12 @@ export const File = uploadFn => {
         },
         href: {
           default: null
+        },
+        preview: {
+          default: false
+        },
+        id: {
+          default: null
         }
       };
     },
@@ -58,14 +62,14 @@ export const File = uploadFn => {
         tag: "img[src]",
         getAttrs: dom => {
           if (typeof dom === "string") return {};
-
-          console.log("parseHTML test");
-
+          console.log("dom", dom);
           const obj = {
             src: dom.getAttribute("src"),
-            href: dom.getAttribute("href"),
             title: dom.getAttribute("title"),
-            alt: dom.getAttribute("alt")
+            alt: dom.getAttribute("alt"),
+            style: dom.getAttribute("style"),
+            type: dom.getAttribute("type"),
+            preview: dom.getAttribute("preview")
           };
           return obj;
         }
@@ -74,36 +78,30 @@ export const File = uploadFn => {
         tag: "a",
         getAttrs: dom => {
           if (typeof dom === "string") return {};
-
-          console.log("parseHTML wrapper");
-
+          console.log("dom", dom);
           const obj = {
             src: dom.getAttribute("src"),
             href: dom.getAttribute("href"),
             title: dom.getAttribute("title"),
-            alt: dom.getAttribute("alt"),
-            "data-test": "test"
+            style: dom.getAttribute("style"),
+            type: dom.getAttribute("type"),
+            preview: dom.getAttribute("preview"),
           };
           return obj;
-        },
-        addAttributes() {
-          return {
-            href: "test"
-          };
         }
       }
     ],
-    renderHTML: ({ HTMLAttributes, node }) => {
-      console.log("render");
-      console.log(HTMLAttributes);
-      console.log(node);
+    renderHTML: ({ HTMLAttributes }) => {
+      const { href, title, src, alt, style, preview } = HTMLAttributes;
 
-      const { href, title, src, alt } = HTMLAttributes;
-      if (HTMLAttributes.href) {
-        console.log(mergeAttributes(HTMLAttributes));
-        return ["a", { href }, ["img", { title, src, alt }, 0]];
+      if (!preview) {
+        return [
+          "a",
+          { href, title, style },
+          title
+        ];
       }
-      return ["img", { title, src, alt }];
+      return ["img", { title, src, alt, style }];
     },
 
     addCommands() {
@@ -117,8 +115,11 @@ export const File = uploadFn => {
           const node = this.type.create(attrs);
           const transaction = state.tr.insert(position, node);
 
-          console.log(" SET IMAGE ");
           return dispatch?.(transaction);
+        },
+        log: attrs => ({ state, dispatch }) => {
+          console.log(attrs);
+          console.log("PRESSED !");
         }
       };
     },
