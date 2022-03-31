@@ -1,14 +1,10 @@
 <template>
-  <button
-    class="menu-item"
-    :class="{ 'is-active': item.isActive ? item.isActive() : null }"
-    @click="item.action"
-    :title="item.title"
-  >
+  <label class="menubar-file-input-field">
     <svg class="remix">
       <use :xlink:href="`${remixiconUrl}#ri-${item.icon}`" />
     </svg>
-  </button>
+    <input type="file" style="visibility: hidden" @change="previewFiles" />
+  </label>
 </template>
 
 <script>
@@ -22,6 +18,12 @@ export default {
     },
   },
 
+  methods: {
+    previewFiles(event) {
+			this.item.action(event.target.files);
+      console.log(event.target.files);
+    },
+  },
   data() {
     return {
       remixiconUrl,
@@ -31,8 +33,13 @@ export default {
 </script>
 
 <style lang="scss">
-
-.menu-item {
+.menubar-file-input-field {
+  width: 50px;
+  text-align: center;
+  height: 20px;
+  cursor: pointer;
+}
+.menu-file {
   width: 1.75rem;
   height: 1.75rem;
   display: flex;

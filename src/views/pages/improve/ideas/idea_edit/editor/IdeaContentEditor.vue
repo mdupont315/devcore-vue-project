@@ -183,7 +183,6 @@ export default {
     align-items: center;
     flex: 0 0 auto;
     flex-wrap: wrap;
-    justify-content: space-between;
     height: 50px;
     padding: 0 20px 5px 20px;
   }

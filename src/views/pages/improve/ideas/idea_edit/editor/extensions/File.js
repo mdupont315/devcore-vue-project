@@ -1,6 +1,9 @@
 import { Node, nodeInputRule, mergeAttributes, inputRegex } from "@tiptap/core";
 
-import { uploadFilePlugin } from "./uploadFile";
+import {
+  uploadFilePlugin,
+  renderFileInBase64ToCoordinates
+} from "./uploadFile";
 
 /**
  * Tiptap Extension to upload images
@@ -85,7 +88,7 @@ export const File = uploadFn => {
             title: dom.getAttribute("title"),
             style: dom.getAttribute("style"),
             type: dom.getAttribute("type"),
-            preview: dom.getAttribute("preview"),
+            preview: dom.getAttribute("preview")
           };
           return obj;
         }
@@ -95,32 +98,33 @@ export const File = uploadFn => {
       const { href, title, src, alt, style, preview } = HTMLAttributes;
 
       if (!preview) {
-        return [
-          "a",
-          { href, title, style },
-          title
-        ];
+        return ["a", { href, title, style }, title];
       }
       return ["img", { title, src, alt, style }];
     },
 
     addCommands() {
       return {
-        setImage: attrs => ({ state, dispatch }) => {
-          const { selection } = state;
-          const position = selection.$head
-            ? selection.$head.pos
-            : selection.$to.pos;
+        setImage: attrs => ({ view }) => {
+          const coordinates = { pos: 1, inside: 0 };
 
-          const node = this.type.create(attrs);
-          const transaction = state.tr.insert(position, node);
+          const files = Array.from(attrs ?? []);
+          const previewFiles = files.filter(file => /image/i.test(file.type));
 
-          return dispatch?.(transaction);
+          if (previewFiles.length > 0) {
+            previewFiles.forEach(async item => {
+              const preview = true;
+              uploadFn(item);
+              renderFileInBase64ToCoordinates(item, view, coordinates, preview);
+            });
+          } else {
+            files.forEach(async item => {
+              const preview = false;
+              uploadFn(item);
+              renderFileInBase64ToCoordinates(item, view, coordinates, preview);
+            });
+          }
         },
-        log: attrs => ({ state, dispatch }) => {
-          console.log(attrs);
-          console.log("PRESSED !");
-        }
       };
     },
     addInputRules() {

@@ -5,7 +5,7 @@ import { Plugin } from "prosemirror-state";
  * @see https://gist.github.com/slava-vishnyakov/16076dff1a77ddaca93c4bccd4ec4521#gistcomment-3744392
  */
 
-const renderFileInBase64ToCoordinates = (item, view, coordinates) => {
+const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
   const { schema } = view.state;
   if (item.size > 1000000) {
     console.log("ERROR, File size too big!");
@@ -17,7 +17,7 @@ const renderFileInBase64ToCoordinates = (item, view, coordinates) => {
       src: readerEvent.target?.result,
       title: item.name,
       type: item.type,
-      preview: false
+      preview
     });
     const transaction = view.state.tr.insert(coordinates.pos, node);
     view.dispatch(transaction);
@@ -25,7 +25,7 @@ const renderFileInBase64ToCoordinates = (item, view, coordinates) => {
   reader.readAsDataURL(item);
 };
 
-export const uploadFilePlugin = addFile => {
+const uploadFilePlugin = addFile => {
   return new Plugin({
     props: {
       // handlePaste(view, event) {
@@ -76,15 +76,19 @@ export const uploadFilePlugin = addFile => {
             top: event.clientY
           });
 
+          console.log(coordinates)
+
           if (previewFiles.length > 0) {
             previewFiles.forEach(async item => {
+              const preview = true;
               addFile(item);
-              renderFileInBase64ToCoordinates(item, view, coordinates);
+              renderFileInBase64ToCoordinates(item, view, coordinates, preview);
             });
           } else {
             data.forEach(async item => {
+              const preview = false;
               addFile(item);
-              renderFileInBase64ToCoordinates(item, view, coordinates);
+              renderFileInBase64ToCoordinates(item, view, coordinates, preview);
             });
           }
 
@@ -94,3 +98,5 @@ export const uploadFilePlugin = addFile => {
     }
   });
 };
+
+export { renderFileInBase64ToCoordinates, uploadFilePlugin };
