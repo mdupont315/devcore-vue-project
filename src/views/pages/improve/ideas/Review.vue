@@ -1,86 +1,43 @@
 <template>
-  <div style="padding-bottom: 100px" id="reviewIdeas__container">
-    <div class="reviewIdeas-header">
-      <div class="testing-reviewIdeas-header">
-        <span class="h4 text-white text-uppercase"
-          >{{ $t("In testing") }}
-        </span>
-        <span class="text-gray-lighter h4 text-white text-uppercase">{{
-          testingIdeas.length
-        }}</span>
-      </div>
-      <div class="evaluating-reviewIdeas-header">
-        <span class="h4 text-white text-uppercase">
+  <div>
+    <b-row v-if="currentProcessSection">
+      <b-col>
+        <h3 class="h4 text-white text-uppercase" style="padding-top: 15px">
+          {{ $t("In testing") }}
+          <span class="text-gray-lighter">{{ testingIdeas.length }}</span>
+        </h3>
+        <idea-card
+          v-for="item in testingIdeas"
+          :id="`idea-id-${item.uuid}`"
+          :ref="`idea-ref-${item.uuid}`"
+          :key="item.id"
+          :idea="item"
+        ></idea-card>
+        <div v-if="testingIdeas.length == 0">
+          <p class="alert alert-warning">
+            {{ $t("There are no records for the given criteria") }}
+          </p>
+        </div>
+      </b-col>
+      <b-col>
+        <h3 class="h4 text-white text-uppercase" style="padding-top: 15px">
           {{ $t("Evaluated ideas") }}
-        </span>
-        <span class="text-gray-lighter h4 text-white text-uppercase">{{
-          evaluatedIdeas.length
-        }}</span>
-      </div>
-    </div>
-    <div v-if="currentProcessSection" style="padding-bottom: 100px">
-      <div
-        v-for="index in Math.max(testingIdeas.length, evaluatedIdeas.length)"
-        :key="index"
-        class="reviewIdeas-content-container"
-        :class="
-          thisOrNextOpen(index - 1) ? 'ideasAreInColumn' : 'ideasAreInRow'
-        "
-      >
-        <div
-          v-if="testingIdeas[index - 1]"
-          style="width: 100%"
-          class="review-idea-card-testing-container"
-        >
-          <idea-card
-            class="review-idea-card review-idea-card-testing"
-            :id="`idea-id-${testingIdeas[index - 1].uuid}`"
-            :ref="`idea-ref-${testingIdeas[index - 1].uuid}`"
-            @openIdea="ideaOpened"
-            @closeIdea="ideaClosed"
-            :idea="testingIdeas[index - 1]"
-          ></idea-card>
-        </div>
-        <div
-          v-else-if="!ideaUuidOpened && !testingIdeas[index - 1]"
-          style="width: 100%"
-        >
-          <p
-            class="alert alert-warning"
-            v-if="index === 1"
-            style="margin-right: 20px"
-          >
+          <span class="text-gray-lighter">{{ evaluatedIdeas.length }}</span>
+        </h3>
+        <idea-card
+          v-for="item in evaluatedIdeas"
+          :id="`idea-id-${item.uuid}`"
+          :ref="`idea-ref-${item.uuid}`"
+          :key="item.id"
+          :idea="item"
+        ></idea-card>
+        <div v-if="evaluatedIdeas.length == 0">
+          <p class="alert alert-warning">
             {{ $t("There are no records for the given criteria") }}
           </p>
         </div>
-        <div
-          v-if="evaluatedIdeas[index - 1]"
-          style="width: 100%"
-          class="review-idea-card-evaluating-container"
-        >
-          <idea-card
-            class="review-idea-card review-idea-card-evaluating"
-            :id="`idea-id-${evaluatedIdeas[index - 1].uuid}`"
-            :ref="`idea-ref-${evaluatedIdeas[index - 1].uuid}`"
-            @openIdea="ideaOpened"
-            @closeIdea="ideaClosed"
-            :idea="evaluatedIdeas[index - 1]"
-          ></idea-card>
-        </div>
-        <div
-          v-else-if="!ideaUuidOpened && !evaluatedIdeas[index - 1]"
-          style="width: 100%"
-        >
-          <p
-            class="alert alert-warning"
-            v-if="index === 1"
-            style="margin-left: 20px"
-          >
-            {{ $t("There are no records for the given criteria") }}
-          </p>
-        </div>
-      </div>
-    </div>
+      </b-col>
+    </b-row>
   </div>
 </template>
 <script>
@@ -91,15 +48,20 @@ export default {
   components: {
     "idea-card": IdeaCard,
   },
-  // mounted() {
-  //   if (this.$router.currentRoute.query) {
-  //     if (this.$router.currentRoute.query.uuid) {
-  //       const { uuid } = this.$router.currentRoute.query;
-  //       this.scrollToElement(uuid);
-  //       this.ideaUuidOpened = uuid;
-  //     }
-  //   }
-  // },
+  mounted() {
+    if (this.$router.currentRoute.query) {
+      if (this.$router.currentRoute.query.uuid) {
+        const { uuid } = this.$router.currentRoute.query;
+        this.$nextTick(() => {
+          const ideaSelector = `idea-id-${uuid}`;
+          const element = document.getElementById(ideaSelector);
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        });
+      }
+    }
+  },
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
@@ -161,42 +123,7 @@ export default {
       },
     },
   },
-  data: () => ({
-    ideaUuidOpened: null,
-  }),
   methods: {
-    scrollToElement(uuid) {
-      if (!uuid) return;
-      this.$nextTick(() => {
-        const ideaSelector = `idea-id-${uuid}`;
-        const element = document.getElementById(ideaSelector);
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth", block: "end" });
-        }
-      });
-    },
-    thisOrNextOpen(index) {
-      const testingIdeaIndex = this.testingIdeas[index]
-        ? this.testingIdeas[index].uuid
-        : false;
-
-      const evaluatedIdeas = this.evaluatedIdeas[index]
-        ? this.evaluatedIdeas[index].uuid
-        : false;
-
-      return (
-        testingIdeaIndex === this.ideaUuidOpened ||
-        evaluatedIdeas === this.ideaUuidOpened
-      );
-    },
-    ideaClosed(idea) {
-      console.log("CLOSED!");
-      this.ideaUuidOpened = null;
-    },
-    ideaOpened(idea) {
-      this.ideaUuidOpened = idea.uuid;
-      this.scrollToElement(idea.uuid);
-    },
     filterByProcessSection(item, status) {
       switch (this.currentProcessSectionName) {
         case "process":
@@ -216,88 +143,3 @@ export default {
   },
 };
 </script>
-
-<style scoped lang="scss">
-.reviewIdeas-content-container {
-  display: flex;
-  width: 100%;
-}
-.testing-reviewIdeas-header,
-.evaluating-reviewIdeas-header {
-  padding: 10px;
-  width: 100%;
-  max-width: 50%;
-}
-.evaluating-reviewIdeas-header-empty,
-.testing-reviewIdeas-header-empty {
-  width: 100%;
-  padding-top: 8px;
-}
-
-.reviewIdeas-header {
-  display: flex;
-  justify-content: space-between;
-  height: 40px;
-}
-
-.reviewIdeas-content-container.ideasAreInRow {
-  justify-content: space-between;
-}
-
-.testingIdeas-content-container.ideasAreInRow {
-  justify-content: start;
-}
-
-.ideasAreInRow {
-  align-self: flex-start;
-  flex-direction: row;
-  justify-content: space-between;
-  & > div > .review-idea-card {
-    width: 100%;
-    max-width: 820px;
-    max-height: 250px;
-  }
-}
-
-.ideasAreInRow > .review-idea-card-evaluating-container {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.ideasAreInRow > .review-idea-card-testing-container {
-  display: flex;
-  justify-content: flex-start;
-}
-
-.ideasAreInColumn > .review-idea-card-evaluating-container > .idea-card-shrunk {
-  float: right;
-}
-
-// .review-idea-card-evaluating {
-//   margin-left: 15px;
-// }
-.review-idea-card-testing {
-  margin-right: 10px;
-}
-.ideasAreInColumn {
-  flex-direction: column;
-  align-self: flex-start;
-  > div > .idea-card-shrunk {
-    max-width: 820px;
-    width: 100%;
-    &.review-idea-card-testing {
-      align-self: start;
-    }
-    &.review-idea-card-evaluating {
-      align-self: end;
-    }
-  }
-
-  > div > .idea-card-expanded {
-    align-self: center;
-    max-width: 100%;
-    width: 100%;
-    padding: 0;
-  }
-}
-</style>

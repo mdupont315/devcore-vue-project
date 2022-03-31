@@ -212,6 +212,7 @@ export default {
       phaseId: null,
       description: null,
       companyToolId: null,
+			removeFileIds: [],
       file: null,
       removeFile: false,
       sourceId: null,

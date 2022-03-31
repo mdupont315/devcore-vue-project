@@ -59,6 +59,11 @@ export default {
       currentProcess: "process/current",
       ideaInEdit: "idea/ideaInEdit",
     }),
+    getIdeaInEditId: {
+      get() {
+        return this.ideaInEdit?.editIdeaId ?? null;
+      },
+    },
     process: {
       get() {
         return this.currentProcess("ideas");
@@ -108,9 +113,8 @@ export default {
   methods: {
     isEditingIdea(idea) {
       let ret = false;
-      if (idea && idea.id && this.ideaInEdit && this.ideaInEdit.id) {
-        ret = this.ideaInEdit.id === idea.id;
-
+      if (idea && idea.id && this.getIdeaInEditId) {
+        ret = this.getIdeaInEditId === idea.id;
       }
       return ret;
     },

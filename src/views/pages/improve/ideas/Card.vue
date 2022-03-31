@@ -182,16 +182,16 @@ export default {
       user: "auth/user",
       ideaInEdit: "idea/ideaInEdit",
     }),
+    getIdeaInEditId: {
+      get() {
+        return this.ideaInEdit?.editIdeaId ?? null;
+      },
+    },
     showDetail: {
       get() {
         let openState = false;
-        if (
-          this.idea &&
-          this.idea.id &&
-          this.ideaInEdit &&
-          this.ideaInEdit.id
-        ) {
-          openState = this.ideaInEdit.id === this.idea.id;
+        if (this.idea && this.idea.id && this.getIdeaInEditId) {
+          openState = this.getIdeaInEditId === this.idea.id;
         }
         return openState;
       },
@@ -239,16 +239,13 @@ export default {
     //   this.$emit("closeIdea", idea);
     // },
     async openIdeaEdit(idea) {
-      console.log("_______________");
-      const editIdea = Object.assign(idea, {});
-
       console.log(idea);
 
       await this.$store.dispatch("idea/setIdeaInEdit", {
         editIdeaMeta: {
           editStartedAt: new Date().getTime(),
         },
-        editIdea,
+        editIdeaId: idea.id,
       });
       this.$emit("openIdea", idea);
     },
@@ -354,7 +351,6 @@ export default {
           });
           break;
       }
-
     },
   },
 };

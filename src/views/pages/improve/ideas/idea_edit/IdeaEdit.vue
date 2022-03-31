@@ -137,7 +137,9 @@ export default {
     }),
     getIdea: {
       get() {
-        return this.ideaInEdit.editIdea;
+        return this.ideas.find(
+          (idea) => idea.id === this.ideaInEdit.editIdeaId
+        );
       },
     },
     getIdeaPath: {
@@ -236,11 +238,13 @@ export default {
     },
     async saveIdea() {
       this.ideaForm.fields.file = this.files;
+      console.log("FILES: ", this.files);
 
-      if (this.ideaForm.fields.file.length === 0) {
-        this.ideaForm.removeFile = true;
-      }
       const ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
+      // reset uploads
+      this.files = [];
+      this.ideaForm.removeFileIds = [];
+
       return ideaSave;
     },
     getImageNodesFromContent() {
@@ -249,25 +253,54 @@ export default {
         markup?.content.filter((node) => node.type === "image") ?? [];
       return imageNodes;
     },
+
+    syncFiles() {
+      //TODO: Check that idea.files (should be actual files on server)
+      // matches with node content node content images
+
+      //TODO: check that resources get deleted correctly. Currently more resources than should get deleted
+      const fileNodesInContent = this.getImageNodesFromContent();
+      if (fileNodesInContent.length === 0) {
+        this.ideaForm.removeFile = true;
+      } else {
+        this.ideaForm.removeFile = false;
+      }
+      console.log("fileNodesInContent");
+      console.log(fileNodesInContent);
+
+      console.log(this.ideaForm);
+      this.ideaForm.removeFileIds = [];
+
+      const uploadedFilesInContent = fileNodesInContent.filter(
+        (node) => node.attrs.id
+      );
+
+      console.log("this.getIdea.files");
+      console.log(this.getIdea.files);
+      const uploadedFiles = uploadedFilesInContent.map((node) => node.attrs.id);
+
+      console.log("uploaded Files: ", uploadedFiles);
+      const removeFiles = this.getIdea.files.filter(
+        (file) => !uploadedFiles.includes(file.uri)
+      );
+      console.log("removeFiles:", removeFiles);
+      this.ideaForm.removeFileIds = removeFiles.map((file) => file.id) ?? [];
+
+      console.log(
+        "REMOVING FILES RESOURCES WITH ID: ",
+        this.ideaForm.removeFileIds
+      );
+    },
     async saveIdeaVersion() {
       this.isLoading = true;
       this.isSaving = true;
       try {
         //Sync files in server with files in content
-        const fileNodesInContent = this.getImageNodesFromContent();
-
-        const uploadedFilesInContent = fileNodesInContent.filter(
-          (node) => node.attrs.id
-        );
-        const uploadedFiles = uploadedFilesInContent.map(
-          (node) => node.attrs.id
-        );
-        const removeFiles = this.getIdea.files.filter(
-          (file) => !uploadedFiles.includes(file.uri)
-        );
-        this.ideaForm.removeFileIds = removeFiles.map((file) => file.id) ?? [];
+        this.syncFiles();
 
         const ideaSave = await this.saveIdea();
+        //reset removeFileIds
+
         if (ideaSave && ideaSave.id) {
           let ideaContent = null;
 
@@ -304,6 +337,7 @@ export default {
       } finally {
         this.isSaving = false;
         this.isLoading = false;
+       // this.closeIdeaEdit();
       }
     },
     async updateIdeaVersionStatus() {
@@ -319,20 +353,19 @@ export default {
       this.closeIdeaEdit();
     },
     async deleteIdeaVersion() {
-      this.form.busy = true;
       const editForm = new GQLForm({
-        id: this.form.id,
+        id: this.ideaForm.id,
       });
       await this.$store.dispatch(`idea/delete`, editForm);
       this.$store.dispatch(`idea/findByProcess`, {
-        id: this.form.processId,
+        id: this.ideaForm.processId,
         force: true,
       });
       this.$store.dispatch("process/findById", {
-        id: this.form.processId,
+        id: this.ideaForm.processId,
         force: true,
       });
-      this.form.busy = false;
+      this.closeIdeaEdit();
     },
     async closeIdeaEdit() {
       this.$emit("close");
