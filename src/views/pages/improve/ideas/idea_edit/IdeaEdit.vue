@@ -221,19 +221,22 @@ export default {
         if (node.type === "image") {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
-
+				console.log(node.attrs)
           if (fileInIdea) {
             if (node.attrs.preview) {
               node.attrs.src = fileInIdea.url;
               node.attrs.id = fileInIdea.uri;
+							node.attrs.href = "";
             } else {
               node.attrs.href = fileInIdea.url;
               node.attrs.id = fileInIdea.uri;
+							node.attrs.src = "";
             }
           }
         }
       });
 
+			console.log(parsedContent)
       return JSON.stringify(parsedContent);
     },
     async saveIdea() {
