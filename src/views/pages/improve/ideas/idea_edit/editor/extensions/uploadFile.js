@@ -76,8 +76,6 @@ const uploadFilePlugin = addFile => {
             top: event.clientY
           });
 
-          console.log(coordinates)
-
           if (previewFiles.length > 0) {
             previewFiles.forEach(async item => {
               const preview = true;

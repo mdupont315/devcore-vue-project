@@ -179,7 +179,8 @@ export function updateColumns(
     table.style.width = `${totalWidth}px`;
     table.style.minWidth = "";
   } else {
-    table.style.width = "100";
+    console.log("totalWidth", totalWidth);
+    table.style.width = "";
     table.style.minWidth = `${totalWidth}px`;
   }
 }
@@ -218,7 +219,7 @@ export const CustomTable = Table.extend({
     return [
       "table",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      ["tbody", 0]
+      ["tbody", { class: "test" }, 0]
     ];
   },
 

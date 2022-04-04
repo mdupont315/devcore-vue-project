@@ -87,7 +87,7 @@ export default {
     },
     isSaving: {
       handler(newVal) {
-        if (newVal) this.test()
+        if (newVal) this.test();
       },
     },
   },
@@ -263,6 +263,10 @@ export default {
     margin: 0;
     overflow: hidden;
 
+		tbody > tr:nth-child(odd) {
+			background: #C7DBFC
+		}
+
     td,
     th {
       min-width: 1em;
@@ -271,15 +275,24 @@ export default {
       vertical-align: top;
       box-sizing: border-box;
       position: relative;
+			font-size: 14px;
       > * {
         margin-bottom: 0;
       }
     }
 
+		td {
+			font-family: FuturaLight;
+			color: #707070
+		}
+
     th {
       font-weight: bold;
       text-align: left;
-      background-color: #f1f3f5;
+      background-color: #4294d0;
+			color: #fff;
+			font-size:14px;
+			font-family: FuturaMedium
     }
 
     .selectedCell:after {
@@ -474,6 +487,7 @@ export default {
 
     .tableLeftSection {
       width: 90%;
+      overflow-x: auto;
     }
 
     .tableRightSection {
@@ -488,6 +502,18 @@ export default {
     }
   }
 
+::-webkit-scrollbar  {
+  width: 5px;
+  height: 8px;
+	display: block;
+  background-color: #f8f8f8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: lightgray;
+	width: 100px;
+	height: 10px
+}
   .table-second-row {
     padding-top: 1em;
     display: flex;

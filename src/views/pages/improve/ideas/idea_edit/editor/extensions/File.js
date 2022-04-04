@@ -107,8 +107,8 @@ export const File = uploadFn => {
       return {
         setImage: attrs => ({ view }) => {
           const coordinates = { pos: 1, inside: 0 };
-
-          const files = Array.from(attrs ?? []);
+          const input = attrs ? attrs : []
+          const files = Array.from(input);
           const previewFiles = files.filter(file => /image/i.test(file.type));
 
           if (previewFiles.length > 0) {
