@@ -14,6 +14,9 @@
         :editor="editor"
         ref="editor_content"
       />
+      <bubble-menu :editor="editor">
+        <button @click="addDummyCommentToSelection"> Add Example Comment </button>
+      </bubble-menu>
       <div class="editor__footer">
         <div :class="`editor__status editor__status--${status}`">
           <template v-if="status === 'connected'">
@@ -37,7 +40,7 @@
 	<script>
 import { mapGetters } from "vuex";
 
-import { EditorContent } from "@tiptap/vue-2";
+import { EditorContent, BubbleMenu } from "@tiptap/vue-2";
 
 // import * as Y from "yjs";
 // import { HocuspocusProvider } from "@hocuspocus/provider";
@@ -50,6 +53,7 @@ export default {
   components: {
     EditorContent,
     MenuBar,
+    BubbleMenu
   },
   props: {
     idea: {
@@ -101,7 +105,7 @@ export default {
   },
   methods: {
     focusEditor() {
-      this.editor.commands.focus();
+      this.editor?.commands.focus();
     },
     initEditor() {
       if (this.editor) this.editor.destroy();
@@ -139,6 +143,31 @@ export default {
       //   name: `${this.user.firstName} ${this.user.lastName}`,
       // });
     },
+    addDummyCommentToSelection() {
+      const dummyComment = {
+        uuid: 'bd21aa31-267a-4ae5-a61d-65bb1d364eff',
+        comments: [
+          {
+            user: 'Kr',
+            content: 'Maybe we could improve this issue',
+            file: {
+              link: 'https://google.com',
+              name: 'Google'
+            }
+          },
+          {
+            user: 'Kr',
+            content: 'And This One Too',
+            file: {
+              link: 'https://github.com',
+              name: 'GitHub'
+            }
+          }
+        ]
+      }
+
+      this.editor?.commands.setComment(JSON.stringify(dummyComment))
+    }
   },
 
   mounted() {
