@@ -1,8 +1,9 @@
-export * from './Table'
-export * from './Indent'
+export * from './comment'
+export * from './table'
+export * from './indent'
 export * from './CustomStyle'
-export * from './EventHandler'
+export * from './eventHandler'
 export * from './ExternalVideoExtension'
 export * from './File'
-export * from './Draggable'
+export { default as Draggable } from './Draggable'
 

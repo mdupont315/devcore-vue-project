@@ -13,7 +13,7 @@ import History from "@tiptap/extension-history";
 import FontFamily from "@tiptap/extension-font-family";
 import Link from '@tiptap/extension-link'
 import { Color } from "@tiptap/extension-color";
-import { Indent, EventHandler, CustomStyle, CustomTable, File, Draggable } from './extensions'
+import { Indent, EventHandler, CustomStyle, CustomTable, File, Draggable, Comment } from './extensions'
 
 export default class ContentEditor {
   constructor(editable, value, options, upload) {
@@ -51,7 +51,8 @@ export default class ContentEditor {
       EventHandler,
       CharacterCount.configure({
         limit: 10000
-      })
+      }),
+      Comment
     ];
     this.editor = this.getEditorInstance();
     this.editor.commands.setParagraphText();
