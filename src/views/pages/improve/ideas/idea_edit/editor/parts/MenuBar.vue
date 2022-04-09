@@ -72,6 +72,8 @@ export default {
                 this.editor.commands.setChapterText();
                 this.editor.commands.setFontFamily("FuturaBold");
                 this.activeHeading = "h-1";
+                this.editor.chain().focus().toggleHeading({ level: 1 }).run();
+                console.log(this.editor.isActive());
               },
               isActive: () => this.editor.isActive("heading", { level: 1 }),
             },
@@ -82,6 +84,7 @@ export default {
                 this.editor.commands.setTitleText();
                 this.editor.commands.setFontFamily("FuturaMedium");
                 this.activeHeading = "h-2";
+                this.editor.chain().focus().toggleHeading({ level: 2 }).run();
               },
               isActive: () => this.editor.isActive("heading", { level: 2 }),
             },
@@ -92,6 +95,7 @@ export default {
                 this.editor.commands.setSubTitleText();
                 this.editor.commands.setFontFamily("FuturaMedium");
                 this.activeHeading = "h-2";
+                this.editor.chain().focus().toggleHeading({ level: 3 }).run();
               },
               isActive: () => this.editor.isActive("heading", { level: 3 }),
             },
@@ -102,6 +106,9 @@ export default {
                 this.editor.commands.setParagraphText();
                 this.editor.commands.setFontFamily("FuturaLight");
                 this.activeHeading = "h-4";
+                this.editor.chain().focus().setParagraph().run();
+
+                //	 this.editor.chain().focus().toggleHeading({ level: 4 }).run();
               },
               isActive: () => this.editor.isActive("heading", { level: 4 }),
             },
@@ -128,7 +135,7 @@ export default {
           icon: "image-line",
           type: "file",
           title: "Image",
-					action: (file) => this.editor.commands.setImage(file)
+          action: (file) => this.editor.commands.setImage(file),
         },
         {
           icon: "list-unordered",

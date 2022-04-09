@@ -219,7 +219,7 @@ export const CustomTable = Table.extend({
     return [
       "table",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      ["tbody", { class: "test" }, 0]
+      ["tbody", 0]
     ];
   },
 

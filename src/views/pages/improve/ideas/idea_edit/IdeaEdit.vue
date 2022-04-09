@@ -268,10 +268,6 @@ export default {
       } else {
         this.ideaForm.removeFile = false;
       }
-      console.log("fileNodesInContent");
-      console.log(fileNodesInContent);
-
-      console.log(this.ideaForm);
       this.ideaForm.removeFileIds = [];
 
       const uploadedFilesInContent = fileNodesInContent.filter(

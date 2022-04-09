@@ -105,9 +105,13 @@ export const File = uploadFn => {
 
     addCommands() {
       return {
-        setImage: attrs => ({ view }) => {
-          const coordinates = { pos: 1, inside: 0 };
-          const input = attrs ? attrs : []
+        setImage: attrs => ({ view, tr }) => {
+          let pos = 1;
+          if (tr && tr.curSelection && tr.curSelection.$head) {
+            pos = tr.curSelection.$head.pos;
+          }
+          const coordinates = { pos, inside: 0 };
+          const input = attrs ? attrs : [];
           const files = Array.from(input);
           const previewFiles = files.filter(file => /image/i.test(file.type));
 
@@ -124,7 +128,7 @@ export const File = uploadFn => {
               renderFileInBase64ToCoordinates(item, view, coordinates, preview);
             });
           }
-        },
+        }
       };
     },
     addInputRules() {
