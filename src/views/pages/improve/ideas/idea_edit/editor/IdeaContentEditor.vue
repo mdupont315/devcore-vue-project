@@ -15,7 +15,7 @@
         ref="editor_content"
       />
       <bubble-menu :editor="editor">
-        <button @click="addDummyCommentToSelection"> Add Example Comment </button>
+        <button @click="addDummyCommentToSelection">Add Example Comment</button>
       </bubble-menu>
       <div class="editor__footer">
         <div :class="`editor__status editor__status--${status}`">
@@ -53,7 +53,7 @@ export default {
   components: {
     EditorContent,
     MenuBar,
-    BubbleMenu
+    BubbleMenu,
   },
   props: {
     idea: {
@@ -115,8 +115,6 @@ export default {
         //this.$emit("fileAdded", file);
         console.log(file);
         this.$emit("fileAdded", file);
-
-        return "http://homestead.test/images/users/17/0x0/Xoc9YBHW1omOharJUn0sltukzi16ncAd9P41DjD8.jpg";
       };
 
       const editorInstance = new ContentEditor(
@@ -145,29 +143,31 @@ export default {
     },
     addDummyCommentToSelection() {
       const dummyComment = {
-        uuid: 'bd21aa31-267a-4ae5-a61d-65bb1d364eff',
+        uuid: "bd21aa31-267a-4ae5-a61d-65bb1d364eff",
         comments: [
           {
-            user: 'Kr',
-            content: 'Maybe we could improve this issue',
+            user: "Kr",
+            content: "Maybe we could improve this issue",
             file: {
-              link: 'https://google.com',
-              name: 'Google'
-            }
+              link: "https://google.com",
+              name: "Google",
+            },
           },
           {
-            user: 'Kr',
-            content: 'And This One Too',
+            user: "Kr",
+            content: "And This One Too",
             file: {
-              link: 'https://github.com',
-              name: 'GitHub'
-            }
-          }
-        ]
-      }
+              link: "https://github.com",
+              name: "GitHub",
+            },
+          },
+        ],
+      };
 
-      this.editor?.commands.setComment(JSON.stringify(dummyComment))
-    }
+      if (this.editor) {
+        this.editor.commands.setComment(JSON.stringify(dummyComment));
+      }
+    },
   },
 
   mounted() {
@@ -292,9 +292,9 @@ export default {
     margin: 0;
     overflow: hidden;
 
-		tbody > tr:nth-child(odd) {
-			background: #C7DBFC
-		}
+    tbody > tr:nth-child(odd) {
+      background: #c7dbfc;
+    }
 
     td,
     th {
@@ -304,24 +304,24 @@ export default {
       vertical-align: top;
       box-sizing: border-box;
       position: relative;
-			font-size: 14px;
+      font-size: 14px;
       > * {
         margin-bottom: 0;
       }
     }
 
-		td {
-			font-family: FuturaLight;
-			color: #707070
-		}
+    td {
+      font-family: FuturaLight;
+      color: #707070;
+    }
 
     th {
       font-weight: bold;
       text-align: left;
       background-color: #4294d0;
-			color: #fff;
-			font-size:14px;
-			font-family: FuturaMedium
+      color: #fff;
+      font-size: 14px;
+      font-family: FuturaMedium;
     }
 
     .selectedCell:after {
@@ -531,18 +531,18 @@ export default {
     }
   }
 
-::-webkit-scrollbar  {
-  width: 5px;
-  height: 8px;
-	display: block;
-  background-color: #f8f8f8;
-}
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 8px;
+    display: block;
+    background-color: #f8f8f8;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: lightgray;
-	width: 100px;
-	height: 10px
-}
+  ::-webkit-scrollbar-thumb {
+    background: lightgray;
+    width: 100px;
+    height: 10px;
+  }
   .table-second-row {
     padding-top: 1em;
     display: flex;

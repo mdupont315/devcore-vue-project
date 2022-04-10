@@ -40,7 +40,7 @@ export const Comment = Node.create({
         return commands.setNode(this.name, { comment })
       },
 
-      
+
       // setComment: (comment) => ({ commands }) => commands.setNode('comment', { comment }),
       // toggleComment: () => ({ commands }) => commands.toggleMark('comment'),
       // unsetComment: () => ({ commands }) => commands.unsetMark('comment'),
@@ -55,6 +55,8 @@ export const Comment = Node.create({
         props: {
           handleClick(view, pos) {
             if (!options.isCommentModeOn()) return false;
+
+            console.log(pos)
 
             const { schema, doc, tr } = view.state;
 
@@ -79,4 +81,3 @@ export const Comment = Node.create({
     return VueNodeViewRenderer(CommentNodeView)
   }
 });
-

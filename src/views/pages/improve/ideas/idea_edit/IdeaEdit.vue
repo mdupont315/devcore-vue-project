@@ -165,18 +165,9 @@ export default {
     },
   },
   methods: {
-    // TODO: Get all files in idea in idea.files.
-    // initialize this.files with that data.
-    // all nodes that that were removed can be synced with this.ideas
-    // / OR
-    // add items to removeFileIds (the files that actually need to removed
-    // More efficient
     async setFile(file) {
       const items = [...this.files, file];
-
-      console.log(items);
       this.files = items;
-      // await this.saveIdeaVersion();
     },
     setContentType(item) {
       this.isLoading = true;
@@ -221,7 +212,6 @@ export default {
         if (node.type === "image") {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
-				console.log(node.attrs)
           if (fileInIdea) {
             if (node.attrs.preview) {
               node.attrs.src = fileInIdea.url;
@@ -236,12 +226,10 @@ export default {
         }
       });
 
-			console.log(parsedContent)
       return JSON.stringify(parsedContent);
     },
     async saveIdea() {
       this.ideaForm.fields.file = this.files;
-      console.log("FILES: ", this.files);
 
       const ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
       // reset uploads
@@ -274,21 +262,12 @@ export default {
         (node) => node.attrs.id
       );
 
-      console.log("this.getIdea.files");
-      console.log(this.getIdea.files);
       const uploadedFiles = uploadedFilesInContent.map((node) => node.attrs.id);
 
-      console.log("uploaded Files: ", uploadedFiles);
       const removeFiles = this.getIdea.files.filter(
         (file) => !uploadedFiles.includes(file.uri)
       );
-      console.log("removeFiles:", removeFiles);
       this.ideaForm.removeFileIds = removeFiles.map((file) => file.id) ?? [];
-
-      console.log(
-        "REMOVING FILES RESOURCES WITH ID: ",
-        this.ideaForm.removeFileIds
-      );
     },
     async saveIdeaVersion() {
       this.isLoading = true;
@@ -336,7 +315,6 @@ export default {
       } finally {
         this.isSaving = false;
         this.isLoading = false;
-       // this.closeIdeaEdit();
       }
     },
     async updateIdeaVersionStatus() {

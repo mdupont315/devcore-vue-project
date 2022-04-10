@@ -1,5 +1,4 @@
 import { Extension } from "@tiptap/core";
-import { TextSelection, AllSelection } from "prosemirror-state";
 
 /**
  * FontSize - Custom Extension
@@ -58,55 +57,6 @@ const getUuid = () => {
   return s.join("").substr(0, 6);
 };
 
-// const updateIndentLevel = (tr, delta) => {
-//   const { doc, selection } = tr;
-
-//   if (!doc || !selection) return tr;
-
-//   if (
-//     !(selection instanceof TextSelection || selection instanceof AllSelection)
-//   ) {
-//     return tr;
-//   }
-
-//   const { from, to } = selection;
-
-//   doc.nodesBetween(from, to, (node, pos) => {
-//     const nodeType = node.type;
-//     console.log("name", nodeType.name)
-
-//     if (nodeType.name === "paragraph" || nodeType.name === "heading") {
-//       tr = setNodeIndentMarkup(tr, pos, delta);
-//       return false;
-//     }
-
-//     return true;
-//   });
-
-//   return tr;
-// };
-
-// function setNodeIndentMarkup(tr, pos, delta) {
-//   if (!tr.doc) return tr;
-
-//   const node = tr.doc.nodeAt(pos);
-//   if (!node) return tr;
-
-//   const minIndent = IndentProps.min;
-//   const maxIndent = IndentProps.max;
-
-//   const indent = clamp((node.attrs.indent || 0) + delta, minIndent, maxIndent);
-
-//   if (indent === node.attrs.indent) return tr;
-
-//   const nodeAttrs = {
-//     ...node.attrs,
-//     indent
-//   };
-
-//   return tr.setNodeMarkup(pos, node.type, nodeAttrs, node.marks);
-// }
-
 export const CustomStyle = Extension.create({
   content: "inline*",
   addOptions() {
@@ -150,7 +100,6 @@ export const CustomStyle = Extension.create({
             renderHTML: attributes => {
               let prefix = "p";
               if (attributes.type === "chapter") {
-                console.log(attributes);
                 prefix = "c";
               } else if (attributes.type === "title") {
                 prefix = "t";
@@ -168,20 +117,6 @@ export const CustomStyle = Extension.create({
               };
             }
           }
-          // dataAttr: {
-          //   default: null,
-          //   renderHTML: attributes => {
-          //     const dataText = `${attributes.dataAttr}-${getUuid()}`
-          //     if (!attributes.dataAttr) {
-          //       return {
-          //         'data-text':dataText
-          //       };
-          //     }
-          //     return {
-          //       'data-text':attributes.dataAttr
-          //     };
-          //   }
-          // }
         }
       }
     ];
@@ -189,23 +124,16 @@ export const CustomStyle = Extension.create({
   addCommands() {
     return {
       setChapterText: styles => ({ chain, tr, state, dispatch, editor }) => {
-        // const { selection } = state;
-        console.log(chain);
-        // tr = tr.setSelection(selection);
-        // tr = updateIndentLevel(tr, IndentProps.more);
-        // console.log("chapter:", chapterText);
         return chain()
           .setMark("textStyle", chapterText)
           .run();
       },
       setTitleText: styles => ({ chain }) => {
-        console.log(styles);
         return chain()
           .setMark("textStyle", titleText)
           .run();
       },
       setSubTitleText: styles => ({ chain }) => {
-        console.log(styles);
         return chain()
           .setMark("textStyle", subTitleText)
           .run();
