@@ -17,8 +17,6 @@ const initialState = () => {
 const state = initialState();
 
 const getters = {
-  // isEditingIdea: state => ideaId =>
-  //   state.isEditingIdea.findIndex(x => x.id == ideaId) >= 0,
   ideaInEdit: state => state.ideaInEdit,
   loading: state => state.loading,
   all: state => state.all,

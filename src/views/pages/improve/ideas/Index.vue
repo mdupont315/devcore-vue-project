@@ -59,7 +59,7 @@
           ref="ideas_innerView_New"
           class="text-uppercase mr-1 ideas__routerLink"
           size="md"
-          @click="loadComponent"
+          @click="setComponent"
           >{{ $t("New") }} ({{ newIdeas.length }})</b-button
         >
         <b-button
@@ -69,7 +69,7 @@
           ref="ideas_innerView_Review"
           class="text-uppercase mr-1 ideas__routerLink"
           size="md"
-          @click="loadComponent"
+          @click="setComponent"
           >{{ $t("Review") }} ({{ reviewIdeas.length }})</b-button
         >
         <b-button
@@ -79,7 +79,7 @@
           ref="ideas_innerView_Adopted"
           class="text-uppercase mr-1 ideas__routerLink"
           size="md"
-          @click="loadComponent"
+          @click="setComponent"
           >{{ $t("Adopted") }} ({{ adoptedIdeas.length }})</b-button
         >
         <b-button
@@ -88,7 +88,7 @@
           :to="{ name: 'ideas', params: { type: 'archived' } }"
           class="text-uppercase mr-1 ideas__routerLink"
           size="md"
-          @click="loadComponent"
+          @click="setComponent"
           >{{ $t("Archived") }} ({{ archivedIdeas.length }})</b-button
         >
       </div>
@@ -150,6 +150,7 @@ export default {
       user: "auth/user",
       loading: "process/loading",
       processes: "process/all",
+      ideaInEdit: "idea/ideaInEdit",
     }),
 
     process: {
@@ -409,7 +410,6 @@ export default {
       );
     },
     async breadcrumbClick(event, section) {
-			console.log("CLICKED")
       event.preventDefault();
       switch (section) {
         case "process":
@@ -440,21 +440,20 @@ export default {
           });
           break;
       }
-			 await this.$store.dispatch("idea/setIdeaInEdit", null);
+      await this.closeIdeaEdit();
     },
 
-    //  <idea-edit
-    //   v-if="showDetail"
-    //   @close="closeEdit"
-    //   :idea="idea"
-    //   :ref="`ideaEdit-${idea.id}`"
-    // ></idea-edit>
+    async closeIdeaEdit() {
+      if (this.ideaInEdit) {
+        await this.$store.dispatch("idea/setIdeaInEdit", null);
+      }
+    },
+
+		async setComponent (){
+			await this.loadComponent();
+		},
 
     async loadComponent() {
-      console.log("LOADING!");
-      //this.currentComponent = type;
-      console.log(this.$route.params);
-      console.log(this.$route);
       this.currentComponent = () =>
         import(
           "./" +

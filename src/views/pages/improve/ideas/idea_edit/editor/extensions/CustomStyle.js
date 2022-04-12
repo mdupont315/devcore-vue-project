@@ -87,7 +87,7 @@ export const CustomStyle = Extension.create({
             renderHTML: attributes => {
               if (!attributes.fontSize) {
                 return {
-                  style: `color:${paragraphText.fontSize}`
+                  style: `font-size:${paragraphText.fontSize}px`
                 };
               }
               return {

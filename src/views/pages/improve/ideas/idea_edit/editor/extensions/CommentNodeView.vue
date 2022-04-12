@@ -1,13 +1,20 @@
 <template>
   <node-view-wrapper as="div" class="comment-component">
+    <layer v-if="isReplying" @closed="closeOverlay()" />
+
     <node-view-content class="content-dom" />
 
     <section v-if="comments.length" class="comment-details">
       <article class="comment" v-for="(comment, i) in comments" :key="i">
-        {{ comment.content }}
+        <span :class="`idea_comment_${comment.type}`"> {{ comment.content }}</span>
 
         <div class="comment-actions">
-          <span v-if="comment.file && comment.file.link" class="file">
+          <span
+            v-if="comment.file && comment.file.link"
+            class="file"
+            v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
+            :title="comment.file.name"
+          >
             <a
               @click.prevent.stop="openUrl(comment.file.link)"
               :href="comment.file.link"
@@ -15,7 +22,7 @@
               target="__blank"
             >
               <img
-                slot="reference"
+                slot="folder_reference"
                 class="folder-icon"
                 :src="FolderIcon"
                 alt=""
@@ -23,13 +30,14 @@
             </a>
           </span>
 
-          <!-- <popper trigger="clickToToggle" :options="{ placement: 'top' }" class="test">
-          <div class="popper">
-            <span> Here, it'll show the rating system and stuff. </span>
-          </div> -->
-          <span>
+          <span
+            v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
+            :title="$t('reply')"
+          >
             <img
-              slot="reference"
+              slot="comment_reference"
+              ref="comment_replyIcon"
+              style="margin-top: -3px"
               @click="isReplying = !isReplying"
               class="comment-icon"
               :src="CommentIcon"
@@ -37,30 +45,22 @@
             />
           </span>
         </div>
-        <!-- </popper> -->
-
-        <div v-if="isReplying">
-          <div>{{ comment.content }}}</div>
-          <!-- <improvement-feedback
-            style="margin-left: 20px; max-height: 46px"
-            :item="item"
-            :itemDescription="item.description"
-            :user="item.author"
-            refTarget="improvementFeedbackIcon"
-            :textPlaceholder="$t('Improvement feedback')"
-            type="improvementFeedback"
-            @toggle="togglePopOverFeedback"
-            @save="saveImprovementReply"
-            @close="closeImprovementForFeedback"
-            :openState="isReplying"
-          >
-            <small
-              class="d-block text-gray"
-              style="line-height: 1em; align-self: center"
-              >{{ $t("Feedback") }}</small
-            >
-          </improvement-feedback> -->
-        </div>
+        <b-popover
+          ref="popover"
+          :target="() => getReplyIconRef()"
+          boundary="window"
+          placement="top"
+          :show="isReplying"
+          custom-class="general-reply-form"
+        >
+          <reply-form
+            @close="isReplying = false"
+            :anonymous="comment.anonymous"
+            :userId="comment.user"
+            :content="comment.content"
+            :comment="comment"
+          ></reply-form>
+        </b-popover>
       </article>
     </section>
   </node-view-wrapper>
@@ -68,17 +68,15 @@
 
 <script>
 import { NodeViewWrapper, nodeViewProps, NodeViewContent } from "@tiptap/vue-2";
-import Popper from "vue-popperjs";
-import "vue-popperjs/dist/vue-popper.css";
 
-import { CommentIcon } from "@/assets";
-import { FolderIcon } from "@/assets";
+import { CommentIcon, FolderIcon } from "@/assets";
+import ReplyForm from "@/components/global/ReplyForm.vue";
 
 export default {
   components: {
     NodeViewWrapper,
     NodeViewContent,
-    // Popper,
+    "reply-form": ReplyForm,
   },
 
   props: nodeViewProps,
@@ -87,12 +85,17 @@ export default {
     return {
       CommentIcon,
       FolderIcon,
-
       isReplying: false,
     };
   },
 
   methods: {
+    closeOverlay() {
+      this.isReplying = false;
+    },
+    getReplyIconRef() {
+      return this.$refs.comment_replyIcon[0];
+    },
     /**
      * Example of how to update attributes
      */
@@ -108,6 +111,7 @@ export default {
 
   computed: {
     commentEntity() {
+      console.log(this.editor);
       const stringCommentEntity = this.node?.attrs?.comment;
 
       return stringCommentEntity ? JSON.parse(stringCommentEntity) : {};
@@ -121,8 +125,8 @@ export default {
 
 <style lang="scss">
 .comment-component {
-	.comment-actions{
-    margin-left:10px
+  .comment-actions {
+    margin-left: 10px;
   }
   .content-dom {
     background-color: #d0e4f3;
@@ -134,9 +138,16 @@ export default {
     border-radius: 8px;
     padding: 8px;
 
+		.idea_comment_IMPROVEMENT {
+			 color: #4294d0;
+		}
+		.idea_comment_PROBLEM {
+			 color: #d0424d;
+		}
+
     .comment {
-      color: #4294d0;
-			display:flex;
+
+      display: flex;
 
       .file {
         margin-left: 10px;
@@ -145,19 +156,19 @@ export default {
           pointer-events: all;
           text-decoration: underline;
 
-          &:hover {
-            &::after {
-              content: attr(data-title);
-              margin: 0 4px;
-							z-index:1;
-              position: absolute;
-              background: white;
-              border-radius: 8px;
-              padding: 4px;
-              box-shadow: 0 0 5px rgba(gray, 0.5);
-              text-decoration: underline;
-            }
-          }
+          // &:hover {
+          //   &::after {
+          //     content: attr(data-title);
+          //     margin: 0 4px;
+          //     z-index: 1;
+          //     position: absolute;
+          //     background: white;
+          //     border-radius: 8px;
+          //     padding: 4px;
+          //     box-shadow: 0 0 5px rgba(gray, 0.5);
+          //     text-decoration: underline;
+          //   }
+          // }
         }
       }
 

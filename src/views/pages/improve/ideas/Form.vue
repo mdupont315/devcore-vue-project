@@ -147,7 +147,7 @@
               $displayError("description", form)
             }}</b-form-invalid-feedback>
           </div>
-          <div>
+          <!-- <div>
             <file-field
               v-model="form.file"
               :placeholder="$t('Upload guide')"
@@ -155,7 +155,7 @@
               :current-file="currentFile"
               @input="fileChanged"
             />
-          </div>
+          </div> -->
         </b-card-body>
         <b-card-footer :class="{ 'px-0': mode === 'create' }">
           <loading-button

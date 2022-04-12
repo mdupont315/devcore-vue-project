@@ -28,15 +28,6 @@
                     :time="item.createdAt"
                     class="d-inline-block"
                   ></author-time>
-                  <!--  <img
-                    :src="user.getAvatarUrl('50x50')"
-                    class="border rounded-circle"
-                    height="22"
-                  />
-
-                  <div class="feedback-form-header-body-author-name-text">
-                    {{ user.fullName }}
-                  </div> -->
                 </div>
 
                 <confirm-button

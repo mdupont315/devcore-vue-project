@@ -198,11 +198,7 @@ export default {
         description: input.description,
         status,
       });
-      await this.$store.dispatch("ideaIssueReply/create", ideaissueReplyForm);
-      await this.$store.dispatch("idea/findById", {
-        id: this.idea.id,
-        force: true,
-      });
+
 
       this.showPopOverFeedback = false;
     },

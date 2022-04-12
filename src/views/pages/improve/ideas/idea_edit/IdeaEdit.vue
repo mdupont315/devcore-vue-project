@@ -138,7 +138,7 @@ export default {
     getIdea: {
       get() {
         return this.ideas.find(
-          (idea) => idea.id === this.ideaInEdit.editIdeaId
+          (idea) => idea.id === this.ideaInEdit?.editIdeaId
         );
       },
     },
@@ -163,6 +163,12 @@ export default {
         contentForm.contentType = value.contentType;
       },
     },
+  },
+  async beforeDestroy() {
+    console.log("DESTROYED");
+    if (this.ideaInEdit) {
+      await this.$store.dispatch("idea/setIdeaInEdit", null);
+    }
   },
   methods: {
     async setFile(file) {
@@ -216,11 +222,11 @@ export default {
             if (node.attrs.preview) {
               node.attrs.src = fileInIdea.url;
               node.attrs.id = fileInIdea.uri;
-							node.attrs.href = "";
+              node.attrs.href = "";
             } else {
               node.attrs.href = fileInIdea.url;
               node.attrs.id = fileInIdea.uri;
-							node.attrs.src = "";
+              node.attrs.src = "";
             }
           }
         }
@@ -356,7 +362,7 @@ export default {
 <style scoped>
 .idea_edit_container {
   width: 100%;
-  max-height: 80vh;
+  max-height: 83vh;
   overflow: hidden;
   height: 100%;
   margin-top: 0px;

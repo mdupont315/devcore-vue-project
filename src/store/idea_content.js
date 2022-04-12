@@ -59,7 +59,6 @@ const actions = {
   },
 
   async findAll(context, { filter = null, force = false } = {}) {
-    console.log("GETTING")
     if (context.getters.all.length === 0 || force) {
       filter = filter || {
         data: {

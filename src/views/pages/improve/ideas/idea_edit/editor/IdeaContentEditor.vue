@@ -14,9 +14,9 @@
         :editor="editor"
         ref="editor_content"
       />
-      <bubble-menu :editor="editor">
+      <!-- <bubble-menu :editor="editor">
         <button @click="addDummyCommentToSelection">Add Example Comment</button>
-      </bubble-menu>
+      </bubble-menu> -->
       <div class="editor__footer">
         <div :class="`editor__status editor__status--${status}`">
           <template v-if="status === 'connected'">
@@ -39,13 +39,8 @@
 
 	<script>
 import { mapGetters } from "vuex";
-
 import { EditorContent, BubbleMenu } from "@tiptap/vue-2";
-
-// import * as Y from "yjs";
-// import { HocuspocusProvider } from "@hocuspocus/provider";
 import { MenuBar } from "./parts";
-
 import ContentEditor from "./EditorLoader.js";
 
 /* eslint-disable */

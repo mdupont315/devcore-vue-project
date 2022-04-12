@@ -39,6 +39,7 @@ export const Comment = Node.create({
       setComment: comment => ({ commands }) => {
         return commands.setNode(this.name, { comment })
       },
+      unsetComment: () => ({ commands }) => commands.unsetMark('comment')
 
 
       // setComment: (comment) => ({ commands }) => commands.setNode('comment', { comment }),
@@ -55,8 +56,6 @@ export const Comment = Node.create({
         props: {
           handleClick(view, pos) {
             if (!options.isCommentModeOn()) return false;
-
-            console.log(pos)
 
             const { schema, doc, tr } = view.state;
 
