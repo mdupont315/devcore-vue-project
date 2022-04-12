@@ -107,8 +107,6 @@ export default {
       if (this.provider) this.editor.destroy();
 
       const addFile = async (file) => {
-        //this.$emit("fileAdded", file);
-        console.log(file);
         this.$emit("fileAdded", file);
       };
 
