@@ -275,12 +275,6 @@ export default {
         return el.getBoundingClientRect().width < 150;
       });
     },
-    /*     closeCreateForm() {
-			console.log("close!");
-			console.log(this.openFormId);
-      this.isEditing = false;
-      this.openFormId = null;
-    }, */
     closeCreateForm(previous) {
 
       if (this.isEditing) {

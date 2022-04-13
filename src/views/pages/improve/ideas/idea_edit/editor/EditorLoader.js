@@ -13,7 +13,7 @@ import History from "@tiptap/extension-history";
 import FontFamily from "@tiptap/extension-font-family";
 import Link from '@tiptap/extension-link'
 import { Color } from "@tiptap/extension-color";
-import { Indent, EventHandler, CustomStyle, CustomTable, File, Comment } from './extensions'
+import { Indent, EventHandler, CustomStyle, Heading, CustomTable, File, Comment } from './extensions'
 
 export default class ContentEditor {
   constructor(editable, value, options, upload) {
@@ -37,7 +37,7 @@ export default class ContentEditor {
         openOnClick: true,
       }),
       TextStyle,
-      CustomStyle,
+      // CustomStyle,
       Color,
       Indent,
       Highlight,
@@ -46,6 +46,7 @@ export default class ContentEditor {
       TableHeader,
       TableCell,
       Gapcursor,
+      Heading,
       File(upload),
       CustomTable,
       EventHandler,
@@ -55,8 +56,8 @@ export default class ContentEditor {
       Comment
     ];
     this.editor = this.getEditorInstance();
-    this.editor.commands.setParagraphText();
-    this.editor.commands.setFontFamily("FuturaLight");
+    // this.editor.commands.setParagraphText();
+    // this.editor.commands.setFontFamily("FuturaLight");
   }
 
   getEditorInstance() {

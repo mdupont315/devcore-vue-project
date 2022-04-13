@@ -404,9 +404,7 @@ export default {
           if (this.mode === "edit") {
             await this.$store.dispatch(`${this.storeName}/update`, this.form);
           } else {
-						console.log(this.form)
             await this.$store.dispatch(`${this.storeName}/create`, this.form);
-						console.log(this.form)
             await this.$store.dispatch(`${this.storeName}/setIdeaTab`, {
               tab: "New",
             });

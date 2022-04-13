@@ -49,6 +49,7 @@
     "graphql-tag": "^2.10.3",
     "laravel-echo": "^1.8.0",
     "lodash": "^4.17.20",
+    "mammoth": "^1.4.21",
     "moment": "^2.27.0",
     "numeral": "^2.0.6",
     "portal-vue": "^2.1.7",

@@ -229,18 +229,9 @@ export default {
       },
     },
   },
-  // async beforeDestroy() {
-  //   await this.closeEdit(this.idea);
-  // },
-  methods: {
-    // async closeEdit(idea = this.idea) {
-    // 	console.log("CLOSING EDIT!")
-    //   await this.$store.dispatch("idea/setIdeaInEdit", null);
-    //   this.$emit("closeIdea", idea);
-    // },
-    async openIdeaEdit(idea) {
-      console.log(idea);
 
+  methods: {
+    async openIdeaEdit(idea) {
       await this.$store.dispatch("idea/setIdeaInEdit", {
         editIdeaMeta: {
           editStartedAt: new Date().getTime(),

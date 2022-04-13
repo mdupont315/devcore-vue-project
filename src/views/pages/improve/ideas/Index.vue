@@ -59,7 +59,7 @@
           ref="ideas_innerView_New"
           class="text-uppercase mr-1 ideas__routerLink"
           size="md"
-          @click="setComponent"
+          @click="setComponent()"
           >{{ $t("New") }} ({{ newIdeas.length }})</b-button
         >
         <b-button
@@ -69,7 +69,7 @@
           ref="ideas_innerView_Review"
           class="text-uppercase mr-1 ideas__routerLink"
           size="md"
-          @click="setComponent"
+          @click="setComponent()"
           >{{ $t("Review") }} ({{ reviewIdeas.length }})</b-button
         >
         <b-button
@@ -79,7 +79,7 @@
           ref="ideas_innerView_Adopted"
           class="text-uppercase mr-1 ideas__routerLink"
           size="md"
-          @click="setComponent"
+          @click="setComponent()"
           >{{ $t("Adopted") }} ({{ adoptedIdeas.length }})</b-button
         >
         <b-button
@@ -88,7 +88,7 @@
           :to="{ name: 'ideas', params: { type: 'archived' } }"
           class="text-uppercase mr-1 ideas__routerLink"
           size="md"
-          @click="setComponent"
+          @click="setComponent()"
           >{{ $t("Archived") }} ({{ archivedIdeas.length }})</b-button
         >
       </div>
@@ -101,8 +101,12 @@
     >
       <component
         :is="currentComponent"
-        v-if="currentProcess && currentComponent"
+        v-if="currentProcess && currentComponent && !ideaInEdit"
       ></component>
+
+      <idea-edit
+        v-else-if="currentProcess && currentComponent && ideaInEdit"
+      ></idea-edit>
 
       <empty-page v-else>
         <div v-if="!currentProcess" class="h2 text-center text-white">
@@ -131,6 +135,7 @@ import MainNav from "@/views/layouts/components/MainNav";
 import New from "./New.vue";
 import Review from "./Review.vue";
 import Adopted from "./Adopted.vue";
+import IdeaEdit from "./idea_edit/IdeaEdit.vue";
 
 export default {
   components: {
@@ -139,6 +144,7 @@ export default {
     "idea-new": New,
     "idea-review": Review,
     "idea-adopted": Adopted,
+    "idea-edit": IdeaEdit,
   },
   data: () => ({
     currentComponent: null,
@@ -264,6 +270,11 @@ export default {
         return ret;
       },
     },
+    getIsIdeaInEdit: {
+      get() {
+        return this.ideaInEdit;
+      },
+    },
   },
   async mounted() {
     if (this.user.can("core/company/manage")) {
@@ -282,7 +293,8 @@ export default {
         force: true,
       });
     }
-    EventBus.$on("process/changeCurrent", (data) => {
+    EventBus.$on("process/changeCurrent", async (data) => {
+				await this.closeIdeaEdit()
       if (data.section === "ideas") {
         if (!this.process.process) return;
         this.$store.dispatch("idea/findByProcess", {
@@ -291,23 +303,23 @@ export default {
         });
       }
     });
-    EventBus.$on("idea/currentTab", (data) => {
+    EventBus.$on("idea/currentTab", async (data) => {
       const tabName =
         data && data.form && data.form.tab ? data.form.tab : "New";
-
+			await this.closeIdeaEdit()
       const ref = `ideas_innerView_${tabName}`;
       if (this.$refs[ref] && this.$refs[ref].$el) {
         this.$refs[ref].$el.click();
       }
     });
 
-    EventBus.$on("idea/currentIdea", (data) => {
-      if (data.form) {
-        this.currentComponent = (data) => import("./idea_edit/IdeaEdit.vue");
-      } else {
-        this.loadComponent();
-      }
-    });
+    // EventBus.$on("idea/currentIdea", (data) => {
+    //   if (data.form) {
+    //     // this.currentComponent = (data) => import("./idea_edit/IdeaEdit.vue")
+    //   } else {
+    //  //   this.loadComponent();
+    //   }
+    // });
 
     if (
       this.$router.currentRoute.query &&
@@ -449,19 +461,22 @@ export default {
       }
     },
 
-		async setComponent (){
-			await this.loadComponent();
-		},
+    async setComponent(component) {
+			await this.closeIdeaEdit()
+      await this.loadComponent(component);
+    },
 
-    async loadComponent() {
-      this.currentComponent = () =>
-        import(
-          "./" +
-            (this.$route.params.type
-              ? this.$route.params.type.capitalize()
-              : "New") +
-            ".vue"
-        );
+    async loadComponent(component) {
+      if (!component) {
+        this.currentComponent = () =>
+          import(
+            "./" +
+              (this.$route.params.type
+                ? this.$route.params.type.capitalize()
+                : "New") +
+              ".vue"
+          );
+      }
     },
   },
 };

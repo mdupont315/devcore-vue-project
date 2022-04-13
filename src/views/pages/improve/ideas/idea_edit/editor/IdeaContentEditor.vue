@@ -338,10 +338,47 @@ export default {
       background-color: #adf;
       pointer-events: none;
     }
+  }
+  p {
+    color: #707070 !important;
+    font-size: 14px !important;
+    font-family: FuturaLight !important;
+  }
+  h1 {
+    color: #242526 !important;
+    font-size: 18px !important;
+    font-family: FuturaBold !important;
+  }
+  h2 {
+    color: #242526 !important;
+    font-size: 14px !important;
+    font-family: FuturaMedium !important;
+  }
+  h3 {
+    color: #4294d0 !important;
+    font-size: 14px !important;
+    font-family: FuturaMedium !important;
+  }
 
-    p {
-      margin: 0;
-    }
+	  p > span {
+    color: #707070 !important;
+    font-size: 14px !important;
+    font-family: FuturaLight !important;
+  }
+  h1 > span{
+    color: #242526 !important;
+    font-size: 18px !important;
+    font-family: FuturaBold !important;
+  }
+  h2> span {
+    color: #242526 !important;
+    font-size: 14px !important;
+    font-family: FuturaMedium !important;
+  }
+  h3 > span{
+    color: #4294d0 !important;
+    font-size: 14px !important;
+    font-family: FuturaMedium !important;
   }
 }
 

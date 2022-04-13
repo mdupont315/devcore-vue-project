@@ -179,7 +179,6 @@ export function updateColumns(
     table.style.width = `${totalWidth}px`;
     table.style.minWidth = "";
   } else {
-    console.log("totalWidth", totalWidth);
     table.style.width = "";
     table.style.minWidth = `${totalWidth}px`;
   }

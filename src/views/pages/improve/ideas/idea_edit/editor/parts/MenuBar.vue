@@ -69,11 +69,10 @@ export default {
               icon: "h-1",
               title: "Chapter",
               action: () => {
-                this.editor.commands.setChapterText();
-                this.editor.commands.setFontFamily("FuturaBold");
+                // this.editor.commands.setChapterText();
+                // this.editor.commands.setFontFamily("FuturaBold");
                 this.activeHeading = "h-1";
                 this.editor.chain().focus().toggleHeading({ level: 1 }).run();
-                console.log(this.editor.isActive());
               },
               isActive: () => this.editor.isActive("heading", { level: 1 }),
             },
@@ -81,8 +80,8 @@ export default {
               icon: "h-2",
               title: "Title",
               action: () => {
-                this.editor.commands.setTitleText();
-                this.editor.commands.setFontFamily("FuturaMedium");
+                // this.editor.commands.setTitleText();
+                // this.editor.commands.setFontFamily("FuturaMedium");
                 this.activeHeading = "h-2";
                 this.editor.chain().focus().toggleHeading({ level: 2 }).run();
               },
@@ -92,8 +91,8 @@ export default {
               icon: "h-3",
               title: "Subtitle",
               action: () => {
-                this.editor.commands.setSubTitleText();
-                this.editor.commands.setFontFamily("FuturaMedium");
+                // this.editor.commands.setSubTitleText();
+                // this.editor.commands.setFontFamily("FuturaMedium");
                 this.activeHeading = "h-2";
                 this.editor.chain().focus().toggleHeading({ level: 3 }).run();
               },
@@ -103,8 +102,8 @@ export default {
               icon: "paragraph",
               title: "Paragraph",
               action: () => {
-                this.editor.commands.setParagraphText();
-                this.editor.commands.setFontFamily("FuturaLight");
+                // this.editor.commands.setParagraphText();
+                // this.editor.commands.setFontFamily("FuturaLight");
                 this.activeHeading = "h-4";
                 this.editor.chain().focus().setParagraph().run();
 

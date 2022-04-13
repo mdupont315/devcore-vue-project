@@ -67,13 +67,7 @@ export default {
       return table.isActive() ? "table-active" : "table-not-active";
     },
     invokeGridItemAction(listItem, index) {
-      // if (this.isTableActive()) {
-      console.log(this.isTableActive());
       listItem.action();
-      // if (!this.selectionOpen) {
-      //   this.$emit("close");
-      // }
-      //  }
     },
     toggleSelection() {
       this.selectionOpen = !this.selectionOpen;

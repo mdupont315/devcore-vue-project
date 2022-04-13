@@ -144,22 +144,25 @@ export default {
         console.log(e);
       }
       this.isLoading = false;
+      this.$emit("savedReply", this.comment.id);
     },
     async saveEmptyFeedback() {
-			 this.isLoading = true;
+      this.isLoading = true;
 
       const ideaIssueCloseForm = new GQLForm({
         id: this.editingIdea.editIdeaId,
         improvementId: this.comment.id,
       });
 
-			//TODO: Unset this comment, remove from editor, save content
+      //TODO: Unset this comment,
+			//TODO:  remove from editor, save content
 
       await this.$store.dispatch(
         "idea/closeImprovementFeedback",
         ideaIssueCloseForm
       );
-			 this.isLoading = false;
+      this.isLoading = false;
+      this.$emit("savedReply", this.comment.id);
     },
   },
   async mounted() {
@@ -174,8 +177,6 @@ export default {
         },
       },
     });
-    console.log(this.$refs);
-    console.log(this.refTarget);
   },
 };
 </script>

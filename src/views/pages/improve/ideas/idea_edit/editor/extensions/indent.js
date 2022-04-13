@@ -50,7 +50,6 @@ function setNodeIndentMarkup(tr, pos, delta) {
 
   if (indent === node.attrs.indent) return tr;
 
-  console.log(indent)
   const nodeAttrs = {
     ...node.attrs,
     indent
@@ -75,7 +74,6 @@ const updateIndentLevel = (tr, delta) => {
   doc.nodesBetween(from, to, (node, pos) => {
     const nodeType = node.type;
 
-    console.log("nodeType: ", nodeType)
     if (nodeType.name === "paragraph" || nodeType.name === "heading") {
       tr = setNodeIndentMarkup(tr, pos, delta);
       return false;
@@ -125,7 +123,6 @@ export const Indent = Extension.create({
     return {
       indent: () => ({ tr, state, dispatch, editor }) => {
         const { selection } = state;
-        console.log(selection);
         tr = tr.setSelection(selection);
         tr = updateIndentLevel(tr, IndentProps.more);
 

@@ -15,31 +15,31 @@ BOLD
 
 //futurabold
 const chapterText = {
-  color: "#242526",
-  fontSize: 18,
+ // color: "#242526",
+ // fontSize: 18,
   type: "chapter",
   class: "chapterText"
 };
 
 const titleText = {
-  color: "#242526",
-  fontSize: 14,
+//  color: "#242526",
+ // fontSize: 14,
   type: "title",
   class: "titleText"
 };
 
 //futuramedium
 const subTitleText = {
-  color: "#4294d0",
-  fontSize: 14,
+//  color: "#4294d0",
+ // fontSize: 14,
   type: "subtitle",
   class: "subtitleText"
 };
 
 //futuralight / narrow
 const paragraphText = {
-  color: "#707070",
-  fontSize: 14,
+ // color: "#707070",
+ // fontSize: 14,
   type: "paragraph",
   class: "paragraphText"
 };

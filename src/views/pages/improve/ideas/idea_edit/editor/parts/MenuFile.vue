@@ -21,7 +21,6 @@ export default {
   methods: {
     previewFiles(event) {
 			this.item.action(event.target.files);
-      console.log(event.target.files);
     },
   },
   data() {

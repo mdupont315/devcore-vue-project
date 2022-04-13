@@ -7,6 +7,7 @@ import { Plugin } from "prosemirror-state";
 
 const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
   const { schema } = view.state;
+  console.log("item", item);
   if (item.size > 1000000) {
     console.log("ERROR, File size too big!");
     return;
@@ -28,36 +29,34 @@ const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
 const uploadFilePlugin = addFile => {
   return new Plugin({
     props: {
-      // handlePaste(view, event) {
-      //   console.log("PASTING CONTETN!");
-      //   const items = Array.from(event.clipboardData?.items || []);
-      //   const { schema } = view.state;
+      handlePaste(view, event, slice) {
+        console.log("TR ", view.state.tr)
+        const items = (event.clipboardData || event.originalEvent.clipboardData)
+          .items;
 
-      //   const previewFiles = items.filter(file => /image/i.test(file.type));
-      //   console.log(items)
-      //   console.log("1")
-      //   console.log(previewFiles)
-      //   previewFiles.forEach(item => {
-      //     console.log("2")
-      //     const image = item.getAsFile();
-      //     console.log(image);
-      //     console.log("typeof", item.type.indexOf("image"));
+        let pos = 1;
+        if (view.state.tr && view.state.tr.curSelection && view.state.tr.curSelection.$head) {
+          pos = view.state.tr.curSelection.$head.pos;
+        }
+        const coordinates = { pos, inside: 0 };
 
-      //     event.preventDefault();
-      //     const reader = new FileReader();
-      //     reader.onload = readerEvent => {
-      //       const node = schema.nodes.image.create({
-      //         src: readerEvent.target?.result
-      //       });
-      //       const transaction = view.state.tr.replaceSelectionWith(node);
-      //       view.dispatch(transaction);
-      //     };
-      //     console.log("3")
-      //     reader.readAsDataURL(image);
-      //   });
+        for (const item of items) {
+          if (item.type.indexOf("image") === 0) {
+            event.preventDefault();
+            const preview = true;
+            const image = item.getAsFile();
 
-      //   return false;
-      // },
+            addFile(item);
+            renderFileInBase64ToCoordinates(image, view, coordinates, preview);
+          } else {
+            const preview = false;
+            const file = item.getAsFile();
+            addFile(item);
+            renderFileInBase64ToCoordinates(file, view, coordinates, preview);
+          }
+        }
+        return false;
+      },
 
       handleDOMEvents: {
         drop(view, event) {
@@ -67,8 +66,12 @@ const uploadFilePlugin = addFile => {
             return false;
           }
 
+          console.log(event.dataTransfer);
+
           const data = Array.from(event.dataTransfer?.files ?? []);
           const previewFiles = data.filter(file => /image/i.test(file.type));
+
+          console.log("data", data)
 
           event.preventDefault();
           const coordinates = view.posAtCoords({

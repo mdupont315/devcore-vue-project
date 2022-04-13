@@ -10,16 +10,13 @@ export const EventHandler = Extension.create({
         key: new PluginKey("eventHandler"),
         props: {
           handleClick(view, pos, event) {
-            console.log(event)
-            console.log(view)
-            if (event.target.className === "editIdea-test-custom-class") {
-              console.log("CLICKED +!!!!");
-            }
+            console.log("Clicked editor!")
           },
           handleDoubleClick(view, pos, event) {
             console.log("Double Clicked!");
           },
           handlePaste(view, event, slice) {
+            console.log(slice)
             console.log("Pasted Content!");
           }
           // … and many, many more.

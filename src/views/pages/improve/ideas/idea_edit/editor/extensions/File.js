@@ -65,7 +65,6 @@ export const File = uploadFn => {
         tag: "img[src]",
         getAttrs: dom => {
           if (typeof dom === "string") return {};
-          console.log("dom", dom);
           const obj = {
             src: dom.getAttribute("src"),
             title: dom.getAttribute("title"),
@@ -81,7 +80,6 @@ export const File = uploadFn => {
         tag: "a",
         getAttrs: dom => {
           if (typeof dom === "string") return {};
-          console.log("dom", dom);
           const obj = {
             src: dom.getAttribute("src"),
             href: dom.getAttribute("href"),
@@ -96,6 +94,8 @@ export const File = uploadFn => {
     ],
     renderHTML: ({ HTMLAttributes }) => {
       const { href, title, src, alt, style, preview } = HTMLAttributes;
+
+      console.log(HTMLAttributes)
 
       if (!preview) {
         return ["a", { href, title, style }, title];

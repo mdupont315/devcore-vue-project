@@ -6,9 +6,15 @@
 
     <section v-if="comments.length" class="comment-details">
       <article class="comment" v-for="(comment, i) in comments" :key="i">
-        <span :class="`idea_comment_${comment.type}`"> {{ comment.content }}</span>
+        <span :class="`idea_comment_${comment.type}`">
+          {{ comment.content }}
+        </span>
 
-        <div class="comment-actions">
+        <div
+          class="comment-actions"
+          :class="`comment-actions-${comment.id}`"
+          ref="test"
+        >
           <span
             v-if="comment.file && comment.file.link"
             class="file"
@@ -33,28 +39,31 @@
           <span
             v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
             :title="$t('reply')"
+            :class="`comment_replyIcon-${comment.id}`"
+            :ref="`comment_replyIcon-${comment.id}`"
           >
             <img
               slot="comment_reference"
-              ref="comment_replyIcon"
               style="margin-top: -3px"
-              @click="isReplying = !isReplying"
+              @click="openReplyForm(comment, i)"
               class="comment-icon"
               :src="CommentIcon"
               alt=""
             />
           </span>
         </div>
+        <!-- getReplyIconRef(comment.id) -->
         <b-popover
           ref="popover"
-          :target="() => getReplyIconRef()"
+          :target="() => $refs[`comment_replyIcon-${comment.id}`][0]"
           boundary="window"
           placement="top"
-          :show="isReplying"
+          :show="isReplying === comment.id"
           custom-class="general-reply-form"
         >
           <reply-form
-            @close="isReplying = false"
+            @close="isReplying = null"
+            @savedReply="savedReply"
             :anonymous="comment.anonymous"
             :userId="comment.user"
             :content="comment.content"
@@ -85,16 +94,30 @@ export default {
     return {
       CommentIcon,
       FolderIcon,
-      isReplying: false,
+      isReplying: null,
     };
   },
 
   methods: {
-    closeOverlay() {
-      this.isReplying = false;
+    openReplyForm(comment) {
+      console.log("OPEN FORM!");
+      console.log(comment);
+      this.isReplying = comment.id;
     },
-    getReplyIconRef() {
-      return this.$refs.comment_replyIcon[0];
+    savedReply(id) {
+      this.isReplying = null;
+      this.editor.commands.unsetComment(this.node?.attrs?.comment, id);
+    },
+    closeOverlay() {
+      this.isReplying = null;
+    },
+
+    getReplyIconRef(id) {
+      console.log();
+      console.log("GET REF TARGET");
+      console.log(id);
+
+      return `comment_replyIcon-${id}`;
     },
     /**
      * Example of how to update attributes
@@ -104,6 +127,13 @@ export default {
     //     count: this.node.attrs.count + 1,
     //   });
     // },
+    getCommentRef(comment) {
+      console.log(comment);
+      const ref = `comment_replyIcon-${comment.id}`;
+			console.log(ref)
+			console.log(this.$refs)
+      return `comment_replyIcon-${comment.id}`;
+    },
     openUrl(link) {
       window.open(link, "__blank");
     },
@@ -111,7 +141,6 @@ export default {
 
   computed: {
     commentEntity() {
-      console.log(this.editor);
       const stringCommentEntity = this.node?.attrs?.comment;
 
       return stringCommentEntity ? JSON.parse(stringCommentEntity) : {};
@@ -138,15 +167,14 @@ export default {
     border-radius: 8px;
     padding: 8px;
 
-		.idea_comment_IMPROVEMENT {
-			 color: #4294d0;
-		}
-		.idea_comment_PROBLEM {
-			 color: #d0424d;
-		}
+    .idea_comment_IMPROVEMENT {
+      color: #4294d0;
+    }
+    .idea_comment_PROBLEM {
+      color: #d0424d;
+    }
 
     .comment {
-
       display: flex;
 
       .file {

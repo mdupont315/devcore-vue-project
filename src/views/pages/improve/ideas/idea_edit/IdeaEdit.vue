@@ -137,9 +137,10 @@ export default {
     }),
     getIdea: {
       get() {
-        return this.ideas.find(
+        const idea = this.ideas.find(
           (idea) => idea.id === this.ideaInEdit?.editIdeaId
         );
+        return idea ?? null;
       },
     },
     getIdeaPath: {
@@ -165,10 +166,7 @@ export default {
     },
   },
   async beforeDestroy() {
-    console.log("DESTROYED");
-    if (this.ideaInEdit) {
-      await this.$store.dispatch("idea/setIdeaInEdit", null);
-    }
+    await this.closeIdeaEdit();
   },
   methods: {
     async setFile(file) {
@@ -250,12 +248,20 @@ export default {
         markup?.content.filter((node) => node.type === "image") ?? [];
       return imageNodes;
     },
+    getCommentNodesFromContent() {
+      const { markup } = this.getIdeaContent;
+      const commentNodes =
+        markup?.content.filter((node) => node.type === "comment") ?? [];
+      return commentNodes;
+    },
+
 
     syncFiles() {
       //TODO: Check that idea.files (should be actual files on server)
       // matches with node content node content images
 
       //TODO: check that resources get deleted correctly. Currently more resources than should get deleted
+
       const fileNodesInContent = this.getImageNodesFromContent();
       if (fileNodesInContent.length === 0) {
         this.ideaForm.removeFile = true;
@@ -333,7 +339,7 @@ export default {
         id: this.getIdea.processId,
         force: true,
       });
-      this.closeIdeaEdit();
+      await this.closeIdeaEdit();
     },
     async deleteIdeaVersion() {
       const editForm = new GQLForm({
@@ -348,7 +354,7 @@ export default {
         id: this.ideaForm.processId,
         force: true,
       });
-      this.closeIdeaEdit();
+      await this.closeIdeaEdit();
     },
     async closeIdeaEdit() {
       this.$emit("close");

@@ -459,7 +459,7 @@ export default {
   }),
   methods: {
     closeIt() {
-      console.log("Close");
+      console.log("Close Issue Template");
     },
     toggleOverlay() {
       this.$emit("toggleOverlay");
