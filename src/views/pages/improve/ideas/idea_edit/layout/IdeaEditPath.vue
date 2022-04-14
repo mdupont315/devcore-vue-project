@@ -28,8 +28,10 @@
           v-if="mutateForm"
         >
           <b-card no-body class="d-block">
-            <b-card-body class="p-0 ideaEditPath-form-fields" :style="idea.hasReviews ? 'max-height:25vh;' : 'max-height:50vh'"
->
+            <b-card-body
+              class="p-0 ideaEditPath-form-fields"
+              :style="idea.hasReviews ? 'max-height:35vh;' : 'max-height:60vh'"
+            >
               <div class="form-group">
                 <div class="form-label-group select required">
                   <div
@@ -135,7 +137,8 @@
                     :options="tools"
                     class="text-capitalize"
                     :class="{
-                      'is-invalid': $validateState('tool', mutateForm) === false,
+                      'is-invalid':
+                        $validateState('tool', mutateForm) === false,
                       'is-valid': $validateState('tool', mutateForm) === true,
                     }"
                   ></v-select>
@@ -167,6 +170,26 @@
                   <b-form-invalid-feedback>{{
                     $displayError("title", mutateForm)
                   }}</b-form-invalid-feedback>
+                </div>
+                <div class="form-group">
+                  <div
+                    class="idea_edit_path_container-body-process-select-title"
+                  >
+                    {{ $t("companyRoles") }}
+                  </div>
+                  <role-selector
+                    name="idea_roles"
+                    id="idea_roles"
+                    autocomplete="idea_roles"
+										:placeholder="$t('companyRoles')"
+                    v-model="mutateForm.companyRoleIds"
+                    v-validate="'required|minlength:1'"
+                    :show-field="true"
+                    style="z-index: 1; position: relative"
+                    :state="$validateState('companyRoleIds', mutateForm)"
+                    :items="allRoles"
+                    :show-add-btn="false"
+                  ></role-selector>
                 </div>
                 <div class="form-group">
                   <div
@@ -277,11 +300,15 @@ export default {
       default: false,
     },
   },
+	async mounted(){
+		await this.$store.dispatch("companyRole/findAll");
+	},
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
       currentTool: "companyTool/current",
       tools: "companyTool/all",
+			allRoles: "companyRole/all"
     }),
 
     mutateForm: {

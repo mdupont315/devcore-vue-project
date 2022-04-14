@@ -128,10 +128,6 @@ export default {
     //   });
     // },
     getCommentRef(comment) {
-      console.log(comment);
-      const ref = `comment_replyIcon-${comment.id}`;
-			console.log(ref)
-			console.log(this.$refs)
       return `comment_replyIcon-${comment.id}`;
     },
     openUrl(link) {

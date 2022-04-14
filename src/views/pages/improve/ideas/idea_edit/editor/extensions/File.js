@@ -1,10 +1,17 @@
-import { Node, nodeInputRule, mergeAttributes, inputRegex } from "@tiptap/core";
+import {
+  Node,
+  nodeInputRule,
+  mergeAttributes,
+  getMarkRange,
+  inputRegex
+} from "@tiptap/core";
 
 import {
   uploadFilePlugin,
   renderFileInBase64ToCoordinates
 } from "./uploadFile";
-
+import FileNodeView from "./FileNodeView.vue";
+import { VueNodeViewRenderer } from "@tiptap/vue-2";
 /**
  * Tiptap Extension to upload images
  * @see  https://gist.github.com/slava-vishnyakov/16076dff1a77ddaca93c4bccd4ec4521#gistcomment-3744392
@@ -38,69 +45,126 @@ export const File = uploadFn => {
 
     draggable: true,
 
+    // addAttributes() {
+    //   return {
+    //     src: {
+    //       default: null
+    //     },
+    //     alt: {
+    //       default: null
+    //     },
+    //     title: {
+    //       default: null
+    //     },
+    //     href: {
+    //       default: null
+    //     },
+    //     preview: {
+    //       default: false
+    //     },
+    //     id: {
+    //       default: null
+    //     }
+    //   };
+    // },
+    // parseHTML: () => [
+    //   // {
+    //   //   tag: "img[src]",
+    //   //   getAttrs: dom => {
+    //   //     if (typeof dom === "string") return {};
+    //   //     const obj = {
+    //   //       src: dom.getAttribute("src"),
+    //   //       title: dom.getAttribute("title"),
+    //   //       alt: dom.getAttribute("alt"),
+    //   //       style: dom.getAttribute("style"),
+    //   //       type: dom.getAttribute("type"),
+    //   //       preview: dom.getAttribute("preview")
+    //   //     };
+    //   //     return obj;
+    //   //   }
+    //   // },
+    //   // {
+    //   //   tag: "a",
+    //   //   getAttrs: dom => {
+    //   //     if (typeof dom === "string") return {};
+    //   //     const obj = {
+    //   //       src: dom.getAttribute("src"),
+    //   //       href: dom.getAttribute("href"),
+    //   //       title: dom.getAttribute("title"),
+    //   //       style: dom.getAttribute("style"),
+    //   //       type: dom.getAttribute("type"),
+    //   //       preview: dom.getAttribute("preview")
+    //   //     };
+    //   //     return obj;
+    //   //   }
+    //   // }
+    // ],
     addAttributes() {
       return {
-        src: {
-          default: null
-        },
-        alt: {
-          default: null
-        },
-        title: {
-          default: null
+        size: {
+          default: null,
+          parseHTML: el => {
+            return el.getAttribute("title");
+          },
+          renderHTML: attrs => ({ size: attrs.size })
         },
         href: {
-          default: null
+          default: null,
+          parseHTML: el => {
+            return el.getAttribute("title");
+          },
+          renderHTML: attrs => ({ href: attrs.href })
+        },
+        title: {
+          default: null,
+          parseHTML: el => {
+            return el.getAttribute("title");
+          },
+          renderHTML: attrs => ({ title: attrs.title })
+        },
+        style: {
+          default: null,
+          parseHTML: el => {
+            return el.getAttribute("style");
+          },
+          renderHTML: attrs => ({ style: attrs.style })
+        },
+        type: {
+          default: null,
+          parseHTML: el => {
+            return el.getAttribute("type");
+          },
+          renderHTML: attrs => ({ type: attrs.type })
         },
         preview: {
-          default: false
+          default: null,
+          parseHTML: el => {
+            return el.getAttribute("preview");
+          },
+          renderHTML: attrs => ({ preview: attrs.preview })
         },
-        id: {
-          default: null
+        src: {
+          default: null,
+          parseHTML: el => {
+            return el.getAttribute("src");
+          },
+          renderHTML: attrs => ({ src: attrs.src })
         }
       };
     },
-    parseHTML: () => [
-      {
-        tag: "img[src]",
-        getAttrs: dom => {
-          if (typeof dom === "string") return {};
-          const obj = {
-            src: dom.getAttribute("src"),
-            title: dom.getAttribute("title"),
-            alt: dom.getAttribute("alt"),
-            style: dom.getAttribute("style"),
-            type: dom.getAttribute("type"),
-            preview: dom.getAttribute("preview")
-          };
-          return obj;
-        }
-      },
-      {
-        tag: "a",
-        getAttrs: dom => {
-          if (typeof dom === "string") return {};
-          const obj = {
-            src: dom.getAttribute("src"),
-            href: dom.getAttribute("href"),
-            title: dom.getAttribute("title"),
-            style: dom.getAttribute("style"),
-            type: dom.getAttribute("type"),
-            preview: dom.getAttribute("preview")
-          };
-          return obj;
-        }
-      }
-    ],
-    renderHTML: ({ HTMLAttributes }) => {
-      const { href, title, src, alt, style, preview } = HTMLAttributes;
-
-      console.log(HTMLAttributes)
-
-      if (!preview) {
-        return ["a", { href, title, style }, title];
-      }
-      return ["img", { title, src, alt, style }];
+    // parseHTML() {
+    //   return [{ tag: "span[file]" }];
+    // },
+    renderHTML({ HTMLAttributes }) {
+      console.log("HTMLATTRS: ", HTMLAttributes);
+      return [
+        "span",
+        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+        0
+      ];
+    },
+    addNodeView() {
+      return VueNodeViewRenderer(FileNodeView);
     },
 
     addCommands() {
@@ -128,7 +192,18 @@ export const File = uploadFn => {
               renderFileInBase64ToCoordinates(item, view, coordinates, preview);
             });
           }
-        }
+        },
+        // removeFile: attrs => ({ view, tr }) => {
+        //   //  const { tr } = view.state;
+        //   console.log(attrs);
+        //   console.log(view, tr);
+        //   console.log("remove");
+        //   const from = tr.curSelection.$anchor.pos;
+        //   const to = tr.to;
+
+        //   const transaction = tr.delete(213, 214);
+        //   view.dispatch(transaction);
+        // }
       };
     },
     addInputRules() {

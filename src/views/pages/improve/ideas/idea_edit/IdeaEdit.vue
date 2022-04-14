@@ -70,6 +70,7 @@ export default {
       file: [],
       removeFile: false,
       removeFileIds: [],
+			companyRoleIds: [],
       companyToolId: null,
       description: null,
       title: null,
@@ -233,10 +234,9 @@ export default {
       return JSON.stringify(parsedContent);
     },
     async saveIdea() {
-      this.ideaForm.fields.file = this.files;
+      this.ideaForm.fields.file = this.files.filter((x) => x.size);
 
       const ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
-      // reset uploads
       this.files = [];
       this.ideaForm.removeFileIds = [];
 
@@ -254,7 +254,6 @@ export default {
         markup?.content.filter((node) => node.type === "comment") ?? [];
       return commentNodes;
     },
-
 
     syncFiles() {
       //TODO: Check that idea.files (should be actual files on server)

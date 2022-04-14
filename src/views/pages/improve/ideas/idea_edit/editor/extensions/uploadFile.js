@@ -8,6 +8,8 @@ import { Plugin } from "prosemirror-state";
 const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
   const { schema } = view.state;
   console.log("item", item);
+
+  if (!item) return;
   if (item.size > 1000000) {
     console.log("ERROR, File size too big!");
     return;
@@ -30,17 +32,24 @@ const uploadFilePlugin = addFile => {
   return new Plugin({
     props: {
       handlePaste(view, event, slice) {
-        console.log("TR ", view.state.tr)
+        console.log("TR ", view.state.tr);
         const items = (event.clipboardData || event.originalEvent.clipboardData)
           .items;
 
+        if (items.length === 0) return;
+
         let pos = 1;
-        if (view.state.tr && view.state.tr.curSelection && view.state.tr.curSelection.$head) {
+        if (
+          view.state.tr &&
+          view.state.tr.curSelection &&
+          view.state.tr.curSelection.$head
+        ) {
           pos = view.state.tr.curSelection.$head.pos;
         }
         const coordinates = { pos, inside: 0 };
 
         for (const item of items) {
+          if (item.kind != "file") return;
           if (item.type.indexOf("image") === 0) {
             event.preventDefault();
             const preview = true;
@@ -71,7 +80,7 @@ const uploadFilePlugin = addFile => {
           const data = Array.from(event.dataTransfer?.files ?? []);
           const previewFiles = data.filter(file => /image/i.test(file.type));
 
-          console.log("data", data)
+          console.log("data", data);
 
           event.preventDefault();
           const coordinates = view.posAtCoords({

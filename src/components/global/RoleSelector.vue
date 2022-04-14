@@ -1,24 +1,24 @@
 <template>
   <super-select
-    :items="roles"
+    :items="users"
     class="image-selector"
     selector-class="columns columns-3"
     v-model="dataValue"
     :v-bind="$props"
     ref="selector"
-    :placeholder="$t('Roles')"
+    :placeholder="placeholder ? placeholder : $t('companyRoles')"
     v-if="ready"
     :state="state"
     :outside-close="!showPopOver"
     :show-input="showInput"
-    :show-footer-display="showFooterSelection"
+    :filter-fn="filter"
     @input="change"
     :show-add-btn="showAddBtn"
-    :filter-fn="filter"
+    :max-display-items="6"
     @close="close"
   >
     <template slot="selection-count" slot-scope="props">{{
-      $tc("role.count", props.values.length)
+      $tc("user.count", props.values.length)
     }}</template>
     <template slot="dropdown-item" slot-scope="props">
       <div class="text-center">
@@ -27,23 +27,19 @@
           class="rounded-circle d-block mx-auto img"
           height="40"
         />
-        <span class="break-word">{{ props.item.name }}</span>
+        <span class="break-word"> {{ props.item.name }}</span>
       </div>
     </template>
     <template slot="header-display">
       <div class="stacked-avatars single-line">
         <div
-          v-for="item in selectedItems"
+          v-for="item in selectedItems.slice(0, maxDisplayItems)"
           :key="item.id"
           v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
           class="avatar-item"
           :title="item.name"
         >
-          <img
-            :src="item.getAvatarUrl('50x50')"
-            height="22"
-            @click="removeItem(item, $event)"
-          />
+          <img :src="item.getAvatarUrl('50x50')" height="22" />
         </div>
       </div>
     </template>
@@ -73,11 +69,11 @@
     <template slot="footer-display">
       <div v-if="showFooterSelection" class="stacked-avatars single-line">
         <div
-          v-for="item in selectedItems"
+          v-for="item in selectedItems.slice(0, maxDisplayItems)"
           :key="item.id"
           v-b-tooltip="{ placement: 'bottom', boundary: 'viewport' }"
           class="avatar-item"
-          :title="item.name"
+          :title="item.fullName"
         >
           <img
             :src="item.getAvatarUrl('50x50')"
@@ -87,44 +83,21 @@
         </div>
       </div>
     </template>
-    <template slot="footer-add-btn">
-      <b-button
-        ref="btnNewRole"
-        style="z-index: 2; position: relative"
-        @click="togglePopOver"
-        >+ {{ $t("New") }}</b-button
-      >
-      <!-- <layer v-if="showPopOver" @closed="togglePopOver" style="z-index:3; position:relative"> -->
-      <b-popover
-        ref="popover"
-        :target="() => $refs.btnNewRole"
-        placement="bottom"
-        class="form-popover"
-        :show.sync="showPopOver"
-      >
-        <b-card no-body style="width: 320px">
-          <b-card-body>
-            <role-form @done="togglePopOver" @input="itemAdded"></role-form>
-          </b-card-body>
-        </b-card>
-      </b-popover>
-      <!-- </layer> -->
-    </template>
   </super-select>
 </template>
 <script>
 import { /* mapState, */ mapGetters } from "vuex";
-import RoleForm from "@/views/pages/manage/company_role/Form";
 
 export default {
-  name: "CompanyRoleSelector",
-  components: {
-    "role-form": RoleForm,
-  },
+  name: "RoleSelector",
   props: {
     items: {
       required: false,
       type: Array,
+    },
+    placeholder: {
+      required: false,
+      default: () => null,
     },
     value: {
       required: false,
@@ -159,23 +132,24 @@ export default {
     showPopOver: false,
     dataValue: [],
     ready: false,
+    maxDisplayItems: 6,
   }),
   computed: {
     ...mapGetters({
-      allRoles: "companyRole/all",
+      allRoles: "user/all",
     }),
-    roles: {
+    users: {
       get() {
         return (this.items || this.allRoles).sort((a, b) =>
-          a.name > b.name ? 1 : -1
+          a.firstName > b.firstName ? 1 : -1
         );
       },
     },
     selectedItems: {
       get() {
-        return this.roles
+        return this.users
           .filter((r) => this.dataValue.includes(r.id))
-          .sort((a, b) => (a.name > b.name ? 1 : -1));
+          .sort((a, b) => (a.fullName > b.fullName ? 1 : -1));
       },
     },
   },
@@ -183,11 +157,12 @@ export default {
     await this.$store.dispatch("companyRole/findAll");
     if (this.value) {
       this.dataValue = this.value.filter(
-        (o) => this.roles.find((u) => u.id === o) != null
+        (o) => this.users.find((u) => u.id === o) != null
       );
     } else {
       this.dataValue = [];
     }
+
     this.ready = true;
   },
   methods: {
@@ -217,10 +192,14 @@ export default {
       if (event) {
         event.stopPropagation();
       }
-      let ret = this.roles;
+      let ret = this.users;
       if (value) {
-        ret = this.roles.filter((i) =>
-          i.name.toLowerCase().includes(value.toLowerCase())
+        ret = this.users.filter(
+          (i) =>
+            i.fullName.toLowerCase().includes(value.toLowerCase()) ||
+            (i.email
+              ? i.email.toLowerCase().includes(value.toLowerCase())
+              : false)
         );
       }
       return ret;
