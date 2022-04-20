@@ -1,28 +1,20 @@
 <template>
-  <node-view-wrapper as="div" class="file-component">
+  <node-view-wrapper as="div" class="video-component">
     <node-view-content class="content-dom" />
 
-    <section class="content-dom-file">
-      <div v-if="getAttrs.preview" style="display: flex">
-        <div style="margin-right: 5px">
-          <img :src="getAttrs.src" :alt="getAttrs.title" />
-        </div>
-        <button @click="remove" class="file-remove-button">
+    <section class="content-dom-video">
+      <div style="display: flex" v-if="videoEntity">
+        <iframe
+          :src="this.node.attrs.src"
+          :title="this.node.attrs.title"
+          :frameborder="this.node.attrs.frameborder"
+          :allow="this.node.attrs.allow"
+          :allowfullscreen="this.node.attrs.allowfullscreen"
+        ></iframe>
+
+        <button @click="remove" class="video-remove-button">
           {{ $t("Remove") }}
         </button>
-      </div>
-
-      <div v-else style="display: flex">
-        <div style="margin-right: 5px">
-          <a :href="getAttrs.src"> {{ getAttrs.title }}</a>
-        </div>
-        <div>
-          <span>
-            <button @click="remove" class="file-remove-button">
-              {{ $t("Remove") }}
-            </button>
-          </span>
-        </div>
       </div>
     </section>
   </node-view-wrapper>
@@ -42,17 +34,17 @@ export default {
   content: "inline*",
 
   computed: {
-    fileEntity() {
+    videoEntity() {
       const stringFileEntity = this.node?.attrs;
+      console.log(this.node);
       return stringFileEntity;
     },
     getAttrs() {
-      return this.fileEntity;
+      return this.videoEntity;
     },
   },
   methods: {
     remove() {
-
       const { editor, getPos, node } = this;
 
       const from = getPos();
@@ -65,8 +57,8 @@ export default {
 </script>
 
 <style lang="scss">
-.file-component {
-  .file-remove-button {
+.video-component {
+  .video-remove-button {
     font-family: "FuturaMedium";
     color: #d0424d;
     border: 1px solid lightgray;
@@ -78,7 +70,7 @@ export default {
     background: #fff;
     transform: translate(-2px, -10px);
   }
-  .file-remove-icon {
+  .video-remove-icon {
     cursor: pointer;
     width: 20px;
     height: 20px;

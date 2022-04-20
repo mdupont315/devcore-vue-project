@@ -115,8 +115,8 @@ export default {
 
 <style lang="scss">
 .menu-list-item.is-active {
-  background: "#f8f8f8";
-  color: #fff;
+  color: #f8f8f8;
+  background: #4294d0;
 }
 
 .menu-list-item:hover {

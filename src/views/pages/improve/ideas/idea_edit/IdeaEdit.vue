@@ -49,6 +49,7 @@ export default {
       },
     };
     await this.$store.dispatch("companyTool/findAll");
+    await this.$store.dispatch("companyRole/findAll");
     await this.$store.dispatch("ideaContent/findAll", {
       filter: this.filter,
       force: true,
@@ -70,7 +71,7 @@ export default {
       file: [],
       removeFile: false,
       removeFileIds: [],
-			companyRoleIds: [],
+      companyRoleIds: null,
       companyToolId: null,
       description: null,
       title: null,
@@ -250,8 +251,11 @@ export default {
     },
     getCommentNodesFromContent() {
       const { markup } = this.getIdeaContent;
+			console.log(markup.content)
       const commentNodes =
         markup?.content.filter((node) => node.type === "comment") ?? [];
+
+				console.log(commentNodes)
       return commentNodes;
     },
 
@@ -286,6 +290,7 @@ export default {
       try {
         //Sync files in server with files in content
         this.syncFiles();
+				this.getCommentNodesFromContent()
 
         const ideaSave = await this.saveIdea();
         //reset removeFileIds

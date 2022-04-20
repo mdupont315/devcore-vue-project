@@ -49,8 +49,17 @@ export const Comment = Node.create({
         console.log(comment);
         return commands.setNode(this.name, { comment });
       },
-      unsetComment: (comment, removeId) => ({ commands }) => {
-        console.log("UNSETTING")
+      unsetComment: (comment, removeId) => ({ commands, state }) => {
+        console.log(comment);
+        console.log(removeId);
+        console.log("UNSETTING");
+
+        const { selection } = state;
+        const { from: selectionFrom, to: selectionTo } = selection;
+
+        console.log(selectionFrom, selectionTo)
+
+       // commands.updateAttributes("comment", { replied: true });
         // return commands.setNode(this.name, {
         //   comment: newComments
         // });

@@ -190,8 +190,8 @@
                   </li>
                 </ul>
                 <span v-else class="text-dark"
-                  >{{ $t("No") }} {{ $t("roles") }} {{ $t("selected") }}</span
-                >
+                  >{{ $t("No") }} {{ $t("roles") }} {{ $t("selected") }}
+                </span>
               </b-card-body>
               <b-card-footer class="mx-2">
                 <b-button

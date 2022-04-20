@@ -103,6 +103,7 @@
                     {{ $t("phase") }}
                   </div>
                   <v-select
+                    v-if="mutateForm.stageId"
                     v-model="mutateForm.phaseId"
                     v-validate="''"
                     label="title"
@@ -121,6 +122,27 @@
                   <b-form-invalid-feedback>{{
                     $displayError("operation_id", mutateForm)
                   }}</b-form-invalid-feedback>
+                </div>
+                <div class="form-group">
+                  <div
+                    class="idea_edit_path_container-body-process-select-title"
+                  >
+                    {{ $t("roles") }}
+                  </div>
+                  <role-selector
+                    name="idea_roles"
+										v-if="mutateForm.companyRoleIds"
+                    id="idea_roles"
+                    autocomplete="idea_roles"
+                    :placeholder="$t('roles')"
+                    :disabled="mutateForm.busy"
+                    v-model="mutateForm.companyRoleIds"
+                    :show-field="true"
+                    style="z-index: 1; position: relative"
+                    :state="$validateState('companyRoleIds', mutateForm)"
+                    :items="getSelectableRoles"
+                    :show-add-btn="false"
+                  ></role-selector>
                 </div>
                 <div class="form-label-group select">
                   <div
@@ -171,26 +193,7 @@
                     $displayError("title", mutateForm)
                   }}</b-form-invalid-feedback>
                 </div>
-                <div class="form-group">
-                  <div
-                    class="idea_edit_path_container-body-process-select-title"
-                  >
-                    {{ $t("companyRoles") }}
-                  </div>
-                  <role-selector
-                    name="idea_roles"
-                    id="idea_roles"
-                    autocomplete="idea_roles"
-										:placeholder="$t('companyRoles')"
-                    v-model="mutateForm.companyRoleIds"
-                    v-validate="'required|minlength:1'"
-                    :show-field="true"
-                    style="z-index: 1; position: relative"
-                    :state="$validateState('companyRoleIds', mutateForm)"
-                    :items="allRoles"
-                    :show-add-btn="false"
-                  ></role-selector>
-                </div>
+
                 <div class="form-group">
                   <div
                     class="idea_edit_path_container-body-process-select-title"
@@ -300,26 +303,29 @@ export default {
       default: false,
     },
   },
-	async mounted(){
-		await this.$store.dispatch("companyRole/findAll");
-	},
+
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
       currentTool: "companyTool/current",
       tools: "companyTool/all",
-			allRoles: "companyRole/all"
+      allRoles: "companyRole/all",
     }),
 
+    getSelectableRoles: {
+      get() {
+        return this.allRoles;
+      },
+    },
     mutateForm: {
       get() {
+        console.log("mutateForm", this.value);
         return this.value;
       },
       set(value) {
         this.$emit("input", value);
       },
     },
-
     process: {
       get() {
         return this.currentProcess(this.section);
@@ -400,7 +406,6 @@ export default {
 
 .ideaEditPath-form-fields {
   overflow-y: scroll;
-
 }
 
 .idea_edit_path_container-header-title {

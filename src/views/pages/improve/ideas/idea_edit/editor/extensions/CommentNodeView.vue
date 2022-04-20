@@ -1,76 +1,81 @@
 <template>
   <node-view-wrapper as="div" class="comment-component">
-    <layer v-if="isReplying" @closed="closeOverlay()" />
+    <inner-overlay
+      v-if="isReplying"
+      @click="closeOverlay()"
+      style="z-index: 2"
+    />
 
     <node-view-content class="content-dom" />
 
     <section v-if="comments.length" class="comment-details">
-      <article class="comment" v-for="(comment, i) in comments" :key="i">
-        <span :class="`idea_comment_${comment.type}`">
-          {{ comment.content }}
-        </span>
+      <template class="comment" v-for="(comment, i) in comments">
+        <article v-if="!isCommentReplied(comment)" :key="i" class="comment">
+          <span :class="`idea_comment_${comment.type}`">
+            {{ comment.content }}
+          </span>
 
-        <div
-          class="comment-actions"
-          :class="`comment-actions-${comment.id}`"
-          ref="test"
-        >
-          <span
-            v-if="comment.file && comment.file.link"
-            class="file"
-            v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
-            :title="comment.file.name"
+          <div
+            class="comment-actions"
+            :class="`comment-actions-${comment.id}`"
+            ref="test"
           >
-            <a
-              @click.prevent.stop="openUrl(comment.file.link)"
-              :href="comment.file.link"
-              :data-title="comment.file.name"
-              target="__blank"
+            <span
+              v-if="comment.file && comment.file.link"
+              class="file"
+              v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
+              :title="comment.file.name"
+            >
+              <a
+                @click.prevent.stop="openUrl(comment.file.link)"
+                :href="comment.file.link"
+                :data-title="comment.file.name"
+                target="__blank"
+              >
+                <img
+                  slot="folder_reference"
+                  class="folder-icon"
+                  :src="FolderIcon"
+                  alt=""
+                />
+              </a>
+            </span>
+
+            <span
+              v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
+              :title="$t('reply')"
+              :class="`comment_replyIcon-${comment.id}`"
+              :ref="`comment_replyIcon-${comment.id}`"
             >
               <img
-                slot="folder_reference"
-                class="folder-icon"
-                :src="FolderIcon"
+                slot="comment_reference"
+                style="margin-top: -3px"
+                @click="openReplyForm(comment, i)"
+                class="comment-icon"
+                :src="CommentIcon"
                 alt=""
               />
-            </a>
-          </span>
-
-          <span
-            v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
-            :title="$t('reply')"
-            :class="`comment_replyIcon-${comment.id}`"
-            :ref="`comment_replyIcon-${comment.id}`"
+            </span>
+          </div>
+          <b-popover
+            ref="popover"
+            :target="() => $refs[`comment_replyIcon-${comment.id}`][0]"
+            boundary="window"
+            placement="top"
+            :show="isReplying === comment.id"
+            custom-class="general-reply-form"
           >
-            <img
-              slot="comment_reference"
-              style="margin-top: -3px"
-              @click="openReplyForm(comment, i)"
-              class="comment-icon"
-              :src="CommentIcon"
-              alt=""
-            />
-          </span>
-        </div>
-        <!-- getReplyIconRef(comment.id) -->
-        <b-popover
-          ref="popover"
-          :target="() => $refs[`comment_replyIcon-${comment.id}`][0]"
-          boundary="window"
-          placement="top"
-          :show="isReplying === comment.id"
-          custom-class="general-reply-form"
-        >
-          <reply-form
-            @close="isReplying = null"
-            @savedReply="savedReply"
-            :anonymous="comment.anonymous"
-            :userId="comment.user"
-            :content="comment.content"
-            :comment="comment"
-          ></reply-form>
-        </b-popover>
-      </article>
+            <reply-form
+              @close="isReplying = null"
+              @savedReply="savedReply"
+              :anonymous="comment.anonymous"
+              :userId="comment.user"
+              :content="comment.content"
+              :comment="comment"
+            ></reply-form>
+          </b-popover>
+        </article>
+      </template>
     </section>
   </node-view-wrapper>
 </template>
@@ -95,20 +100,52 @@ export default {
       CommentIcon,
       FolderIcon,
       isReplying: null,
+      intent: Math.random(),
     };
   },
 
   methods: {
     openReplyForm(comment) {
+      console.log(this);
       console.log("OPEN FORM!");
-      console.log(comment);
+
+      //	this.intent = Math.random()
+
+      // const data = {
+      //   uuid: comment.uuid,
+      //   comments: this.commentEntity.comments.filter(
+      //     (x) => x.id !== comment.id
+      //   ),
+      // };
+
+      // this.editor.commands.setComment(JSON.stringify(data));
+
       this.isReplying = comment.id;
     },
     savedReply(id) {
       this.isReplying = null;
-      this.editor.commands.unsetComment(this.node?.attrs?.comment, id);
+      console.log(this.node.attrs);
+      //		this.node.attrs.replied = true
+      // this.editor.commands.unsetComment(this.node?.attrs?.comment, id);
+      const json = {
+        uuid: "d3dfd3d9-55a3-466c-b89d-77d9047131ea",
+        comments: [
+          {
+            id: "207",
+            user: "17",
+            anonymous: false,
+            content: "second",
+            createdAt: "2022-04-20 13:09:55",
+            replied: true,
+            type: "PROBLEM",
+          },
+        ],
+      };
+      this.updateAttributes({ comment: JSON.stringify(json) });
+      this.intent = Math.random();
     },
     closeOverlay() {
+      console.log("CLOSING DIALOG! ");
       this.isReplying = null;
     },
 
@@ -133,12 +170,17 @@ export default {
     openUrl(link) {
       window.open(link, "__blank");
     },
+    isCommentReplied(comment) {
+      console.log(comment);
+      return !!comment.replied;
+    },
   },
 
   computed: {
     commentEntity() {
       const stringCommentEntity = this.node?.attrs?.comment;
 
+      console.log(this.node.attrs);
       return stringCommentEntity ? JSON.parse(stringCommentEntity) : {};
     },
     comments() {
@@ -154,23 +196,32 @@ export default {
     margin-left: 10px;
   }
   .content-dom {
-    background-color: #d0e4f3;
     border-radius: 4px;
     padding: 4px;
+    color: #707070 !important;
+    font-size: 14px !important;
+    font-family: FuturaLight !important;
   }
 
   .comment-details {
     border-radius: 8px;
-    padding: 8px;
 
     .idea_comment_IMPROVEMENT {
-      color: #4294d0;
+      background: #d0e4f3;
+      color: #707070;
+      border-radius: 5px;
+      padding: 0px 5px;
+      margin: 2px 0px;
     }
     .idea_comment_PROBLEM {
-      color: #d0424d;
+      background: #d0424d;
+      border-radius: 5px;
+      padding: 0px 5px;
+      margin: 2px 0;
     }
 
     .comment {
+      color: #fff;
       display: flex;
 
       .file {

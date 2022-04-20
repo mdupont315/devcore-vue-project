@@ -162,7 +162,7 @@ export default function getItems(user) {
           }
         },
         {
-          title: i18n.t("Employee roles"),
+          title: i18n.t("roles"),
           name: "company-role",
           icon: "mdi-briefcase-account",
           permissions: "core/companyRole/manage",

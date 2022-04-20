@@ -1,6 +1,5 @@
 import { Node, mergeAttributes, textblockTypeInputRule } from "@tiptap/core";
 
-
 export const Heading = Node.create({
   name: "heading",
 
@@ -50,7 +49,15 @@ export const Heading = Node.create({
     const hasLevel = this.options.levels.includes(node.attrs.level);
     const level = hasLevel ? node.attrs.level : this.options.levels[0];
     HTMLAttributes.id = "heading-" + this.storage.counter;
-   
+
+    if (!level || level > 3) {
+      return [
+        `p`,
+        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+        0
+      ];
+    }
+
     return [
       `h${level}`,
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
@@ -59,10 +66,7 @@ export const Heading = Node.create({
   },
 
   addNodeView() {
-    return ({
-      editor,
-      node,
-    }) => {
+    return ({ editor, node }) => {
       const heading = document.createElement("h1");
       const headings = [];
 

@@ -1,7 +1,7 @@
 <template>
   <super-select
-    :items="users"
-    class="image-selector"
+    :items="roles"
+    class="image-selector role-selector"
     selector-class="columns columns-3"
     v-model="dataValue"
     :v-bind="$props"
@@ -18,7 +18,7 @@
     @close="close"
   >
     <template slot="selection-count" slot-scope="props">{{
-      $tc("user.count", props.values.length)
+      $tc("role.count", props.values.length)
     }}</template>
     <template slot="dropdown-item" slot-scope="props">
       <div class="text-center">
@@ -101,7 +101,6 @@ export default {
     },
     value: {
       required: false,
-      default: () => [],
     },
     state: {
       required: false,
@@ -136,9 +135,9 @@ export default {
   }),
   computed: {
     ...mapGetters({
-      allRoles: "user/all",
+      allRoles: "companyRole/all",
     }),
-    users: {
+    roles: {
       get() {
         return (this.items || this.allRoles).sort((a, b) =>
           a.firstName > b.firstName ? 1 : -1
@@ -147,18 +146,31 @@ export default {
     },
     selectedItems: {
       get() {
-        return this.users
+        console.log(this.roles);
+        return this.roles
           .filter((r) => this.dataValue.includes(r.id))
-          .sort((a, b) => (a.fullName > b.fullName ? 1 : -1));
+          .sort((a, b) => (a.name > b.name ? 1 : -1));
       },
     },
   },
   async mounted() {
-    await this.$store.dispatch("companyRole/findAll");
-    if (this.value) {
-      this.dataValue = this.value.filter(
-        (o) => this.users.find((u) => u.id === o) != null
+    console.log("GET ROLES");
+
+    console.log(this.value);
+    if (this.value && this.value.length > 0) {
+      // const allRoleIds = this.value;
+      // console.log("allroleids", allRoleIds);
+      // console.log(this.value)
+      // console.log(this.value)
+      console.log(this.value);
+      const roles = this.value.filter(
+        (o) => this.roles.find((u) => u.id === o) != null
       );
+      console.log(roles);
+      this.dataValue = roles;
+
+      // console.log("this.dataValue")
+      // console.log(this.dataValue)
     } else {
       this.dataValue = [];
     }
@@ -192,9 +204,9 @@ export default {
       if (event) {
         event.stopPropagation();
       }
-      let ret = this.users;
+      let ret = this.roles;
       if (value) {
-        ret = this.users.filter(
+        ret = this.roles.filter(
           (i) =>
             i.fullName.toLowerCase().includes(value.toLowerCase()) ||
             (i.email

@@ -28,6 +28,8 @@
         :item="item"
         class="idea_editor_header_item"
       />
+
+
     </template>
   </div>
 </template>
@@ -135,6 +137,14 @@ export default {
           type: "file",
           title: "Image",
           action: (file) => this.editor.commands.setImage(file),
+        },
+        {
+          icon: "vidicon-line",
+          title: "video",
+          action: (file) =>
+            this.editor.commands.setExternalVideo({
+              src: "https://www.youtube.com/embed/iyd8dY8rRtA",
+            }),
         },
         {
           icon: "list-unordered",

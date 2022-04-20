@@ -14,24 +14,8 @@
         :editor="editor"
         ref="editor_content"
       />
-      <!-- <bubble-menu :editor="editor">
-        <button @click="addDummyCommentToSelection">Add Example Comment</button>
-      </bubble-menu> -->
+
       <div class="editor__footer">
-        <div :class="`editor__status editor__status--${status}`">
-          <template v-if="status === 'connected'">
-            {{ editor.storage.collaborationCursor.users.length }} user{{
-              editor.storage.collaborationCursor.users.length === 1 ? "" : "s"
-            }}
-            viewing idea {{ idea.title }}
-          </template>
-          <template v-else> offline </template>
-        </div>
-        <div class="editor__name">
-          <div>
-            {{ user.firstName + " " + user.lastName }}
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -84,11 +68,6 @@ export default {
         if (newVal) this.focusEditor();
       },
     },
-    isSaving: {
-      handler(newVal) {
-        if (newVal) this.test();
-      },
-    },
   },
 
   data() {
@@ -99,6 +78,7 @@ export default {
     };
   },
   methods: {
+
     focusEditor() {
       this.editor?.commands.focus();
     },
@@ -133,33 +113,6 @@ export default {
       // this.editor.commands.updateUser({
       //   name: `${this.user.firstName} ${this.user.lastName}`,
       // });
-    },
-    addDummyCommentToSelection() {
-      const dummyComment = {
-        uuid: "bd21aa31-267a-4ae5-a61d-65bb1d364eff",
-        comments: [
-          {
-            user: "Kr",
-            content: "Maybe we could improve this issue",
-            file: {
-              link: "https://google.com",
-              name: "Google",
-            },
-          },
-          {
-            user: "Kr",
-            content: "And This One Too",
-            file: {
-              link: "https://github.com",
-              name: "GitHub",
-            },
-          },
-        ],
-      };
-
-      if (this.editor) {
-        this.editor.commands.setComment(JSON.stringify(dummyComment));
-      }
     },
   },
 
@@ -343,42 +296,51 @@ export default {
     color: #707070 !important;
     font-size: 14px !important;
     font-family: FuturaLight !important;
+    font-weight: 400;
   }
   h1 {
     color: #242526 !important;
     font-size: 18px !important;
     font-family: FuturaBold !important;
+    font-weight: 400;
   }
   h2 {
     color: #242526 !important;
     font-size: 14px !important;
     font-family: FuturaMedium !important;
+    font-weight: 400;
   }
   h3 {
     color: #4294d0 !important;
     font-size: 14px !important;
     font-family: FuturaMedium !important;
+    font-weight: 400;
   }
 
-	  p > span {
+  p > span {
     color: #707070 !important;
     font-size: 14px !important;
     font-family: FuturaLight !important;
+    font-weight: 400;
   }
-  h1 > span{
+  h1 > span {
     color: #242526 !important;
     font-size: 18px !important;
     font-family: FuturaBold !important;
+
+    font-weight: 400;
   }
-  h2> span {
+  h2 > span {
     color: #242526 !important;
     font-size: 14px !important;
     font-family: FuturaMedium !important;
+    font-weight: 400;
   }
-  h3 > span{
+  h3 > span {
     color: #4294d0 !important;
     font-size: 14px !important;
     font-family: FuturaMedium !important;
+    font-weight: 400;
   }
 }
 

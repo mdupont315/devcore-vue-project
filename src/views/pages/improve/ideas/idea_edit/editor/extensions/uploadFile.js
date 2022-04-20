@@ -5,6 +5,7 @@ import { Plugin } from "prosemirror-state";
  * @see https://gist.github.com/slava-vishnyakov/16076dff1a77ddaca93c4bccd4ec4521#gistcomment-3744392
  */
 
+
 const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
   const { schema } = view.state;
   console.log("item", item);
@@ -32,7 +33,6 @@ const uploadFilePlugin = addFile => {
   return new Plugin({
     props: {
       handlePaste(view, event, slice) {
-        console.log("TR ", view.state.tr);
         const items = (event.clipboardData || event.originalEvent.clipboardData)
           .items;
 
@@ -49,11 +49,14 @@ const uploadFilePlugin = addFile => {
         const coordinates = { pos, inside: 0 };
 
         for (const item of items) {
+          console.log("item", item)
+          console.log(item.kind)
           if (item.kind != "file") return;
           if (item.type.indexOf("image") === 0) {
             event.preventDefault();
             const preview = true;
             const image = item.getAsFile();
+            console.log(image)
 
             addFile(item);
             renderFileInBase64ToCoordinates(image, view, coordinates, preview);

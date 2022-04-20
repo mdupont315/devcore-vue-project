@@ -11,9 +11,17 @@ import Text from "@tiptap/extension-text";
 import TextStyle from "@tiptap/extension-text-style";
 import History from "@tiptap/extension-history";
 import FontFamily from "@tiptap/extension-font-family";
-import Link from '@tiptap/extension-link'
+import Link from "@tiptap/extension-link";
 import { Color } from "@tiptap/extension-color";
-import { Indent, EventHandler, CustomStyle, Heading, CustomTable, File, Comment } from './extensions'
+import {
+  Indent,
+  EventHandler,
+  Heading,
+  CustomTable,
+  File,
+  Comment,
+  ExternalVideo
+} from "./extensions";
 
 export default class ContentEditor {
   constructor(editable, value, options, upload) {
@@ -32,15 +40,16 @@ export default class ContentEditor {
       Text,
       // Draggable,
       Link.configure({
-        HTMLAttributes: { target: '_blank' },
+        HTMLAttributes: { target: "_blank" },
         linkOnPaste: false,
-        openOnClick: true,
+        openOnClick: true
       }),
       TextStyle,
       // CustomStyle,
       Color,
       Indent,
       Highlight,
+      ExternalVideo,
       Underline,
       TableRow,
       TableHeader,
@@ -65,10 +74,24 @@ export default class ContentEditor {
       editable: this.editable,
       content: this.content,
       extensions: this.extensions,
+      editorProps: {
+        transformPastedText(text) {
+          // console.log(text);
+          console.log(text);
+          return text.replace(/&nbsp;/g, " ");
+        },
+        transformPastedHTML(html) {
+          console.log(html);
+          // console.log(_html);
+          // console.log(JSON.parse(_html));
+          // console.log(this.generateJSON(_html));
+          return html.replace(/&nbsp;/g, " ");
+        }
+      },
       onUpdate: ({ editor }) => {
         const json = editor.getJSON();
         this.options.onUpdate(json);
-      },
+      }
     });
   }
 
