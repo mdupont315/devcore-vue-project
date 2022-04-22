@@ -1,10 +1,12 @@
 <template>
-  <label class="menubar-file-input-field">
-    <svg class="remix">
-      <use :xlink:href="`${remixiconUrl}#ri-${item.icon}`" />
-    </svg>
-    <input type="file" style="visibility: hidden" @change="previewFiles" />
-  </label>
+  <div class="menubar-file-input-field-container">
+    <label class="menubar-file-input-field">
+      <svg class="remix" style="transform: translate(0px, 10px)">
+        <use :xlink:href="`${remixiconUrl}#ri-${item.icon}`" />
+      </svg>
+      <input type="file" style="visibility: hidden" @change="previewFiles" />
+    </label>
+  </div>
 </template>
 
 <script>
@@ -20,7 +22,7 @@ export default {
 
   methods: {
     previewFiles(event) {
-			this.item.action(event.target.files);
+      this.item.action(event.target.files);
     },
   },
   data() {
@@ -31,12 +33,25 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.menubar-file-input-field-container {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .menubar-file-input-field {
   width: 50px;
   text-align: center;
-  height: 20px;
   cursor: pointer;
+  width: 100%;
+  margin-bottom: 0px;
+  height: 100%;
+
+
+
+
 }
 .menu-file {
   width: 1.75rem;
@@ -53,12 +68,6 @@ export default {
     width: 100%;
     height: 100%;
     fill: currentColor;
-  }
-
-  &.is-active,
-  &:hover {
-    color: #fff;
-    background-color: #0d0d0d;
   }
 }
 </style>

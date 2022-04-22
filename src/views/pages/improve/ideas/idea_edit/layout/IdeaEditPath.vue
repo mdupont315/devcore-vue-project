@@ -131,7 +131,7 @@
                   </div>
                   <role-selector
                     name="idea_roles"
-										v-if="mutateForm.companyRoleIds"
+                    v-if="mutateForm.companyRoleIds"
                     id="idea_roles"
                     autocomplete="idea_roles"
                     :placeholder="$t('roles')"
@@ -421,7 +421,7 @@ export default {
 .idea_edit_path_container {
   overflow: hidden;
   height: 100%;
-  margin-left: 15px;
+  margin-left: 20px;
   border-radius: 5px;
   width: 25%;
   min-width: 300px;

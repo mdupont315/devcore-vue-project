@@ -45,7 +45,6 @@ export default class ContentEditor {
         openOnClick: true
       }),
       TextStyle,
-      // CustomStyle,
       Color,
       Indent,
       Highlight,
@@ -76,19 +75,28 @@ export default class ContentEditor {
       extensions: this.extensions,
       editorProps: {
         transformPastedText(text) {
-          // console.log(text);
-          console.log(text);
-          return text.replace(/&nbsp;/g, " ");
+          //Remove spaces
+          const formatHTML = text.replace(/&nbsp;/g, " ");
+
+          //Remove comments
+          const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
+          return _formatHTML;
         },
         transformPastedHTML(html) {
-          console.log(html);
-          // console.log(_html);
-          // console.log(JSON.parse(_html));
-          // console.log(this.generateJSON(_html));
-          return html.replace(/&nbsp;/g, " ");
+          //Remove spaces
+          const formatHTML = html.replace(/&nbsp;/g, " ");
+
+          //Remove comments
+          const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
+
+          return _formatHTML;
         }
       },
       onUpdate: ({ editor }) => {
+        const json = editor.getJSON();
+        this.options.onUpdate(json);
+      },
+      onFocus: ({ editor }) => {
         const json = editor.getJSON();
         this.options.onUpdate(json);
       }

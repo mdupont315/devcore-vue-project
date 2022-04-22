@@ -6,15 +6,21 @@
       ref="btnMenuListPopover"
       tabindex="0"
       :class="{ 'is-active': selectionOpen }"
+      style="width: 100%; height: 100%; margin: 0"
     >
-      <svg class="remix">
+      <div class="menu-list-active-text">
+        <div class="menu-list-active-text-icon">
+          {{ getActiveText(activeIcon) }}
+        </div>
+      </div>
+      <!-- <svg class="remix">
         <use :xlink:href="`${remixiconUrl}#ri-${activeIcon}`" />
-      </svg>
+      </svg> -->
     </b-button>
     <b-popover
       ref="menuList-popover"
       class="menu-list-items"
-      triggers="hover blur"
+      triggers="hover"
       :target="() => $refs.btnMenuListPopover"
       placement="bottom"
     >
@@ -26,9 +32,9 @@
           class="menu-list-item"
           :class="{ 'is-active': activeHeadingIndex == index }"
           :style="{
-            'font-size': getHeadingFontSize(listItem),
             color: getHeadingColor(listItem),
           }"
+          style="width: 100%; font-size: 1.25rem; padding: 10px"
         >
           {{ listItem.title }}
         </div></b-card
@@ -57,6 +63,22 @@ export default {
     },
   },
   methods: {
+    getActiveText(active) {
+      console.log(active);
+      let ret = "P";
+      switch (active) {
+        case "h-3":
+          ret = "S";
+          break;
+        case "h-2":
+          ret = "T";
+          break;
+        case "h-1":
+          ret = "C";
+      }
+
+      return ret;
+    },
     invokeListItemAction(listItem, index) {
       this.setActiveHeadingIndex(index);
       listItem.action();
@@ -71,21 +93,21 @@ export default {
     toggleSelection() {
       this.selectionOpen = !this.selectionOpen;
     },
-    getHeadingFontSize(item) {
-      if (!item || !item.title) return;
-      let ret = "1rem";
-      switch (fontLevels[item.title]) {
-        case 3:
-          ret = "12px";
-          break;
-        case 2:
-          ret = "14px";
-          break;
-        case 1:
-          ret = "20px";
-      }
-      return ret;
-    },
+    // getHeadingFontSize(item) {
+    //   if (!item || !item.title) return;
+    //   let ret = "1rem";
+    //   switch (fontLevels[item.title]) {
+    //     case 3:
+    //       ret = "12px";
+    //       break;
+    //     case 2:
+    //       ret = "14px";
+    //       break;
+    //     case 1:
+    //       ret = "20px";
+    //   }
+    //   return ret;
+    // },
     getHeadingColor(item) {
       if (!item || !item.title) return;
       let ret = "1rem";
@@ -113,7 +135,32 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.menu-list-active-text {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  font-size: 1.6rem;
+	font-weight:500;
+  margin: 0px;
+  align-items: center;
+  justify-content: center;
+}
+.menu-list-active-text-icon {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+	line-height:5px;
+  padding: 5px;
+  border-radius: 5px;
+  &.is-active,
+  &:hover {
+    color: #fff;
+    background-color: #0d0d0d;
+  }
+}
 .menu-list-item.is-active {
   color: #f8f8f8;
   background: #4294d0;
@@ -135,6 +182,9 @@ export default {
   padding: 5px 10px;
   width: 100%;
   cursor: pointer;
+  width: 100%;
+  font-size: 1.5rem;
+  padding: 10px;
 }
 
 .menu-list {
@@ -154,12 +204,6 @@ export default {
     width: 100%;
     height: 100%;
     fill: currentColor;
-  }
-
-  &.is-active,
-  &:hover {
-    color: #fff;
-    background-color: #0d0d0d;
   }
 }
 </style>

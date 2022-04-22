@@ -13,7 +13,6 @@
         :activeIcon="activeHeading"
         class="idea_editor_header_item"
       />
-      <!-- <menu-grid v-else-if="item.type === 'grid'" :key="index" :item="item" /> -->
 
       <menu-file-field
         v-else-if="item.type === 'file'"
@@ -22,14 +21,19 @@
         :editor="editor"
       />
 
+      <menu-prompt
+        v-else-if="item.type === 'prompt'"
+        :key="index + '-item'"
+        :item="item"
+        class="idea_editor_header_item"
+      />
+
       <menu-item
         v-else
         :key="index + '-item'"
         :item="item"
         class="idea_editor_header_item"
       />
-
-
     </template>
   </div>
 </template>
@@ -38,6 +42,7 @@
 import MenuItem from "./MenuItem.vue";
 import MenuList from "./MenuList.vue";
 import MenuFile from "./MenuFile";
+import MenuPrompt from "./MenuPrompt";
 // import MenuGrid from "./MenuGrid.vue";
 
 export default {
@@ -45,6 +50,7 @@ export default {
     "menu-item": MenuItem,
     "menu-list": MenuList,
     "menu-file-field": MenuFile,
+    "menu-prompt": MenuPrompt,
   },
   methods: {
     toggleDropArea() {
@@ -95,7 +101,7 @@ export default {
               action: () => {
                 // this.editor.commands.setSubTitleText();
                 // this.editor.commands.setFontFamily("FuturaMedium");
-                this.activeHeading = "h-2";
+                this.activeHeading = "h-3";
                 this.editor.chain().focus().toggleHeading({ level: 3 }).run();
               },
               isActive: () => this.editor.isActive("heading", { level: 3 }),
@@ -131,7 +137,6 @@ export default {
         {
           type: "divider",
         },
-
         {
           icon: "image-line",
           type: "file",
@@ -141,6 +146,7 @@ export default {
         {
           icon: "vidicon-line",
           title: "video",
+          type: "prompt",
           action: (file) =>
             this.editor.commands.setExternalVideo({
               src: "https://www.youtube.com/embed/iyd8dY8rRtA",
@@ -177,6 +183,17 @@ export default {
               .run(),
           isActive: () => this.editor.isActive("table"),
         },
+				 {
+          icon: "message-2-line",
+          title: "comment",
+          action: () =>
+            this.editor
+              .chain()
+              .focus()
+              .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+              .run(),
+          isActive: () => this.editor.isActive("table"),
+        },
       ],
     };
   },
@@ -193,6 +210,14 @@ export default {
 }
 
 .idea_editor_header_item {
+  max-height: 50px;
+  max-width: 50px;
   width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  place-content: center;
+	cursor:pointer;
 }
 </style>

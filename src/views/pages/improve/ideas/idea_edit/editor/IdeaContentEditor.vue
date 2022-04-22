@@ -159,7 +159,7 @@ export default {
     flex: 0 0 auto;
     flex-wrap: wrap;
     height: 50px;
-    padding: 0 20px 5px 20px;
+    padding: 0 20px 5px 5px;
   }
 
   &__content {

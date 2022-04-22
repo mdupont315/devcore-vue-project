@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="idea_edit-wrapper">
     <div class="idea_edit_container" v-if="getIdea">
       <idea-edit-content
         :user="user"
@@ -369,16 +369,20 @@ export default {
 </script>
 
 
-<style scoped>
+<style lang="scss" scoped>
 .idea_edit_container {
   width: 100%;
-  max-height: 83vh;
+  max-height: 82vh;
   overflow: hidden;
   height: 100%;
   margin-top: 0px;
-  min-height: 80vh;
+  min-height: 82vh;
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+}
+
+.idea_edit-wrapper{
+	margin: 20px 20px 0 20px;
 }
 </style>
