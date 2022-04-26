@@ -10,8 +10,74 @@
       </svg>
     </label>
     <div>
-      <b-modal id="modal-1" title="BootstrapVue">
-        <p class="my-4">Hello from modal!</p>
+      <b-modal
+        id="modal-1"
+        ref="idea_insert_iframe"
+        :title="$t('setUrl')"
+        hide-footer
+      >
+        <b-form>
+          <b-row>
+            <b-col class="col-12" ref="insert_iframe-url">
+              <div class="form-label-group required form-group">
+                <b-form-input
+                  id="insert_iframe_url"
+                  name="insert_iframe_url"
+                  v-model="form.url"
+                  v-validate="'required'"
+                  v-autofocus
+                  placeholder="Insert URL"
+                  type="text"
+                ></b-form-input>
+              </div>
+            </b-col>
+            <b-col class="col-12" ref="insert_iframe-widthHeight">
+              <b-row style="margin: auto">
+                <div class="form-label-group required form-group">
+                  <b-form-input
+                    id="insert_iframe-width"
+                    name="insert_iframe-width"
+                    v-model="form.width"
+                    v-validate="'required'"
+                    v-autofocus
+                    placeholder="Insert Width"
+                    type="text"
+                  ></b-form-input></div
+              ></b-row>
+              <b-row style="margin: auto">
+                <div class="form-label-group required form-group">
+                  <b-form-input
+                    id="insert_iframe-height"
+                    name="insert_iframe-height"
+                    v-model="form.height"
+                    v-validate="'required'"
+                    v-autofocus
+                    placeholder="Insert Height"
+                    type="text"
+                  ></b-form-input></div
+              ></b-row>
+            </b-col>
+
+            <b-col cols="3">
+              <b-button
+                class="mt-3"
+                variant="outline-primary"
+                block
+                @click="save"
+                >OK</b-button
+              >
+            </b-col>
+            <b-col cols="3">
+              <b-button
+                class="mt-3"
+                variant="outline-danger"
+                block
+                @click="cancel"
+                >Close Me</b-button
+              >
+            </b-col>
+          </b-row>
+        </b-form>
       </b-modal>
     </div>
   </div>
@@ -28,15 +94,52 @@ export default {
     },
   },
 
+  data: () => ({
+    remixiconUrl,
+    form: {
+      url: null,
+      width: 560,
+      height: 315,
+    },
+  }),
+
   methods: {
+    close() {
+      this.$refs["idea_insert_iframe"].hide();
+    },
+    save() {
+      const src = `https://www.youtube.com/embed/${this.handleUrl(
+        this.form.url
+      )}`;
+      const width = this.form.width;
+      const height = this.form.height;
+      this.item.action({ src, width, height });
+      this.close();
+    },
+    cancel() {
+      this.close();
+    },
+    isYoutubeUrl(url) {
+      return true;
+    },
+    parseYoutubeUrl(url) {
+      const regExp =
+        /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return match && match[7].length === 11 ? match[7] : false;
+    },
+    handleUrl(url) {
+      let ret = null;
+
+      if (this.isYoutubeUrl(url)) {
+        ret = this.parseYoutubeUrl(url);
+      }
+
+      return ret;
+    },
     previewFiles(event) {
       this.item.action(event.target.files);
     },
-  },
-  data() {
-    return {
-      remixiconUrl,
-    };
   },
 };
 </script>
@@ -98,6 +201,10 @@ export default {
     width: 100%;
     height: 100%;
     fill: currentColor;
+    &:active,
+    :focus {
+      outline: none;
+    }
   }
 }
 </style>

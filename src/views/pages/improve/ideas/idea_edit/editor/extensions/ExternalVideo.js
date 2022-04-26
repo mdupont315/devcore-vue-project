@@ -4,9 +4,11 @@ import { VueNodeViewRenderer } from "@tiptap/vue-2";
 export default Node.create({
   name: "external-video",
 
-  defaultOptions: {
-    inline: false,
-    HTMLAttributes: {}
+  addOptions() {
+    return {
+      inline: false,
+      HTMLAttributes: {}
+    };
   },
 
   inline() {
@@ -32,10 +34,16 @@ export default Node.create({
       },
       allow: {
         default:
-          "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          "accelerometer; autoplay; clipboard-write; modestbranding; encrypted-media; gyroscope; picture-in-picture"
       },
       allowfullscreen: {
         default: "allowfullscreen"
+      },
+      width: {
+        default: 560
+      },
+      height: {
+        default: 315
       }
     };
   },
@@ -65,6 +73,7 @@ export default Node.create({
   addCommands() {
     return {
       setExternalVideo: options => ({ commands }) => {
+        console.log(options);
         return commands.insertContent({
           type: this.name,
           attrs: options

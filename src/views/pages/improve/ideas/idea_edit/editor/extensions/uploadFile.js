@@ -17,7 +17,7 @@ const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
   }
   const reader = new FileReader();
   reader.onload = readerEvent => {
-    const node = schema.nodes.image.create({
+    const node = schema.nodes.file.create({
       src: readerEvent.target?.result,
       title: item.name,
       type: item.type,

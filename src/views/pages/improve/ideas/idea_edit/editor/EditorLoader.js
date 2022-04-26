@@ -24,11 +24,12 @@ import {
 } from "./extensions";
 
 export default class ContentEditor {
-  constructor(editable, value, options, upload) {
+  constructor(editable, value, options, upload, saveContent) {
     this.editable = editable;
     this.content = value;
     this.options = options;
     this.upload = upload;
+    this.saveContent = saveContent;
     this.extensions = [
       StarterKit.configure({
         history: false
@@ -61,7 +62,7 @@ export default class ContentEditor {
       CharacterCount.configure({
         limit: 10000
       }),
-      Comment
+      Comment(saveContent)
     ];
     this.editor = this.getEditorInstance();
     // this.editor.commands.setParagraphText();

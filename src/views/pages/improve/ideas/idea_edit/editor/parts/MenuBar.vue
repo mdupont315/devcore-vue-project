@@ -112,7 +112,7 @@ export default {
               action: () => {
                 // this.editor.commands.setParagraphText();
                 // this.editor.commands.setFontFamily("FuturaLight");
-                this.activeHeading = "h-4";
+                this.activeHeading = "paragraph";
                 this.editor.chain().focus().setParagraph().run();
 
                 //	 this.editor.chain().focus().toggleHeading({ level: 4 }).run();
@@ -149,7 +149,9 @@ export default {
           type: "prompt",
           action: (file) =>
             this.editor.commands.setExternalVideo({
-              src: "https://www.youtube.com/embed/iyd8dY8rRtA",
+              src: file.src,
+              width: file.width,
+              height: file.height,
             }),
         },
         {

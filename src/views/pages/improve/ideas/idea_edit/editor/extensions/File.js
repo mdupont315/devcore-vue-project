@@ -1,8 +1,4 @@
-import {
-  Node,
-  nodeInputRule,
-  mergeAttributes,
-} from "@tiptap/core";
+import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
 
 import {
   uploadFilePlugin,
@@ -15,10 +11,13 @@ const IMAGE_INPUT_REGEX = /!\[(.+|:?)\]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
 
 export const File = uploadFn => {
   return Node.create({
-    name: "image",
-    defaultOptions: {
-      inline: false,
-      HTMLAttributes: {}
+    name: "file",
+
+    addOptions() {
+      return {
+        inline: false,
+        HTMLAttributes: {}
+      };
     },
 
     inline() {
@@ -124,7 +123,7 @@ export const File = uploadFn => {
               renderFileInBase64ToCoordinates(item, view, coordinates, preview);
             });
           }
-        },
+        }
       };
     },
     addInputRules() {

@@ -232,10 +232,13 @@
     "ideaImprovementCloseFeedback": "Palautteen sulkeminen parannukselle onnistui!",
     "ideaImprovementCloseFeedbackFail": "Palautteen sulkeminen parannukselle epäonnistui!",
     "issueEffectTemplateDelete": "Vaikutettu rooli poistettu onnistuneesti!",
-    "issueEffectTemplateDeleteFail": "Vaikutetun roolin poistaminen epäonnistui!"
+    "issueEffectTemplateDeleteFail": "Vaikutetun roolin poistaminen epäonnistui!",
+
+    "Unauthenticated": "Sessio vanhentunut. Ole hyvä ja päivitä sivu"
   },
   "Privacy Policy": "Tietosuojakäytäntö",
   "EULA": "EULA",
+  "Idea feedback": "Palaute",
   "Issue Evaluation Restriction": "Ongelman arviointi rajoitus",
   "Issue Evaluation Restriction Info": "Valitut roolit eivät pysty asettamaan hukan määrää mobiilissa jaa ongelma ominaisuudesta.",
   "Issue Template Restriction": "Ongelman vaikutuksen rajoitus",
@@ -262,6 +265,7 @@
   "description": "kuvaus",
   "adminEmail": "Ylläpitäjän email",
   "currencyCode": "valuutta koodi",
+  "close": "Sulje",
   "companyRole": "rooli yrityksessä",
   "currentValue": "Nykyinen arvo",
   "rewardAchieved": "Palkinto saavutettu",
@@ -484,6 +488,7 @@
   "Upload file": "Lisää tiedosto",
   "Upload guide": "Lisää opas",
   "No guide attached": "Opasta ei ole liitettynä",
+  "setUrl": "Aseta linkki",
   "Guide": "Opas",
   "Tool Ideas": "Työkalu ohjeet",
   "Tool Instructions": "Työkalu ohjeet",

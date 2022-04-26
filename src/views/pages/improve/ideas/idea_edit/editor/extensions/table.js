@@ -17,23 +17,24 @@ const getElementWithAttributes = (name, attrs) => {
 const rowControlButtonsData = [
   {
     name: "Remove Row",
+    text: "-",
     action: editor =>
       editor
         .chain()
         .focus()
         .deleteRow()
         .run(),
-    text: "-"
+
   },
   {
     name: "Add Row",
+    text: "+",
     action: editor =>
       editor
         .chain()
         .focus()
         .addRowAfter()
-        .run(),
-    text: "+"
+        .run()
   }
 ];
 

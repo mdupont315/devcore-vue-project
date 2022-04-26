@@ -100,7 +100,6 @@ export default {
       CommentIcon,
       FolderIcon,
       isReplying: null,
-      intent: Math.random(),
     };
   },
 
@@ -109,61 +108,28 @@ export default {
       console.log(this);
       console.log("OPEN FORM!");
 
-      //	this.intent = Math.random()
-
-      // const data = {
-      //   uuid: comment.uuid,
-      //   comments: this.commentEntity.comments.filter(
-      //     (x) => x.id !== comment.id
-      //   ),
-      // };
-
-      // this.editor.commands.setComment(JSON.stringify(data));
-
       this.isReplying = comment.id;
     },
     savedReply(id) {
       this.isReplying = null;
-      console.log(this.node.attrs);
-      //		this.node.attrs.replied = true
-      // this.editor.commands.unsetComment(this.node?.attrs?.comment, id);
-      const json = {
-        uuid: "d3dfd3d9-55a3-466c-b89d-77d9047131ea",
-        comments: [
-          {
-            id: "207",
-            user: "17",
-            anonymous: false,
-            content: "second",
-            createdAt: "2022-04-20 13:09:55",
-            replied: true,
-            type: "PROBLEM",
-          },
-        ],
+
+      const data = {
+        comments: this.commentEntity.comments.filter((x) => x.id !== id),
       };
-      this.updateAttributes({ comment: JSON.stringify(json) });
-      this.intent = Math.random();
+      this.updateAttributes({ comment: JSON.stringify(data) });
+
+      if (this.editor) {
+        this.editor.commands.saveReply();
+      }
     },
     closeOverlay() {
-      console.log("CLOSING DIALOG! ");
       this.isReplying = null;
     },
 
     getReplyIconRef(id) {
-      console.log();
-      console.log("GET REF TARGET");
-      console.log(id);
-
       return `comment_replyIcon-${id}`;
     },
-    /**
-     * Example of how to update attributes
-     */
-    // increase() {
-    //   this.updateAttributes({
-    //     count: this.node.attrs.count + 1,
-    //   });
-    // },
+
     getCommentRef(comment) {
       return `comment_replyIcon-${comment.id}`;
     },
@@ -171,7 +137,6 @@ export default {
       window.open(link, "__blank");
     },
     isCommentReplied(comment) {
-      console.log(comment);
       return !!comment.replied;
     },
   },
@@ -179,8 +144,6 @@ export default {
   computed: {
     commentEntity() {
       const stringCommentEntity = this.node?.attrs?.comment;
-
-      console.log(this.node.attrs);
       return stringCommentEntity ? JSON.parse(stringCommentEntity) : {};
     },
     comments() {

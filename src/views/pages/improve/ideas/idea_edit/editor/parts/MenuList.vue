@@ -8,7 +8,7 @@
       :class="{ 'is-active': selectionOpen }"
       style="width: 100%; height: 100%; margin: 0"
     >
-      <div class="menu-list-active-text">
+      <div class="menu-list-active-text" @click="setActive(activeIcon)">
         <div class="menu-list-active-text-icon">
           {{ getActiveText(activeIcon) }}
         </div>
@@ -36,7 +36,7 @@
           }"
           style="width: 100%; font-size: 1.25rem; padding: 10px"
         >
-          {{ listItem.title }}
+          <span>{{ getActiveText(listItem.icon) }} </span> {{ listItem.title }}
         </div></b-card
       >
     </b-popover>
@@ -63,8 +63,11 @@ export default {
     },
   },
   methods: {
+    setActive(active) {
+      const thisItem = this.item.listItems.find((x) => x.icon === active);
+      thisItem.action();
+    },
     getActiveText(active) {
-      console.log(active);
       let ret = "P";
       switch (active) {
         case "h-3":
@@ -141,7 +144,7 @@ export default {
   width: 100%;
   height: 100%;
   font-size: 1.6rem;
-	font-weight:500;
+  font-weight: 500;
   margin: 0px;
   align-items: center;
   justify-content: center;
@@ -152,7 +155,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-	line-height:5px;
+  line-height: 5px;
   padding: 5px;
   border-radius: 5px;
   &.is-active,

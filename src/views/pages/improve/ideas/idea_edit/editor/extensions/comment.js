@@ -7,7 +7,7 @@ import {
 import { Plugin, TextSelection } from "prosemirror-state";
 import CommentNodeView from "./CommentNodeView.vue";
 
-export const Comment = Node.create({
+export const Comment = saveContent => Node.create({
   name: "comment",
 
   group: "block",
@@ -46,28 +46,9 @@ export const Comment = Node.create({
   addCommands() {
     return {
       setComment: comment => ({ commands }) => {
-        console.log(comment);
         return commands.setNode(this.name, { comment });
       },
-      unsetComment: (comment, removeId) => ({ commands, state }) => {
-        console.log(comment);
-        console.log(removeId);
-        console.log("UNSETTING");
-
-        const { selection } = state;
-        const { from: selectionFrom, to: selectionTo } = selection;
-
-        console.log(selectionFrom, selectionTo)
-
-       // commands.updateAttributes("comment", { replied: true });
-        // return commands.setNode(this.name, {
-        //   comment: newComments
-        // });
-      }
-
-      // setComment: (comment) => ({ commands }) => commands.setNode('comment', { comment }),
-      // toggleComment: () => ({ commands }) => commands.toggleMark('comment'),
-      // unsetComment: () => ({ commands }) => commands.unsetMark('comment'),
+      saveReply: comment => ({ commands }) => saveContent()
     };
   },
 

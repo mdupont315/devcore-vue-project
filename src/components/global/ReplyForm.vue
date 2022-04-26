@@ -118,7 +118,6 @@ export default {
     async saveFeedback() {
       this.isLoading = true;
       this.feedbackForm.value = this.rewardablePoints[this.rewardActiveIndex];
-      console.log(this.comment);
       //TODO: send comment reply here
       // const ideaIssueReplyForm = new GQLForm({
       //   authorId: this.item.author.id,
@@ -155,7 +154,7 @@ export default {
       });
 
       //TODO: Unset this comment,
-			//TODO:  remove from editor, save content
+      //TODO:  remove from editor, save content
 
       await this.$store.dispatch(
         "idea/closeImprovementFeedback",
@@ -186,6 +185,8 @@ export default {
   padding: 5px 10px;
   display: flex;
   flex-direction: column;
+  max-height: 150px;
+  overflow: scroll;
   align-items: center;
   border-bottom: 1px solid lightgrey;
 }

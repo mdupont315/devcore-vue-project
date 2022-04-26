@@ -231,11 +231,14 @@
     "ideaImprovementCloseFeedback": "Issue closed for feedback succesfully!",
     "ideaImprovementCloseFeedbackFail": "Closing issue feedback failed!",
     "issueEffectTemplateDelete": "Affected role deleted from issue template succesfully!",
-    "issueEffectTemplateDeleteFail": "Deleting affected role failed!"
+    "issueEffectTemplateDeleteFail": "Deleting affected role failed!",
+
+    "Unauthenticated": "Unauthenticated"
   },
 
   "Privacy Policy": "Privacy Policy",
   "EULA": "EULA",
+  "Idea feedback": "Idea feedback",
   "Milestone reward text": "Reward here",
   "Issue Evaluation Restriction": "Issue Restriction",
   "Issue Evaluation Restriction Info": "Selected roles are restricted to evaluate issue loss amounts in mobile report issue feature.",
@@ -261,6 +264,7 @@
   "description": "description",
   "adminEmail": "Admin email",
   "currencyCode": "currency code",
+  "close": "Close",
   "companyRoles": "company roles",
   "companyRole": "company role",
   "lang": "language",
@@ -411,6 +415,7 @@
   "Upload file": "Upload file",
   "Upload guide": "Upload guide",
   "No guide attached": "No guide attached",
+  "setUrl": "Set Url",
   "Guide": "Guide",
   "Tool Ideas": "Tool Instructions",
   "Tool Instructions": "Tool Instructions",

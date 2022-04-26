@@ -70,6 +70,7 @@
       :idea="idea"
       :isSaving="isSaving"
       @fileAdded="setFile"
+      @saveContent="saveContent"
       @initialized="isEditable = true"
       :contentType="contentType"
     />
@@ -139,18 +140,15 @@ export default {
     newType: "",
   }),
   methods: {
+    saveContent() {
+      this.$emit("saveIdeaContent");
+    },
     setFile(file) {
       this.$emit("fileAdded", file);
     },
     changeContentType(item) {
-      // EMIT MARKUP TO SAVE LOCAL CHANGES
-      //	this.$emit("")
       this.$emit("selectedType", item);
     },
-    // addNewIdeaTemplate() {
-    //   if (!this.newType) return;
-    //   this.ideaContentCategories.push({ name: this.newType });
-    // },
   },
 };
 </script>

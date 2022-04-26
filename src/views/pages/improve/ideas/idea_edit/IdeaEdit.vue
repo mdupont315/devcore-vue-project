@@ -9,6 +9,7 @@
         :selectedCategoryIndex="selectedCategoryIndex"
         @fileAdded="setFile"
         @selectedType="setContentType"
+        @saveIdeaContent="saveIdeaVersion"
         :isSaving="isSaving"
         v-model="getIdeaContent"
       ></idea-edit-content>
@@ -20,6 +21,7 @@
         :isLoading="isLoading"
         v-model="getIdeaPath"
         :idea="getIdea"
+        v-if="isLoaded"
       ></idea-edit-path>
     </div>
   </div>
@@ -61,6 +63,7 @@ export default {
   data: () => ({
     filter: null,
     isSaving: false,
+    isLoaded: false,
     selectedCategoryIndex: 2,
     ideaForm: new GQLForm({
       id: undefined,
@@ -199,7 +202,9 @@ export default {
       const mapToIdea = this.ideaForm;
       const mapFromIdea = Object.assign(this.getIdea, {});
       this.formFieldMapper(mapToIdea, mapFromIdea);
+      this.isLoaded = true;
     },
+
     ideaContentFormFieldMapper() {
       if (this.getIdea && this.getIdea.ideaContentId) {
         this.ideaContents.map((content) => {
@@ -251,20 +256,15 @@ export default {
     },
     getCommentNodesFromContent() {
       const { markup } = this.getIdeaContent;
-			console.log(markup.content)
       const commentNodes =
         markup?.content.filter((node) => node.type === "comment") ?? [];
 
-				console.log(commentNodes)
+      console.log(commentNodes);
+
       return commentNodes;
     },
 
     syncFiles() {
-      //TODO: Check that idea.files (should be actual files on server)
-      // matches with node content node content images
-
-      //TODO: check that resources get deleted correctly. Currently more resources than should get deleted
-
       const fileNodesInContent = this.getImageNodesFromContent();
       if (fileNodesInContent.length === 0) {
         this.ideaForm.removeFile = true;
@@ -290,7 +290,7 @@ export default {
       try {
         //Sync files in server with files in content
         this.syncFiles();
-				this.getCommentNodesFromContent()
+        this.getCommentNodesFromContent();
 
         const ideaSave = await this.saveIdea();
         //reset removeFileIds
@@ -382,7 +382,7 @@ export default {
   justify-content: space-evenly;
 }
 
-.idea_edit-wrapper{
-	margin: 20px 20px 0 20px;
+.idea_edit-wrapper {
+  margin: 20px 20px 0 20px;
 }
 </style>

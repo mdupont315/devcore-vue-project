@@ -1,6 +1,6 @@
 <template>
   <super-select
-    :items="roles"
+    :items="tools"
     class="image-selector role-selector"
     selector-class="columns columns-3"
     v-model="dataValue"
@@ -16,10 +16,9 @@
     :show-add-btn="showAddBtn"
     :max-display-items="6"
     @close="close"
-    :key="intent"
   >
     <template slot="selection-count" slot-scope="props">{{
-      $tc("role.count", props.values.length)
+      $tc("tool.count", props.values.length)
     }}</template>
     <template slot="dropdown-item" slot-scope="props">
       <div class="text-center">
@@ -90,7 +89,7 @@
 import { /* mapState, */ mapGetters } from "vuex";
 
 export default {
-  name: "RoleSelector",
+  name: "CompanyToolSelector",
   props: {
     items: {
       required: false,
@@ -133,44 +132,48 @@ export default {
     dataValue: [],
     ready: false,
     maxDisplayItems: 6,
-    intent: Math.random(),
   }),
   computed: {
     ...mapGetters({
-      allRoles: "companyRole/all",
+      allTools: "companyTool/all",
     }),
-    roles: {
+    tools: {
       get() {
-        return (this.items || this.allRoles).sort((a, b) =>
+        return (this.items || this.allTools).sort((a, b) =>
           a.firstName > b.firstName ? 1 : -1
         );
       },
     },
-
     selectedItems: {
       get() {
-        return this.roles
+        console.log(this.tools);
+        return this.tools
           .filter((r) => this.dataValue.includes(r.id))
           .sort((a, b) => (a.name > b.name ? 1 : -1));
       },
     },
   },
-  mounted() {
-    if (this.value) {
-      if (this.value.length > 0) {
-        const roles = this.value.filter(
-          (o) => this.roles.find((u) => u.id === o) != null
-        );
-        this.dataValue = roles;
-      } else {
-        this.dataValue = [];
-      }
-    } else {
+  async mounted() {
 
-		}
+    console.log(this.value);
+    if (this.value && this.value.length > 0) {
+      // const allRoleIds = this.value;
+      // console.log(this.value)
+      // console.log(this.value)
+      console.log(this.value);
+      const tools = this.value.filter(
+        (o) => this.tools.find((u) => u.id === o) != null
+      );
+      console.log(tools);
+      this.dataValue = tools;
+
+      // console.log("this.dataValue")
+      // console.log(this.dataValue)
+    } else {
+      this.dataValue = [];
+    }
 
     this.ready = true;
-    this.intent = Math.random();
   },
   methods: {
     removeItem(item, event) {
@@ -199,9 +202,9 @@ export default {
       if (event) {
         event.stopPropagation();
       }
-      let ret = this.roles;
+      let ret = this.tools;
       if (value) {
-        ret = this.roles.filter(
+        ret = this.tools.filter(
           (i) =>
             i.fullName.toLowerCase().includes(value.toLowerCase()) ||
             (i.email

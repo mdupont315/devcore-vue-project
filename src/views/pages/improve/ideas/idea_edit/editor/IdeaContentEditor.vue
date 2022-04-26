@@ -15,8 +15,7 @@
         ref="editor_content"
       />
 
-      <div class="editor__footer">
-      </div>
+      <div class="editor__footer"></div>
     </div>
   </div>
 </template>
@@ -78,7 +77,6 @@ export default {
     };
   },
   methods: {
-
     focusEditor() {
       this.editor?.commands.focus();
     },
@@ -88,6 +86,13 @@ export default {
 
       const addFile = async (file) => {
         this.$emit("fileAdded", file);
+      };
+
+      const saveContent = async (content) => {
+				console.log("SAVING CONTENT!")
+        this.$nextTick(() => {
+          this.$emit("saveContent");
+        });
       };
 
       const editorInstance = new ContentEditor(
@@ -100,19 +105,12 @@ export default {
               markup: content,
             }),
         },
-        addFile
+        addFile,
+        saveContent
       );
 
       this.editor = editorInstance.editor;
       this.$emit("initialized");
-      //this.editable = true;
-
-      //this.editable = true;
-      //this.editor.setEditable(this.editable);
-
-      // this.editor.commands.updateUser({
-      //   name: `${this.user.firstName} ${this.user.lastName}`,
-      // });
     },
   },
 

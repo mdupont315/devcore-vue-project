@@ -5,11 +5,13 @@
     <section class="content-dom-video">
       <div style="display: flex" v-if="videoEntity">
         <iframe
-          :src="this.node.attrs.src"
+          :src="`${this.node.attrs.src}?rel=0`"
           :title="this.node.attrs.title"
           :frameborder="this.node.attrs.frameborder"
           :allow="this.node.attrs.allow"
           :allowfullscreen="this.node.attrs.allowfullscreen"
+          :height="getHeight"
+          :width="getWidth"
         ></iframe>
 
         <button @click="remove" class="video-remove-button">
@@ -34,9 +36,24 @@ export default {
   content: "inline*",
 
   computed: {
+    getWidth() {
+      const maxWidth = 560;
+      const width =
+        this.node.attrs.width >= maxWidth ? maxWidth : this.node.attrs.width;
+
+      return width;
+    },
+
+    getHeight() {
+      const maxHeight = 315;
+      const height =
+        this.node.attrs.height >= maxHeight
+          ? maxHeight
+          : this.node.attrs.height;
+      return height;
+    },
     videoEntity() {
       const stringFileEntity = this.node?.attrs;
-      console.log(this.node);
       return stringFileEntity;
     },
     getAttrs() {

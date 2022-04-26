@@ -72,6 +72,7 @@
                   </div>
                   <v-select
                     v-model="mutateForm.operationId"
+                    v-if="mutateForm.stageId"
                     v-validate="''"
                     label="title"
                     data-vv-name="operation_id"
@@ -103,7 +104,7 @@
                     {{ $t("phase") }}
                   </div>
                   <v-select
-                    v-if="mutateForm.stageId"
+                    v-if="mutateForm.operationId"
                     v-model="mutateForm.phaseId"
                     v-validate="''"
                     label="title"
@@ -130,8 +131,8 @@
                     {{ $t("roles") }}
                   </div>
                   <role-selector
-                    name="idea_roles"
                     v-if="mutateForm.companyRoleIds"
+                    name="idea_roles"
                     id="idea_roles"
                     autocomplete="idea_roles"
                     :placeholder="$t('roles')"
@@ -144,7 +145,7 @@
                     :show-add-btn="false"
                   ></role-selector>
                 </div>
-                <div class="form-label-group select">
+                <!-- <div class="form-label-group select">
                   <div
                     class="idea_edit_path_container-body-process-select-title"
                   >
@@ -168,7 +169,7 @@
                   <b-form-invalid-feedback>{{
                     $displayError("tool", mutateForm)
                   }}</b-form-invalid-feedback>
-                </div>
+                </div> -->
                 <div class="form-group">
                   <div
                     class="idea_edit_path_container-body-process-select-title"
@@ -220,7 +221,14 @@
               </div>
             </b-card-body>
             <b-card-footer class="ideaEditPath-form-actions">
-              <b-row>
+              <b-col
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  flex-direction: row;
+                  padding: 10px 0px;
+                "
+              >
                 <loading-button
                   v-if="
                     idea.status === 'NEW' &&
@@ -228,6 +236,12 @@
                   "
                   variant="primary"
                   size="lg"
+                  style="
+                    overflow: hidden;
+                    height: 40px;
+                    margin-right: 10px;
+                    width: 100%;
+                  "
                   :loading="isLoading"
                   @click="updateStatus"
                   >{{ $t("Test") }}</loading-button
@@ -240,39 +254,40 @@
                   variant="primary"
                   size="lg"
                   :loading="isLoading"
-                  style="height: 40px"
+                  style="
+                    overflow: hidden;
+                    height: 40px;
+                    margin-right: 10px;
+                    width: 100%;
+                  "
                   @click="updateStatus"
                   >{{ $t("Adopt") }}</loading-button
                 >
-                <b-col>
-                  <loading-button
-                    :disabled="vErrors.any() || isLoading"
-                    :loading="isLoading"
-                    size="lg"
-                    style="height: 40px; min-width: 85px"
-                    block
-                    type="submit"
-                    >{{ $t("Save") }}</loading-button
-                  ></b-col
+                <loading-button
+                  :disabled="vErrors.any() || isLoading"
+                  :loading="isLoading"
+                  size="lg"
+                  style="height: 40px; width: 100%"
+                  block
+                  type="submit"
+                  >{{ $t("Save") }}</loading-button
                 >
-                <b-col>
-                  <confirm-button
-                    variant="outline-danger"
-                    size="lg"
-                    class="pl-2"
-                    style="height: 40px"
-                    :confirm-title="$t('Delete') + ' ' + mutateForm.title + '?'"
-                    :confirmPlacement="'top'"
-                    :confirm-message="$t('This action cannot be undone!')"
-                    :btnStyle="'background:#fff;height:41px;width:100%;color:#cc454b;padding:0'"
-                    @confirm="deleteItem"
-                  >
-                    <div class="ideaEditPath-remove-idea-button">
-                      {{ $t("Remove") }}
-                    </div>
-                  </confirm-button>
-                </b-col>
-              </b-row>
+                <confirm-button
+                  variant="outline-danger"
+                  size="lg"
+                  class="pl-2"
+                  style="height: 40px; width: 100%"
+                  :confirm-title="$t('Delete') + ' ' + mutateForm.title + '?'"
+                  :confirmPlacement="'top'"
+                  :confirm-message="$t('This action cannot be undone!')"
+                  :btnStyle="'background:#fff;height:41px;width:100%;color:#cc454b;padding:0'"
+                  @confirm="deleteItem"
+                >
+                  <div class="ideaEditPath-remove-idea-button">
+                    {{ $t("Remove") }}
+                  </div>
+                </confirm-button>
+              </b-col>
             </b-card-footer>
           </b-card>
         </b-form>
@@ -307,14 +322,22 @@ export default {
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
-      currentTool: "companyTool/current",
-      tools: "companyTool/all",
+      allTools: "companyTool/all",
       allRoles: "companyRole/all",
     }),
 
+    getParentRoles: {
+      get() {
+        const parentRoles =
+          this.idea.parent?.companyRoles.map((role) => role.id) ?? [];
+        return parentRoles;
+      },
+    },
     getSelectableRoles: {
       get() {
-        return this.allRoles;
+        return this.allRoles.filter((role) =>
+          this.getParentRoles.includes(role.id)
+        );
       },
     },
     mutateForm: {
@@ -323,6 +346,7 @@ export default {
         return this.value;
       },
       set(value) {
+        console.log(value);
         this.$emit("input", value);
       },
     },
@@ -361,12 +385,15 @@ export default {
       },
     },
   },
+
   data: () => ({
     section: "ideas",
+    selectableIdeaRoles: [],
+		hasChanges: false
   }),
-
   methods: {
     async save() {
+      console.log(this.value.changes);
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         this.$validator.reset();
@@ -395,6 +422,9 @@ export default {
 
 
 <style scoped>
+.ideaEditPath-form-actions {
+  padding: 0;
+}
 .idea_edit_path_container-body {
   height: 100%;
 }
