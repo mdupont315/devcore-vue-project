@@ -70,6 +70,7 @@
       :idea="idea"
       :isSaving="isSaving"
       @fileAdded="setFile"
+      @fileRemoved="removeFile"
       @saveContent="saveContent"
       @initialized="isEditable = true"
       :contentType="contentType"
@@ -145,6 +146,9 @@ export default {
     },
     setFile(file) {
       this.$emit("fileAdded", file);
+    },
+    removeFile(file) {
+      this.$emit("fileRemoved", file);
     },
     changeContentType(item) {
       this.$emit("selectedType", item);

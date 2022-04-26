@@ -46,6 +46,13 @@ export const File = fileHandlers => {
           },
           renderHTML: attrs => ({ href: attrs.href })
         },
+        id: {
+          default: null,
+          parseHTML: el => {
+            return el.getAttribute("id");
+          },
+          renderHTML: attrs => ({ href: attrs.id })
+        },
         title: {
           default: null,
           parseHTML: el => {
@@ -92,6 +99,7 @@ export const File = fileHandlers => {
         getAttrs: dom => {
           if (typeof dom === "string") return {};
           const obj = {
+            id: dom.getAttribute("id"),
             src: dom.getAttribute("src"),
             title: dom.getAttribute("title"),
             alt: dom.getAttribute("alt"),
@@ -107,6 +115,7 @@ export const File = fileHandlers => {
         getAttrs: dom => {
           if (typeof dom === "string") return {};
           const obj = {
+            id: dom.getAttribute("id"),
             src: dom.getAttribute("src"),
             href: dom.getAttribute("href"),
             title: dom.getAttribute("title"),
@@ -160,7 +169,7 @@ export const File = fileHandlers => {
         },
         removeFile: file => () => {
           console.log("REMOVING FILE! ", file);
-
+          fileHandlers.removeFile(file);
         }
       };
     },

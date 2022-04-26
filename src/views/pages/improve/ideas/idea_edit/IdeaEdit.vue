@@ -8,6 +8,7 @@
         :isLoading="isLoading"
         :selectedCategoryIndex="selectedCategoryIndex"
         @fileAdded="setFile"
+        @fileRemoved="removeFile"
         @selectedType="setContentType"
         @saveIdeaContent="saveIdeaVersion"
         :isSaving="isSaving"
@@ -176,15 +177,14 @@ export default {
   async beforeDestroy() {
     await this.closeIdeaEdit();
   },
-  mounted() {
-    console.log("SETTING FILES: ");
-    console.log(this.getIdea.files);
-    this.files = this.getIdea.files;
-  },
   methods: {
+    removeFile(file) {
+      if (file.src && file.id) {
+        console.log(file);
+				this.ideaForm._fields.removeFileIds.push(file.id)
+      }
+    },
     async setFile(file) {
-      console.log("SETTING FILE!");
-      console.log(file);
       const items = [...this.files, file];
       this.files = items;
     },
@@ -235,8 +235,6 @@ export default {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
 
-          console.log(node.attrs);
-          console.log(fileInIdea);
           if (fileInIdea) {
             if (node.attrs.preview) {
               node.attrs.src = fileInIdea.url;
@@ -255,25 +253,19 @@ export default {
     },
 
     async saveIdea() {
-      console.log("SAVING!  ");
-      console.log(this.ideaForm.fields.file);
-      console.log(this.ideaForm);
-      console.log(this.files);
       this.ideaForm.fields.file = this.files.filter((x) => x.size && !x.uri);
 
       const ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
-     // this.files = [];
-      this.ideaForm.removeFileIds = [];
+      // this.files = [];
+      this.ideaForm._fields.removeFileIds = [];
 
       return ideaSave;
     },
     getImageNodesFromContent() {
       const { markup } = this.getIdeaContent;
-      console.log(markup);
       const imageNodes =
         markup?.content.filter((node) => node.type === "file") ?? [];
 
-      console.log(imageNodes);
       return imageNodes;
     },
     getCommentNodesFromContent() {
@@ -299,23 +291,18 @@ export default {
 
       const uploadedFiles = uploadedFilesInContent.map((node) => node.attrs.id);
 
-      console.log("uploadedFiles");
-      console.log(uploadedFiles);
-
-      console.log("this.files");
-      console.log(this.files);
 
       const removeFiles = this.files.filter(
         (file) => !uploadedFiles.includes(file.uri)
       );
-      this.ideaForm.removeFileIds = removeFiles.map((file) => file.id) ?? [];
+     // this.ideaForm.removeFileIds = removeFiles.map((file) => file.id) ?? [];
     },
     async saveIdeaVersion() {
       this.isLoading = true;
       this.isSaving = true;
       try {
         //Sync files in server with files in content
-        this.syncFiles();
+       // this.syncFiles();
         this.getCommentNodesFromContent();
 
         const ideaSave = await this.saveIdea();

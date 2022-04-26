@@ -85,11 +85,13 @@ export default {
       if (this.provider) this.editor.destroy();
 
       const fileHandlers = {
-        addFile: () => async (file) => {
+        addFile: async (file) => {
           console.log("ADDED FILE! ");
           this.$emit("fileAdded", file);
         },
-        removeFile: () => async (file) => {
+        removeFile: (file) => {
+          console.log(file);
+					this.$emit("fileRemoved", file);
           console.log("REMOVED FILE");
         },
       };
