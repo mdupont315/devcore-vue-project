@@ -56,7 +56,9 @@ export default {
       filter: this.filter,
       force: true,
     });
-
+    this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
+      (content) => content.name === this.defaultContentName
+    );
     await this.initializeForms();
     this.isLoading = false;
   },
@@ -64,6 +66,7 @@ export default {
     filter: null,
     isSaving: false,
     isLoaded: false,
+    defaultContentName: "Custom",
     selectedCategoryIndex: 2,
     ideaForm: new GQLForm({
       id: undefined,
@@ -175,6 +178,8 @@ export default {
   },
   methods: {
     async setFile(file) {
+			console.log("SETTING FILE!")
+			console.log(file)
       const items = [...this.files, file];
       this.files = items;
     },
@@ -183,6 +188,7 @@ export default {
       this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
         (content) => content.name === item.name
       );
+
       this.$nextTick(() => {
         this.isLoading = false;
       });
@@ -220,9 +226,12 @@ export default {
       const parsedContent = JSON.parse(content);
 
       parsedContent.content.forEach((node) => {
-        if (node.type === "image") {
+        if (node.type === "file") {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
+
+					console.log(node.attrs)
+					console.log(fileInIdea)
           if (fileInIdea) {
             if (node.attrs.preview) {
               node.attrs.src = fileInIdea.url;
@@ -240,6 +249,9 @@ export default {
       return JSON.stringify(parsedContent);
     },
     async saveIdea() {
+			console.log("SAVING!  ");
+			console.log(this.ideaForm.fields.file)
+			console.log(this.ideaForm)
       this.ideaForm.fields.file = this.files.filter((x) => x.size);
 
       const ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
@@ -250,16 +262,17 @@ export default {
     },
     getImageNodesFromContent() {
       const { markup } = this.getIdeaContent;
+			console.log(markup)
       const imageNodes =
-        markup?.content.filter((node) => node.type === "image") ?? [];
+        markup?.content.filter((node) => node.type === "file") ?? [];
+
+				console.log(imageNodes)
       return imageNodes;
     },
     getCommentNodesFromContent() {
       const { markup } = this.getIdeaContent;
       const commentNodes =
         markup?.content.filter((node) => node.type === "comment") ?? [];
-
-      console.log(commentNodes);
 
       return commentNodes;
     },

@@ -86,13 +86,45 @@ export const File = uploadFn => {
     // parseHTML() {
     //   return [{ tag: "span[file]" }];
     // },
-    renderHTML({ HTMLAttributes }) {
-      console.log("HTMLATTRS: ", HTMLAttributes);
-      return [
-        "span",
-        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-        0
-      ];
+    parseHTML: () => [
+      {
+        tag: "img[src]",
+        getAttrs: dom => {
+          if (typeof dom === "string") return {};
+          const obj = {
+            src: dom.getAttribute("src"),
+            title: dom.getAttribute("title"),
+            alt: dom.getAttribute("alt"),
+            style: dom.getAttribute("style"),
+            type: dom.getAttribute("type"),
+            preview: dom.getAttribute("preview")
+          };
+          return obj;
+        }
+      },
+      {
+        tag: "a",
+        getAttrs: dom => {
+          if (typeof dom === "string") return {};
+          const obj = {
+            src: dom.getAttribute("src"),
+            href: dom.getAttribute("href"),
+            title: dom.getAttribute("title"),
+            style: dom.getAttribute("style"),
+            type: dom.getAttribute("type"),
+            preview: dom.getAttribute("preview")
+          };
+          return obj;
+        }
+      }
+    ],
+    renderHTML: ({ HTMLAttributes }) => {
+      const { href, title, src, alt, style, preview } = HTMLAttributes;
+
+      if (!preview) {
+        return ["a", { href, title, style }, title];
+      }
+      return ["img", { title, src, alt, style }];
     },
     addNodeView() {
       return VueNodeViewRenderer(FileNodeView);
@@ -109,6 +141,8 @@ export const File = uploadFn => {
           const input = attrs ? attrs : [];
           const files = Array.from(input);
           const previewFiles = files.filter(file => /image/i.test(file.type));
+
+          console.log(previewFiles)
 
           if (previewFiles.length > 0) {
             previewFiles.forEach(async item => {

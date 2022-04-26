@@ -56,17 +56,12 @@ export default class ContentEditor {
       TableCell,
       Gapcursor,
       Heading,
-      File(upload),
+      File(this.upload),
       CustomTable,
       EventHandler,
-      CharacterCount.configure({
-        limit: 10000
-      }),
-      Comment(saveContent)
+      Comment(this.saveContent)
     ];
     this.editor = this.getEditorInstance();
-    // this.editor.commands.setParagraphText();
-    // this.editor.commands.setFontFamily("FuturaLight");
   }
 
   getEditorInstance() {
