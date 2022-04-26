@@ -24,11 +24,11 @@ import {
 } from "./extensions";
 
 export default class ContentEditor {
-  constructor(editable, value, options, upload, saveContent) {
+  constructor(editable, value, options, fileHandlers, saveContent) {
     this.editable = editable;
     this.content = value;
     this.options = options;
-    this.upload = upload;
+    this.fileHandlers = fileHandlers;
     this.saveContent = saveContent;
     this.extensions = [
       StarterKit.configure({
@@ -56,7 +56,7 @@ export default class ContentEditor {
       TableCell,
       Gapcursor,
       Heading,
-      File(this.upload),
+      File(this.fileHandlers),
       CustomTable,
       EventHandler,
       Comment(this.saveContent)

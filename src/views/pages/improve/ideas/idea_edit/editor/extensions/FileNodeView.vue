@@ -50,6 +50,9 @@ export default {
       return this.fileEntity;
     },
   },
+	beforeDestroy(){
+		this.editor.commands.removeFile(this.fileEntity)
+	},
   methods: {
     remove() {
 

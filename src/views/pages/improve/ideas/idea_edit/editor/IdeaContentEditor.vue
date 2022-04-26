@@ -84,13 +84,18 @@ export default {
       if (this.editor) this.editor.destroy();
       if (this.provider) this.editor.destroy();
 
-      const addFile = async (file) => {
-				console.log("ADDED FILE! ")
-        this.$emit("fileAdded", file);
+      const fileHandlers = {
+        addFile: () => async (file) => {
+          console.log("ADDED FILE! ");
+          this.$emit("fileAdded", file);
+        },
+        removeFile: () => async (file) => {
+          console.log("REMOVED FILE");
+        },
       };
 
       const saveContent = async (content) => {
-				console.log("SAVING CONTENT!")
+        console.log("SAVING CONTENT!");
         this.$nextTick(() => {
           this.$emit("saveContent");
         });
@@ -106,7 +111,7 @@ export default {
               markup: content,
             }),
         },
-        addFile,
+        fileHandlers,
         saveContent
       );
 

@@ -176,10 +176,15 @@ export default {
   async beforeDestroy() {
     await this.closeIdeaEdit();
   },
+  mounted() {
+    console.log("SETTING FILES: ");
+    console.log(this.getIdea.files);
+    this.files = this.getIdea.files;
+  },
   methods: {
     async setFile(file) {
-			console.log("SETTING FILE!")
-			console.log(file)
+      console.log("SETTING FILE!");
+      console.log(file);
       const items = [...this.files, file];
       this.files = items;
     },
@@ -230,8 +235,8 @@ export default {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
 
-					console.log(node.attrs)
-					console.log(fileInIdea)
+          console.log(node.attrs);
+          console.log(fileInIdea);
           if (fileInIdea) {
             if (node.attrs.preview) {
               node.attrs.src = fileInIdea.url;
@@ -248,25 +253,27 @@ export default {
 
       return JSON.stringify(parsedContent);
     },
+
     async saveIdea() {
-			console.log("SAVING!  ");
-			console.log(this.ideaForm.fields.file)
-			console.log(this.ideaForm)
-      this.ideaForm.fields.file = this.files.filter((x) => x.size);
+      console.log("SAVING!  ");
+      console.log(this.ideaForm.fields.file);
+      console.log(this.ideaForm);
+      console.log(this.files);
+      this.ideaForm.fields.file = this.files.filter((x) => x.size && !x.uri);
 
       const ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
-      this.files = [];
+     // this.files = [];
       this.ideaForm.removeFileIds = [];
 
       return ideaSave;
     },
     getImageNodesFromContent() {
       const { markup } = this.getIdeaContent;
-			console.log(markup)
+      console.log(markup);
       const imageNodes =
         markup?.content.filter((node) => node.type === "file") ?? [];
 
-				console.log(imageNodes)
+      console.log(imageNodes);
       return imageNodes;
     },
     getCommentNodesFromContent() {
@@ -292,7 +299,13 @@ export default {
 
       const uploadedFiles = uploadedFilesInContent.map((node) => node.attrs.id);
 
-      const removeFiles = this.getIdea.files.filter(
+      console.log("uploadedFiles");
+      console.log(uploadedFiles);
+
+      console.log("this.files");
+      console.log(this.files);
+
+      const removeFiles = this.files.filter(
         (file) => !uploadedFiles.includes(file.uri)
       );
       this.ideaForm.removeFileIds = removeFiles.map((file) => file.id) ?? [];

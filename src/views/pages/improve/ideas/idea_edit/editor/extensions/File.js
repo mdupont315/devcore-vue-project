@@ -9,7 +9,7 @@ import { VueNodeViewRenderer } from "@tiptap/vue-2";
 
 const IMAGE_INPUT_REGEX = /!\[(.+|:?)\]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
 
-export const File = uploadFn => {
+export const File = fileHandlers => {
   return Node.create({
     name: "file",
 
@@ -142,21 +142,25 @@ export const File = uploadFn => {
           const files = Array.from(input);
           const previewFiles = files.filter(file => /image/i.test(file.type));
 
-          console.log(previewFiles)
+          console.log(previewFiles);
 
           if (previewFiles.length > 0) {
             previewFiles.forEach(async item => {
               const preview = true;
-              uploadFn(item);
+              fileHandlers.addFile(item);
               renderFileInBase64ToCoordinates(item, view, coordinates, preview);
             });
           } else {
             files.forEach(async item => {
               const preview = false;
-              uploadFn(item);
+              fileHandlers.addFile(item);
               renderFileInBase64ToCoordinates(item, view, coordinates, preview);
             });
           }
+        },
+        removeFile: file => () => {
+          console.log("REMOVING FILE! ", file);
+
         }
       };
     },
@@ -174,7 +178,7 @@ export const File = uploadFn => {
       ];
     },
     addProseMirrorPlugins() {
-      return [uploadFilePlugin(uploadFn)];
+      return [uploadFilePlugin(fileHandlers.addFile)];
     }
   });
 };
