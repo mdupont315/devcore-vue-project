@@ -180,8 +180,7 @@ export default {
   methods: {
     removeFile(file) {
       if (file.src && file.id) {
-        console.log(file);
-				this.ideaForm._fields.removeFileIds.push(file.id)
+        this.ideaForm._fields.removeFileIds.push(file.id);
       }
     },
     async setFile(file) {
@@ -253,10 +252,11 @@ export default {
     },
 
     async saveIdea() {
+      console.log(this.files);
       this.ideaForm.fields.file = this.files.filter((x) => x.size && !x.uri);
 
       const ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
-      // this.files = [];
+      this.files = [];
       this.ideaForm._fields.removeFileIds = [];
 
       return ideaSave;
@@ -278,31 +278,31 @@ export default {
 
     syncFiles() {
       const fileNodesInContent = this.getImageNodesFromContent();
+      console.log(fileNodesInContent);
       if (fileNodesInContent.length === 0) {
-        this.ideaForm.removeFile = true;
+        this.ideaForm._fields.removeFile = true;
       } else {
-        this.ideaForm.removeFile = false;
+        this.ideaForm._fields.removeFile = false;
       }
-      this.ideaForm.removeFileIds = [];
+      //   this.ideaForm.removeFileIds = [];
 
-      const uploadedFilesInContent = fileNodesInContent.filter(
-        (node) => node.attrs.id
-      );
+      //   const uploadedFilesInContent = fileNodesInContent.filter(
+      //     (node) => node.attrs.id
+      //   );
 
-      const uploadedFiles = uploadedFilesInContent.map((node) => node.attrs.id);
+      //   const uploadedFiles = uploadedFilesInContent.map((node) => node.attrs.id);
 
-
-      const removeFiles = this.files.filter(
-        (file) => !uploadedFiles.includes(file.uri)
-      );
-     // this.ideaForm.removeFileIds = removeFiles.map((file) => file.id) ?? [];
+      //   const removeFiles = this.files.filter(
+      //     (file) => !uploadedFiles.includes(file.uri)
+      //   );
+      //  // this.ideaForm.removeFileIds = removeFiles.map((file) => file.id) ?? [];
     },
     async saveIdeaVersion() {
       this.isLoading = true;
       this.isSaving = true;
       try {
         //Sync files in server with files in content
-       // this.syncFiles();
+        this.syncFiles();
         this.getCommentNodesFromContent();
 
         const ideaSave = await this.saveIdea();

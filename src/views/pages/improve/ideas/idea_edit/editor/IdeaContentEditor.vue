@@ -86,13 +86,10 @@ export default {
 
       const fileHandlers = {
         addFile: async (file) => {
-          console.log("ADDED FILE! ");
           this.$emit("fileAdded", file);
         },
         removeFile: (file) => {
-          console.log(file);
 					this.$emit("fileRemoved", file);
-          console.log("REMOVED FILE");
         },
       };
 

@@ -151,8 +151,6 @@ export const File = fileHandlers => {
           const files = Array.from(input);
           const previewFiles = files.filter(file => /image/i.test(file.type));
 
-          console.log(previewFiles);
-
           if (previewFiles.length > 0) {
             previewFiles.forEach(async item => {
               const preview = true;
