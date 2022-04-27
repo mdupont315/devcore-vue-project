@@ -6,9 +6,15 @@
       @click="item.action"
       :title="item.title"
     >
-      <svg class="remix" width="20" height="20">
+      <svg
+        class="remix"
+        width="20"
+        height="20"
+        v-if="item.iconType === 'remix'"
+      >
         <use :xlink:href="`${remixiconUrl}#ri-${item.icon}`" />
       </svg>
+      <img v-else :src="item.icon" />
     </div>
   </div>
 </template>

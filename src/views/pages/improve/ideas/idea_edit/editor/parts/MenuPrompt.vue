@@ -64,7 +64,7 @@
                 variant="outline-primary"
                 block
                 @click="save"
-                >OK</b-button
+                >{{ $t("Save") }}</b-button
               >
             </b-col>
             <b-col cols="3">
@@ -73,7 +73,7 @@
                 variant="outline-danger"
                 block
                 @click="cancel"
-                >Close Me</b-button
+                >{{ $t("close") }}</b-button
               >
             </b-col>
           </b-row>
@@ -204,6 +204,12 @@ export default {
     &:active,
     :focus {
       outline: none;
+    }
+    & > use {
+      &:active,
+      :focus {
+        outline: none;
+      }
     }
   }
 }

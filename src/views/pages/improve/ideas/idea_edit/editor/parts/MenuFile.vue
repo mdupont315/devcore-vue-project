@@ -1,7 +1,10 @@
 <template>
   <div class="menubar-file-input-field-container">
     <label class="menubar-file-input-field">
-      <svg class="remix" style="transform: translate(0px, 10px)">
+      <svg
+        class="remix menuFile-remix"
+        style="transform: translate(0px, 10px); margin: 5px"
+      >
         <use :xlink:href="`${remixiconUrl}#ri-${item.icon}`" />
       </svg>
       <input type="file" style="visibility: hidden" @change="previewFiles" />
@@ -41,6 +44,7 @@ export default {
   align-items: center;
   justify-content: center;
 }
+
 .menubar-file-input-field {
   width: 50px;
   text-align: center;
@@ -48,11 +52,8 @@ export default {
   width: 100%;
   margin-bottom: 0px;
   height: 100%;
-
-
-
-
 }
+
 .menu-file {
   width: 1.75rem;
   height: 1.75rem;

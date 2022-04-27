@@ -5,7 +5,6 @@ import { Plugin } from "prosemirror-state";
  * @see https://gist.github.com/slava-vishnyakov/16076dff1a77ddaca93c4bccd4ec4521#gistcomment-3744392
  */
 
-
 const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
   const { schema } = view.state;
   console.log("item", item);
@@ -23,6 +22,8 @@ const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
       type: item.type,
       preview
     });
+    console.log(node);
+
     const transaction = view.state.tr.insert(coordinates.pos, node);
     view.dispatch(transaction);
   };
@@ -49,22 +50,33 @@ const uploadFilePlugin = addFile => {
         const coordinates = { pos, inside: 0 };
 
         for (const item of items) {
-          console.log("item", item)
-          console.log(item.kind)
+          console.log("item", item);
+          console.log(item.kind);
           if (item.kind != "file") return;
           if (item.type.indexOf("image") === 0) {
+            console.log("ITEM IS IMAGE ! ");
             event.preventDefault();
             const preview = true;
-            const image = item.getAsFile();
-            console.log(image)
 
-            addFile(item);
-            renderFileInBase64ToCoordinates(image, view, coordinates, preview);
+            const itemAsFile = item.getAsFile();
+
+            addFile(itemAsFile);
+            renderFileInBase64ToCoordinates(
+              itemAsFile,
+              view,
+              coordinates,
+              preview
+            );
           } else {
             const preview = false;
-            const file = item.getAsFile();
-            addFile(item);
-            renderFileInBase64ToCoordinates(file, view, coordinates, preview);
+            const itemAsFile = item.getAsFile();
+            addFile(itemAsFile);
+            renderFileInBase64ToCoordinates(
+              itemAsFile,
+              view,
+              coordinates,
+              preview
+            );
           }
         }
         return false;
@@ -82,8 +94,12 @@ const uploadFilePlugin = addFile => {
 
           const data = Array.from(event.dataTransfer?.files ?? []);
           const previewFiles = data.filter(file => /image/i.test(file.type));
+          const nonPreviewFiles = data.filter(
+            file => !/image/i.test(file.type)
+          );
 
           console.log("data", data);
+          console.log("nonPreviewFiles", nonPreviewFiles);
 
           event.preventDefault();
           const coordinates = view.posAtCoords({
@@ -92,13 +108,17 @@ const uploadFilePlugin = addFile => {
           });
 
           if (previewFiles.length > 0) {
+            console.log(previewFiles);
             previewFiles.forEach(async item => {
               const preview = true;
               addFile(item);
               renderFileInBase64ToCoordinates(item, view, coordinates, preview);
             });
-          } else {
-            data.forEach(async item => {
+          }
+
+          if (nonPreviewFiles.length > 0) {
+            console.log(data);
+            nonPreviewFiles.forEach(async item => {
               const preview = false;
               addFile(item);
               renderFileInBase64ToCoordinates(item, view, coordinates, preview);

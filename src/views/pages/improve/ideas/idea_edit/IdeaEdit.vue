@@ -228,12 +228,17 @@ export default {
     },
     setFileUrls(content, files) {
       const parsedContent = JSON.parse(content);
+      console.log("parsedContent");
 
+      console.log(parsedContent);
       parsedContent.content.forEach((node) => {
         if (node.type === "file") {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
 
+          //TODO: Check pasted images storing as BASE64
+          console.log(fileInIdea);
+          console.log(node.attrs);
           if (fileInIdea) {
             if (node.attrs.preview) {
               node.attrs.src = fileInIdea.url;
@@ -247,6 +252,8 @@ export default {
           }
         }
       });
+
+      //	const parseFailedBASE64Conversions = parsedContent.content
 
       return JSON.stringify(parsedContent);
     },

@@ -44,6 +44,7 @@ import MenuList from "./MenuList.vue";
 import MenuFile from "./MenuFile";
 import MenuPrompt from "./MenuPrompt";
 // import MenuGrid from "./MenuGrid.vue";
+import { CommentIcon } from "@/assets";
 
 export default {
   components: {
@@ -51,6 +52,7 @@ export default {
     "menu-list": MenuList,
     "menu-file-field": MenuFile,
     "menu-prompt": MenuPrompt,
+    CommentIcon,
   },
   methods: {
     toggleDropArea() {
@@ -72,10 +74,12 @@ export default {
           icon: "menu-line",
           title: "Menu",
           type: "list",
+          iconType: "remix",
           listItems: [
             {
               icon: "h-1",
               title: "Chapter",
+              iconType: "remix",
               action: () => {
                 // this.editor.commands.setChapterText();
                 // this.editor.commands.setFontFamily("FuturaBold");
@@ -87,6 +91,7 @@ export default {
             {
               icon: "h-2",
               title: "Title",
+              iconType: "remix",
               action: () => {
                 // this.editor.commands.setTitleText();
                 // this.editor.commands.setFontFamily("FuturaMedium");
@@ -98,6 +103,7 @@ export default {
             {
               icon: "h-3",
               title: "Subtitle",
+              iconType: "remix",
               action: () => {
                 // this.editor.commands.setSubTitleText();
                 // this.editor.commands.setFontFamily("FuturaMedium");
@@ -109,6 +115,7 @@ export default {
             {
               icon: "paragraph",
               title: "Paragraph",
+              iconType: "remix",
               action: () => {
                 // this.editor.commands.setParagraphText();
                 // this.editor.commands.setFontFamily("FuturaLight");
@@ -124,12 +131,14 @@ export default {
 
         {
           icon: "bold",
+          iconType: "remix",
           title: "Bold",
           action: () => this.editor.chain().focus().toggleBold().run(),
           isActive: () => this.editor.isActive("bold"),
         },
         {
           icon: "italic",
+          iconType: "remix",
           title: "Italic",
           action: () => this.editor.chain().focus().toggleItalic().run(),
           isActive: () => this.editor.isActive("italic"),
@@ -139,12 +148,14 @@ export default {
         },
         {
           icon: "image-line",
+          iconType: "remix",
           type: "file",
           title: "Image",
           action: (file) => this.editor.commands.setImage(file),
         },
         {
           icon: "vidicon-line",
+          iconType: "remix",
           title: "video",
           type: "prompt",
           action: (file) =>
@@ -156,12 +167,14 @@ export default {
         },
         {
           icon: "list-unordered",
+          iconType: "remix",
           title: "Bullet List",
           action: () => this.editor.chain().focus().toggleBulletList().run(),
           isActive: () => this.editor.isActive("bulletList"),
         },
         {
           icon: "list-ordered",
+          iconType: "remix",
           title: "Ordered List",
           action: () => this.editor.chain().focus().toggleOrderedList().run(),
           isActive: () => this.editor.isActive("orderedList"),
@@ -171,11 +184,13 @@ export default {
         },
         {
           icon: "separator",
+          iconType: "remix",
           title: "Horizontal Rule",
           action: () => this.editor.chain().focus().setHorizontalRule().run(),
         },
         {
           icon: "grid-line",
+          iconType: "remix",
           title: "table",
           action: () =>
             this.editor
@@ -185,9 +200,11 @@ export default {
               .run(),
           isActive: () => this.editor.isActive("table"),
         },
-				 {
-          icon: "message-2-line",
+        {
+          icon: CommentIcon,
+          iconType: "inline",
           title: "comment",
+          action: () => console.log("HELLO"),
           // action: () =>
           //   this.editor
           //     .chain()
@@ -220,6 +237,6 @@ export default {
   align-items: center;
   margin: 0;
   place-content: center;
-	cursor:pointer;
+  cursor: pointer;
 }
 </style>

@@ -14,7 +14,7 @@
 
       <div v-else style="display: flex">
         <div style="margin-right: 5px">
-          <a :href="getAttrs.src"> {{ getAttrs.title }}</a>
+          <a :href="getAttrs.href"> {{ getAttrs.title }}</a>
         </div>
         <div>
           <span>
@@ -47,6 +47,7 @@ export default {
       return stringFileEntity;
     },
     getAttrs() {
+			console.log(this.fileEntity)
       return this.fileEntity;
     },
   },

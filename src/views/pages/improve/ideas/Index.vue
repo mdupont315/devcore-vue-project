@@ -294,7 +294,7 @@ export default {
       });
     }
     EventBus.$on("process/changeCurrent", async (data) => {
-				await this.closeIdeaEdit()
+      await this.closeIdeaEdit();
       if (data.section === "ideas") {
         if (!this.process.process) return;
         this.$store.dispatch("idea/findByProcess", {
@@ -304,12 +304,17 @@ export default {
       }
     });
     EventBus.$on("idea/currentTab", async (data) => {
+      console.log("data");
+      console.log(data);
       const tabName =
         data && data.form && data.form.tab ? data.form.tab : "New";
-			await this.closeIdeaEdit()
+      await this.closeIdeaEdit();
       const ref = `ideas_innerView_${tabName}`;
       if (this.$refs[ref] && this.$refs[ref].$el) {
-        this.$refs[ref].$el.click();
+        console.log("CLICK! ");
+        this.$nextTick(() => {
+          this.$refs[ref].$el.click();
+        });
       }
     });
 
@@ -462,11 +467,13 @@ export default {
     },
 
     async setComponent(component) {
-			await this.closeIdeaEdit()
+			console.log("SET !!")
+      await this.closeIdeaEdit();
       await this.loadComponent(component);
     },
 
     async loadComponent(component) {
+			console.log("SET COMPONENT!")
       if (!component) {
         this.currentComponent = () =>
           import(

@@ -213,7 +213,7 @@ export default {
       description: null,
       companyToolId: null,
 			removeFileIds: [],
-      file: null,
+      file: [],
       removeFile: false,
       sourceId: null,
       sourceType: null,

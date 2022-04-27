@@ -166,7 +166,6 @@ export const File = fileHandlers => {
           }
         },
         removeFile: file => () => {
-          console.log("REMOVING FILE! ", file);
           fileHandlers.removeFile(file);
         }
       };
