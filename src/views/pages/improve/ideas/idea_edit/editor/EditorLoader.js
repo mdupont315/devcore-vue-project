@@ -1,7 +1,6 @@
 import { Editor } from "@tiptap/vue-2";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
-import CharacterCount from "@tiptap/extension-character-count";
 import Underline from "@tiptap/extension-underline";
 import Gapcursor from "@tiptap/extension-gapcursor";
 import TableRow from "@tiptap/extension-table-row";
@@ -20,7 +19,8 @@ import {
   CustomTable,
   File,
   Comment,
-  ExternalVideo
+  ExternalVideo,
+  TrailingNode
 } from "./extensions";
 
 export default class ContentEditor {
@@ -59,7 +59,8 @@ export default class ContentEditor {
       File(this.fileHandlers),
       CustomTable,
       EventHandler,
-      Comment(this.saveContent)
+      Comment(this.saveContent),
+      TrailingNode
     ];
     this.editor = this.getEditorInstance();
   }

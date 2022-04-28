@@ -43,8 +43,8 @@ import MenuItem from "./MenuItem.vue";
 import MenuList from "./MenuList.vue";
 import MenuFile from "./MenuFile";
 import MenuPrompt from "./MenuPrompt";
-// import MenuGrid from "./MenuGrid.vue";
 import { CommentIcon } from "@/assets";
+import { TextSelection } from "prosemirror-state";
 
 export default {
   components: {
@@ -52,7 +52,6 @@ export default {
     "menu-list": MenuList,
     "menu-file-field": MenuFile,
     "menu-prompt": MenuPrompt,
-    CommentIcon,
   },
   methods: {
     toggleDropArea() {
@@ -204,14 +203,57 @@ export default {
           icon: CommentIcon,
           iconType: "inline",
           title: "comment",
-          action: () => console.log("HELLO"),
-          // action: () =>
-          //   this.editor
-          //     .chain()
-          //     .focus()
-          //     .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-          //     .run(),
-          // isActive: () => this.editor.isActive("table"),
+          action: () => {
+            const editor = this.editor;
+
+            const {
+              state: { doc, tr, selection },
+              view: { dispatch },
+            } = editor;
+
+            const { from: selectionFrom, to: selectionTo } = selection;
+
+            const commentNodes = [];
+
+            doc.descendants((node, pos) => {
+              if (node.type.name !== "comment") return;
+
+              const [nodeFrom, nodeTo] = [pos, pos + node.content.size];
+
+              commentNodes.push({ nodeFrom, nodeTo });
+            });
+
+            let focusNextCommentNode = false;
+            let coordsOfCommentToFocus = null;
+
+            for (const commentNode of commentNodes) {
+              const { nodeFrom, nodeTo } = commentNode;
+
+              if (focusNextCommentNode) {
+                coordsOfCommentToFocus = commentNode;
+                break;
+              }
+
+              const isSelectionInsideCommentNode =
+                nodeFrom <= selectionFrom && selectionTo <= nodeTo + 1;
+
+              focusNextCommentNode = isSelectionInsideCommentNode;
+            }
+
+            if (!coordsOfCommentToFocus && commentNodes.length) {
+              coordsOfCommentToFocus = commentNodes[0];
+            }
+
+            const { nodeFrom } = coordsOfCommentToFocus;
+
+            const $from = doc.resolve(nodeFrom);
+
+            const sel = new TextSelection($from);
+
+            dispatch(tr.setSelection(sel));
+            dispatch(tr.scrollIntoView());
+          },
+          isActive: () => this.editor.isActive("comment"),
         },
       ],
     };

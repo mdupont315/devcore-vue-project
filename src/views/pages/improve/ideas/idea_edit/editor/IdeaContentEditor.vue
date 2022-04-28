@@ -89,7 +89,7 @@ export default {
           this.$emit("fileAdded", file);
         },
         removeFile: (file) => {
-					this.$emit("fileRemoved", file);
+          this.$emit("fileRemoved", file);
         },
       };
 
@@ -117,6 +117,12 @@ export default {
       this.editor = editorInstance.editor;
       this.$emit("initialized");
     },
+    addParagraphAtEnd() {
+      if (!this.editor) throw new Error("`editor` not defined");
+
+      this.editor.commands.focus("end");
+      this.editor.commands.insertContent("<p> </p>");
+    },
   },
 
   mounted() {
@@ -135,9 +141,6 @@ export default {
 
 .editor_header_border {
   border-bottom: 1px solid lightgray;
-}
-.editor__content {
-  cursor: text;
 }
 
 .idea_editor_content {
@@ -167,6 +170,7 @@ export default {
 
   &__content {
     padding: 1.25rem 2rem;
+		cursor: text;
     flex: 1 1 auto;
     overflow-x: hidden;
     overflow-y: auto;

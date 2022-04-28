@@ -14,6 +14,32 @@ const getElementWithAttributes = (name, attrs) => {
   return el;
 };
 
+const focusTable = (editor, getPos) => {
+  const currentTablePos = getPos()
+
+  const { state } = editor
+
+  const { doc, selection } = state
+
+  const { from: selectionFrom, to: selectionTo } = selection
+
+  let positionToFocus = null
+
+  doc.descendants((node, pos) => {
+    if (node.type.name !== 'table' || positionToFocus) return
+
+    const [nodeFrom, nodeTo] = [pos, pos + node.content.size]
+
+    const isCurrentNodeTableToFind = nodeFrom <= currentTablePos && currentTablePos <= nodeTo
+
+    const isSelectionInsideTableToFind = nodeFrom <= selectionFrom && selectionTo <= nodeTo
+
+    if (isCurrentNodeTableToFind && !isSelectionInsideTableToFind) positionToFocus = pos
+  })
+
+  if (positionToFocus) editor.commands.focus(positionToFocus + 1)
+}
+
 const rowControlButtonsData = [
   {
     name: "Remove Row",
@@ -38,15 +64,13 @@ const rowControlButtonsData = [
   }
 ];
 
-const getRowControlButtons = editor => {
-  const container = getElementWithAttributes("div", {
-    class: "row-control-button-container"
-  });
+const getRowControlButtons = (editor) => {
+  const containerClass = "row-control-button-container"
+  const container = getElementWithAttributes("div", { class: containerClass });
 
+  const buttonClass = "table-control-button "
   for (const el of rowControlButtonsData) {
-    const btn = getElementWithAttributes("button", {
-      class: "table-control-button "
-    });
+    const btn = getElementWithAttributes("button", { class: buttonClass });
     btn.innerText = el.text;
 
     btn.addEventListener("click", () => el.action(editor));
@@ -61,23 +85,22 @@ const getRowControlButtons = editor => {
 
 const deleteTableButtonData = {
   name: "Delete Table",
-  action: editor =>
-    editor
-      .chain()
-      .focus()
-      .deleteTable()
-      .run(),
+  action: (editor, getPos) => {
+    focusTable(editor, getPos)
+
+    setTimeout(() => editor.commands.deleteTable())
+  },
   text: "Remove"
 };
 
-const getDeleteTableButton = editor => {
+const getDeleteTableButton = (editor, getPos) => {
   const { name, action, text } = deleteTableButtonData;
 
   const el = getElementWithAttributes("button", {
     class: "delete-table-button"
   });
 
-  el.addEventListener("click", () => action(editor));
+  el.addEventListener("click", () => action(editor, getPos));
   el.innerText = text;
 
   el.setAttribute("data-tooltip", name);
@@ -108,15 +131,13 @@ const colControlButtonsData = [
   }
 ];
 
-const getColControlButtons = editor => {
-  const container = getElementWithAttributes("div", {
-    class: "col-control-button-container"
-  });
+const getColControlButtons = (editor) => {
+  const containerClass = "col-control-button-container"
+  const container = getElementWithAttributes("div", { class: containerClass });
 
+  const buttonClass = "table-control-button "
   for (const el of colControlButtonsData) {
-    const btn = getElementWithAttributes("button", {
-      class: "table-control-button "
-    });
+    const btn = getElementWithAttributes("button", { class: buttonClass });
     btn.innerText = el.text;
 
     btn.addEventListener("click", () => el.action(editor));
@@ -225,7 +246,7 @@ export const CustomTable = Table.extend({
 
   addNodeView() {
     return ({ editor, node: nodeViewNode, getPos }) => {
-      let tempNoders = nodeViewNode;
+      let tempNode = nodeViewNode;
 
       const cellMinWidth = 40;
 
@@ -242,7 +263,7 @@ export const CustomTable = Table.extend({
           class: "table-second-row"
         });
 
-        tableSecondRow.appendChild(getDeleteTableButton(editor));
+        tableSecondRow.appendChild(getDeleteTableButton(editor, getPos));
         tableSecondRow.appendChild(getColControlButtons(editor));
         tableSecondRow.appendChild(getElementWithAttributes("div", {}));
 
@@ -276,16 +297,19 @@ export const CustomTable = Table.extend({
       return {
         dom,
         contentDOM,
-        ignoreMutation: mutation =>
-          mutation.type === "attributes" &&
-          (mutation.target === table || colgroup.contains(mutation.target)),
-        update: node => {
-          if (node.type !== nodeViewNode.type) {
-            return false;
-          }
+        ignoreMutation: mutation => {
+          const isMutationOfTypeAttribute = mutation.type === "attributes"
+          const isMutationTargetTable = mutation.target === table
+          const colgroupContainsTarget = colgroup.contains(mutation.target)
 
-          tempNoders = node;
-          updateColumns(tempNoders, colgroup, table, cellMinWidth);
+          return isMutationOfTypeAttribute && (isMutationTargetTable || colgroupContainsTarget)
+        },
+        update: node => {
+          if (node.type !== nodeViewNode.type) return false
+
+          tempNode = node;
+
+          updateColumns(tempNode, colgroup, table, cellMinWidth);
 
           return true;
         }

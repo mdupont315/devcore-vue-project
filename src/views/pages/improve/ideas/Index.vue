@@ -474,6 +474,7 @@ export default {
 
     async loadComponent(component) {
 			console.log("SET COMPONENT!")
+			console.log(component)
       if (!component) {
         this.currentComponent = () =>
           import(

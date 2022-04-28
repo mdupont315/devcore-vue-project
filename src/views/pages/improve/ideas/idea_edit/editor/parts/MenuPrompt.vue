@@ -26,12 +26,12 @@
                   v-model="form.url"
                   v-validate="'required'"
                   v-autofocus
-                  placeholder="Insert URL"
+                  :placeholder="$t('url')"
                   type="text"
                 ></b-form-input>
               </div>
             </b-col>
-            <b-col class="col-12" ref="insert_iframe-widthHeight">
+            <!-- <b-col class="col-12" ref="insert_iframe-widthHeight">
               <b-row style="margin: auto">
                 <div class="form-label-group required form-group">
                   <b-form-input
@@ -56,7 +56,7 @@
                     type="text"
                   ></b-form-input></div
               ></b-row>
-            </b-col>
+            </b-col> -->
 
             <b-col cols="3">
               <b-button

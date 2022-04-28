@@ -3,7 +3,10 @@
     <node-view-content class="content-dom" />
 
     <section class="content-dom-file">
-      <div v-if="getAttrs.preview" style="display: flex">
+      <div
+        v-if="getAttrs.preview"
+        style="display: flex; flex-direction: column"
+      >
         <div style="margin-right: 5px">
           <img :src="getAttrs.src" :alt="getAttrs.title" />
         </div>
@@ -13,7 +16,7 @@
       </div>
 
       <div v-else style="display: flex">
-        <div style="margin-right: 5px">
+        <div style="margin-right: 5px; margin-bottom: 10px">
           <a :href="getAttrs.href"> {{ getAttrs.title }}</a>
         </div>
         <div>
@@ -47,16 +50,15 @@ export default {
       return stringFileEntity;
     },
     getAttrs() {
-			console.log(this.fileEntity)
+      console.log(this.fileEntity);
       return this.fileEntity;
     },
   },
-	beforeDestroy(){
-		this.editor.commands.removeFile(this.fileEntity)
-	},
+  beforeDestroy() {
+    this.editor.commands.removeFile(this.fileEntity);
+  },
   methods: {
     remove() {
-
       const { editor, getPos, node } = this;
 
       const from = getPos();
@@ -76,18 +78,16 @@ export default {
     border: 1px solid lightgray;
     width: 60px;
     height: 20px;
-    right: -15px;
     position: relative;
     border-radius: 3px;
     background: #fff;
-    transform: translate(-2px, -10px);
+    bottom: 2px;
   }
   .file-remove-icon {
     cursor: pointer;
     width: 20px;
     height: 20px;
     position: absolute;
-    transform: translate(-8px, -8px);
   }
 }
 </style>
