@@ -75,6 +75,7 @@ export default class ContentEditor {
       editorProps: {
         transformPastedText(text) {
           //Remove spaces
+          console.log(text)
           const formatHTML = text.replace(/&nbsp;/g, " ");
 
           //Remove comments
@@ -82,6 +83,8 @@ export default class ContentEditor {
           return _formatHTML;
         },
         transformPastedHTML(html) {
+
+          console.log(html)
           //Remove spaces
           const formatHTML = html.replace(/&nbsp;/g, " ");
 

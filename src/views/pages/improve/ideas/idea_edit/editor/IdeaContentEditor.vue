@@ -122,7 +122,6 @@ export default {
           newParagraphWithContent
         );
 
-
         dispatch(replaceTransaction);
       }
     },
@@ -165,6 +164,12 @@ export default {
 
       this.editor = editorInstance.editor;
       this.$emit("initialized");
+    },
+    addParagraphAtEnd() {
+      if (!this.editor) throw new Error("`editor` not defined");
+
+      this.editor.commands.focus("end");
+      this.editor.commands.insertContent("<p> </p>");
     },
   },
 
@@ -565,7 +570,7 @@ export default {
       display: flex;
       align-items: center;
 
-      .row-control-button-container {
+      .col-control-button-container {
         display: flex;
         flex-direction: column;
         gap: 1em;
@@ -597,7 +602,7 @@ export default {
       border: 1px solid gray;
     }
 
-    .col-control-button-container {
+    .row-control-button-container {
       display: flex;
       flex-direction: row;
       gap: 1em;

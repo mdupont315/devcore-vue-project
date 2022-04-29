@@ -155,6 +155,7 @@ export default {
 
 <style lang="scss">
 .comment-component {
+
   .comment-actions {
     margin-left: 10px;
   }

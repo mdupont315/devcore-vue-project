@@ -22,6 +22,8 @@ export const TrailingNode = Extension.create({
   },
   addProseMirrorPlugins() {
     const plugin = new PluginKey(this.name);
+    console.log("this.editor.schema.nodes")
+    console.log(this.editor.schema.nodes)
 
     const disabledNodes = Object.entries(this.editor.schema.nodes)
       .map(([, value]) => value)

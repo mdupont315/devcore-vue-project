@@ -129,7 +129,6 @@ export default {
         };
       },
       set(value) {
-        console.log(value);
         this.$emit("input", value);
       },
     },

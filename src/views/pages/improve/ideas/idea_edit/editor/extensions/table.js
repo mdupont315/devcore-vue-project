@@ -264,7 +264,7 @@ export const CustomTable = Table.extend({
         });
 
         tableSecondRow.appendChild(getDeleteTableButton(editor, getPos));
-        tableSecondRow.appendChild(getColControlButtons(editor));
+        tableSecondRow.appendChild(getRowControlButtons(editor));
         tableSecondRow.appendChild(getElementWithAttributes("div", {}));
 
         const tableLeftContainer = getElementWithAttributes("section", {
@@ -275,7 +275,7 @@ export const CustomTable = Table.extend({
           class: "tableRightSection"
         });
 
-        tableRightContainer.appendChild(getRowControlButtons(editor));
+        tableRightContainer.appendChild(getColControlButtons(editor));
 
         tableFirstRow.appendChild(tableLeftContainer);
         tableFirstRow.appendChild(tableRightContainer);

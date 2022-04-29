@@ -8,7 +8,7 @@
         style="display: flex; flex-direction: column"
       >
         <div style="margin-right: 5px; margin-bottom:10px;">
-          <img :src="getAttrs.src" :alt="getAttrs.title" />
+          <img :src="getAttrs.src" :alt="getAttrs.title" style="width:100%;height:100%"/>
         </div>
         <button @click="remove" class="file-remove-button">
           {{ $t("Remove") }}
