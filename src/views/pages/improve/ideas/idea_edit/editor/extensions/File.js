@@ -16,7 +16,8 @@ export const File = Node.create({
     return {
       inline: false,
       HTMLAttributes: {},
-      fileHandlers: () => {}
+      addFile: () => {},
+      removeFile: () => {}
     };
   },
 
@@ -140,9 +141,11 @@ export const File = Node.create({
   },
 
   addCommands() {
-    const { fileHandlers } = this.options;
+    console.log(this.options);
+    const { addFile } = this.options;
     return {
       setImage: attrs => ({ view, tr }) => {
+        console.log("SETTING IMAGE ");
         let pos = 1;
         if (tr && tr.curSelection && tr.curSelection.$head) {
           pos = tr.curSelection.$head.pos;
@@ -155,19 +158,20 @@ export const File = Node.create({
         if (previewFiles.length > 0) {
           previewFiles.forEach(async item => {
             const preview = true;
-            fileHandlers.addFile(item);
+            addFile(item);
             renderFileInBase64ToCoordinates(item, view, coordinates, preview);
           });
         } else {
           files.forEach(async item => {
             const preview = false;
-            fileHandlers.addFile(item);
+            addFile(item);
             renderFileInBase64ToCoordinates(item, view, coordinates, preview);
           });
         }
       },
       removeFile: file => () => {
-        fileHandlers.removeFile?.(file);
+        const { removeFile } = this.options;
+        removeFile?.(file);
       }
     };
   },
@@ -185,7 +189,7 @@ export const File = Node.create({
     ];
   },
   addProseMirrorPlugins() {
-    const { fileHandlers } = this.options;
-    return [uploadFilePlugin(fileHandlers.addFile)];
+    const { addFile } = this.options;
+    return [uploadFilePlugin(addFile)];
   }
 });

@@ -28,6 +28,7 @@ export default class ContentEditor {
     this.editable = editable;
     this.content = value;
     this.options = options;
+    this.fileHandlers = fileHandlers;
     this.extensions = [
       StarterKit.configure({
         history: false
@@ -57,8 +58,11 @@ export default class ContentEditor {
       CustomTable,
       EventHandler,
       TrailingNode,
-      File.configure({ fileHandlers }),
-      Comment.configure({ saveContent }),
+      File.configure({
+        addFile: fileHandlers.addFile,
+        removeFile: fileHandlers.removeFile
+      }),
+      Comment.configure({ saveContent })
     ];
     this.editor = this.getEditorInstance();
   }
@@ -93,7 +97,6 @@ export default class ContentEditor {
 
           this.options.onUpdate(json);
         });
-
       },
       onFocus: ({ editor }) => {
         const json = editor.getJSON();

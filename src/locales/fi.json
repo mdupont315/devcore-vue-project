@@ -511,6 +511,7 @@
   "You must add stages to the current process to create ideas.": "Sinun pitää lisätä vaiheita tiedonohjaukseen, luodaksesi ohjeita",
   "Tool ideas required for selected tool.": "Työkalua ei valittuna",
   "You must select tool for tool ideas.": "Sinun pitää valita työkalu, luodaksesi työkalu ohjeita.",
+  "restrictIdeaCreationWithoutStage": "Sinun pitää valita vaihe nykyiseen tiedonohjaukseen voidaksesi luoda ideoita",
   "Search tools": "Hae työkalua",
   "Search areas": "Haku alueet",
   "Edit Area": "Muokkaa aluetta",

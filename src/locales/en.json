@@ -437,6 +437,7 @@
   "There are no stages on the current process.": "There are no stages on the current Information management.",
   "Tool ideas required for selected tool.": "There is no associated tool for the instructions.",
   "You must select tool for tool ideas.": "You must select tool to create tool instruction for.",
+  "restrictIdeaCreationWithoutStage": "You must select stage to the current information management to create new ideas",
   "Search tools": "Search tools",
   "Search areas": "Search areas",
   "Edit Area": "Edit Area",

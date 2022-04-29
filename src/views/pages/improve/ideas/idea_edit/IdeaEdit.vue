@@ -1,6 +1,6 @@
 <template>
   <div class="idea_edit-wrapper">
-    <div class="idea_edit_container" v-if="getIdea">
+    <div class="idea_edit_container">
       <idea-edit-content
         :user="user"
         :idea="getIdea"
@@ -33,6 +33,7 @@ import IdeaEditContent from "./layout/IdeaEditContent.vue";
 import IdeaEditPath from "./layout/IdeaEditPath.vue";
 import GQLForm from "@/lib/gqlform";
 import { mapGetters } from "vuex";
+import { Idea } from "@/models";
 
 export default {
   components: {
@@ -40,27 +41,17 @@ export default {
     "idea-edit-path": IdeaEditPath,
   },
   async created() {
-    // await this.$store.dispatch("ideaContent/findAll", { force: true });
     this.isLoading = true;
-    this.filter = {
-      data: {
-        where: {
-          field: "idea_id",
-          op: "eq",
-          value: this.getIdea.id,
-        },
-      },
-    };
-    await this.$store.dispatch("companyTool/findAll");
-    await this.$store.dispatch("companyRole/findAll");
-    await this.$store.dispatch("ideaContent/findAll", {
-      filter: this.filter,
-      force: true,
-    });
-    this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
-      (content) => content.name === this.defaultContentName
-    );
-    await this.initializeForms();
+    if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
+      await this.initializeData();
+      await this.initializeForms();
+    }
+
+    if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "CREATE") {
+      this.newIdea = new Idea();
+      this.isLoaded = true;
+    }
+
     this.isLoading = false;
   },
   data: () => ({
@@ -126,7 +117,7 @@ export default {
         }),
       },
     ],
-
+    newIdea: null,
     isLoading: false,
     files: [],
   }),
@@ -145,13 +136,23 @@ export default {
       ideaContents: "ideaContent/all",
       ideaInEdit: "idea/ideaInEdit",
       ideas: "idea/all",
+      currentProcess: "process/current",
     }),
+    processPath: {
+      get() {
+        return this.currentProcess("ideas");
+      },
+    },
     getIdea: {
       get() {
         const idea = this.ideas.find(
           (idea) => idea.id === this.ideaInEdit?.editIdeaId
         );
-        return idea ?? null;
+        if (idea) {
+          return idea;
+        } else {
+          return this.newIdea;
+        }
       },
     },
     getIdeaPath: {
@@ -159,7 +160,7 @@ export default {
         return this.ideaForm;
       },
       set(value) {
-				//TODO: SAVE ONLY CONTENT IF FILES OR PATH NOT CHANGED
+        //TODO: SAVE ONLY CONTENT IF FILES OR PATH NOT CHANGED
         this.ideaPathChanged = true;
       },
     },
@@ -212,9 +213,31 @@ export default {
           mapTo[key] = mapFrom[key];
         });
     },
+    async initializeData() {
+      this.filter = {
+        data: {
+          where: {
+            field: "idea_id",
+            op: "eq",
+            value: this.getIdea.id,
+          },
+        },
+      };
+      await this.$store.dispatch("companyTool/findAll");
+      await this.$store.dispatch("companyRole/findAll");
+      await this.$store.dispatch("ideaContent/findAll", {
+        filter: this.filter,
+        force: true,
+      });
+      this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
+        (content) => content.name === this.defaultContentName
+      );
+    },
     async initializeForms() {
-      this.ideaFormFieldMapper();
-      this.ideaContentFormFieldMapper();
+      if (this.ideaInEdit.editIdeaMode === "EDIT") {
+        this.ideaFormFieldMapper();
+        this.ideaContentFormFieldMapper();
+      }
     },
     ideaFormFieldMapper() {
       const mapToIdea = this.ideaForm;
@@ -236,16 +259,11 @@ export default {
     },
     setFileUrls(content, files) {
       const parsedContent = JSON.parse(content);
-      console.log("parsedContent");
-
-      console.log(parsedContent);
       parsedContent.content.forEach((node) => {
         if (node.type === "file") {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
 
-          console.log(fileInIdea);
-          console.log(node.attrs);
           if (fileInIdea) {
             if (node.attrs.preview) {
               node.attrs.src = fileInIdea.url;
@@ -260,16 +278,20 @@ export default {
         }
       });
 
-      //	const parseFailedBASE64Conversions = parsedContent.content
-
       return JSON.stringify(parsedContent);
     },
 
     async saveIdea() {
       console.log(this.files);
       this.ideaForm.fields.file = this.files.filter((x) => x.size && !x.uri);
+      let ideaSave = null;
+      this.ideaForm.processId = this.processPath.process.id;
+      if (this.ideaForm.id) {
+        ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
+      } else {
+        ideaSave = await this.$store.dispatch(`idea/create`, this.ideaForm);
+      }
 
-      const ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
       this.files = [];
       this.ideaForm._fields.removeFileIds = [];
 
@@ -358,7 +380,29 @@ export default {
       } finally {
         this.isSaving = false;
         this.isLoading = false;
+        if (this.ideaInEdit.editIdeaMode === "CREATE") {
+          await this.navigateToPath();
+          await this.closeIdeaEdit();
+        }
       }
+    },
+    async navigateToPath() {
+      const { stageId, operationId, phaseId } = this.ideaForm;
+
+      const _process = this.processPath.process;
+      const _stage = _process.stages?.filter((x) => x.id === stageId)[0];
+      const _operation = _stage?.operations?.filter(
+        (x) => x.id === operationId
+      )[0];
+      const _phase = _operation?.phases?.filter((x) => x.id === phaseId)[0];
+
+      await this.$store.dispatch("process/setCurrentProcess", {
+        section: "ideas",
+        process: _process,
+        stage: _stage,
+        operation: _operation,
+        phase: _phase,
+      });
     },
     async updateIdeaVersionStatus() {
       const editForm = new GQLForm({

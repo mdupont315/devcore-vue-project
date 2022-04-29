@@ -168,6 +168,7 @@ export default {
 
   .comment-details {
     border-radius: 8px;
+    padding: 8px;
 
     .idea_comment_IMPROVEMENT {
       background: #d0e4f3;

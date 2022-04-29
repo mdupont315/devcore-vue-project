@@ -2,7 +2,7 @@
   <div class="idea_edit_content_container">
     <div class="idea_edit_content_container_content-header">
       <div class="idea_edit_content_container_content-header-title">
-        {{ idea.title }}
+        {{ idea.title ? idea.title : $t("action.create", { name: $t("idea") }) }}
       </div>
       <div class="idea_edit_content_container_content-header-button">
         <b-button

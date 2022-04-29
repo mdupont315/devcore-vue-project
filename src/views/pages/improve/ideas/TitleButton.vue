@@ -2,42 +2,27 @@
   <div
     v-if="$can('improve/idea/create') && process && process.stages.length > 0"
     class="ml-3"
+    style="display: flex; align-items: center"
   >
+    <b-tooltip target="btnNew" triggers="hover" :key="tooltipIntent" >
+      {{ $t("Create New") + " " + $t("Idea") }}
+    </b-tooltip>
     <b-button
       id="btnNew"
-      v-b-tooltip.hover
       size="sm"
       class="text-uppercase"
       variant="primary"
       :title="$t('Create New') + ' ' + $t('Idea')"
-      @click="togglePopOver"
+      :disabled="!!ideaInEdit"
+      @click="createNewIdea($event)"
     >
       <i class="mdi mdi-plus"></i>
       {{ $t("New") }}
     </b-button>
-    <b-popover
-      ref="popover"
-      target="btnNew"
-      :show.sync="showPopOver"
-      placement="bottom"
-      class="form-popover"
-    >
-      <b-card no-body style="width: 550px">
-        <b-card-body>
-          <idea-form
-            type="PROCESS"
-            :item="item"
-						section="ideas"
-            @done="togglePopOver"
-          ></idea-form>
-        </b-card-body>
-      </b-card>
-    </b-popover>
   </div>
 </template>
 <script>
 import { /* mapState, */ mapGetters } from "vuex";
-import Form from "./Form";
 import { Idea } from "@/models";
 
 export default {
@@ -46,24 +31,40 @@ export default {
       option: false,
       showPopOver: false,
       item: {},
+			tooltipIntent: Math.random()
     };
   },
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
+      ideaInEdit: "idea/ideaInEdit",
     }),
+
     process: {
       get() {
+        console.log(this.currentProcess("ideas"));
         return this.currentProcess("ideas")
           ? this.currentProcess("ideas").process
           : null;
       },
     },
   },
-  components: {
-    "idea-form": Form,
-  },
   methods: {
+    async createNewIdea(event) {
+			event.preventDefault();
+			this.tooltipIntent = Math.random();
+      await this.$store.dispatch(`idea/setIdeaTab`, {
+        tab: "New",
+      });
+
+      await this.$store.dispatch("idea/setIdeaInEdit", {
+        editIdeaMeta: {
+          editStartedAt: new Date().getTime(),
+        },
+        editIdeaMode: "CREATE",
+        editIdeaId: "NEW",
+      });
+    },
     togglePopOver() {
       this.item = new Idea();
       this.showPopOver = !this.showPopOver;

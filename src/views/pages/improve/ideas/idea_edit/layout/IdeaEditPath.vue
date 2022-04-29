@@ -113,6 +113,7 @@
                     :reduce="(phase) => phase.id"
                     class="text-capitalize"
                     :options="phases"
+                    @input="changePhase"
                     :class="{
                       'is-invalid':
                         $validateState('phase', mutateForm) === false,
@@ -131,7 +132,7 @@
                     {{ $t("roles") }}
                   </div>
                   <role-selector
-                    v-if="mutateForm.companyRoleIds"
+                    v-if="roleIntent"
                     name="idea_roles"
                     id="idea_roles"
                     autocomplete="idea_roles"
@@ -141,8 +142,9 @@
                     :show-field="true"
                     style="z-index: 1; position: relative"
                     :state="$validateState('companyRoleIds', mutateForm)"
-                    :items="getSelectableRoles"
+                    :items="selectablePathRoles"
                     :show-add-btn="false"
+                    :key="roleIntent"
                   ></role-selector>
                 </div>
                 <!-- <div class="form-label-group select">
@@ -209,7 +211,7 @@
                     no-resize
                     :disabled="mutateForm.busy"
                     :placeholder="$t('Idea description')"
-                    style="min-height: 250px; max-height: 250px"
+                    style="min-height: 150px; max-height: 250px"
                     name="description"
                     :state="$validateState('description', mutateForm)"
                   ></b-form-textarea>
@@ -326,15 +328,23 @@ export default {
       allRoles: "companyRole/all",
     }),
 
+    processPath: {
+      get() {
+        return this.currentProcess("ideas");
+      },
+    },
+
     getParentRoles: {
       get() {
         const parentRoles =
-          this.idea.parent?.companyRoles.map((role) => role.id) ?? [];
+          this.idea.parent?.companyRoles.map((role) => role.id) ??
+          this.selectablePathRoles;
         return parentRoles;
       },
     },
     getSelectableRoles: {
       get() {
+        console.log(this.getParentRoles);
         return this.allRoles.filter((role) =>
           this.getParentRoles.includes(role.id)
         );
@@ -388,10 +398,26 @@ export default {
 
   data: () => ({
     section: "ideas",
-    selectableIdeaRoles: [],
-		hasChanges: false
+    hasChanges: false,
+    selectablePathRoles: [],
+    roleIntent: null,
   }),
+  mounted() {
+    this.selectablePathRoles = this.getSelectableRoles;
+    this.roleIntent = Math.random();
+  },
   methods: {
+    getSelectableProcessPathRoles() {
+      if (this.processPath.phase) {
+        return this.processPath.phase.companyRoles.map((x) => x.id);
+      } else if (this.processPath.operation) {
+        return this.processPath.operation.companyRoles.map((x) => x.id);
+      } else if (this.processPath.stage) {
+        return this.processPath.stage.companyRoles.map((x) => x.id);
+      } else {
+        return this.allRoles.map((x) => x.id);
+      }
+    },
     async save() {
       console.log(this.value.changes);
       await this.$validator.validateAll();
@@ -406,12 +432,58 @@ export default {
     async deleteItem() {
       this.$emit("deleteIdea");
     },
+    setSelectableRoles(path) {
+      if (!path || !path.stageId) return;
+
+      const stage = this.process.process.stages.find(
+        (x) => x.id === path.stageId
+      );
+      if (path.stageId) {
+        this.selectablePathRoles = stage.companyRoles;
+      }
+      if (path.operationId) {
+        const operation = stage.operations.find(
+          (x) => x.id === path.operationId
+        );
+        console.log(operation.companyRoles);
+        this.selectablePathRoles = operation.companyRoles;
+      }
+
+      if (path.phaseId) {
+        const operation = stage.operations.find(
+          (x) => x.id === path.operationId
+        );
+        const phase = operation.phases.find((x) => x.id === path.phaseId);
+        this.selectablePathRoles = phase.companyRoles;
+      }
+
+      console.log(this.selectablePathRoles);
+      this.roleIntent = Math.random();
+    },
     changeStage() {
       this.mutateForm.operationId = null;
       this.mutateForm.phaseId = null;
+      if (this.value.stageId) {
+        this.setSelectableRoles({ stageId: this.value.stageId });
+      }
     },
     changeOperation() {
       this.mutateForm.phaseId = null;
+      if (this.value.operationId) {
+        this.setSelectableRoles({
+          operationId: this.value.operationId,
+          stageId: this.value.stageId,
+        });
+      }
+    },
+    changePhase() {
+      if (this.value.phaseId) {
+        this.setSelectableRoles({
+          phaseId: this.value.phaseId,
+          operationId: this.value.operationId,
+          stageId: this.value.stageId,
+        });
+      }
     },
     closeIdeaEdit() {
       this.$emit("close");

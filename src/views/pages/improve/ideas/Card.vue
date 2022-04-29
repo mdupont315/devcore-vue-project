@@ -236,6 +236,7 @@ export default {
         editIdeaMeta: {
           editStartedAt: new Date().getTime(),
         },
+				editIdeaMode: "EDIT",
         editIdeaId: idea.id,
       });
       this.$emit("openIdea", idea);

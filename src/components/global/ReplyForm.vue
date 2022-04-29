@@ -196,6 +196,7 @@ export default {
   border: none;
   width: 100%;
   height: 100%;
+	margin-right: 10px;
 }
 .feedback-form-footer-body {
   display: flex;

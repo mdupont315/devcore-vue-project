@@ -49,6 +49,9 @@ const uploadFilePlugin = addFile => {
         }
         const coordinates = { pos, inside: 0 };
 
+        console.log("ADD FILE ", addFile)
+
+        console.log(this);
         for (const item of items) {
           console.log("item", item);
           console.log(item.kind);
@@ -92,6 +95,7 @@ const uploadFilePlugin = addFile => {
 
           console.log(event.dataTransfer);
 
+          console.log("ADD FILE ", addFile)
           const data = Array.from(event.dataTransfer?.files ?? []);
           const previewFiles = data.filter(file => /image/i.test(file.type));
           const nonPreviewFiles = data.filter(

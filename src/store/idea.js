@@ -61,6 +61,7 @@ const actions = {
       mutation: IDEA.create
     });
     const role = new Idea().deserialize(result.data.ideaCreate);
+    await context.dispatch('findAll', { force: true });
     return role;
   },
 
@@ -75,7 +76,7 @@ const actions = {
     });
     const idea = new Idea().deserialize(result.data.ideaUpdate);
     context.commit("SET_ITEM", idea);
-    // await context.dispatch('findAll', { force: true });
+    await context.dispatch('findAll', { force: true });
     return idea;
   },
 

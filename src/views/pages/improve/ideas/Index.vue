@@ -101,11 +101,11 @@
     >
       <component
         :is="currentComponent"
-        v-if="currentProcess && currentComponent && !ideaInEdit"
+        v-if="currentProcess && currentComponent && !getIsIdeaInEdit"
       ></component>
 
       <idea-edit
-        v-else-if="currentProcess && currentComponent && ideaInEdit"
+        v-else-if="currentProcess && currentComponent && getIsIdeaInEdit"
       ></idea-edit>
 
       <empty-page v-else>
@@ -272,11 +272,24 @@ export default {
     },
     getIsIdeaInEdit: {
       get() {
-        return this.ideaInEdit;
+        if (this.ideaInEdit) {
+					console.log(this.ideaInEdit);
+          const isEditingOrCreating = this.ideaInEdit.editIdeaMode;
+          if (isEditingOrCreating === "EDIT") {
+            return this.ideaInEdit;
+          }
+
+          if (isEditingOrCreating === "CREATE") {
+            return true;
+          }
+        }
+        return false;
       },
     },
   },
   async mounted() {
+
+
     if (this.user.can("core/company/manage")) {
       await this.$router.replace("/manage/companies");
     }
@@ -311,7 +324,6 @@ export default {
       await this.closeIdeaEdit();
       const ref = `ideas_innerView_${tabName}`;
       if (this.$refs[ref] && this.$refs[ref].$el) {
-        console.log("CLICK! ");
         this.$nextTick(() => {
           this.$refs[ref].$el.click();
         });
@@ -326,37 +338,39 @@ export default {
     //   }
     // });
 
-    if (
-      this.$router.currentRoute.query &&
-      Object.keys(this.$router.currentRoute.query).length > 0
-    ) {
-      await this.goToIdeaByQuery();
-    }
+    // if (
+    //   this.$router.currentRoute.query &&
+    //   Object.keys(this.$router.currentRoute.query).length > 0
+    // ) {
+    //   await this.goToIdeaByQuery();
+    // }
   },
   methods: {
-    async goToIdeaByQuery() {
-      // Navigated through link
-      if (this.$router.currentRoute.query) {
-        const query = {
-          processId: this.$router.currentRoute.query.processId ?? null,
-          stageId: this.$router.currentRoute.query.stageId ?? null,
-          operationId: this.$router.currentRoute.query.operationId ?? null,
-          phaseId: this.$router.currentRoute.query.phaseId ?? null,
-          ideaId: this.$router.currentRoute.query.ideaId ?? null,
-        };
-        await this.navigateToIdea(query);
-        const editIdea = await this.$store.dispatch("idea/findById", {
-          id: query.ideaId,
-          force: true,
-        });
-        await this.$store.dispatch("idea/setIdeaInEdit", {
-          editIdeaMeta: {
-            editStartedAt: new Date().getTime(),
-          },
-          editIdea,
-        });
-      }
-    },
+    // async goToIdeaByQuery() {
+    //   // Navigated through link
+    //   if (this.$router.currentRoute.query) {
+    //     const query = {
+    //       processId: this.$router.currentRoute.query.processId ?? null,
+    //       stageId: this.$router.currentRoute.query.stageId ?? null,
+    //       operationId: this.$router.currentRoute.query.operationId ?? null,
+    //       phaseId: this.$router.currentRoute.query.phaseId ?? null,
+    //       ideaId: this.$router.currentRoute.query.ideaId ?? null,
+    //     };
+    //     await this.navigateToIdea(query);
+    //     const editIdea = await this.$store.dispatch("idea/findById", {
+    //       id: query.ideaId,
+    //       force: true,
+    //     });
+    //     await this.$store.dispatch("idea/setIdeaInEdit", {
+    //       editIdeaMeta: {
+    //         editStartedAt: new Date().getTime(),
+    //       },
+    //       editIdea,
+		// 					editIdeaMode: "EDIT",
+    //     editIdeaId: idea.id,
+    //     });
+    //   }
+    // },
     async navigateToIdea({
       processId = null,
       stageId = null,
@@ -461,20 +475,20 @@ export default {
     },
 
     async closeIdeaEdit() {
-      if (this.ideaInEdit) {
+      if (this.getIsIdeaInEdit) {
         await this.$store.dispatch("idea/setIdeaInEdit", null);
       }
     },
 
     async setComponent(component) {
-			console.log("SET !!")
+      console.log("SET !!");
       await this.closeIdeaEdit();
       await this.loadComponent(component);
     },
 
     async loadComponent(component) {
-			console.log("SET COMPONENT!")
-			console.log(component)
+      console.log("SET COMPONENT!");
+      console.log(component);
       if (!component) {
         this.currentComponent = () =>
           import(
