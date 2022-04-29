@@ -47,15 +47,15 @@ export default function getItems(user) {
       icon: "mdi-account-convert",
       header: true,
       children: [
-        {
-          title: i18n.t("People"),
-          name: "support-people",
-          icon: "mdi-settings",
-          url: {
-            name: "support-people"
-          },
-          permissions: "process/process/manage"
-        },
+        // {
+        //   title: i18n.t("People"),
+        //   name: "support-people",
+        //   icon: "mdi-settings",
+        //   url: {
+        //     name: "support-people"
+        //   },
+        //   permissions: "process/process/manage"
+        // },
         {
           title: i18n.t("Issues"),
           name: "support-issues",

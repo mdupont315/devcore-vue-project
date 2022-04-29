@@ -28,7 +28,7 @@ const focusTable = (editor, getPos) => {
   doc.descendants((node, pos) => {
     if (node.type.name !== 'table' || positionToFocus) return
 
-    const [nodeFrom, nodeTo] = [pos, pos + node.content.size]
+    const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize]
 
     const isCurrentNodeTableToFind = nodeFrom <= currentTablePos && currentTablePos <= nodeTo
 

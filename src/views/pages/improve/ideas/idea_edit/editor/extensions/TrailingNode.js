@@ -35,7 +35,7 @@ export const TrailingNode = Extension.create({
 
           const shouldInsertNodeAtEnd = plugin.getState(state);
 
-          const endPosition = doc.content.size;
+          const endPosition = doc.nodeSize;
 
           const type = schema.nodes[this.options.node];
 

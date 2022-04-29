@@ -7,7 +7,7 @@
         v-if="getAttrs.preview"
         style="display: flex; flex-direction: column"
       >
-        <div style="margin-right: 5px">
+        <div style="margin-right: 5px; margin-bottom:10px;">
           <img :src="getAttrs.src" :alt="getAttrs.title" />
         </div>
         <button @click="remove" class="file-remove-button">

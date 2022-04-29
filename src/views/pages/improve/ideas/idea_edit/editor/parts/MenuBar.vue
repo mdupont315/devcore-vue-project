@@ -218,7 +218,7 @@ export default {
             doc.descendants((node, pos) => {
               if (node.type.name !== "comment") return;
 
-              const [nodeFrom, nodeTo] = [pos, pos + node.content.size];
+              const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
 
               commentNodes.push({ nodeFrom, nodeTo });
             });
@@ -244,14 +244,18 @@ export default {
               coordsOfCommentToFocus = commentNodes[0];
             }
 
-            const { nodeFrom } = coordsOfCommentToFocus;
+            const { nodeFrom, nodeTo } = coordsOfCommentToFocus;
 
-            const $from = doc.resolve(nodeFrom);
+            const [$from, $to] = [doc.resolve(nodeFrom + 1), doc.resolve(nodeTo)]
+						const sel = new TextSelection($from, $to)
+            dispatch(tr.setSelection(sel).scrollIntoView())
 
-            const sel = new TextSelection($from);
+            setTimeout(() => {
+              const selCommentStart = new TextSelection($from)
 
-            dispatch(tr.setSelection(sel));
-            dispatch(tr.scrollIntoView());
+              dispatch(tr.setSelection(selCommentStart))
+            }, 300)
+
           },
           isActive: () => this.editor.isActive("comment"),
         },
