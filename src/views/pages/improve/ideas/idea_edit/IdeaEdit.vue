@@ -67,6 +67,8 @@ export default {
     filter: null,
     isSaving: false,
     isLoaded: false,
+    ideaPathChanged: false,
+    filesChanged: false,
     defaultContentName: "Custom",
     selectedCategoryIndex: 2,
     ideaForm: new GQLForm({
@@ -156,6 +158,10 @@ export default {
       get() {
         return this.ideaForm;
       },
+      set(value) {
+				//TODO: SAVE ONLY CONTENT IF FILES OR PATH NOT CHANGED
+        this.ideaPathChanged = true;
+      },
     },
     getIdeaContent: {
       get() {
@@ -180,12 +186,14 @@ export default {
   methods: {
     removeFile(file) {
       if (file.src && file.id) {
+        this.filesChanged = true;
         this.ideaForm._fields.removeFileIds.push(file.id);
       }
     },
     async setFile(file) {
       const items = [...this.files, file];
       this.files = items;
+      this.filesChanged = true;
     },
     setContentType(item) {
       this.isLoading = true;
@@ -236,7 +244,6 @@ export default {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
 
-          //TODO: Check pasted images storing as BASE64
           console.log(fileInIdea);
           console.log(node.attrs);
           if (fileInIdea) {

@@ -24,6 +24,7 @@
 import { mapGetters } from "vuex";
 import { EditorContent, BubbleMenu } from "@tiptap/vue-2";
 import { MenuBar } from "./parts";
+import { TextSelection } from "prosemirror-state";
 import ContentEditor from "./EditorLoader.js";
 
 /* eslint-disable */
@@ -80,6 +81,52 @@ export default {
     focusEditor() {
       this.editor?.commands.focus();
     },
+    transformProcessedCommentNodesToParagraph() {
+      const comments = [];
+
+      const {
+        state: { doc, tr, schema },
+        view: { dispatch },
+      } = this.editor;
+
+      doc.descendants((node, pos) => {
+        if (node.type.name !== "comment") return;
+
+        comments.push({
+          from: pos,
+          to: pos + node.nodeSize,
+          comment: JSON.parse(node.attrs.comment),
+          shouldDelete: false,
+        });
+      });
+
+      for (const comment of comments) {
+        const { from, to, comment: commentData } = comment;
+
+        const shouldRemoveComment = !commentData.comments.length;
+
+        if (!shouldRemoveComment) continue;
+
+        const textContent = doc.textBetween(from, to);
+
+        const paragraphContent = schema.text(textContent || " ");
+
+        const newParagraphWithContent = schema.nodes.paragraph.create(
+          {},
+          paragraphContent
+        );
+
+        const replaceTransaction = tr.replaceRangeWith(
+          from,
+          to,
+          newParagraphWithContent
+        );
+
+
+        dispatch(replaceTransaction);
+      }
+    },
+
     initEditor() {
       if (this.editor) this.editor.destroy();
       if (this.provider) this.editor.destroy();
@@ -94,10 +141,12 @@ export default {
       };
 
       const saveContent = async (content) => {
-        console.log("SAVING CONTENT!");
-        this.$nextTick(() => {
+        console.log("transforming");
+        this.transformProcessedCommentNodesToParagraph();
+
+        setTimeout(() => {
           this.$emit("saveContent");
-        });
+        }, 200);
       };
 
       const editorInstance = new ContentEditor(
@@ -116,12 +165,6 @@ export default {
 
       this.editor = editorInstance.editor;
       this.$emit("initialized");
-    },
-    addParagraphAtEnd() {
-      if (!this.editor) throw new Error("`editor` not defined");
-
-      this.editor.commands.focus("end");
-      this.editor.commands.insertContent("<p> </p>");
     },
   },
 
@@ -170,7 +213,7 @@ export default {
 
   &__content {
     padding: 1.25rem 2rem;
-		cursor: text;
+    cursor: text;
     flex: 1 1 auto;
     overflow-x: hidden;
     overflow-y: auto;

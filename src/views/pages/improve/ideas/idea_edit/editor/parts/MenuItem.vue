@@ -2,11 +2,15 @@
   <div class="menubar-item-field-container">
     <div
       class="menu-item"
-      :class="{ 'is-active': item.isActive ? item.isActive() : null }"
+      :class="[
+        { 'is-active': item.isActive ? item.isActive() : null },
+        `menu-item-${item.title}`,
+      ]"
       @click="item.action"
       :title="item.title"
     >
       <svg
+        :class="item.title ? item.title : ''"
         class="remix"
         width="20"
         height="20"
@@ -69,11 +73,18 @@ export default {
     height: 100%;
     fill: currentColor;
   }
-
   &.is-active,
   &:hover {
     color: #fff;
     background-color: #0d0d0d;
+    &.menu-item-comment {
+      color: #fff;
+      background-color: #fff;
+    }
+    &.menu-item-table {
+      color: #fff;
+      background-color: #fff;
+    }
   }
 }
 </style>

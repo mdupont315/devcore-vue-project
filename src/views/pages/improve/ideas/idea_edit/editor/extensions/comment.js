@@ -7,7 +7,7 @@ import {
 import { Plugin, TextSelection } from "prosemirror-state";
 import CommentNodeView from "./CommentNodeView.vue";
 
-export const Comment = saveContent => Node.create({
+export const Comment = Node.create({
   name: "comment",
 
   group: "block",
@@ -17,7 +17,8 @@ export const Comment = saveContent => Node.create({
   addOptions() {
     return {
       HTMLAttributes: {},
-      isCommentModeOn: () => false
+      isCommentModeOn: () => false,
+      saveContent: () => {}
     };
   },
 
@@ -44,11 +45,12 @@ export const Comment = saveContent => Node.create({
   },
 
   addCommands() {
+    const { saveContent } = this.options;
     return {
-      setComment: comment => ({ commands }) => {
-        return commands.setNode(this.name, { comment });
-      },
-      saveReply: comment => ({ commands }) => saveContent()
+      setComment: comment => ({ commands }) =>
+        commands.setNode(this.name, { comment }),
+
+      saveReply: () => () => saveContent()
     };
   },
 

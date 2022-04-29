@@ -28,8 +28,6 @@ export default class ContentEditor {
     this.editable = editable;
     this.content = value;
     this.options = options;
-    this.fileHandlers = fileHandlers;
-    this.saveContent = saveContent;
     this.extensions = [
       StarterKit.configure({
         history: false
@@ -56,11 +54,11 @@ export default class ContentEditor {
       TableCell,
       Gapcursor,
       Heading,
-      File(this.fileHandlers),
       CustomTable,
       EventHandler,
-      Comment(this.saveContent),
-      TrailingNode
+      TrailingNode,
+      File.configure({ fileHandlers }),
+      Comment.configure({ saveContent }),
     ];
     this.editor = this.getEditorInstance();
   }
@@ -90,8 +88,12 @@ export default class ContentEditor {
         }
       },
       onUpdate: ({ editor }) => {
-        const json = editor.getJSON();
-        this.options.onUpdate(json);
+        setTimeout(() => {
+          const json = editor.getJSON();
+
+          this.options.onUpdate(json);
+        });
+
       },
       onFocus: ({ editor }) => {
         const json = editor.getJSON();

@@ -209,7 +209,7 @@
                     no-resize
                     :disabled="mutateForm.busy"
                     :placeholder="$t('Idea description')"
-                    style="min-height: 50px; max-height: 180px"
+                    style="min-height: 250px; max-height: 250px"
                     name="description"
                     :state="$validateState('description', mutateForm)"
                   ></b-form-textarea>
