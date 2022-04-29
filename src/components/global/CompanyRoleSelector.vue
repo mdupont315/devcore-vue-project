@@ -2,22 +2,24 @@
   <super-select
     :items="roles"
     class="image-selector"
-    @input="change"
     selector-class="columns columns-3"
+    v-model="dataValue"
     :v-bind="$props"
+    ref="selector"
     :placeholder="$t('Roles')"
+    v-if="ready"
     :state="state"
     :outside-close="!showPopOver"
-    v-model="dataValue"
-    ref="selector"
-    v-if="ready"
     :show-input="showInput"
     :show-footer-display="showFooterSelection"
+    @input="change"
     :show-add-btn="showAddBtn"
+    :filter-fn="filter"
     @close="close"
-    :filterFn="filter"
   >
-    <template slot="selection-count" slot-scope="props">{{ $tc('role.count', props.values.length) }}</template>
+    <template slot="selection-count" slot-scope="props">{{
+      $tc("role.count", props.values.length)
+    }}</template>
     <template slot="dropdown-item" slot-scope="props">
       <div class="text-center">
         <img
@@ -33,21 +35,34 @@
         <div
           v-for="item in selectedItems"
           :key="item.id"
+          v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
           class="avatar-item"
-          v-b-tooltip="{  placement: 'top', boundary:'viewport' }"
           :title="item.name"
         >
-          <img :src="item.getAvatarUrl('50x50')" height="22" @click="removeItem(item, $event)" />
+          <img
+            :src="item.getAvatarUrl('50x50')"
+            height="22"
+            @click="removeItem(item, $event)"
+          />
         </div>
       </div>
     </template>
     <template slot="display-details" slot-scope="props">
-      <ul class="list-unstyled" v-if="props.items">
+      <ul v-if="props.items" class="list-unstyled">
         <li v-for="item in selectedItems" :key="item.id" class="my-1">
-          <img class="border rounded-circle" :src="item.getAvatarUrl('50x50')" height="30" />
+          <img
+            class="border rounded-circle"
+            :src="item.getAvatarUrl('50x50')"
+            height="30"
+          />
           {{ item.name }}
           <b-button
-            class="float-right btn-white btn-outline-danger btn-xs border-0 text-danger"
+            class="
+              float-right
+              btn-white btn-outline-danger btn-xs
+              border-0
+              text-danger
+            "
             @click.stop="removeItem(item, $event)"
           >
             <i class="mdi mdi-delete"></i>
@@ -56,33 +71,38 @@
       </ul>
     </template>
     <template slot="footer-display">
-      <div class="stacked-avatars single-line" v-if="showFooterSelection">
+      <div v-if="showFooterSelection" class="stacked-avatars single-line">
         <div
           v-for="item in selectedItems"
           :key="item.id"
+          v-b-tooltip="{ placement: 'bottom', boundary: 'viewport' }"
           class="avatar-item"
-          v-b-tooltip="{  placement: 'bottom', boundary:'viewport' }"
           :title="item.name"
         >
-          <img :src="item.getAvatarUrl('50x50')" height="22" @click="removeItem(item, $event)" />
+          <img
+            :src="item.getAvatarUrl('50x50')"
+            height="22"
+            @click="removeItem(item, $event)"
+          />
         </div>
       </div>
     </template>
     <template slot="footer-add-btn">
       <b-button
         ref="btnNewRole"
-        style="z-index:2;position:relative"
+        style="z-index: 2; position: relative"
         @click="togglePopOver"
-      >+ {{ $t('New') }}</b-button>
+        >+ {{ $t("New") }}</b-button
+      >
       <!-- <layer v-if="showPopOver" @closed="togglePopOver" style="z-index:3; position:relative"> -->
       <b-popover
-        :target="()=>$refs.btnNewRole"
+        ref="popover"
+        :target="() => $refs.btnNewRole"
         placement="bottom"
         class="form-popover"
-        ref="popover"
         :show.sync="showPopOver"
       >
-        <b-card no-body style="width:320px">
+        <b-card no-body style="width: 320px">
           <b-card-body>
             <role-form @done="togglePopOver" @input="itemAdded"></role-form>
           </b-card-body>
@@ -93,37 +113,38 @@
   </super-select>
 </template>
 <script>
+import { /* mapState, */ mapGetters } from "vuex";
 import RoleForm from "@/views/pages/manage/company_role/Form";
-import { /*mapState,*/ mapGetters } from "vuex";
+
 export default {
-  name: "company-role-selector",
+  name: "CompanyRoleSelector",
   components: {
-    "role-form": RoleForm
+    "role-form": RoleForm,
   },
   props: {
     items: {
       required: false,
-      type: Array
+      type: Array,
     },
     value: {
       required: false,
-      default: () => []
+      default: () => [],
     },
     state: {
-      required: false
+      required: false,
     },
     showAddBtn: {
       required: false,
-      default: () => true
+      default: () => true,
     },
     showInput: {
       required: false,
-      default: () => true
+      default: () => true,
     },
     showFooterSelection: {
       required: false,
-      default: () => true
-    }
+      default: () => true,
+    },
   },
   $_veeValidate: {
     // fetch the current value from the innerValue defined in the component data.
@@ -132,37 +153,37 @@ export default {
     },
     value() {
       return this.value;
-    }
+    },
   },
   data: () => ({
     showPopOver: false,
     dataValue: [],
-    ready: false
+    ready: false,
   }),
   computed: {
     ...mapGetters({
-      allRoles: "companyRole/all"
+      allRoles: "companyRole/all",
     }),
     roles: {
       get() {
         return (this.items || this.allRoles).sort((a, b) =>
           a.name > b.name ? 1 : -1
         );
-      }
+      },
     },
     selectedItems: {
       get() {
         return this.roles
-          .filter(r => this.dataValue.includes(r.id))
+          .filter((r) => this.dataValue.includes(r.id))
           .sort((a, b) => (a.name > b.name ? 1 : -1));
-      }
-    }
+      },
+    },
   },
   async mounted() {
     await this.$store.dispatch("companyRole/findAll");
     if (this.value) {
       this.dataValue = this.value.filter(
-        o => this.roles.find(u => u.id === o) != null
+        (o) => this.roles.find((u) => u.id === o) != null
       );
     } else {
       this.dataValue = [];
@@ -173,7 +194,7 @@ export default {
     removeItem(item, event) {
       event.stopPropagation();
       if (item) {
-        this.dataValue = this.dataValue.filter(i => i !== item.id);
+        this.dataValue = this.dataValue.filter((i) => i !== item.id);
         this.$refs.selector.setDataValue(this.dataValue);
         this.$emit("input", this.dataValue);
       }
@@ -198,12 +219,12 @@ export default {
       }
       let ret = this.roles;
       if (value) {
-        ret = this.roles.filter(i =>
+        ret = this.roles.filter((i) =>
           i.name.toLowerCase().includes(value.toLowerCase())
         );
       }
       return ret;
-    }
-  }
+    },
+  },
 };
 </script>

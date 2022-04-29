@@ -39,13 +39,13 @@ const actions = {
         try {
             const result = await form.mutate({
                 mutation: PROCESS_OPERATION.create,
-                /*update(cache, result) {
+                /* update(cache, result) {
                     const { processOperationFindAll } = cache.readQuery({ query: PROCESS_OPERATION.findAll });
                     cache.writeQuery({
                         query: PROCESS_OPERATION.findAll,
                         data: { processOperationFindAll: processOperationFindAll.concat([result.data.processOperationCreate]) },
                     });
-                }*/
+                } */
             });
             form.busy = true;
             const processOperation = new ProcessOperation().deserialize(result.data.processOperationCreate);
@@ -120,19 +120,19 @@ const actions = {
         filter = null,
         force = false
     } = {}) {
-        if (context.rootGetters['all'].length === 0 || force) {
+        if (context.rootGetters.all.length === 0 || force) {
             filter = filter || {
                 data: {
-                    orderBy: ["name"]
+                    orderBy: ["title"]
                 }
 
             };
-            filter.busy = context.rootGetters['all'].length < 1;
+            filter.busy = context.rootGetters.all.length < 1;
             try {
-                /*const { data } = await apolloClient.watchquery({
+                /* const { data } = await apolloClient.watchquery({
                     query: PROCESS_OPERATION.findAll,
                     variables: { filter: filter }
-                });*/
+                }); */
                 const query = apolloClient.watchQuery({
                     query: PROCESS_OPERATION.findAll,
                     variables: {
@@ -151,7 +151,7 @@ const actions = {
                 filter.busy = false;
             }
         }
-        return context.rootGetters['all'];
+        return context.rootGetters.all;
     },
 
     async filter(context, filter) {
@@ -186,8 +186,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

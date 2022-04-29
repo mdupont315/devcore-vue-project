@@ -2,7 +2,23 @@
 module.exports = {
   resolve: {
     alias: {
-      '@': require('path').resolve(__dirname, 'src')
+      "@": require("path").resolve(__dirname, "src"),
     }
+  },
+  externals: {
+    'vue$': 'vue/dist/vue.esm.js'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.worker\.js$/,
+        use: {
+          loader: "worker-loader",
+          options: {
+            filename: "7.worker.js"
+          }
+        }
+      }
+    ]
   }
-}
+};

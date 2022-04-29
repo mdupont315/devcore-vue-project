@@ -6,11 +6,17 @@ import ProcessPhaseModel from "./processphase.model";
 
 export default class ProcessOperationModel extends BaseModel {
     title = null;
+
     dOrder = 1;
+
     id = null;
+
     companyRoles = [];
+
     ideas = [];
+
     stageId = null;
+
     phases = [];
 
 
@@ -46,6 +52,7 @@ export default class ProcessOperationModel extends BaseModel {
     get projectsCount() {
         return this.projectsStats.total || 0;
     }
+
     deserialize(input) {
         if (input.companyRoles) {
             input.companyRoles = input.companyRoles.map(u => {

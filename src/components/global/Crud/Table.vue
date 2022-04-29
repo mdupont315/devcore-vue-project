@@ -13,15 +13,16 @@
       :empty-text="$t('There are no records for the given criteria')"
       :tbody-tr-class="(item,type)=>false?'editing':null"
     >
-      
+
       <slot name="default" />
     </b-table>
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
+
 export default {
-  name: "crud-table",
+  name: "CrudTable",
   props: {
     items: {
       required: true

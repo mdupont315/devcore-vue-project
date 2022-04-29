@@ -1,23 +1,23 @@
 <template>
-  <div class="ml-3" v-if="$can('auth/user/create')">
+  <div v-if="$can('auth/user/create')" class="ml-3">
     <b-button
+      id="btnNew"
+      v-b-tooltip.hover
       size="sm"
       class="text-uppercase"
       variant="primary"
       :title="$t('Create New') + ' ' + $t('Process')"
-      v-b-tooltip.hover
-      id="btnNew"
       @click="togglePopOver"
     >
       <i class="mdi mdi-plus"></i>
       {{ $t('New')}}
     </b-button>
     <b-popover
+      ref="popover"
       target="btnNew"
       :show.sync="showPopOver"
       placement="bottom"
       class="form-popover"
-      ref="popover"
     >
       <b-card no-body style="width:300px">
         <b-card-body>
@@ -38,9 +38,9 @@
               >
                 <span>{{ $t('Stage') }}</span>
                 <small
+                  v-b-tooltip.hover
                   class="flex-grow-1 text-gray text-capitalize text-right text-overflow ml-5"
                   :title="currentProcess.title.capitalize()"
-                  v-b-tooltip.hover
                 >{{ currentProcess.title }}</small>
               </a>
             </div>
@@ -51,8 +51,9 @@
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import ProcessForm from "./Form";
+
 export default {
   data: () => {
     return {
@@ -65,7 +66,7 @@ export default {
       current: "process/current"
     }),
     currentProcess: {
-      get: function() {
+      get() {
         return this.current("process") ? this.current("process").process : null;
       }
     }

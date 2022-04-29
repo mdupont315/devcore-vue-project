@@ -1,10 +1,10 @@
 <template>
   <div class="action-card" :class="dataMode">
     <b-card class="wrapper" no-body>
-      <div class="placeholder" @click="toggleContent" v-if="!showContent">
+      <div v-if="!showContent" class="placeholder" @click="toggleContent">
         <slot name="placeholder">Add new item</slot>
       </div>
-      <div class="content-wrapper" v-if="showContent">
+      <div v-if="showContent" class="content-wrapper">
         <inner-overlay @click="toggleContent"></inner-overlay>
         <div class="content">
           <slot name="default"></slot>
@@ -15,7 +15,7 @@
 </template>
 <script>
 export default {
-  name: "action-card",
+  name: "ActionCard",
   props: {
     mode: {
       required: false,
@@ -32,7 +32,7 @@ export default {
   methods: {
     changeMode(mode) {
       if (mode) {
-        this.dataMode = "mode-" + mode;
+        this.dataMode = `mode-${mode}`;
       } else {
         this.dataMode = "no-mode";
       }

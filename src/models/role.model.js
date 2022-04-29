@@ -5,9 +5,10 @@ import PermissionModel from "./permission.model";
 
 export default class RoleModel extends BaseModel {
     name = null;
+
     usersCount = 0;
 
-    //table details reactive property
+    // table details reactive property
     _showDetails = false;
 
     deserialize(input) {

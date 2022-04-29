@@ -5,7 +5,6 @@ export default class BaseModel {
     }
 
     deserialize(input) {
-
         return Object.assign(this, input);
     }
 

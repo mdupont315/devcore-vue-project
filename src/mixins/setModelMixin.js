@@ -9,7 +9,7 @@ export default {
       if (!currentModel) throw new Error('requires \'currentModel\' param')
       if (!fetchedModel) throw new Error('requires \'fetchedModel\' param')
 
-      let result = {}
+      const result = {}
       Object.keys(currentModel).forEach(propName => {
         if (propName in fetchedModel) {
           if (![null, undefined].includes(fetchedModel[propName])) {

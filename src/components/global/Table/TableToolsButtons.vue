@@ -1,18 +1,18 @@
 <template>
   <div class="buttons">
-    <div class="overlay" :class="{'top-all':true}" v-if="deleting" @click="overlayClick"></div>
-    <b-button :class="btnEditClass" v-if="showEditButton" @click="editItem">
+    <div v-if="deleting" class="overlay" :class="{'top-all':true}" @click="overlayClick"></div>
+    <b-button v-if="showEditButton" :class="btnEditClass" @click="editItem">
       <i class="mdi mdi-pencil"></i>
     </b-button>
     <confirm-button
-      :class="btnDeleteClass"
-      :btnClass="btnDeleteClass"
       v-if="showDeleteButton"
-      :confirmText="$t('Delete')"
-      :confirmTitle="deleteTitle"
-      :confirmMessage="deleteMessage"
-      :confirmPlacement="deleteConfirmPlacement"
-      :confirmBoundary="deleteConfirmBoundary"
+      :class="btnDeleteClass"
+      :btn-class="btnDeleteClass"
+      :confirm-text="$t('Delete')"
+      :confirm-title="deleteTitle"
+      :confirm-message="deleteMessage"
+      :confirm-placement="deleteConfirmPlacement"
+      :confirm-boundary="deleteConfirmBoundary"
       @showConfirm="showConfirm"
       @confirm="deleteItem"
     >
@@ -23,8 +23,12 @@
 <script>
 import GQLForm from "@/lib/gqlform";
 import ConfirmButton from "../ConfirmButton";
+
 export default {
-  name: "table-tools-buttons",
+  name: "TableToolsButtons",
+  components: {
+    "confirm-button": ConfirmButton
+  },
   props: {
     item: {
       type: Object,
@@ -47,14 +51,14 @@ export default {
     deleteTitle: {
       type: String,
       required: false,
-      default: function() {
+      default() {
         return this.$t("Delete item?");
       }
     },
     deleteMessage: {
       type: String,
       required: false,
-      default: function() {
+      default() {
         return this.$t("This action cannot be undone!");
       }
     },
@@ -73,9 +77,6 @@ export default {
     deleteConfirmBoundary: {
       required: false
     }
-  },
-  components: {
-    "confirm-button": ConfirmButton
   },
   data: () => ({
     deleting: false
@@ -96,7 +97,7 @@ export default {
     async deleteItem() {
       try {
         await this.$store.dispatch(
-          this.store + "/delete",
+          `${this.store}/delete`,
           new GQLForm({ id: this.item.id }, null)
         );
       } finally {

@@ -39,13 +39,13 @@ const actions = {
         try {
             const result = await form.mutate({
                 mutation: PROCESS_PHASE.create,
-                /*update(cache, result) {
+                /* update(cache, result) {
                     const { processPhaseFindAll } = cache.readQuery({ query: PROCESS_PHASE.findAll });
                     cache.writeQuery({
                         query: PROCESS_PHASE.findAll,
                         data: { processPhaseFindAll: processPhaseFindAll.concat([result.data.processPhaseCreate]) },
                     });
-                }*/
+                } */
             });
             form.busy = true;
             const processPhase = new ProcessPhase().deserialize(result.data.processPhaseCreate);
@@ -120,19 +120,19 @@ const actions = {
         filter = null,
         force = false
     } = {}) {
-        if (context.rootGetters['all'].length === 0 || force) {
+        if (context.rootGetters.all.length === 0 || force) {
             filter = filter || {
                 data: {
-                    orderBy: ["name"]
+                    orderBy: ["title"]
                 }
 
             };
-            filter.busy = context.rootGetters['all'].length < 1;
+            filter.busy = context.rootGetters.all.length < 1;
             try {
-                /*const { data } = await apolloClient.watchquery({
+                /* const { data } = await apolloClient.watchquery({
                     query: PROCESS_PHASE.findAll,
                     variables: { filter: filter }
-                });*/
+                }); */
                 const query = apolloClient.watchQuery({
                     query: PROCESS_PHASE.findAll,
                     variables: {
@@ -151,7 +151,7 @@ const actions = {
                 filter.busy = false;
             }
         }
-        return context.rootGetters['all'];
+        return context.rootGetters.all;
     },
 
     async filter(context, filter) {
@@ -186,8 +186,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

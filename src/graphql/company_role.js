@@ -9,7 +9,10 @@ const COMPANY_ROLE_FRAGMENT = gql `
       name,
       createdAt,
       updatedAt,
-      #usersCount,
+      users{
+        id
+        yearlyCosts
+      }
       avatar,
       avatarUrl
       _metadata{
@@ -71,3 +74,4 @@ export const COMPANY_ROLE = {
         }
     `,
 }
+

@@ -1,15 +1,17 @@
 <template>
   <div class="page animated fadeIn">
     <div
+      v-if="
+        process && (!loading || (items.length > 0 && process.stages.length > 0))
+      "
       class="editable-dashboard"
-      v-if="process && (!loading || items.length>0 && process.stages.length>0)"
     >
       <div class="sortable-wrapper t01 horizontal">
         <div
-          class="process-stage item sortable-item enable-drag"
           v-for="stage in process.stages"
           :key="stage.id"
           :ref="`stage_${stage.id}`"
+          class="process-stage item sortable-item enable-drag"
         >
           <div class="card stage-card bg-light">
             <div>
@@ -17,23 +19,31 @@
                 <div class="title">
                   <h2
                     class="h5 m-0 text-capitalize text-center text-overflow text-bold"
-                  >{{ stage.title }}</h2>
+                  >
+                    {{ stage.title }}
+                  </h2>
                 </div>
               </div>
-              <div class="card-body" v-if="getProjectFromStage(stage).length>0">
-                <project-card
-                  v-for="project in getProjectFromStage(stage)"
-                  :key="constructRefForItem(project, stage)"
-                  :item="project"
-                  :stage="project.getStage(stage.id)"
-                  :ref="constructRefForItem(project, stage)"
-                  :expanded="currentItem && currentItem.id===project.getStage(stage.id).id"
-                  @itemChanged="itemChanged"
-                  @toggled="itemToggled"
-                  @itemDetailsToggled="itemDetailsToggled"
-                ></project-card>
+              <div
+                v-if="getProjectFromStage(stage).length > 0"
+                class="card-body"
+              >
+                  <project-card
+                    v-for="project in getProjectFromStage(stage)"
+                    :key="constructRefForItem(project, stage)"
+                    :ref="constructRefForItem(project, stage)"
+                    :item="project"
+                    :stage="project.getStage(stage.id)"
+                    :expanded="
+                      currentItem &&
+                      currentItem.id === project.getStage(stage.id).id
+                    "
+                    @itemChanged="itemChanged"
+                    @toggled="itemToggled"
+                    @itemDetailsToggled="itemDetailsToggled"
+                  ></project-card>
               </div>
-              <div class="card-body" v-else>
+              <div v-else class="card-body">
                 <empty-slot></empty-slot>
               </div>
             </div>
@@ -41,19 +51,21 @@
         </div>
       </div>
     </div>
-    <page-loader v-if="loading && items.length==0"></page-loader>
-    <empty-page v-if="!loading && (!process || process.stages.length === 0)"></empty-page>
+    <page-loader v-if="loading && items.length == 0"></page-loader>
+    <empty-page
+      v-if="!loading && (!process || process.stages.length === 0)"
+    ></empty-page>
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
 import ProjectCard from "./Card";
 import { scrollLeftToElement } from "@/lib/utils";
 
 export default {
   components: {
-    "project-card": ProjectCard
+    "project-card": ProjectCard,
   },
   data: () => {
     return {
@@ -62,50 +74,62 @@ export default {
       currentItem: null,
       loadingItem: false,
       filter: {
-        busy: false
+        busy: false,
       },
-      toolOptions: null
+      toolOptions: null,
     };
   },
   computed: {
     ...mapGetters({
+      filteredItems: "project/filteredItems",
       loading: "project/loading",
       currentProcess: "process/current",
-      showInnerOverlayOnTop: "app/show_inner_overlay_on_top"
+      showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
     }),
     process: {
-      get: function() {
+      get() {
         return this.currentProcess("projects").process;
-      }
+      },
     },
     items: {
       get() {
         if (!this.process) {
           return [];
         }
-        return this.$store.getters["project/filteredByprocess"](
+
+        const result = this.$store.getters["project/filteredByprocess"](
           this.process.id
         );
-      }
-    }
+        return result;
+      },
+    },
   },
   async mounted() {
     if (this.process) {
       await this.$store.dispatch("process/findById", {
         id: this.process.id,
-        force: true
+        force: true,
       });
       await this.$store.dispatch("project/findByProcess", {
         id: this.process.id,
-        force: true
+        force: true,
       });
     }
   },
   methods: {
+    overlayClick() {
+      if (this.currentItem) {
+        this.toggleItem(null);
+      } else {
+        this.showDetails(null);
+      }
+    },
     getProjectFromStage(stage) {
-      const it= this.items
+      const it = this.$store.getters["project/filteredByprocess"](
+        this.process.id
+      )
         .filter(
-          o =>
+          (o) =>
             o.getStage(stage.id) && o.getStage(stage.id).status != "NOT_STARTED"
         )
         .sort((a, b) => {
@@ -116,7 +140,7 @@ export default {
           }
           return a.name < b.name ? -1 : 1;
         });
-        return it;
+      return it;
     },
     isRowEditing(row) {
       return (
@@ -124,13 +148,6 @@ export default {
         row &&
         this.currentItem.id === (row.item ? row.item.id : row.id)
       );
-    },
-    overlayClick() {
-      if (this.currentItem) {
-        this.toggleItem(null);
-      } else {
-        this.showDetails(null);
-      }
     },
     async saveItem(form) {
       await this.$validator.validateAll();
@@ -148,7 +165,7 @@ export default {
         this.currentRowDetails.item = await this.$store.dispatch(
           "toolCategory/findById",
           {
-            id: item.id
+            id: item.id,
           }
         );
       } finally {
@@ -183,7 +200,7 @@ export default {
       } else {
         this.updateForm = new GQLForm({
           id: item.id,
-          name: item.name
+          name: item.name,
         });
         this.currentItem = item;
         this.$validator.reset();
@@ -201,13 +218,12 @@ export default {
       if (query.trim().length <= 3) {
         return [];
       }
-
       const response = await this.$store.dispatch("tool/findAll", {
         where: {
           field: "name",
           op: "like",
-          value: query
-        }
+          value: query,
+        },
       });
 
       return response;
@@ -224,7 +240,7 @@ export default {
     },
     itemDetailsToggled(expanded, item, stage) {
       if (expanded) {
-        const ref = this.$refs[`stage_` + stage.stageId];
+        const ref = this.$refs[`stage_${stage.stageId}`];
         if (ref) {
           this.$nextTick(() => scrollLeftToElement(ref[0]));
         }
@@ -234,7 +250,7 @@ export default {
       if (item) {
         this.loadItem(item);
       }
-    }
-  }
+    },
+  },
 };
 </script>

@@ -46,8 +46,8 @@
           <template v-slot:cell(actions)="row">
             <table-tools-buttons
               :item="row.item"
-              :showEditButton="$can('core/project/update', row.item)"
-              :showDeleteButton="$can('core/project/delete', row.item)"
+              :show-edit-button="$can('core/project/update', row.item)"
+              :show-delete-button="$can('core/project/delete', row.item)"
               store="project"
               @editItem="toggleItem(row.item)"
             ></table-tools-buttons>
@@ -58,8 +58,8 @@
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
-//import GQLForm from "@/lib/gqlform";
+import { /* mapState, */ mapGetters } from "vuex";
+// import GQLForm from "@/lib/gqlform";
 
 export default {
   components: {},
@@ -78,7 +78,7 @@ export default {
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top"
     }),
     process: {
-      get: function() {
+      get() {
         return this.currentProcess("projects").process;
       }
     },
@@ -93,7 +93,7 @@ export default {
       }
     },
     fields: {
-      get: function() {
+      get() {
         return [
           { key: "name", label: this.$t("Name"), sortable: true },
           { key: "status", label: this.$t("Status"), sortable: true },

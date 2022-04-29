@@ -3,7 +3,7 @@
 </template>
 <script>
 export default {
-  name: "select-all-input",
+  name: "SelectAllInput",
   methods: {
     focus(event) {
       this.$el.focus();

@@ -28,7 +28,6 @@
         <template v-slot:table-colgroup>
           <col style="width:60%" />
           <col style="width:10%" />
-          <col style="width:300px" />
         </template>
         <template v-slot:empty="scope">
           <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -45,8 +44,10 @@
         <template v-slot:cell(value)="row">
           <span
             :class="{'text-danger':row.item.consolidatedValue<0,'text-success':row.item.consolidatedValue>=0}"
-          >{{ (row.item.consolidatedValue*100/project.budget) | numberFormat('0.00') }} %</span>
-        </template>
+          > {{ (row.item.consolidatedValue*100/project.budget) | numberFormat('0.00') }} %</span>
+
+
+				</template>
       </b-table>
     </div>
   </div>
@@ -67,9 +68,10 @@ export default {
       type: Array
     }
   },
+
   computed: {
     fields: {
-      get: function() {
+      get() {
         return [
           { key: "idea", label: this.$t("Idea"), sortable: false },
           {
@@ -89,3 +91,4 @@ export default {
   }
 };
 </script>
+

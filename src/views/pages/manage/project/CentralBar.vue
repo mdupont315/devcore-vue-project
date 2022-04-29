@@ -4,7 +4,7 @@
       max-level="process"
       show-count="projects"
       section="projects"
-      :onApply="onApply"
+      :on-apply="onApply"
     ></process-selector>
   </div>
 </template>

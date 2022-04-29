@@ -19,16 +19,16 @@
               </b-alert>
               <div class="form-label-group required">
                 <b-form-input
-                  type="text"
                   id="username"
-                  :disabled="form.busy"
                   v-model="form.username"
+                  v-validate="'required|email'"
+                  type="text"
+                  :disabled="form.busy"
                   :placeholder="$t('Username')"
                   :state="$validateState('username', form)"
                   autocomplete="new-username"
                   name="username"
                   autofocus
-                  v-validate="'required|email'"
                 ></b-form-input>
                 <label for="username">
                   <i class="mdi mdi-account"></i>
@@ -63,16 +63,16 @@
                 </b-alert>
                 <div class="form-label-group required">
                   <b-form-input
-                    type="text"
                     id="code"
-                    :disabled="form.busy"
                     v-model="form.code"
+                    v-validate="'required|length:6'"
+                    type="text"
+                    :disabled="form.busy"
                     :placeholder="$t('Received code')"
                     :state="$validateState('code', form)"
                     autocomplete="new-code"
                     name="code"
                     autofocus
-                    v-validate="'required|length:6'"
                   ></b-form-input>
                   <label for="code">
                     <i class="mdi mdi-dialpad"></i>
@@ -114,6 +114,7 @@
 <script>
 import { mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
+
 export default {
   data: () => ({
     // Create a new form instance
@@ -131,7 +132,7 @@ export default {
     })
   },
   mounted() {
-    this.form.fields.username = this.$route.query["email"];
+    this.form.fields.username = this.$route.query.email;
   },
   methods: {
     async onSubmit() {
@@ -149,12 +150,12 @@ export default {
           this.showResend = true;
         }, 30000);
       } catch (ex) {
-        if(ex.code==='USER_ALREADY_VERIFIED'){
-          this.$router.push({name:'login'});
+        if (ex.code === 'USER_ALREADY_VERIFIED'){
+          this.$router.push({ name:'login' });
         }
-        //console.log(processGraphQLErrors(ex));
+        console.log(ex);
       } finally {
-        //this.$validator.reset();
+        // this.$validator.reset();
       }
     },
     async verify() {
@@ -167,14 +168,14 @@ export default {
         await this.$store.dispatch("auth/verifyAccount", this.form);
         await this.$router.replace("/");
       } catch (ex) {
-        if(ex.code==='TOKEN_EXPIRED'){
+        if (ex.code === 'TOKEN_EXPIRED'){
           this.resend();
         }
-        if(ex.code==='USER_ALREADY_VERIFIED'){
-          this.$router.push({name:'login'});
+        if (ex.code === 'USER_ALREADY_VERIFIED'){
+          this.$router.push({ name:'login' });
         }
       } finally {
-        //this.$validator.reset();
+        // this.$validator.reset();
       }
     },
     resend() {

@@ -2,16 +2,17 @@
   <div class="search-bar">
     <b-input-group style="margin-top:5px" class="search">
       <b-form-input
-        class="search"
         v-model="currentFilter"
-        @input="filterResults"
+        class="search"
         :placeholder="$t('Search tools') + ` (${items.length})`"
+        @input="filterResults"
       ></b-form-input>
     </b-input-group>
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
+
 export default {
   data: () => {
     return {

@@ -1,9 +1,9 @@
 <template>
   <div class="page animated fadeIn">
     <div
+      v-if="currentItem || currentRowDetails || resetingPassword"
       class="overlay"
       :class="{'top-all':this.showInnerOverlayOnTop || resetingPassword}"
-      v-if="currentItem || currentRowDetails || resetingPassword"
       @click="overlayClick"
     ></div>
     <div class="container-fluid">
@@ -51,22 +51,22 @@
                 />
                 {{ row.item.name }}
               </span>
-              <template slot="editing" v-if="isRowEditing(row)">
+              <template v-if="isRowEditing(row)" slot="editing">
                 <div class="d-flex">
                   <div class="flex-grow-1 mr-1" style="position:relative">
                     <b-input
-                      name="name"
-                      size="sm"
                       v-model="updateForm.name"
                       v-validate="'required|min:4'"
+                      name="name"
+                      size="sm"
                       :state="$validateState('name', updateForm)"
                       :disabled="updateForm.busy"
                     ></b-input>
                     <b-form-invalid-feedback>{{ $displayError('name', updateForm) }}</b-form-invalid-feedback>
                   </div>
-                 
+
                 </div>
-             
+
               </template>
             </table-editable-cell>
           </template>
@@ -78,18 +78,18 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="currencyCode"
-              :staticValue="row.item.currencyCode"
+              :static-value="row.item.currencyCode"
             >
-              <template slot="editing" v-if="isRowEditing(row)">
+              <template v-if="isRowEditing(row)" slot="editing">
                   <b-form-select
                   id="currencyCode"
-                  :disabled="updateForm.busy"
                   v-model="updateForm.currencyCode"
+                  v-validate="'required'"
+                  :disabled="updateForm.busy"
                   :placeholder="$t('Currency')"
                   type="text"
                   name="currencyCode"
                   :state="$validateState('currencyCode', updateForm)"
-                  v-validate="'required'"
                 >
                   <option :value="null">--- {{ $t('None')}} ---</option>
                   <option
@@ -98,7 +98,7 @@
                     :value="item.code"
                   >{{ item.name }} | {{ item.symbol }} ({{ item.code }})</option>
                 </b-form-select>
-             
+
                 <b-form-invalid-feedback>{{ $displayError('currencyCode', updateForm) }}</b-form-invalid-feedback>
               </template>
             </table-editable-cell>
@@ -111,22 +111,22 @@
             <div v-if="isRowEditing(row)" class="text-right">
               <table-edit-tools-buttons
                 :item="row.item"
-                :showSaveButton="$can('core/company/update', row.item)"
-                :disableSaveButton="vErrors.any()||updateForm.busy"
-                :showDeleteButton="$can('core/company/delete', row.item)"
+                :show-save-button="$can('core/company/update', row.item)"
+                :disable-save-button="vErrors.any()||updateForm.busy"
+                :show-delete-button="$can('core/company/delete', row.item)"
                 :loading="updateForm.busy"
+                store="company"
                 @cancel="toggleItem(row.item)"
                 @delete="toggleItem(null)"
                 @save="saveItem(updateForm)"
-                store="company"
               ></table-edit-tools-buttons>
             </div>
             <!-- when the row is not editing -->
             <table-tools-buttons
               v-else
               :item="row.item"
-              :showEditButton="$can('core/company/update', row.item)"
-              :showDeleteButton="$can('core/company/delete', row.item)"
+              :show-edit-button="$can('core/company/update', row.item)"
+              :show-delete-button="$can('core/company/delete', row.item)"
               store="company"
               @editItem="toggleItem(row.item)"
             ></table-tools-buttons>
@@ -137,8 +137,9 @@
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
+
 export default {
   components: {},
   data: () => {
@@ -157,12 +158,9 @@ export default {
       items: "company/filteredItems",
       currencies: "currency/all",
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
-      companyRoles: "companyRole/all", // need to remove
-      roles: "role/all", // need to remove
-      
     }),
     fields: {
-      get: function() {
+      get() {
         return [
           { key: "name", label: this.$t("name"), sortable: true },
           { key: "currencyCode", label: this.$t("Currency"), sortable: true },
@@ -221,8 +219,8 @@ export default {
         this.toggleItem(null);
       }
     },
-   
- 
+
+
   }
 };
 </script>

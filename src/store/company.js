@@ -36,13 +36,13 @@ const actions = {
     async create(context, form) {
         const result = await form.mutate({
             mutation: COMPANY.create,
-            /*update(cache, result) {
+            /* update(cache, result) {
                 const { userFindAll } = cache.readQuery({ query: USER.findAll });
                 cache.writeQuery({
                     query: USER.findAll,
                     data: { userFindAll: userFindAll.concat([result.data.userCreate]) },
                 });
-            }*/
+            } */
         });
         const company = new Company().deserialize(result.data.companyCreate);
         await context.dispatch('findAll', {
@@ -80,18 +80,18 @@ const actions = {
         filter = null,
         force = false
     } = {}) {
-        if (context.getters['all'].length === 0 || force) {
+        if (context.getters.all.length === 0 || force) {
             filter = filter || {
                 data: {
                     orderBy: ["name"]
                 }
 
             };
-            filter.busy = context.getters['all'].length < 1;
-            /*const { data } = await apolloClient.watchquery({
+            filter.busy = context.getters.all.length < 1;
+            /* const { data } = await apolloClient.watchquery({
                 query: USER.findAll,
                 variables: { filter: filter }
-            });*/
+            }); */
             try {
                 const query = apolloClient.watchQuery({
                     query: COMPANY.findAll,
@@ -111,7 +111,7 @@ const actions = {
                 filter.busy = false;
             }
         }
-        return context.getters['all'];
+        return context.getters.all;
     },
 
     async filter(context, filter) {
@@ -136,8 +136,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

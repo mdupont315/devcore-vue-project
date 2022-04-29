@@ -1,20 +1,20 @@
 <template>
   <li :class="{'active': active}" @click="toggle(item,$event)">
-    <router-link class="title" :to="item.url" v-if="item.url">
-      <i class="mdi icon" :class="item.icon" v-if="item.icon"></i>
+    <router-link v-if="item.url" class="title" :to="item.url">
+      <i v-if="item.icon" class="mdi icon" :class="item.icon"></i>
       {{ $t(item.title) }}
     </router-link>
-    <span class="title" v-else>
-      <i class="mdi icon" :class="item.icon" v-if="item.icon"></i>
+    <span v-else class="title">
+      <i v-if="item.icon" class="mdi icon" :class="item.icon"></i>
       {{ $t(item.title) }}
     </span>
-    <ul class="nav sub-menu" v-if="item.children">
+    <ul v-if="item.children" class="nav sub-menu">
       <li
         v-for="(subitem,subindex) in item.children"
         :key="subindex"
-        @click.stop="subItemClick($event, item)"
         class="item link"
         :class="{'active':$route.matched.some(({ name }) => name === subitem.name)}"
+        @click.stop="subItemClick($event, item)"
       >
         <router-link :to="subitem.url" class="title">
           <!--<i class="mdi" :class="subitem.icon" v-if="subitem.icon"></i>-->
@@ -25,9 +25,10 @@
   </li>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
+
 export default {
-  name: "menu-item",
+  name: "MenuItem",
   props: {
     item: {
       type: Object,
@@ -36,7 +37,7 @@ export default {
   },
   computed: {
     active: {
-      get: function() {
+      get() {
         return (
           this.expandedItems.some(({ name }) => name === this.item.name)
         );

@@ -1,22 +1,53 @@
 <template>
-  <div class="author-time" v-if="user">
-    <img :src="user.getAvatarUrl('50x50')" height="30" class="rounded-circle border" />
+  <div v-if="user" class="author-time">
+    <img
+      v-if="!anonymous && user"
+      :src="getAvatarUrl('50x50')"
+      height="30"
+      class="rounded-circle border"
+    />
+    <img v-else :src="getAnonAvatarUrl()" class="rounded-circle border" />
     <span class="right">
-      <span class="name">{{ user.fullName }}</span>
-      <time-ago class="time" :time="time" v-if="time" />
+      <span class="name" v-if="!anonymous"
+        >{{ user.fullName }}</span
+      >
+      <span class="name" v-else>{{ $t("Anonymous") }}</span>
+      <time-ago v-if="time" class="time" :time="time" />
     </span>
   </div>
 </template>
 <script>
+import { imageResolver } from "@/lib/utils";
 export default {
-  name: "author-time",
+  name: "AuthorTime",
   props: {
     user: {
-      required: true
+      required: true,
+    },
+    anonymous: {
+      required: false,
+      default: () => false,
     },
     time: {
-      required: false
-    }
-  }
+      required: false,
+    },
+  },
+  methods: {
+    getAnonAvatarUrl(lang = "en") {
+      if (lang === "en") {
+        return require("@/assets/anonUserEn.png");
+      } else {
+        return require("@/assets/anonUserFi.png");
+      }
+    },
+    getAvatarUrl(size = "0x0") {
+      if (this.user.avatarUrl) {
+        return imageResolver(this.user.avatarUrl, size);
+      }
+      return null;
+    },
+  },
+
 };
 </script>
+

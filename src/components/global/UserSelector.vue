@@ -2,22 +2,24 @@
   <super-select
     :items="users"
     class="image-selector"
-    @input="change"
     selector-class="columns columns-3"
+    v-model="dataValue"
     :v-bind="$props"
-    :placeholder="$t('Users')"
+    ref="selector"
+    :placeholder="placeholder ? placeholder : $t('Users')"
+    v-if="ready"
     :state="state"
     :outside-close="!showPopOver"
-    v-model="dataValue"
-    ref="selector"
-    v-if="ready"
     :show-input="showInput"
-    :filterFn="filter"
+    :filter-fn="filter"
+    @input="change"
     :show-add-btn="showAddBtn"
-    :maxDisplayItems="6"
+    :max-display-items="6"
     @close="close"
   >
-    <template slot="selection-count" slot-scope="props">{{ $tc('user.count', props.values.length) }}</template>
+    <template slot="selection-count" slot-scope="props">{{
+      $tc("user.count", props.values.length)
+    }}</template>
     <template slot="dropdown-item" slot-scope="props">
       <div class="text-center">
         <img
@@ -31,10 +33,10 @@
     <template slot="header-display">
       <div class="stacked-avatars single-line">
         <div
-          v-for="item in selectedItems.slice(0,maxDisplayItems)"
+          v-for="item in selectedItems.slice(0, maxDisplayItems)"
           :key="item.id"
+          v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
           class="avatar-item"
-          v-b-tooltip="{  placement: 'top', boundary:'viewport' }"
           :title="item.fullName"
         >
           <img :src="item.getAvatarUrl('50x50')" height="22" />
@@ -42,12 +44,21 @@
       </div>
     </template>
     <template slot="display-details" slot-scope="props">
-      <ul class="list-unstyled" v-if="props.items">
+      <ul v-if="props.items" class="list-unstyled">
         <li v-for="item in selectedItems" :key="item.id" class="my-1">
-          <img class="border rounded-circle" :src="item.getAvatarUrl('50x50')" height="30" />
+          <img
+            class="border rounded-circle"
+            :src="item.getAvatarUrl('50x50')"
+            height="30"
+          />
           {{ item.fullName }}
           <b-button
-            class="float-right btn-white btn-outline-danger btn-xs border-0 text-danger"
+            class="
+              float-right
+              btn-white btn-outline-danger btn-xs
+              border-0
+              text-danger
+            "
             @click.stop="removeItem(item, $event)"
           >
             <i class="mdi mdi-delete"></i>
@@ -56,48 +67,57 @@
       </ul>
     </template>
     <template slot="footer-display">
-      <div class="stacked-avatars single-line" v-if="showFooterSelection">
+      <div v-if="showFooterSelection" class="stacked-avatars single-line">
         <div
-          v-for="item in selectedItems.slice(0,maxDisplayItems)"
+          v-for="item in selectedItems.slice(0, maxDisplayItems)"
           :key="item.id"
+          v-b-tooltip="{ placement: 'bottom', boundary: 'viewport' }"
           class="avatar-item"
-          v-b-tooltip="{  placement: 'bottom', boundary:'viewport' }"
           :title="item.fullName"
         >
-          <img :src="item.getAvatarUrl('50x50')" height="22" @click="removeItem(item, $event)" />
+          <img
+            :src="item.getAvatarUrl('50x50')"
+            height="22"
+            @click="removeItem(item, $event)"
+          />
         </div>
       </div>
     </template>
   </super-select>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
+
 export default {
-  name: "user-selector",
+  name: "UserSelector",
   props: {
     items: {
       required: false,
-      type: Array
+      type: Array,
+    },
+    placeholder: {
+      required: false,
+      default: () => null,
     },
     value: {
       required: false,
-      default: () => []
+      default: () => [],
     },
     state: {
-      required: false
+      required: false,
     },
     showAddBtn: {
       required: false,
-      default: () => true
+      default: () => true,
     },
     showInput: {
       required: false,
-      default: () => true
+      default: () => true,
     },
     showFooterSelection: {
       required: false,
-      default: () => true
-    }
+      default: () => true,
+    },
   },
   $_veeValidate: {
     // fetch the current value from the innerValue defined in the component data.
@@ -106,38 +126,38 @@ export default {
     },
     value() {
       return this.value;
-    }
+    },
   },
   data: () => ({
     showPopOver: false,
     dataValue: [],
     ready: false,
-    maxDisplayItems: 6
+    maxDisplayItems: 6,
   }),
   computed: {
     ...mapGetters({
-      allUsers: "user/all"
+      allUsers: "user/all",
     }),
     users: {
       get() {
         return (this.items || this.allUsers).sort((a, b) =>
           a.firstName > b.firstName ? 1 : -1
         );
-      }
+      },
     },
     selectedItems: {
       get() {
         return this.users
-          .filter(r => this.dataValue.includes(r.id))
+          .filter((r) => this.dataValue.includes(r.id))
           .sort((a, b) => (a.fullName > b.fullName ? 1 : -1));
-      }
-    }
+      },
+    },
   },
   async mounted() {
     await this.$store.dispatch("user/findAll");
     if (this.value) {
       this.dataValue = this.value.filter(
-        o => this.users.find(u => u.id === o) != null
+        (o) => this.users.find((u) => u.id === o) != null
       );
     } else {
       this.dataValue = [];
@@ -149,7 +169,7 @@ export default {
     removeItem(item, event) {
       event.stopPropagation();
       if (item) {
-        this.dataValue = this.dataValue.filter(i => i !== item.id);
+        this.dataValue = this.dataValue.filter((i) => i !== item.id);
         this.$refs.selector.setDataValue(this.dataValue);
         this.$emit("input", this.dataValue);
       }
@@ -175,7 +195,7 @@ export default {
       let ret = this.users;
       if (value) {
         ret = this.users.filter(
-          i =>
+          (i) =>
             i.fullName.toLowerCase().includes(value.toLowerCase()) ||
             (i.email
               ? i.email.toLowerCase().includes(value.toLowerCase())
@@ -183,7 +203,7 @@ export default {
         );
       }
       return ret;
-    }
-  }
+    },
+  },
 };
 </script>

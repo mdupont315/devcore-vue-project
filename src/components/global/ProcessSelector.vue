@@ -1,93 +1,180 @@
 <template>
   <div class="process-selector">
-    <div class="label" v-show="!editing">{{ $t('Process') }}</div>
+    <div v-show="!editing" class="label">{{ $t("Process") }}</div>
     <div
       class="current-process"
-      :class="{'expanded':expanded, editing:editing}"
+      :class="{ expanded: expanded, editing: editing }"
       @click.stop="toggleSelector"
     >
       <span v-show="true">
-        <span class="edit-btn" @click.stop="initEdit" v-if="!editing && allowEdit">
+        <span
+          v-if="!editing && current.process"
+          class="edit-btn"
+          @click.stop="initEdit"
+        >
           <i class="mdi mdi-pencil"></i>
         </span>
         <div
-          class="title"
-          @click.stop="toggleSelector"
-          :title="current.process?current.process.title.toUpperCase():null"
-          v-b-tooltip.hover
           ref="selectProcessBtn"
-        >{{ current.process?`${current.process.title} ${this.getCount('process', current.process)}`:$t('Select process') }}</div>
-        <span class="arrow" v-show="!editing" @click.stop="toggleSelector"></span>
+          v-b-tooltip.hover
+          class="title"
+          :title="current.process ? current.process.title.toUpperCase() : null"
+          @click.stop="toggleSelector"
+        >
+          {{
+            current.process
+              ? `${current.process.title} ${this.getCount(
+                  "process",
+                  current.process
+                )}`
+              : $t("Select process")
+          }}
+        </div>
+        <span
+          v-show="!editing"
+          class="arrow"
+          @click.stop="toggleSelector"
+        ></span>
       </span>
       <layer v-if="editing" @closed="initEdit">
-        <div class="edit" style="width:300px; left:0">
-          <label class="label">{{ $t('Name of process') }}</label>
+        <div class="edit" style="width: 300px; left: 0">
+          <label class="label">{{ $t("Name of process") }}</label>
           <div class="d-flex flex-row">
             <div class="flex-grow-1 position-relative">
               <b-input
+                ref="editInput"
                 v-model="editForm.title"
+                v-validate="'required|min:4'"
                 size="sm"
                 name="title"
                 :disabled="editForm.busy"
-                ref="editInput"
                 class="no-focus-style"
-                style="margin:0!important"
+                style="margin: 0 !important"
                 :state="$validateState('title', editForm)"
-                v-validate="'required|min:4'"
               />
-              <b-form-invalid-feedback>{{ $displayError('title', editForm) }}</b-form-invalid-feedback>
+              <b-form-invalid-feedback>{{
+                $displayError("title", editForm)
+              }}</b-form-invalid-feedback>
             </div>
             <b-button
               :disabled="vErrors.any()"
               size="xs"
               variant="transparent"
-              class="action mdi mdi-check text-success font-15x m-0 outline-none"
-              @click="saveItem"
+              style="width: 36px; height: 36px"
+              class="
+                action
+                mdi mdi-check
+                text-success
+                font-15x
+                m-0
+                outline-none
+              "
               :title="$t('Save')"
+              @click="saveItem"
             ></b-button>
-            <b-button
-              size="xs"
-              variant="transparent"
-              class="action mdi mdi-close text-danger font-15x m-0 outline-none"
-              @click="cancelEdit"
-              :title="$t('Cancel')"
-            ></b-button>
+            <confirm-button
+              @confirm="() => removeItem(current.process)"
+              :showOverlay="false"
+              :popoverCustomClass="'process_selector_popover_custom_class'"
+              :btnStyle="'background:transparent;color:#DC3545;border-color:transparent'"
+            >
+              <!-- <b-button
+                size="xs"
+                variant="transparent"
+                class="
+                  action
+                  mdi mdi-close
+                  text-danger
+                  font-15x
+                  m-0
+                  outline-none
+                "
+                :title="$t('Cancel')"
+                @click="cancelEdit"
+              ></b-button> -->
+              <i class="mdi mdi-window-close" style="font-size: 16px"></i>
+            </confirm-button>
           </div>
         </div>
       </layer>
     </div>
-    <b-popover placement="bottom" :show.sync="expanded" :target="()=>$refs.selectProcessBtn">
-      <b-card no-body class="process-selector-popover" style="min-width:300px">
+    <b-popover
+      placement="bottom"
+      :show.sync="expanded"
+      :target="() => $refs.selectProcessBtn"
+    >
+      <b-card no-body class="process-selector-popover" style="min-width: 300px">
         <div class="px-3 pt-3">
           <div class="sections">
             <div
               class="section"
+              :class="{ expanded: expandedSection === 'process' }"
               @click="toggleSection('process')"
-              :class="{expanded:expandedSection==='process'}"
             >
-              <div class="label">{{ $t('Process') }}</div>
-              <div
-                class="title"
-              >{{ (selectedProcess?`${selectedProcess.title} ${this.getCount('process',selectedProcess)}`:$t('Select process') + ' (' +(loading.process?$t('Loading...'):items.length>0?items.length:$t('No process available'))+ ')')}}</div>
+              <div class="label">{{ $t("Process") }}</div>
+              <div class="title">
+                {{
+                  selectedProcess
+                    ? `${selectedProcess.title} ${this.getCount(
+                        "process",
+                        selectedProcess
+                      )}`
+                    : $t("Select process") +
+                      " (" +
+                      (loading.process
+                        ? $t("Loading...")
+                        : items.length > 0
+                        ? items.length
+                        : $t("No process available")) +
+                      ")"
+                }}
+              </div>
               <div class="selector">
                 <perfect-scrollbar>
-                  <div style="position:relative;">
+                  <div style="position: relative">
                     <div
-                      class="loading"
                       v-if="loading.stage"
-                      style="background:rgba(0,0,0,.4);position:absolute;top:0;left:0;bottom:0;right:0;display:flex;justify-content:center;flex-direction:column; align-items:center;z-index:1;margin:0 -16px;height:100%"
+                      class="loading"
+                      style="
+                        background: rgba(0, 0, 0, 0.4);
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        bottom: 0;
+                        right: 0;
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        align-items: center;
+                        z-index: 1;
+                        margin: 0 -16px;
+                        height: 100%;
+                      "
                     >
                       <b-spinner></b-spinner>
                     </div>
                     <ul class="list-unstyled m-0 scrollY">
                       <li
                         class="item"
+                        :class="{ active: !selectedProcess }"
+                        @click="selectProcess(null, false)"
+                      >
+                        {{ $t("None") }}
+                      </li>
+
+                      <li
                         v-for="item in items"
                         :key="item.id"
-                        :ref="'process_'+item.id"
-                        :class="{active:selectedProcess&&selectedProcess.id===item.id}"
+                        :ref="'process_' + item.id"
+                        class="item"
+                        :class="{
+                          active:
+                            selectedProcess && selectedProcess.id === item.id,
+                        }"
                         @click.stop="selectProcess(item, true)"
-                      >{{ item.title }} {{ getCount('process', item)}}</li>
+                      >
+                        {{ item.title }} {{ getCount("process", item) }}
+                      </li>
                     </ul>
                   </div>
                 </perfect-scrollbar>
@@ -98,30 +185,52 @@
             <div
               v-if="maxLevelNumber > 0"
               class="section"
+              :class="{ expanded: expandedSection === 'stage' }"
               @click="toggleSection('stage')"
-              :class="{expanded:expandedSection==='stage'}"
             >
-              <div class="label">{{ $t('Stage') }}</div>
-              <div
-                class="title"
-              >{{ (selectedStage && (!loading.stage)?`${selectedStage.title} ${this.getCount('stage',selectedStage)}`:$t('Select stage') + ' (' + (loading.stage?$t('Loading...'):selectedProcess && selectedProcess.stages.length>0?selectedProcess.stages.length:$t('No stages available')) +')')}}</div>
+              <div class="label">{{ $t("Stage") }}</div>
+              <div class="title">
+                {{
+                  selectedStage && !loading.stage
+                    ? `${selectedStage.title} ${this.getCount(
+                        "stage",
+                        selectedStage
+                      )}`
+                    : $t("Select stage") +
+                      " (" +
+                      (loading.stage
+                        ? $t("Loading...")
+                        : selectedProcess && selectedProcess.stages.length > 0
+                        ? selectedProcess.stages.length
+                        : $t("No stages available")) +
+                      ")"
+                }}
+              </div>
               <div class="selector">
                 <perfect-scrollbar>
-                  <div style="position:relative;margin-right:15px">
+                  <div style="position: relative; margin-right: 15px">
                     <ul class="list-unstyled">
                       <li
                         class="item"
-                        :class="{active:!selectedStage}"
+                        :class="{ active: !selectedStage }"
                         @click="selectStage(null, true)"
-                      >{{ $t('None') }}</li>
+                      >
+                        {{ $t("None") }}
+                      </li>
                       <li
-                        class="item"
-                        v-for="item in (selectedProcess?selectedProcess.stages:[])"
+                        v-for="item in selectedProcess
+                          ? selectedProcess.stages
+                          : []"
                         :key="item.id"
-                        :ref="'stage_'+item.id"
-                        :class="{active:selectedStage&&selectedStage.id===item.id}"
+                        :ref="'stage_' + item.id"
+                        class="item"
+                        :class="{
+                          active: selectedStage && selectedStage.id === item.id,
+                        }"
                         @click.stop="selectStage(item, true)"
-                      >{{ item.title }} {{ getCount('stage', item)}}</li>
+                      >
+                        {{ item.title }} {{ getCount("stage", item) }}
+                      </li>
                     </ul>
                   </div>
                 </perfect-scrollbar>
@@ -132,30 +241,54 @@
             <div
               v-if="maxLevelNumber > 1"
               class="section"
+              :class="{ expanded: expandedSection === 'operation' }"
               @click="toggleSection('operation')"
-              :class="{expanded:expandedSection==='operation'}"
             >
-              <div class="label">{{ $t('Operation') }}</div>
-              <div
-                class="title"
-              >{{ (selectedOperation&& (!loading.operation)?`${selectedOperation.title} ${this.getCount('operation',selectedOperation)}`:$t('Select operation') + ' (' + (loading.operation?$t('Loading...'):selectedStage && selectedStage.operations.length>0?selectedStage.operations.length:$t('No operations available')) +')')}}</div>
+              <div class="label">{{ $t("Operation") }}</div>
+              <div class="title">
+                {{
+                  selectedOperation && !loading.operation
+                    ? `${selectedOperation.title} ${this.getCount(
+                        "operation",
+                        selectedOperation
+                      )}`
+                    : $t("Select operation") +
+                      " (" +
+                      (loading.operation
+                        ? $t("Loading...")
+                        : selectedStage && selectedStage.operations.length > 0
+                        ? selectedStage.operations.length
+                        : $t("No operations available")) +
+                      ")"
+                }}
+              </div>
               <div class="selector">
                 <perfect-scrollbar>
-                  <div style="position:relative;margin-right:15px">
+                  <div style="position: relative; margin-right: 15px">
                     <ul class="list-unstyled">
                       <li
                         class="item"
-                        :class="{active:!selectedOperation}"
+                        :class="{ active: !selectedOperation }"
                         @click="selectOperation(null, true)"
-                      >{{ $t('None') }}</li>
+                      >
+                        {{ $t("None") }}
+                      </li>
                       <li
-                        class="item"
-                        v-for="item in (selectedStage?selectedStage.operations:[])"
+                        v-for="item in selectedStage
+                          ? selectedStage.operations
+                          : []"
                         :key="item.id"
-                        :ref="'operation_'+item.id"
-                        :class="{active:selectedOperation&&selectedOperation.id===item.id}"
+                        :ref="'operation_' + item.id"
+                        class="item"
+                        :class="{
+                          active:
+                            selectedOperation &&
+                            selectedOperation.id === item.id,
+                        }"
                         @click.stop="selectOperation(item, true)"
-                      >{{ item.title }} {{ getCount('operation', item)}}</li>
+                      >
+                        {{ item.title }} {{ getCount("operation", item) }}
+                      </li>
                     </ul>
                   </div>
                 </perfect-scrollbar>
@@ -166,30 +299,53 @@
             <div
               v-if="maxLevelNumber > 2"
               class="section"
+              :class="{ expanded: expandedSection === 'phase' }"
               @click="toggleSection('phase')"
-              :class="{expanded:expandedSection==='phase'}"
             >
-              <div class="label">{{ $t('Phase') }}</div>
-              <div
-                class="title"
-              >{{ (selectedPhase&& (!loading.phase)?`${selectedPhase.title} ${this.getCount('phase',selectedPhase)}`:$t('Select phase') + ' (' + (loading.phase?$t('Loading...'):(selectedOperation && selectedOperation.phases.length>0)?selectedOperation.phases.length:$t('No phases available')) +')')}}</div>
+              <div class="label">{{ $t("Phase") }}</div>
+              <div class="title">
+                {{
+                  selectedPhase && !loading.phase
+                    ? `${selectedPhase.title} ${this.getCount(
+                        "phase",
+                        selectedPhase
+                      )}`
+                    : $t("Select phase") +
+                      " (" +
+                      (loading.phase
+                        ? $t("Loading...")
+                        : selectedOperation &&
+                          selectedOperation.phases.length > 0
+                        ? selectedOperation.phases.length
+                        : $t("No phases available")) +
+                      ")"
+                }}
+              </div>
               <div class="selector">
                 <perfect-scrollbar>
-                  <div style="position:relative;margin-right:15px">
+                  <div style="position: relative; margin-right: 15px">
                     <ul class="list-unstyled">
                       <li
                         class="item"
-                        :class="{active:!selectedPhase}"
+                        :class="{ active: !selectedPhase }"
                         @click="selectPhase(null, true)"
-                      >{{ $t('None') }}</li>
+                      >
+                        {{ $t("None") }}
+                      </li>
                       <li
-                        class="item"
-                        v-for="item in (selectedOperation?selectedOperation.phases:[])"
+                        v-for="item in selectedOperation
+                          ? selectedOperation.phases
+                          : []"
                         :key="item.id"
-                        :ref="'phase_'+item.id"
-                        :class="{active:selectedPhase&&selectedPhase.id===item.id}"
+                        :ref="'phase_' + item.id"
+                        class="item"
+                        :class="{
+                          active: selectedPhase && selectedPhase.id === item.id,
+                        }"
                         @click="selectPhase(item, true)"
-                      >{{ item.title }} {{ getCount('phase', item)}}</li>
+                      >
+                        {{ item.title }} {{ getCount("phase", item) }}
+                      </li>
                     </ul>
                   </div>
                 </perfect-scrollbar>
@@ -199,12 +355,16 @@
         </div>
         <div class="footer">
           <div class="d-flex flex-row">
-            <i class="mdi mdi-close cursor-pointer font-15x opacity" @click="close"></i>
+            <i
+              class="mdi mdi-close cursor-pointer font-15x opacity"
+              @click="close"
+            ></i>
             <b-button
               variant="link"
               class="text-uppercase text-white text-undecorated p-0 flex-grow-1"
               @click="apply"
-            >{{ $t('Apply') }}</b-button>
+              >{{ $t("Apply") }}</b-button
+            >
           </div>
         </div>
       </b-card>
@@ -212,47 +372,43 @@
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
+
 export default {
-  name: "process-selector",
+  name: "ProcessSelector",
   props: {
     maxLevel: {
       required: false,
-      default: () => "process"
+      default: () => "process",
     },
     showCount: {
       required: false,
-      validator: value => {
+      validator: (value) => {
         return ["items", "ideas", "projects", "toolIdeas"].includes(value);
-      }
+      },
     },
     list: {
       required: false,
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     detail: {
       required: false,
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     section: {
-      required: true
+      required: true,
     },
     onSelection: {
       required: false,
-      type: Function
+      type: Function,
     },
     onApply: {
       required: false,
-      type: Function
+      type: Function,
     },
-    allowEdit: {
-      required: false,
-      type: Boolean,
-      default: () => false
-    }
   },
   data: () => ({
     expanded: false,
@@ -268,32 +424,32 @@ export default {
       process: true,
       stage: true,
       operation: true,
-      phase: true
+      phase: true,
     },
     defaultListFields: {
       withStages: false,
       withStagesFull: false,
-      withIdeas: false
+      withIdeas: false,
     },
 
     defaultDetailFields: {
       withStages: false,
       withStagesFull: false,
-      withIdeas: false
-    }
+      withIdeas: false,
+    },
   }),
   computed: {
     ...mapGetters({
       items: "process/all",
-      currentProcess: "process/current"
+      currentProcess: "process/current",
     }),
     current: {
-      get: function() {
+      get() {
         return this.currentProcess(this.section);
-      }
+      },
     },
     maxLevelNumber: {
-      get: function() {
+      get() {
         switch (this.maxLevel) {
           case "phase":
             return 3;
@@ -304,8 +460,8 @@ export default {
           default:
             return 0;
         }
-      }
-    }
+      },
+    },
   },
   async mounted() {
     try {
@@ -313,7 +469,7 @@ export default {
       this.$store.dispatch("process/setCurrentSection", this.section);
       await this.$store.dispatch("process/findAll", {
         filter: null,
-        fields: Object.assign({}, this.defaultListFields, this.list)
+        fields: Object.assign({}, this.defaultListFields, this.list),
       });
       this.selectedProcess = this.current.process;
     } finally {
@@ -326,7 +482,6 @@ export default {
       this.loading.phase = true;
       if (this.current.process) {
         if (this.selectedProcess) {
-         
           if (this.onSelection) {
             await this.onSelection("process", this.current.process);
           }
@@ -342,46 +497,65 @@ export default {
     }
   },
   methods: {
+    async removeItem(item) {
+      if (!item) return;
+      try {
+        await this.$store.dispatch(
+          "process/delete",
+          new GQLForm({
+            id: item.id,
+          })
+        );
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.initEdit();
+				 this.loading.stage = false;
+          this.loading.operation = false;
+          this.loading.phase = false;
+          this.selectedProcess = null;
+
+        await this.$store.dispatch("process/setCurrentProcess", {
+          section: this.section,
+          process: null,
+          stage: null,
+          operation: null,
+          phase: null,
+        });
+      }
+    },
+    getIdeasCount(item) {
+      if (item.__typename === "Process" && item.stages.length > 0) {
+        let count = 0;
+        item.stages.forEach((s) => {
+          count += s.ideasCount;
+        });
+      }
+
+      if (item.__typename === "ProcessStage" && item.operations.length > 0) {
+        return item.ideaCount;
+      }
+    },
     getCount(section, item) {
       if (!item) {
         return "";
       }
       switch (this.showCount) {
         case "ideas": {
-          let count = item.ideasCount;
-          // switch (section) {
-          //   case "process":
-          //     count = this.$store.getters["idea/byProcess"](item.id).length;
-          //     break;
-          //   case "stage":
-          //     count = this.$store.getters["idea/byStage"](item.id).length;
-          //     break;
-          //   case "operation":
-          //     count = this.$store.getters["idea/byOperation"](item.id).length;
-          //     break;
-          //   case "phase":
-          //     count = this.$store.getters["idea/byPhase"](item.id).length;
-          //     break;
-          // }
+          if (item.__typename === "Process") {
+            let stageIdeaCount = 0;
+            if (item.stages.length > 0) {
+              this.getIdeasCount(item);
+              item.stages.map((stage) => (stageIdeaCount += stage.ideaCount));
+            }
+          }
+
+          const count = item.ideasCount;
+
           return `(${this.$tc("idea.count", count)})`;
         }
         case "toolIdeas": {
-          let count = item.toolIdeasCount;
-          // switch (section) {
-          //   case "process":
-          //     count = this.$store.getters["toolIdea/byProcess"](item.id).length;
-          //     break;
-          //   case "stage":
-          //     count = this.$store.getters["toolIdea/byStage"](item.id).length;
-          //     break;
-          //   case "operation":
-          //     count = this.$store.getters["toolIdea/byOperation"](item.id)
-          //       .length;
-          //     break;
-          //   case "phase":
-          //     count = this.$store.getters["toolIdea/byPhase"](item.id).length;
-          //     break;
-          // }
+          const count = item.toolIdeasCount;
           return `(${this.$tc("idea.count", count)})`;
         }
         case "projects": {
@@ -413,7 +587,7 @@ export default {
             this.$nextTick(() => {
               try {
                 this.$refs[
-                  "process_" + this.selectedProcess.id
+                  `process_${this.selectedProcess.id}`
                 ][0].scrollIntoView();
                 // eslint-disable-next-line
               } catch (ex) {}
@@ -425,7 +599,7 @@ export default {
             this.$nextTick(() => {
               try {
                 this.$refs[
-                  "stage_" + this.selectedStage.id
+                  `stage_${this.selectedStage.id}`
                 ][0].scrollIntoView();
                 // eslint-disable-next-line
               } catch (ex) {}
@@ -437,7 +611,7 @@ export default {
             this.$nextTick(() => {
               try {
                 this.$refs[
-                  "operation_" + this.selectedOperation.id
+                  `operation_${this.selectedOperation.id}`
                 ][0].scrollIntoView();
                 // eslint-disable-next-line
               } catch (ex) {}
@@ -449,7 +623,7 @@ export default {
             this.$nextTick(() => {
               try {
                 this.$refs[
-                  "phase_" + this.selectedPhase.id
+                  `phase_${this.selectedPhase.id}`
                 ][0].scrollIntoView();
                 // eslint-disable-next-line
               } catch (ex) {}
@@ -467,7 +641,7 @@ export default {
       this.expandedSection = "process";
       this.$store.dispatch("app/showOverlay", {
         show: this.expanded,
-        onClick: this.toggleSelector
+        onClick: this.toggleSelector,
       });
     },
     initEdit() {
@@ -478,7 +652,7 @@ export default {
           this.intent++;
           this.editForm = new GQLForm({
             id: this.current.process.id,
-            title: this.current.process.title
+            title: this.current.process.title,
           });
           this.expanded = false;
           this.editing = true;
@@ -504,26 +678,24 @@ export default {
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         this.$nextTick(async () => {
-          //if (this.selectedProcess.title != this.editForm.fields.title) {
+          // if (this.selectedProcess.title != this.editForm.fields.title) {
           await this.$store.dispatch("process/update", this.editForm);
-          /*this.$store.dispatch(
+          /* this.$store.dispatch(
             "process/setCurrentProcess",
             this.items.find(o => o.id === process.id)
-          );*/
-          //}
+          ); */
+          // }
           this.initEdit();
         });
       }
     },
-    cancelEdit() {
-      this.initEdit();
-    },
+
     close() {
       this.expanded = false;
       this.expandedSection = null;
       this.$store.dispatch("app/showOverlay", {
         show: this.expanded,
-        onClick: this.close
+        onClick: this.close,
       });
     },
     async selectProcess(process, toggleNext = false) {
@@ -539,14 +711,33 @@ export default {
         this.selectedOperation = null;
         this.selectedPhase = null;
         this.selectedStage = null;
+
+        if (!process && lastProcess) {
+          this.loading.stage = false;
+          this.loading.operation = false;
+          this.loading.phase = false;
+          this.selectedProcess = null;
+
+          await this.$store.dispatch("process/setCurrentProcess", {
+            section: this.section,
+            process: null,
+            stage: null,
+            operation: null,
+            phase: null,
+          });
+
+          //	 	await this.$store.dispatch("process/resetProcess");
+        }
       }
+
+
       if (process) {
         this.selectedProcess = await this.$store.dispatch("process/findById", {
           id: process.id,
-          ...Object.assign({}, this.defaultDetailFields, this.detail)
+          ...Object.assign({}, this.defaultDetailFields, this.detail),
         });
         this.selectedProcess = this.$store.getters["process/all"].find(
-          o => o.id === process.id
+          (o) => o.id === process.id
         );
         if (this.onSelection) {
           await this.onSelection("process", this.selectedProcess);
@@ -555,7 +746,7 @@ export default {
           this.selectedOperation = null;
           this.selectedPhase = null;
           this.selectedStage = null;
-          //this.selectStage(this.selectedProcess.stages[0]);
+          // this.selectStage(this.selectedProcess.stages[0]);
         }
         this.loading.stage = false;
         this.loading.operation = false;
@@ -583,13 +774,13 @@ export default {
         lastStage.id != this.selectedStage.id ||
         !this.selectedOperation
       ) {
-        //this.selectOperation(this.selectedStage.operations[0]);
+        // this.selectOperation(this.selectedStage.operations[0]);
       } else {
         const operation = this.selectedStage.operations.find(
-          i => i.id === this.selectedOperation.id
+          (i) => i.id === this.selectedOperation.id
         );
         if (!operation) {
-          //this.selectOperation(this.selectedStage.operations[0]);
+          // this.selectOperation(this.selectedStage.operations[0]);
         } else {
           this.selectOperation(operation);
         }
@@ -613,13 +804,13 @@ export default {
         lastOperation.id != this.selectedOperation.id ||
         !this.selectedPhase
       ) {
-        //this.selectPhase(this.selectedOperation.phases[0]);
+        // this.selectPhase(this.selectedOperation.phases[0]);
       } else {
         const phase = this.selectedOperation.phases.find(
-          i => i.id === this.selectedPhase.id
+          (i) => i.id === this.selectedPhase.id
         );
         if (!phase) {
-          //this.selectPhase(this.selectedOperation.phases[0]);
+          // this.selectPhase(this.selectedOperation.phases[0]);
         } else {
           this.selectPhase(phase);
         }
@@ -636,19 +827,19 @@ export default {
     },
     async apply() {
       console.log("Set Current Process");
-      console.log( {
+      console.log({
         section: this.section,
         process: this.selectedProcess,
         stage: this.selectedStage,
         operation: this.selectedOperation,
-        phase: this.selectedPhase
+        phase: this.selectedPhase,
       });
       await this.$store.dispatch("process/setCurrentProcess", {
         section: this.section,
         process: this.selectedProcess,
         stage: this.selectedStage,
         operation: this.selectedOperation,
-        phase: this.selectedPhase
+        phase: this.selectedPhase,
       });
       if (this.onApply) {
         window.vm.$emit("process_processChange");
@@ -657,12 +848,19 @@ export default {
           process: this.selectedProcess,
           stage: this.selectedStage,
           operation: this.selectedOperation,
-          phase: this.selectedPhase
+          phase: this.selectedPhase,
         });
       }
-      //await this.$store.dispatch("process/setCurrentStage", this.selectedStage);
+      // await this.$store.dispatch("process/setCurrentStage", this.selectedStage);
       this.close();
-    }
-  }
+    },
+  },
 };
 </script>
+
+<style>
+.process_selector_popover_custom_class {
+  top: -5px;
+  z-index: 10000;
+}
+</style>

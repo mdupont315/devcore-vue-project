@@ -5,7 +5,7 @@ import Snotify, {
 
 const options = {
     toast: {
-        timeout: 4000,
+        timeout: 3000,
         position: SnotifyPosition.rightTop
     }
 }

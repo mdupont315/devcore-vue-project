@@ -1,296 +1,328 @@
 <template>
   <div
-    class="process-operation"
-    :class="{'enable-drag':!editing, 'active':editing, 'collapsed':collapsed}"
     v-if="item"
     ref="operation"
-    style="position:relative"
+    class="process-operation"
+    :class="{ 'enable-drag': !editing, active: editing, collapsed: collapsed }"
+    style="position: relative"
   >
- 
-      <b-card no-body class="shadow-sm mb-3 bg-white border stage-card">
-        <div v-if="item">
-          <b-card-header class="header">
-            <!-- <div class="tools">
-              <span class="expander" @click="toggleCollapse"></span>
-            </div>-->
-            <div class="title pl-0">
-              <h2 class="h5 m-0 text-capitalize text-left text-overflow text-bold">{{ item.title }}</h2>
-  
-              <div class="tools">
-                <span
-                   class="btn-action2"
-                   @click="toggleView"
-                  >
-                  <i class="mdi mdi-eye"></i>
-                </span>
-
-                <span
-                  class="btn-action2"
-                  @click="toggleEdit"
-                  v-if="$can('process/operation/update', item)"
-                >
-                  <i class="mdi mdi-pencil"></i>
-                </span>
-
-                
-               
-              </div>
-            </div>
-          </b-card-header>
-          <b-card-body class="pt-0">
-            <p class="p-0 m-0 text-gray text-justify text-multiline" style>{{ item.description }}</p>
-            <div>
+    <b-card no-body class="shadow-sm mb-3 bg-white border stage-card">
+      <div v-if="item">
+        <b-card-header class="header" style="width:100%">
+          <div
+            class="title pl-0"
+            style="display: flex; justify-content: space-between"
+          >
               <div
-                class="stacked-avatars px-0"
-                v-if="item.companyRoles && item.companyRoles.length>0"
+                class="h5 m-0 text-capitalize text-left text-overflow text-bold"
               >
-                <div
-                  v-for="role in item.companyRoles"
-                  :key="role.id"
-                  class="avatar-item"
-                  v-b-tooltip="{  placement: 'top', boundary:'viewport' }"
-                  :title="role.name"
-                >
-                  <img :src="role.getAvatarUrl('50x50')" height="21" />
-                </div>
+                {{ item.title }}
+              </div>
+            <div style="display: flex">
+              <div
+                class="btn-action2"
+                @click="toggleView"
+                style="margin-right: 10px; cursor: pointer"
+              >
+                <i class="mdi mdi-eye"></i>
+              </div>
+              <div
+                v-if="$can('process/operation/update', item)"
+                class="btn-action2"
+                @click="toggleEdit"
+                style="cursor: pointer"
+              >
+                <i class="mdi mdi-pencil"></i>
               </div>
             </div>
-            <div class="list-group border-0 border-top-1">
-              <dragable
-                class
-                v-model="phases"
-                @change="onPhaseDrag"
-                v-bind="{disabled:orderBusy||editingCard, group:'phases', draggable:'.enable-drag', animation:200, filter:'.busy'}"
-              >
-                <phase-card
-                  @editing="editingPhase"
-                  v-for="phase in phases"
-                  class="item"
-                  :key="phase.id"
-                  :item="phase"
-                  :operation="item"
-                ></phase-card>
-              </dragable>
-              <action-card
-                ref="newPhaseCard"
-                class="primary list-group-item"
-                @beforeModeChange="preparePhase"
-                @beforeToggle="preparePhase"
-              >
-                <template slot="placeholder">
-                  <b-button variant="transparent" class="text-primary p-3" size="md" block>
-                    <i class="mdi mdi-plus"></i>
-                    {{ $t('Add phase')}}
-                  </b-button>
-                </template>
-                <phase-form v-model="newPhase" @close="closePhaseForm" :operation="item"></phase-form>
-              </action-card>
-            </div>
-          </b-card-body>
-        </div>
-        <div v-else>create new phase</div>
-      </b-card>
-    
-      <div class="view-container" v-if="viewing" >
-        <layer >
-          <div  style="height:1px"></div>
-          <div class="overlay transparent" @click="closeViewPopover" v-if="showViewPopover"  />
+          </div>
+        </b-card-header>
+        <b-card-body class="pt-0">
+          <p class="p-0 m-0 text-gray text-justify text-multiline" v-if="item.description">
+            {{ item.description }}
+          </p>
           <div>
-              <b-row>
-                <b-col>
-                  <b-card class="bg-white shadow-sm" style="padding: 10px" no-body>
-                    <div class="form-group my-0 title">
-                      {{item.title}}
-                    </div>
-                    <div class="form-group my-0">
-                      {{item.description}}
-                    </div>
-                    <div>
-                         <ul
+            <div
+              v-if="item.companyRoles && item.companyRoles.length > 0"
+              class="stacked-avatars px-0"
+            >
+              <div
+                v-for="role in item.companyRoles"
+                :key="role.id"
+                v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
+                class="avatar-item"
+                :title="role.name"
+              >
+                <img :src="role.getAvatarUrl('50x50')" height="21" />
+              </div>
+            </div>
+          </div>
+          <div class="list-group border-0 border-top-1">
+            <dragable
+              v-model="phases"
+              class
+              v-bind="{
+                disabled: orderBusy || editingCard,
+                group: 'phases',
+                draggable: '.enable-drag',
+                animation: 200,
+                filter: '.busy',
+              }"
+              @change="onPhaseDrag"
+            >
+              <phase-card
+                v-for="phase in phases"
+                :key="phase.id"
+                class="item"
+                :item="phase"
+                :operation="item"
+                @editing="editingPhase"
+              ></phase-card>
+            </dragable>
+            <action-card
+              ref="newPhaseCard"
+              class="primary list-group-item"
+              @beforeModeChange="preparePhase"
+              @beforeToggle="preparePhase"
+            >
+              <template slot="placeholder">
+                <b-button
+                  variant="transparent"
+                  class="text-primary p-3"
+                  size="md"
+                  block
+                >
+                  <i class="mdi mdi-plus"></i>
+                  {{ $t("Add phase") }}
+                </b-button>
+              </template>
+              <phase-form
+                v-model="newPhase"
+                :operation="item"
+                @close="closePhaseForm"
+              ></phase-form>
+            </action-card>
+          </div>
+        </b-card-body>
+      </div>
+      <div v-else>create new phase</div>
+    </b-card>
+
+    <div v-if="viewing" class="view-container">
+      <layer>
+        <div style="height: 1px"></div>
+        <div
+          v-if="showViewPopover"
+          class="overlay transparent"
+          @click="closeViewPopover"
+        />
+        <div>
+          <b-row>
+            <b-col>
+              <b-card class="bg-white shadow-sm" style="padding: 10px" no-body>
+                <div class="form-group my-0 title">
+                  {{ item.title }}
+                </div>
+                <div class="form-group my-0">
+                  {{ item.description }}
+                </div>
+                <div>
+                  <ul
+                    v-if="item.companyRoles && item.companyRoles.length > 0"
                     class="list-inline break mb-0"
-                    v-if="item.companyRoles && item.companyRoles.length>0"
                   >
                     <li
-                      class="list-inline-item my-1 mx-1"
                       v-for="role in item.companyRoles"
                       :key="role.id"
-                    >
-                      <img
-                        :src="role.getAvatarUrl('50x50')"
-                        class="rounded rounded-circle border"
-                        height="30"
-                        v-b-tooltip.hover
-                        :title="role.name"
-                      />
-                    </li>
-                  </ul>
-
-                    </div>
-                  </b-card>
-                  
-                </b-col>
-              </b-row>
-            </div>
-            
-          
-        </layer>
-      </div>
-      <div class="form" v-if="editForm">
-        <layer :key="intent" @closed="cancelEdit">
-          <div ref="editRolesPlaceholder" style="height:1px"></div>
-          <div class="overlay transparent" @click="closeRolesPopover" v-if="showRolesPopover" />
-          <b-form @submit.prevent="saveItem">
-            <div>
-              <b-row>
-                <b-col>
-                  <b-card class="bg-white shadow-sm" no-body>
-                    <div class="form-group my-0">
-                      <b-input
-                        v-model="editForm.title"
-                        class="no-style my-0"
-                        style="min-height:20px; height:30px; overflow:hidden"
-                        v-autofocus="true"
-                        v-autoresize
-                        :state="$validateState('title', editForm)"
-                        v-validate="'required|min:4'"
-                        :placeholder="$t('Operation name')"
-                        name="title"
-                        :key="intent"
-                      ></b-input>
-                      <b-form-invalid-feedback>{{ $displayError('title', editForm) }}</b-form-invalid-feedback>
-                    </div>
-                    <div class="form-group my-0">
-                      <b-textarea
-                        v-model="editForm.description"
-                        class="no-style my-0"
-                        style="min-height:20px; overflow:hidden"
-                        v-autoresize
-                        :placeholder="$t('Operation description')"
-                        :state="$validateState('description', editForm)"
-                        name="description"
-                        :key="intent"
-                      ></b-textarea>
-                      <b-form-invalid-feedback>{{ $displayError('description', editForm) }}</b-form-invalid-feedback>
-                    </div>
-                  </b-card>
-                  <div class="mt-3">
-                    <loading-button
-                      size="md"
-                      :loading="editForm.busy"
-                      :disabled="vErrors.any() || editForm.busy"
-                      type="submit"
-                      class="padding shadow-sm"
-                    >{{ $t('Save') }}</loading-button>
-                  </div>
-                </b-col>
-              </b-row>
-            </div>
-            <b-popover
-              placement="rightbottom"
-              :show="true"
-              :target="()=>$refs.editRolesPlaceholder"
-              custom-class="no-arrow transparent offset-t-5"
-              :key="intent"
-            >
-              <b-card class="bg-light shadow-sm" no-body style="width:210px">
-                <b-card-body>
-                  <ul
-                    class="list-inline break mb-0"
-                    v-if="editForm.companyRoles && editForm.companyRoles.length>0"
-                  >
-                    <li
                       class="list-inline-item my-1 mx-1"
-                      v-for="role in selectedRoles"
-                      :key="role.id"
                     >
                       <img
+                        v-b-tooltip.hover
                         :src="role.getAvatarUrl('50x50')"
                         class="rounded rounded-circle border"
                         height="30"
-                        v-b-tooltip.hover
                         :title="role.name"
                       />
                     </li>
                   </ul>
-                  <span v-else class="text-dark">{{ $t('No') }} {{ $t('roles') }} {{ $t('selected') }}</span>
-                </b-card-body>
-                <b-card-footer class="mx-2">
-                  <b-button
-                    block
-                    variant="white"
-                    class="text-primary"
-                    size="md"
-                    ref="btnAssignRoles"
-                    @click="toggleRolesPopover"
-                  >+ {{$t('Assign roles')}}</b-button>
-                  <b-popover
-                    :target="()=>$refs.btnAssignRoles"
-                    placement="bottom"
-                    custom-class="offset-t-5"
-                    :show.sync="showRolesPopover"
-                  >
-                    <div style="width:210px; overflow:hidden;" class="rounded">
-                      <company-role-selector
-                        v-model="editForm.companyRoles"
-                        :key="intent"
-                        selector-class="rounded"
-                        :show-input="false"
-                        :show-footer-selection="false"
-                        :showFooterDisplay="false"
-                        @close="toggleRolesPopover"
-                        :items="availableRoles"
-                        :show-add-btn="$can('core/companyRole/create')"
-                      ></company-role-selector>
-                    </div>
-                  </b-popover>
-                </b-card-footer>
+                </div>
               </b-card>
-              <div class="mt-2" v-if="$can('process/operation/delete', editItem)">
-                <confirm-button
-                  variant="transparent"
-                  :confirmMessage="$t('This action cannot be undone!')"
-                  :confirmTitle="$t('Delete operation')+'?'"
-                  :confirmText="$t('Delete operation')"
-                  btnClass="text-white border outline-none"
-                  size="xs"
-                  :showOverlay="false"
+            </b-col>
+          </b-row>
+        </div>
+      </layer>
+    </div>
+    <div v-if="editForm" class="form">
+      <layer :key="intent" @closed="cancelEdit">
+        <div ref="editRolesPlaceholder" style="height: 1px"></div>
+        <div
+          v-if="showRolesPopover"
+          class="overlay transparent"
+          @click="closeRolesPopover"
+        />
+        <b-form @submit.prevent="saveItem">
+          <div>
+            <b-row>
+              <b-col>
+                <b-card class="bg-white shadow-sm" no-body>
+                  <div class="form-group my-0">
+                    <b-input
+                      :key="intent"
+                      v-model="editForm.title"
+                      v-autofocus="true"
+                      v-autoresize
+                      v-validate="'required|min:4'"
+                      class="no-style my-0"
+                      style="min-height: 20px; height: 30px; overflow: hidden"
+                      :state="$validateState('title', editForm)"
+                      :placeholder="$t('Operation name')"
+                      name="title"
+                    ></b-input>
+                    <b-form-invalid-feedback>{{
+                      $displayError("title", editForm)
+                    }}</b-form-invalid-feedback>
+                  </div>
+                  <div class="form-group my-0">
+                    <b-textarea
+                      :key="intent"
+                      v-model="editForm.description"
+                      v-autoresize
+                      class="no-style my-0"
+                      style="min-height: 20px; overflow: hidden"
+                      :placeholder="$t('Operation description')"
+                      :state="$validateState('description', editForm)"
+                      name="description"
+                    ></b-textarea>
+                    <b-form-invalid-feedback>{{
+                      $displayError("description", editForm)
+                    }}</b-form-invalid-feedback>
+                  </div>
+                </b-card>
+                <div class="mt-3">
+                  <loading-button
+                    size="md"
+                    :loading="editForm.busy"
+                    :disabled="vErrors.any() || editForm.busy"
+                    type="submit"
+                    class="padding shadow-sm"
+                    >{{ $t("Save") }}</loading-button
+                  >
+                </div>
+              </b-col>
+            </b-row>
+          </div>
+          <b-popover
+            :key="intent"
+            placement="rightbottom"
+            :show="true"
+            :target="() => $refs.editRolesPlaceholder"
+            custom-class="no-arrow transparent offset-t-5"
+          >
+            <b-card class="bg-light shadow-sm" no-body style="width: 210px">
+              <b-card-body>
+                <ul
+                  v-if="
+                    editForm.companyRoles && editForm.companyRoles.length > 0
+                  "
+                  class="list-inline break mb-0"
+                >
+                  <li
+                    v-for="role in selectedRoles"
+                    :key="role.id"
+                    class="list-inline-item my-1 mx-1"
+                  >
+                    <img
+                      v-b-tooltip.hover
+                      :src="role.getAvatarUrl('50x50')"
+                      class="rounded rounded-circle border"
+                      height="30"
+                      :title="role.name"
+                    />
+                  </li>
+                </ul>
+                <span v-else class="text-dark"
+                  >{{ $t("No") }} {{ $t("roles") }} {{ $t("selected") }}</span
+                >
+              </b-card-body>
+              <b-card-footer class="mx-2">
+                <b-button
+                  ref="btnAssignRoles"
                   block
-                  @confirm="deleteItem"
-                >{{ $t('Delete operation') }}</confirm-button>
-              </div>
-            </b-popover>
-          </b-form>
-        </layer>
-      </div>
+                  variant="white"
+                  class="text-primary"
+                  size="md"
+                  @click="toggleRolesPopover"
+                  >+ {{ $t("Assign roles") }}</b-button
+                >
+                <b-popover
+                  :target="() => $refs.btnAssignRoles"
+                  placement="bottom"
+                  custom-class="offset-t-5"
+                  :show.sync="showRolesPopover"
+                >
+                  <div style="width: 210px; overflow: hidden" class="rounded">
+                    <company-role-selector
+                      :key="intent"
+                      v-model="editForm.companyRoles"
+                      selector-class="rounded"
+                      :show-input="false"
+                      :show-footer-selection="false"
+                      :show-footer-display="false"
+                      :items="availableRoles"
+                      :show-add-btn="$can('core/companyRole/create')"
+                      @close="toggleRolesPopover"
+                    ></company-role-selector>
+                  </div>
+                </b-popover>
+              </b-card-footer>
+            </b-card>
+            <div v-if="$can('process/operation/delete', editItem)" class="mt-2">
+              <confirm-button
+                variant="transparent"
+                :confirm-message="$t('This action cannot be undone!')"
+                :confirm-title="$t('Delete operation') + '?'"
+                :confirm-text="$t('Delete operation')"
+                btn-class="text-white border outline-none"
+                size="xs"
+                :show-overlay="false"
+                block
+                @confirm="deleteItem"
+                >{{ $t("Delete operation") }}</confirm-button
+              >
+            </div>
+          </b-popover>
+        </b-form>
+      </layer>
+    </div>
   </div>
 </template>
 <script>
+import { /* mapState, */ mapGetters } from "vuex";
+import draggable from "vuedraggable";
 import GQLForm from "@/lib/gqlform";
 import { ProcessOperation, ProcessPhase } from "@/models";
 import PhaseCard from "../phase/Card";
 import PhaseForm from "../phase/Form";
-import { /*mapState,*/ mapGetters } from "vuex";
 
-import draggable from "vuedraggable";
 export default {
-  props: {
-    item: {
-      required: false
-    },
-    stage: {
-      required: true
-    },
-    mode: {
-      required: false
-    },
-    moving: {
-      required: false
-    }
-  },
   components: {
     dragable: draggable,
     "phase-card": PhaseCard,
-    "phase-form": PhaseForm
+    "phase-form": PhaseForm,
+  },
+  props: {
+    item: {
+      required: false,
+    },
+    stage: {
+      required: true,
+    },
+    mode: {
+      required: false,
+    },
+    moving: {
+      required: false,
+    },
   },
   data: () => ({
     collapsed: true,
@@ -309,7 +341,7 @@ export default {
   }),
   computed: {
     ...mapGetters({
-      allRoles: "companyRole/all"
+      allRoles: "companyRole/all",
     }),
     availableRoles: {
       get() {
@@ -317,27 +349,27 @@ export default {
         //   this.allRoles.find(o => o.id === r.id)
         // );
         return this.allRoles;
-      }
+      },
     },
     selectedRoles: {
       get() {
         return this.availableRoles
-          .filter(r => this.editForm.companyRoles.includes(r.id))
+          .filter((r) => this.editForm.companyRoles.includes(r.id))
           .sort((a, b) => (a.name > b.name ? 1 : -1));
-      }
+      },
     },
     phases: {
-      get: function() {
+      get() {
         return [...this.item.phases].sort((a, b) => {
           return a.dOrder > b.dOrder ? 1 : -1;
         });
       },
-      set: function(value) {
+      set(value) {
         this.item.phases = value.sort((a, b) => {
           return a.dOrder > b.dOrder ? 1 : -1;
         });
-      }
-    }
+      },
+    },
   },
   async mounted() {
     await this.$store.dispatch("companyRole/findAll");
@@ -348,11 +380,11 @@ export default {
     },
     toggleMenu() {
       this.showMenu = !this.showMenu;
-      //this.showOverlay=this.showMenu;
+      // this.showOverlay=this.showMenu;
     },
     hideMenu() {
       this.showMenu = false;
-      //this.showOverlay=false;
+      // this.showOverlay=false;
     },
     toggleEdit() {
       this.$store.dispatch("app/showInnerOverlay");
@@ -370,7 +402,7 @@ export default {
             stageId: this.editItem.stageId,
             title: this.editItem.title,
             description: this.editItem.description,
-            companyRoles: this.editItem.companyRoles.map(r => r.id)
+            companyRoles: this.editItem.companyRoles.map((r) => r.id),
           });
           this.$validator.reset();
           this.$validator.resume();
@@ -378,12 +410,10 @@ export default {
       }
     },
     toggleView() {
-      
       this.$store.dispatch("app/showInnerOverlay");
       this.showOverlay = !this.showOverlay;
       this.viewing = !this.viewing;
       this.$emit("viewing", this.viewing);
-      
     },
     toggleOverlay() {
       if (this.editing) {
@@ -418,7 +448,7 @@ export default {
     preparePhase() {
       this.newPhase = new ProcessPhase().deserialize({
         operationId: this.item.id,
-        companyRoles: []
+        companyRoles: [],
       });
       this.$nextTick(() => {
         document.getElementById("main").scrollTop =
@@ -438,7 +468,7 @@ export default {
             new GQLForm({
               id: event.moved.element.id,
               operationId: event.moved.element.operationId,
-              dOrder: newOrder
+              dOrder: newOrder,
             })
           );
         }
@@ -451,16 +481,16 @@ export default {
               id: event.added.element.id,
               operationId: this.item.id,
               dOrder: newOrder,
-              companyRoles: event.added.element.companyRoles.map(i => i.id),
+              companyRoles: event.added.element.companyRoles.map((i) => i.id),
               title: event.added.element.title,
-              description: event.added.element.description
+              description: event.added.element.description,
             })
           );
         }
         // eslint-disable-next-line
       } catch (ex) {
         console.log(ex);
-        //dont care about the error
+        // dont care about the error
       } finally {
         this.orderBusy = false;
       }
@@ -482,7 +512,7 @@ export default {
       this.editItem = null;
       this.editForm = null;
       this.showOverlay = false;
-    }
-  }
+    },
+  },
 };
 </script>

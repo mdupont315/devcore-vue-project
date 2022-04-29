@@ -1,19 +1,20 @@
 <template>
-  <span class="time-ago" v-b-tooltip :title="$tc('time.at', parsedTime)">{{ text }}</span>
+  <span v-b-tooltip class="time-ago" :title="$tc('time.at', parsedTime)">{{ text }}</span>
 </template>
 <script>
 import moment from "moment";
+
 export default {
-  name: "time-ago",
-  data: () => ({
-    text: null,
-    parsedTime: null
-  }),
+  name: "TimeAgo",
   props: {
     time: {
       required: false
     }
   },
+  data: () => ({
+    text: null,
+    parsedTime: null
+  }),
   mounted() {
     this.count();
     this.parsedTime = moment.utc(this.time).local().format("DD/MM/YYYY HH:mm:ss");

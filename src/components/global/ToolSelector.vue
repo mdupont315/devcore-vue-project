@@ -2,49 +2,56 @@
   <super-select
     :items="tools"
     class="text-selector"
-    @input="change"
     selector-class="list"
+    v-model="dataValue"
     :v-bind="$props"
-    :placeholder="$t('Tools')"
+    ref="selector"
+    :placeholder="placeHolderText"
+    v-if="ready"
     :state="state"
     :outside-close="!showPopOver"
-    v-model="dataValue"
-    ref="selector"
-    v-if="ready"
     :show-input="showInput"
     :show-footer-selection="false"
-    :filterFn="filter"
+    @input="change"
+    :filter-fn="filter"
     :show-add-btn="showAddBtn"
-    :maxDisplayItems="1"
+    :max-display-items="1"
     @close="close"
   >
-    <template slot="selection-count" slot-scope="props">{{ $tc('tool.count', props.values.length) }}</template>
+    <template slot="selection-count" slot-scope="props">
+      {{ $tc("tool.count", props.values.length) }}</template
+    >
     <template slot="dropdown-item" slot-scope="props">
       <div class="text-left">
-        <span class="break-word">{{ props.item.name }}</span>
+        <span class="break-word"> {{ props.item.name }}</span>
       </div>
     </template>
     <template slot="header-display">
-      <div class="selected-item" v-if="selectedItems && selectedItems.length>0">
+      <div v-if="selectedItemsAndLength()" class="selected-item">
         <div
-          class="text-overflow"
-          v-for="item in selectedItems.slice(0,maxDisplayItems)"
+          v-for="item in selectedItems.slice(0, maxDisplayItems)"
           :key="item.id"
-          v-b-tooltip="{  placement: 'top', boundary:'viewport' }"
+          v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
+          class="text-overflow"
           :title="item.name"
-        >{{ item.name }}</div>
+        >
+          {{ getName(item) }}
+        </div>
       </div>
     </template>
     <template slot="header-display-overflow">
-      <span
-        class="overflow"
-        v-if="selectedItems.length>maxDisplayItems"
-      >{{ selectedItems && selectedItems.length>maxDisplayItems?'+'+(selectedItems.length - maxDisplayItems ):null }}</span>
+      <span v-if="selectedItems.length > maxDisplayItems" class="overflow">{{
+        selectedItems && selectedItems.length > maxDisplayItems
+          ? "+" + (selectedItems.length - maxDisplayItems)
+          : null
+      }}</span>
     </template>
     <template slot="display-details" slot-scope="props">
-      <ul class="list-unstyled" v-if="props.items">
+      <ul v-if="props.items" class="list-unstyled">
         <li v-for="item in selectedItems" :key="item.id" class="my-1 row">
-          <span class="col-10 text-overflow">{{ item.name }}</span>
+          <span class="col-10 text-overflow">
+            {{ item.name }} {{ item.status }}
+          </span>
           <b-button
             class="col-2 btn-white btn-outline-danger btn-xs border-0 text-danger"
             @click.stop="removeItem(item, $event)"
@@ -57,73 +64,79 @@
   </super-select>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
+
 export default {
-  name: "tool-selector",
+  name: "ToolSelector",
   props: {
+    placeHolderText: null,
     items: {
       required: false,
-      type: Array
+      type: Array,
     },
     value: {
       required: false,
-      default: () => []
+      default: () => [],
     },
     state: {
-      required: false
+      required: false,
     },
     showAddBtn: {
       required: false,
-      default: () => true
+      default: () => true,
     },
     showInput: {
       required: false,
-      default: () => true
+      default: () => true,
     },
     showFooterSelection: {
       required: false,
-      default: () => false
-    }
+      default: () => false,
+    },
   },
   $_veeValidate: {
     // fetch the current value from the innerValue defined in the component data.
     name() {
-      return this.name;
+      return this.title;
     },
     value() {
       return this.value;
-    }
+    },
   },
   data: () => ({
     showPopOver: false,
     dataValue: [],
     ready: false,
-    maxDisplayItems: 1
+    maxDisplayItems: 1,
   }),
   computed: {
     ...mapGetters({
-      allTools: "companyTool/all"
+      allTools: "companyTool/all",
     }),
     tools: {
       get() {
-        return (this.items || this.allTools).sort((a, b) =>
-          a.name > b.name ? 1 : -1
+        const allTools = this.allTools.filter(
+          (tool) => tool.type === "TOOL"
         );
-      }
+        return (this.items || allTools).sort((a, b) =>
+          a.title > b.title ? 1 : -1
+        );
+      },
     },
     selectedItems: {
       get() {
         return this.tools
-          .filter(r => this.dataValue.includes(r.id))
-          .sort((a, b) => (a.name > b.name ? 1 : -1));
-      }
-    }
+          .filter((r) => this.dataValue.includes(r.id))
+          .sort((a, b) => (a.title > b.title ? 1 : -1));
+      },
+    },
   },
+
   async mounted() {
     await this.$store.dispatch("companyTool/findAll");
     if (this.value) {
       this.dataValue = this.value.filter(
-        o => this.tools.find(u => u.id === o) != null
+        (o) => this.tools.find((u) => u.id === o) != null
       );
     } else {
       this.dataValue = [];
@@ -131,10 +144,16 @@ export default {
     this.ready = true;
   },
   methods: {
+    selectedItemsAndLength() {
+      return this.selectedItems && this.selectedItems.length > 0;
+    },
+    getName(item) {
+      return item.name;
+    },
     removeItem(item, event) {
       event.stopPropagation();
       if (item) {
-        this.dataValue = this.dataValue.filter(i => i !== item.id);
+        this.dataValue = this.dataValue.filter((i) => i !== item.id);
         this.$refs.selector.setDataValue(this.dataValue);
         this.$emit("input", this.dataValue);
       }
@@ -159,12 +178,12 @@ export default {
       }
       let ret = this.tools;
       if (value) {
-        ret = this.tools.filter(i =>
+        ret = this.tools.filter((i) =>
           i.name.toLowerCase().includes(value.toLowerCase())
         );
       }
       return ret;
-    }
-  }
+    },
+  },
 };
 </script>

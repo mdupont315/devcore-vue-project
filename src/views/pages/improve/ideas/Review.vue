@@ -2,24 +2,36 @@
   <div>
     <b-row v-if="currentProcessSection">
       <b-col>
-        <h3 class="h4 text-white text-uppercase" style="padding-top:15px">
-          {{ $t('In testing') }}
+        <h3 class="h4 text-white text-uppercase" style="padding-top: 15px">
+          {{ $t("In testing") }}
           <span class="text-gray-lighter">{{ testingIdeas.length }}</span>
         </h3>
-        <idea-card v-for="item in testingIdeas" :key="item.id" :idea="item"></idea-card>
-        <div v-if="testingIdeas.length==0">
+        <idea-card
+          v-for="item in testingIdeas"
+          :id="`idea-id-${item.uuid}`"
+          :ref="`idea-ref-${item.uuid}`"
+          :key="item.id"
+          :idea="item"
+        ></idea-card>
+        <div v-if="testingIdeas.length == 0">
           <p class="alert alert-warning">
             {{ $t("There are no records for the given criteria") }}
           </p>
         </div>
       </b-col>
       <b-col>
-        <h3 class="h4 text-white text-uppercase" style="padding-top:15px">
-          {{ $t('Evaluated ideas') }}
+        <h3 class="h4 text-white text-uppercase" style="padding-top: 15px">
+          {{ $t("Evaluated ideas") }}
           <span class="text-gray-lighter">{{ evaluatedIdeas.length }}</span>
         </h3>
-        <idea-card v-for="item in evaluatedIdeas" :key="item.id" :idea="item"></idea-card>
-        <div v-if="evaluatedIdeas.length==0">
+        <idea-card
+          v-for="item in evaluatedIdeas"
+          :id="`idea-id-${item.uuid}`"
+          :ref="`idea-ref-${item.uuid}`"
+          :key="item.id"
+          :idea="item"
+        ></idea-card>
+        <div v-if="evaluatedIdeas.length == 0">
           <p class="alert alert-warning">
             {{ $t("There are no records for the given criteria") }}
           </p>
@@ -31,31 +43,46 @@
 <script>
 import { mapGetters } from "vuex";
 import IdeaCard from "./Card";
+
 export default {
   components: {
-    "idea-card": IdeaCard
+    "idea-card": IdeaCard,
+  },
+  mounted() {
+    if (this.$router.currentRoute.query) {
+      if (this.$router.currentRoute.query.uuid) {
+        const { uuid } = this.$router.currentRoute.query;
+        this.$nextTick(() => {
+          const ideaSelector = `idea-id-${uuid}`;
+          const element = document.getElementById(ideaSelector);
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        });
+      }
+    }
   },
   computed: {
     ...mapGetters({
-      currentProcess: "process/current"
+      currentProcess: "process/current",
     }),
     process: {
-      get: function() {
+      get() {
         return this.currentProcess("ideas");
-      }
+      },
     },
     currentProcessSection: {
-      get: function() {
+      get() {
         return (
           this.process.phase ||
           this.process.operation ||
           this.process.stage ||
           this.process.process
         );
-      }
+      },
     },
     currentProcessSectionName: {
-      get: function() {
+      get() {
         if (this.process.phase) {
           return "phase";
         }
@@ -69,52 +96,50 @@ export default {
           return "process";
         }
         return null;
-      }
+      },
     },
     testingIdeas: {
-      get: function() {
+      get() {
         if (this.currentProcessSection) {
           return this.$store.getters[
-            "idea/by" + this.currentProcessSectionName.capitalize()
-          ](this.currentProcessSection.id).filter(i => this.filterByProcessSection(i,"TESTING") && !i.hasReviews);
-        }
-        return [];
-      }
-    },
-    evaluatedIdeas: {
-      get: function() {
-        if (this.currentProcessSection) {
-          return this.$store.getters[
-            "idea/by" + this.currentProcessSectionName.capitalize()
+            `idea/by${this.currentProcessSectionName.capitalize()}`
           ](this.currentProcessSection.id).filter(
-            i => this.filterByProcessSection(i,"TESTING") && i.hasReviews
+            (i) => this.filterByProcessSection(i, "TESTING") && !i.hasReviews
           );
         }
         return [];
-      }
-    }
+      },
+    },
+    evaluatedIdeas: {
+      get() {
+        if (this.currentProcessSection) {
+          return this.$store.getters[
+            `idea/by${this.currentProcessSectionName.capitalize()}`
+          ](this.currentProcessSection.id).filter(
+            (i) => this.filterByProcessSection(i, "TESTING") && i.hasReviews
+          );
+        }
+        return [];
+      },
+    },
   },
-  methods: { 
-    filterByProcessSection(item,status){
-       switch(this.currentProcessSectionName){
-         case 'process':
-           return (item.status === status)
-           break;
-         case 'stage':
-           return (item.status === status && item.parentType === 'process_stage'  )
-           break;
-         case 'operation':
-           return (item.status === status && item.parentType === 'process_operation'  )
-           break;
-
-        case 'phase':
-           return (item.status === status && item.parentType === 'process_phase'  )
-           break;  
-         default: 
-           return false;
-
-
-       }
-    }}
+  methods: {
+    filterByProcessSection(item, status) {
+      switch (this.currentProcessSectionName) {
+        case "process":
+          return item.status === status;
+        case "stage":
+          return item.status === status && item.parentType === "process_stage";
+        case "operation":
+          return (
+            item.status === status && item.parentType === "process_operation"
+          );
+        case "phase":
+          return item.status === status && item.parentType === "process_phase";
+        default:
+          return false;
+      }
+    },
+  },
 };
 </script>

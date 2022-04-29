@@ -3,15 +3,15 @@
     <div class="page bg-white">
       <div class="container">
         <h2 class="h1 border-bottom">{{ company.name }}</h2>
-        <b-form @submit.prevent="save" @keyup="$validator.validateAll()" class="floating-labels">
+        <b-form class="floating-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
           <div class="text-center">
             <image-upload
+              ref="uploader"
               v-model="form.file"
               :uploading="form.busy"
               class="rounded"
+              :current-image="company.getLogoUrl('200x200')"
               @remove="()=>form.deleteLogo=true"
-              :currentImage="company.getLogoUrl('200x200')"
-              ref="uploader"
             />
           </div>
           <hr />
@@ -20,13 +20,13 @@
               <div class="form-label-group required">
                 <b-form-input
                   id="name"
-                  :disabled="form.busy"
                   v-model="form.name"
+                  v-validate="'required|min:2'"
+                  :disabled="form.busy"
                   :placeholder="$t('Name')"
                   type="text"
                   name="name"
                   :state="$validateState('name',form)"
-                  v-validate="'required|min:4'"
                 ></b-form-input>
                 <label for="name">
                   <i class="mdi mdi-domain"></i>
@@ -41,13 +41,13 @@
               <div class="form-label-group select required">
                 <b-form-select
                   id="currencyCode"
-                  :disabled="form.busy"
                   v-model="form.currencyCode"
+                  v-validate="'required'"
+                  :disabled="form.busy"
                   :placeholder="$t('Currency')"
                   type="text"
                   name="currencyCode"
                   :state="$validateState('currencyCode', form)"
-                  v-validate="'required'"
                 >
                   <option :value="null">--- {{ $t('None')}} ---</option>
                   <option
@@ -84,7 +84,7 @@
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
 
 export default {
@@ -111,7 +111,7 @@ export default {
       Object.keys(this.company)
         .filter(key => key in this.form)
         .forEach(key => (this.form[key] = this.company[key]));
-      //set the image
+      // set the image
       this.$refs.uploader.image = this.company.getLogoUrl("200x200");
     },
     async save() {

@@ -4,6 +4,6 @@
 
 import Vue from 'vue'
 
-import globalEventBus from '../plugins/globalEventBus'
+import globalEventBus from "./globalEventBus"
 
 Vue.use(globalEventBus)

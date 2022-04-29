@@ -2,20 +2,20 @@
   <div>
     <inner-overlay @click="close"></inner-overlay>
     <b-card style="position:relative;z-index:1000">
-      <b-form @submit.prevent="save" @keyup="$validator.validateAll()" class="hide-labels">
+      <b-form class="hide-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
         <b-row>
           <b-col cols="12">
             <div class="form-group">
               <b-form-input
                 id="name"
-                :disabled="form.busy"
-                v-model="form.title"
+                v-model.trim="form.title"
                 v-autofocus
+                v-validate="'required|min:4'"
+                :disabled="form.busy"
                 :placeholder="$t('Phase name')"
                 type="text"
                 name="title"
                 :state="$validateState('title', form)"
-                v-validate="'required|min:4'"
               ></b-form-input>
               <label for="name">{{ $t('Name') }}</label>
               <b-form-invalid-feedback>{{ $displayError('title', form) }}</b-form-invalid-feedback>
@@ -25,8 +25,8 @@
             <div class="form-group">
               <b-form-textarea
                 id="description"
-                :disabled="form.busy"
                 v-model="form.description"
+                :disabled="form.busy"
                 :placeholder="$t('Phase description')"
                 name="description"
                 :state="$validateState('description', form)"
@@ -38,11 +38,11 @@
           <b-col cols="12">
             <div class="form-group">
               <company-role-selector
+                v-model="form.companyRoles"
                 :show-field="true"
                 name="companyRoles"
                 style="z-index:1;position:relative"
                 :state="$validateState('companyRoles', form)"
-                v-model="form.companyRoles"
                 :items="availableRoles"
                 :show-add-btn="$can('core/companyRole/create')"
               ></company-role-selector>
@@ -66,8 +66,9 @@
   </div>
 </template>
 <script>
-import GQLForm from "@/lib/gqlform";
 import { mapGetters } from "vuex";
+import GQLForm from "@/lib/gqlform";
+
 export default {
   props: {
     value: {
@@ -80,7 +81,7 @@ export default {
   data: () => ({
     input: null,
     form: new GQLForm({
-      //id: undefined,
+      // id: undefined,
       operationId: null,
       title: null,
       description: null,

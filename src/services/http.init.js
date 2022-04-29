@@ -31,9 +31,9 @@ export class Http {
               request.headers.authorization = AuthService.getBearer()
               return request
             }).catch(error => Promise.reject(error))
-        } else {
-          return request
         }
+          return request
+
       }, error => {
         return Promise.reject(error)
       })

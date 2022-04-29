@@ -5,10 +5,15 @@ import ProcessOperationModel from "./processoperation.model";
 
 export default class ProcessPhaseModel extends BaseModel {
     title = null;
+
     dOrder = 1;
+
     id = null;
+
     ideas = [];
+
     companyRoles = [];
+
     operationId = null;
 
     get ideaStats() {
@@ -34,6 +39,7 @@ export default class ProcessPhaseModel extends BaseModel {
     get projectsCount() {
         return this.projectsStats.total || 0;
     }
+
     deserialize(input) {
         if (input.companyRoles) {
             input.companyRoles = input.companyRoles.map(u => {

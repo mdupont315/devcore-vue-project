@@ -33,12 +33,12 @@ const actions = {
             const response = await apolloClient.query({
                 query: CURRENCY.findAll,
                 variables: {
-                    filter: filter
+                    filter
                 },
                 fetchPolicy: 'default',
             });
             context.commit("SET_ALL", response.data.currencyFindAll);
-            return context.getters["all"];
+            return context.getters.all;
         } catch (ex) {
             console.info(ex);
         }
@@ -59,8 +59,8 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state: state,
-    getters: getters,
-    actions: actions,
-    mutations: mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

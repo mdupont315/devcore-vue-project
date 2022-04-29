@@ -1,7 +1,7 @@
 <template>
   <div class="top-selector" :class="{expanded:expanded}">
     <div class="title">{{ title }}</div>
-    <div class="current-selection" @click="toggle" ref="currentSelection">
+    <div ref="currentSelection" class="current-selection" @click="toggle">
       <div class="text-overflow">
         <slot name="current" v-bind="{value:this.currentItem, items:items}">{{$t('All')}}</slot>
       </div>
@@ -11,10 +11,10 @@
         <div class="top-selector-content">
           <div class="content">
             <div
-              class="item"
-              :class="{active:isItemActive(item)}"
               v-for="(item,index) in items"
               :key="index"
+              class="item"
+              :class="{active:isItemActive(item)}"
             >
               <slot name="item" v-bind="{item:item, items:items}">{{ item }}</slot>
             </div>
@@ -26,7 +26,7 @@
 </template>
 <script>
 export default {
-  name: "top-selector",
+  name: "TopSelector",
   props: {
     items: {
       default: () => [],

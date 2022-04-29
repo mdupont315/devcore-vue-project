@@ -1,70 +1,78 @@
 <template>
-  <div class="ml-3" v-if="$can('improve/idea/create') && process && process.stages.length > 0">
+  <div
+    v-if="$can('improve/idea/create') && process && process.stages.length > 0"
+    class="ml-3"
+    style="display: flex; align-items: center"
+  >
+    <b-tooltip target="btnNew" triggers="hover" :key="tooltipIntent" >
+      {{ $t("Create New") + " " + $t("Idea") }}
+    </b-tooltip>
     <b-button
+      id="btnNew"
       size="sm"
       class="text-uppercase"
       variant="primary"
       :title="$t('Create New') + ' ' + $t('Idea')"
-      v-b-tooltip.hover
-      id="btnNew"
-      @click="togglePopOver"
+      :disabled="!!ideaInEdit"
+      @click="createNewIdea($event)"
     >
       <i class="mdi mdi-plus"></i>
-      {{ $t('New')}}
+      {{ $t("New") }}
     </b-button>
-    <b-popover
-      target="btnNew"
-      :show.sync="showPopOver"
-      placement="bottom"
-      class="form-popover"
-      ref="popover"
-    >
-      <b-card no-body style="width:500px">
-        <b-card-body>
-          <idea-form @done="togglePopOver" type="PROCESS" :item="item"></idea-form>
-        </b-card-body>
-      </b-card>
-    </b-popover>
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
-import Form from "./Form";
+import { /* mapState, */ mapGetters } from "vuex";
 import { Idea } from "@/models";
+
 export default {
   data: () => {
     return {
       option: false,
       showPopOver: false,
-      item: {}
+      item: {},
+			tooltipIntent: Math.random()
     };
   },
   computed: {
     ...mapGetters({
-      currentProcess: "process/current"
+      currentProcess: "process/current",
+      ideaInEdit: "idea/ideaInEdit",
     }),
+
     process: {
-      get: function() {
+      get() {
+        console.log(this.currentProcess("ideas"));
         return this.currentProcess("ideas")
           ? this.currentProcess("ideas").process
           : null;
-      }
-    }
-  },
-  components: {
-    "idea-form": Form
-  },
-  mounted(){
+      },
+    },
   },
   methods: {
+    async createNewIdea(event) {
+			event.preventDefault();
+			this.tooltipIntent = Math.random();
+      await this.$store.dispatch(`idea/setIdeaTab`, {
+        tab: "New",
+      });
+
+      await this.$store.dispatch("idea/setIdeaInEdit", {
+        editIdeaMeta: {
+          editStartedAt: new Date().getTime(),
+        },
+        editIdeaMode: "CREATE",
+        editIdeaId: "NEW",
+      });
+    },
     togglePopOver() {
       this.item = new Idea();
       this.showPopOver = !this.showPopOver;
       this.$store.dispatch("app/showOverlay", {
         show: this.showPopOver,
-        onClick: this.togglePopOver
+        onClick: this.togglePopOver,
       });
-    }
-  }
+    },
+  },
 };
 </script>

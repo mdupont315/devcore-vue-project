@@ -13,4 +13,6 @@ export default class CompanyModel extends BaseModel {
     }
 
 
+
+
 }

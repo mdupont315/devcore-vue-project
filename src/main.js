@@ -1,98 +1,67 @@
-// import Vue from 'vue'
+import Vue from "vue";
+import "./registerServiceWorker";
+import VueApollo from "vue-apollo";
+import BootstrapVue from "bootstrap-vue";
+import router from "./router";
+import store from "./store";
+import i18n from "./i18n";
+import VueTheMask from "vue-the-mask";
 
-// import AppLayout from './layout/index.vue'
-// import router from './router'
-// import store from './store'
+import DefaultLayout from "./views/layouts/DefaultLayout";
+import ExternalLayout from "./views/layouts/ExternalLayout";
+import AppComponent from "./App.vue";
+/* import wysiwyg from 'vue-wysiwyg';
+ */
+import 'remixicon/fonts/remixicon.css'
+import "@/lib/functions";
 
-// import './mixins'
-// import './plugins'
-// import './thirdParty'
-
-// import './scss/style.scss'
-// import './assets/fonts/bebasneue.css'
-
-// Vue.config.productionTip = false
-
-// new Vue({
-//   name: 'Root',
-//   router,
-//   store,
-//   mounted () {
-//     store.commit('dom/SET_WINDOW_WIDTH', window.innerWidth)
-//     window.addEventListener('resize', () => store.commit('dom/SET_WINDOW_WIDTH', window.innerWidth))
-//   },
-
-//   beforeDestroy () {
-//     window.removeEventListener('resize', () => store.commit('dom/SET_WINDOW_WIDTH', window.innerWidth))
-//   },
-//   render: h => h(AppLayout)
-// }).$mount('#app')
-import Vue from 'vue'
-import './registerServiceWorker'
-import router from './router'
-import store from './store'
-import VueApollo from 'vue-apollo'
-import i18n from './i18n'
-import BootstrapVue from 'bootstrap-vue'
-
-
-
-import DefaultLayout from './views/layouts/DefaultLayout'
-import ExternalLayout from './views/layouts/ExternalLayout'
-import AppComponent from './App.vue'
-
-
-import '@/lib/functions'
-
-import './components/global';
+import "./components/global";
 // import './assets/scss/app.scss'
+import VueDragscroll from "vue-dragscroll";
 
-//plugins
-import '@/plugins/validator'
-import '@/plugins/snotify'
-import '@/plugins/permissions'
-import '@/plugins/currency'
-import '@/plugins/sweetalert'
-import '@/plugins/vueselect'
-import '@/plugins/vueavatar'
-import '@/plugins/portal'
-import '@/plugins/perfect-scrollbar'
-import '@/plugins/month-picker'
 
-//directives
-import '@/directives'
+// plugins
+import "@/plugins/validator";
+import "@/plugins/snotify";
+import "@/plugins/permissions";
+import "@/plugins/currency";
+import "@/plugins/sweetalert";
+import "@/plugins/vueselect";
+import "@/plugins/vueavatar";
+import "@/plugins/portal";
+import "@/plugins/perfect-scrollbar";
+import "@/plugins/month-picker";
 
-//middlewares
-import '@/middlewares'
+// directives
+import "@/directives";
 
-//filters
-import '@/filters'
+// middlewares
+import "@/middlewares";
 
-import {
-    apolloProvider
-} from '@/plugins/apollo/client'
+// filters
+import "@/filters";
 
-//set the apollo client
-import gqlform from './lib/gqlform';
+import { apolloProvider } from "@/plugins/apollo/client";
+
+// set the apollo client
+import gqlform from "./lib/gqlform";
+Vue.use(VueDragscroll);
 gqlform.apolloClients = apolloProvider.clients;
-
-Vue.use(VueApollo)
-Vue.use(BootstrapVue)
-
-
+Vue.use(VueApollo);
+Vue.use(BootstrapVue);
+/* Vue.use(wysiwyg, {}) */
+Vue.use(VueTheMask);
 Vue.config.productionTip = false;
+// layout
+Vue.component("default-layout", DefaultLayout);
+Vue.component("external-layout", ExternalLayout);
 
-//layout
-Vue.component('default-layout', DefaultLayout);
-Vue.component('external-layout', ExternalLayout);
-
-
-
+//Set language
 
 window.vm = new Vue({
-    router,
-    store,
-    i18n,
-    apolloProvider,
-    render: h => h(AppComponent)
-}).$mount('#app')
+  router,
+  store,
+  i18n,
+  apolloProvider,
+  render: h => h(AppComponent)
+}).$mount("#app");

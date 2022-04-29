@@ -1,9 +1,9 @@
 <template>
   <div class="page animated fadeIn">
     <div
-      class="overlay"
-      :class="{'top-all':this.showInnerOverlayOnTop}"
       v-if="currentItem || currentRowDetails"
+      class="overlay"
+      :class="{ 'top-all': this.showInnerOverlayOnTop }"
       @click="overlayClick"
     ></div>
     <div class="container-fluid">
@@ -17,16 +17,18 @@
           primary-key="id"
           hover
           :fields="fields"
-          :items="items"
+          :items="tableItems"
           :show-empty="true"
           :empty-text="$t('There are no records for the given criteria')"
-          :tbody-tr-class="(item,type)=>isRowEditing(item)?'editing':null"
+          :tbody-tr-class="
+            (item, type) => (isRowEditing(item) ? 'editing' : null)
+          "
         >
           <template v-slot:table-colgroup>
-            <col style="width:70%" />
+            <col style="width: 70%" />
             <!-- <col style="width:20%" /> -->
-            <col style="width:10%" />
-            <col style="width:300px" />
+            <col style="width: 10%" />
+            <col style="width: 300px" />
           </template>
           <template v-slot:empty="scope">
             <p class="alert alert-warning text-center">{{ scope.emptyText }}</p>
@@ -44,28 +46,32 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="name"
-              :staticValue="row.item.name"
+              :static-value="row.item.name"
             >
-              <template slot="editing" v-if="isRowEditing(row)">
+              <template v-if="isRowEditing(row)" slot="editing">
                 <suggestions
+                  v-model="updateForm.name"
                   class="sm"
                   name="tool"
-                  v-model="updateForm.name"
-                  :options="{debounce:250, inputClass:'form-control form-control-sm', autofocus:true}"
+                  :options="{
+                    debounce: 250,
+                    inputClass: 'form-control form-control-sm',
+                    autofocus: true,
+                  }"
                   :state="$validateState('tool', updateForm)"
-                  :onInputChange="onToolInputChange"
-                  :onItemSelected="onToolSelected"
+                  :on-input-change="onToolInputChange"
+                  :on-item-selected="onToolSelected"
                 >
                   <div slot="item" slot-scope="props" class="single-item">
-                    <span class="name">{{props.item.name}}</span>
+                    <span class="name">{{ props.item.name }}</span>
                   </div>
                 </suggestions>
-                <b-form-invalid-feedback>{{ $displayError('tool', updateForm) }}</b-form-invalid-feedback>
+                <b-form-invalid-feedback>{{
+                  $displayError("tool", updateForm)
+                }}</b-form-invalid-feedback>
               </template>
             </table-editable-cell>
           </template>
-
-          
 
           <!-- yearly costs -->
           <template v-slot:cell(yearlyCosts)="row">
@@ -74,11 +80,13 @@
               :editing="isRowEditing(row)"
               :item="updateForm"
               property="yearlyCosts"
-              :staticValue="$currency(calculateModulesTotal(row.item))"
+              :static-value="$currency(calculateModulesTotal(row.item))"
             >
-              <template slot="editing" v-if="isRowEditing(row)">
-                {{$currency(calculateModulesTotal(row.item))}}
-                <b-form-invalid-feedback>{{ $displayError('yearlyCosts', updateForm) }}</b-form-invalid-feedback>
+              <template v-if="isRowEditing(row)" slot="editing">
+                {{ $currency(calculateModulesTotal(row.item)) }}
+                <b-form-invalid-feedback>{{
+                  $displayError("yearlyCosts", updateForm)
+                }}</b-form-invalid-feedback>
               </template>
             </table-editable-cell>
           </template>
@@ -88,36 +96,50 @@
             <div v-if="isRowEditing(row)" class="text-right">
               <table-edit-tools-buttons
                 :item="row.item"
-                :showSaveButton="$can('core/companyTool/update', row.item)"
-                :disableSaveButton="vErrors.any()||updateForm.busy"
+                :show-save-button="$can('core/companyTool/update', row.item)"
+                :disable-save-button="vErrors.any() || updateForm.busy"
                 :loading="updateForm.busy"
-                :showDeleteButton="$can('core/companyTool/delete', row.item)"
+                :show-delete-button="$can('core/companyTool/delete', row.item)"
+                store="companyTool"
                 @cancel="toggleItem(row.item)"
                 @delete="toggleItem(null)"
                 @save="saveItem(updateForm)"
-                store="companyTool"
               ></table-edit-tools-buttons>
             </div>
-            <div class="d-flex" v-else>
+            <div v-else class="d-flex">
               <table-tools-buttons
-                style="max-width:100px"
+                style="max-width: 100px"
                 class="flex-grow-1 mr-2"
                 store="companyTool"
                 :item="row.item"
+                :show-delete-button="false"
+                :show-edit-button="
+                  $can('core/companyTool/update', row.item) &&
+                  (!currentRowDetails ||
+                    currentRowDetails.item.id != row.item.id)
+                "
                 @editItem="toggleItem"
-                :showDeleteButton="false"
-                :showEditButton="$can('core/companyTool/update', row.item) && (!currentRowDetails || currentRowDetails.item.id!=row.item.id)"
               ></table-tools-buttons>
               <div class="flex-grow-1">
                 <b-button
-                  @click="showDetails(row)"
                   size="xs"
-                  variant="action"
-                  style="font-size: 1.2rem;padding: 3px;"
-                  class="btn-primary btn-expand btn-block text-uppercase"
-                  :class="{'expanded':currentRowDetails &&currentRowDetails.item.id === row.item.id}"
                   v-if="$can('core/companyTool/manage')"
-                >{{ (currentRowDetails && currentRowDetails.item.id === row.item.id? $t('Close') : $t('Details')) }}</b-button>
+                  variant="action"
+                  style="font-size: 1.2rem; padding: 3px"
+                  class="btn-primary btn-expand btn-block text-uppercase"
+                  :class="{
+                    expanded:
+                      currentRowDetails &&
+                      currentRowDetails.item.id === row.item.id,
+                  }"
+                  @click="showDetails(row)"
+                  >{{
+                    currentRowDetails &&
+                    currentRowDetails.item.id === row.item.id
+                      ? $t("Close")
+                      : $t("Details")
+                  }}</b-button
+                >
               </div>
             </div>
           </template>
@@ -127,12 +149,12 @@
             <div class="row-details">
               <modules-table
                 ref="modulesTable"
+                :category-id="row.item.id"
+                :items="row.item.modules"
+                :company-tool="row.item"
+                :busy="loadingItem"
                 @itemChanged="itemChanged(row.item)"
                 @priceChanged="itemChanged(row.item)"
-                :categoryId="row.item.id"
-                :items="row.item.modules"
-                :companyTool="row.item"
-                :busy="loadingItem"
               ></modules-table>
             </div>
           </template>
@@ -142,15 +164,15 @@
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
-//import Form from "./Form";
+import { /* mapState, */ mapGetters } from "vuex";
+// import Form from "./Form";
 import ModulesTable from "../module/Table";
 import GQLForm from "@/lib/gqlform";
 
 export default {
   components: {
-    //"tool-form": Form,
-    "modules-table": ModulesTable
+    // "tool-form": Form,
+    "modules-table": ModulesTable,
   },
   data: () => {
     return {
@@ -161,40 +183,45 @@ export default {
       currentDetailsItem: null,
       loadingItem: false,
       filter: {
-        busy: false
+        busy: false,
       },
-      toolOptions: null
+      toolOptions: null,
     };
   },
   computed: {
     ...mapGetters({
       items: "companyTool/filteredItems",
       showInnerOverlayOnTop: "app/show_inner_overlay_on_top",
-      priceModels: "priceModel/all"
+      priceModels: "priceModel/all",
     }),
+
+    tableItems: {
+      get() {
+        return this.items.filter((item) => item.type === "TOOL");
+      },
+    },
     fields: {
-      get: function() {
+      get() {
         return [
           { key: "name", label: this.$t("Name"), sortable: true },
           // { key: "priceModel", label: this.$t("Price model"), sortable: true },
           {
             key: "yearlyCosts",
             label: this.$t("Yearly costs"),
-            sortable: true
+            sortable: true,
           },
-          { key: "actions", label: this.$t("Manage"), class: "actions" }
+          { key: "actions", label: this.$t("Manage"), class: "actions" },
         ];
-      }
-    }
+      },
+    },
   },
-  async mounted() {
-    //this.$store.dispatch("priceModel/findAll");
+  async created() {
+    // this.$store.dispatch("priceModel/findAll");
     this.$store.dispatch("companyTool/findAll", {
       filter: this.filter,
-      force: true
+      force: true,
     });
-    console.log(this.items);
-    //this.$store.dispatch("toolArea/findAll");
+    // this.$store.dispatch("toolArea/findAll");
   },
   methods: {
     isRowEditing(row) {
@@ -205,21 +232,18 @@ export default {
       );
     },
     calculateModulesTotal(item) {
-        if (item.modules && item.modules.length > 0) {
-          let sum = 0;
+      if (item.modules && item.modules.length > 0) {
+        let sum = 0;
 
-          item.modules.map((moduleObj) => {
+        item.modules.map((moduleObj) => {
+          moduleObj.prices.map((priceObj) => {
+            sum += priceObj.price / 100;
+          });
+        });
 
-             moduleObj.prices.map( (priceObj) => {
-                sum += (priceObj.price / 100)
-            });
-
-          })
-         
-
-          return sum;
-        }
-        return 0;
+        return sum;
+      }
+      return 0;
     },
     overlayClick() {
       if (this.currentItem) {
@@ -229,43 +253,48 @@ export default {
       }
     },
     async saveItem(form) {
-    
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         await this.$validator.reset();
         await this.$store.dispatch("companyTool/update", form);
+
         this.toggleItem(null);
       }
     },
 
     async loadItem(item) {
+
       try {
         if (!item.products) {
           this.loadingItem = true;
         }
         const openModule = this.currentRowDetails.item.modules.find(
-          f => f._showDetails
+          (f) => f._showDetails
         );
         if (openModule) {
           openModule._showDetails = false;
         }
-        this.currentRowDetails.item = await this.$store.dispatch(
+           this.currentRowDetails.item = await this.$store.dispatch(
           "companyTool/findById",
           {
-            id: item.id
+            id: item.id,
           }
-        );
+				);
+
+     // this.currentRowDetails.item = item;
+
         if (openModule) {
           const newModule = this.currentRowDetails.item.modules.find(
-            f => f.id === openModule.id
+            (f) => f.id === openModule.id
           );
           newModule._showDetails = true;
         }
-        this.$refs.modulesTable.$forceUpdate();
+        if (this.$refs.modulesTable) this.$refs.modulesTable.$forceUpdate();
       } finally {
         this.loadingItem = false;
       }
     },
+
     async showDetails(row) {
       if (this.currentRowDetails) {
         this.currentRowDetails.item._showDetails = false;
@@ -297,7 +326,7 @@ export default {
           name: item.name,
           yearlyCosts: item.yearlyCosts,
           priceModel: item.priceModel ? item.priceModel.id : null,
-          toolId: item.toolId
+          toolId: item.toolId,
         });
         this.currentItem = item;
         this.$validator.reset();
@@ -320,22 +349,15 @@ export default {
         where: {
           field: "name",
           op: "cn",
-          value: query
-        }
+          value: query,
+        },
       });
-
       return response;
     },
     async itemChanged() {
-      //const copy = { ...this.currentRowDetails };
-      //this.showDetails(null);
-      //this.showDetails(copy);
-      // this.currentRowDetails.toggleDetails();
-      // this.currentRowDetails.item._showDetails=true;
       this.loadItem(this.currentRowDetails.item);
-      // // this.currentRowDetails.toggleDetails();
-      // // this.currentRowDetails.item._showDetails=true;
-    }
-  }
+
+    },
+  },
 };
 </script>

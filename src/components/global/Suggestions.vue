@@ -1,27 +1,27 @@
 <template>
   <div class="v-suggestions" :class="{'is-invalid':state===false}">
     <b-form-input
+      v-model="query"
+      v-autofocus="extendedOptions.autofocus || false"
+      v-autoselect="extendedOptions.autoselect || false"
       type="text"
       :class="extendedOptions.inputClass"
       v-bind="$attrs"
-      v-autofocus="extendedOptions.autofocus || false"
-      v-autoselect="extendedOptions.autoselect || false"
-      v-on:keydown="onKeyDown"
-      v-on:blur="hideItems"
-      v-on:focus="showItems = true"
-      v-model="query"
       :state="state"
       :autocomplete="Math.random().toString()"
       :placeholder="extendedOptions.placeholder"
+      @keydown="onKeyDown"
+      @blur="hideItems"
+      @focus="showItems = true"
     />
     <div class="suggestions">
-      <ul class="items" v-show="items.length > 0 && showItems === true">
+      <ul v-show="items.length > 0 && showItems === true" class="items">
         <li
-          class="item"
-          :key="index"
           v-for="(item, index) in items"
+          :key="index"
+          class="item"
+          :class="{ 'is-active': index === activeItemIndex }"
           @click.prevent="selectItem(index)"
-          v-bind:class="{ 'is-active': index === activeItemIndex }"
         >
           <slot name="item" :item="item">{{item}}</slot>
         </li>
@@ -31,9 +31,10 @@
 </template>
 <script>
 import debounce from "debounce";
+
 export default {
   inheritAttributes: true,
-  name: "suggestions",
+  name: "Suggestions",
   props: {
     options: {
       type: Object,
@@ -69,6 +70,19 @@ export default {
       showItems: false
     };
   },
+  watch: {
+    query(newValue) {
+      if (newValue === this.lastSetQuery) {
+        this.lastSetQuery = null;
+        return;
+      }
+      this.onQueryChanged(newValue);
+      this.$emit("input", newValue);
+    },
+    value(newValue) {
+      this.setInputQuery(newValue);
+    }
+  },
   beforeMount() {
     if (this.extendedOptions.debounce !== 0) {
       this.onQueryChanged = debounce(
@@ -77,26 +91,12 @@ export default {
       );
     }
   },
-  watch: {
-    query: function(newValue) {
-      if (newValue === this.lastSetQuery) {
-        this.lastSetQuery = null;
-        return;
-      }
-      this.onQueryChanged(newValue);
-      this.$emit("input", newValue);
-    },
-    value: function(newValue) {
-      this.setInputQuery(newValue);
-    }
-  },
   methods: {
     onItemSelectedDefault(item) {
       if (typeof item === "string") {
         this.$emit("input", item);
         this.setInputQuery(item);
         this.showItems = false;
-        // console.log('change value')
       }
     },
     hideItems() {

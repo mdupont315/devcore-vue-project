@@ -1,28 +1,29 @@
 <template>
   <div class="search-bar">
-    <b-input-group style="margin-top:5px" class="search">
+    <b-input-group style="margin-top: 5px" class="search">
       <b-form-input
-        class="search"
         v-model="currentFilter"
-        @input="filterResults"
+        class="search"
         :placeholder="$t('Search Companies') + ` (${items.length})`"
+        @input="filterResults"
       ></b-form-input>
     </b-input-group>
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
+
 export default {
   data: () => {
     return {
-      currentFilter: null
+      currentFilter: null,
     };
   },
   computed: {
     ...mapGetters({
       items: "company/filteredItems",
-      filter: "company/filter"
-    })
+      filter: "company/filter",
+    }),
   },
   async mounted() {
     this.currentFilter = this.filter;
@@ -30,7 +31,7 @@ export default {
   methods: {
     async filterResults(filter) {
       await this.$store.dispatch("company/filter", filter);
-    }
-  }
+    },
+  },
 };
 </script>

@@ -1,15 +1,16 @@
 <template>
-  <div class="layer" v-if="show">
-    <inner-overlay style="z-index:1" @click="close" v-if="showOverlay" :class="backdropClass"></inner-overlay>
+  <div v-if="show" class="layer">
+    <inner-overlay v-if="showOverlay" style="z-index:1" :class="backdropClass" @click="close"></inner-overlay>
     <div style="z-index:2;position:absolute;width:100%">
       <slot name="default"></slot>
     </div>
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
+
 export default {
-  name: "layer",
+  name: "Layer",
   props: {
     showBackdrop: {
       name: "show-backdrop",
@@ -30,7 +31,7 @@ export default {
       current: "layers/current"
     }),
     showOverlay: {
-      get: function() {
+      get() {
         return this.showBackdrop && this.current === this;
       }
     }
@@ -42,7 +43,7 @@ export default {
     this.$store.dispatch("layers/removeLayer", this);
   },
   updated() {
-    //controller.addLayer(this)
+    // controller.addLayer(this)
   },
   methods: {
     close(event) {

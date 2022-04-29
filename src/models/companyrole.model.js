@@ -7,6 +7,7 @@ import {
 
 export default class CompanyRoleModel extends BaseModel {
     name = null;
+
     usersCount = 0;
 
 

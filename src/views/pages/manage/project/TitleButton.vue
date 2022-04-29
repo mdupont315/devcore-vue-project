@@ -1,37 +1,40 @@
 <template>
-  <div class="ml-3" v-if="$can('core/project/create') && process && process.stages.length > 0">
+  <div v-if="$can('core/project/create') && process && process.stages.length > 0" class="ml-3">
     <b-button
+      id="btnNew"
+      v-b-tooltip.hover
       size="sm"
       class="text-uppercase"
       variant="primary"
       :title="$t('action.create',{name:$t('project')})"
-      v-b-tooltip.hover
-      id="btnNew"
       @click="togglePopOver"
     >
       <i class="mdi mdi-plus"></i>
       {{ $t('New')}}
     </b-button>
     <b-popover
+      ref="popover"
       target="btnNew"
       :show.sync="showPopOver"
       placement="bottom"
       class="form-popover"
-      ref="popover"
     >
       <b-card no-body style="width:300px">
         <b-card-body>
-          <project-form @done="togglePopOver" v-model="item"></project-form>
+          <project-form v-model="item" @done="togglePopOver"></project-form>
         </b-card-body>
       </b-card>
     </b-popover>
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
 import Form from "./Form";
-//import { Project } from "@/models";
+// import { Project } from "@/models";
 export default {
+  components: {
+    "project-form": Form
+  },
   data: () => {
     return {
       option: false,
@@ -40,15 +43,12 @@ export default {
       item: null
     };
   },
-  components: {
-    "project-form": Form
-  },
   computed: {
     ...mapGetters({
       currentProcess: "process/current"
     }),
     process: {
-      get: function() {
+      get() {
         return this.currentProcess("projects")
           ? this.currentProcess("projects").process
           : null;

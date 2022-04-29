@@ -13,13 +13,14 @@ const COMPANY_FRAGMENT = gql `
             name,
             symbol,
         }
+
     }
 `;
 
 const COMPANY_FULL_FRAGMENT = gql `
     fragment companyFullFields on Company{
         ...companyFields,
-      
+
     }
     ${COMPANY_FRAGMENT}
 `;

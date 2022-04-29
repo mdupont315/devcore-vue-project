@@ -1,11 +1,11 @@
 <style>
-  @import './assets/css/style.css';
+@import "./assets/css/style.css";
 </style>
 
 <template>
   <div id="app" :class="container_class">
-    <div class="overlay" v-if="show_overlay" @click="overlayClicked"></div>
-    <component :is="layout" >
+    <div v-if="show_overlay" class="overlay" @click="overlayClicked"></div>
+    <component :is="layout">
       <router-view v-if="loaded" />
       <portal-target name="layers"></portal-target>
     </component>
@@ -19,52 +19,48 @@ import { loadApp } from "@/lib/utils";
 import UpdateFound from "./components/UpdateFound";
 
 const defaultLayout = "default-layout";
-
 export default {
   components: {
-    "ws-update-notify": UpdateFound
+    "ws-update-notify": UpdateFound,
   },
   data() {
     return {
-      loaded: false
+      loaded: false,
     };
   },
   computed: {
     layout() {
-      return (this.$route.meta.layout || defaultLayout );
+      return this.$route.meta.layout || defaultLayout;
     },
     ...mapGetters({
       show_navbar: "app/show_navbar",
       container_class: "app/container_class",
       show_overlay: "app/show_overlay",
-      ws_updated: "app/ws_updated"
-    })
+      ws_updated: "app/ws_updated",
+    }),
   },
   async mounted() {
     await loadApp();
     this.loaded = true;
   },
-  // apollo: {
-  //   $subscribe: {
-  //     subscribed: {
-  //       query: gql`
-  //         subscription notificationSubscription {
-  //           newNotification{
-  //             type
-  //             payload
-  //           }
-  //         }
-  //       `,
-  //       result({ data }) {
-  //         console.log(data);
-  //       }
-  //     }
-  //   }
-  // },
   methods: {
     overlayClicked($event) {
       this.$store.dispatch("app/overlayClicked", $event);
-    }
-  }
+    },
+  },
 };
 </script>
+<style>
+/* Hide scrollbar for Chrome, Safari and Opera */
+ ::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+html {
+
+ -ms-overflow-style: none;
+  scrollbar-width: none;
+	-webkit-transform: translate3d(0, 0, 0);
+}
+</style>

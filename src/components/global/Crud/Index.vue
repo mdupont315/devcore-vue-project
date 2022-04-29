@@ -1,23 +1,24 @@
 <template>
   <div class="crud-index crud-page">
     <div
+      v-if="showOverlay"
       class="overlay"
       :class="{'top-all':this.showInnerOverlayOnTop}"
-      v-if="showOverlay"
       @click="overlayClick"
     ></div>
     <div class="container-fluid">
       <!-- page content -->
       <b-card>
-        <slot name="default" v-bind:filter="filter" v-bind:showOverlay="showOverlay" v-bind:store="store" />
+        <slot name="default" :filter="filter" :showOverlay="showOverlay" :store="store" />
       </b-card>
     </div>
   </div>
 </template>
 <script>
-import { /*mapState,*/ mapGetters } from "vuex";
+import { /* mapState, */ mapGetters } from "vuex";
+
 export default {
-  name: "crud-index",
+  name: "CrudIndex",
   props: {
     showOverlay: {
       type: Boolean,

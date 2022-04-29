@@ -1,8 +1,14 @@
 <template>
-    <div class="overlay" v-bind="$attrs" @click="$emit('click')"></div>
+  <div
+    class="overlay"
+    id="inner_overlay"
+    style="overscroll-behavior: contain"
+    v-bind="$attrs"
+    @click="$emit('click')"
+  ></div>
 </template>
 <script>
 export default {
-    name:"inner-overlay"
-}
+  name: "InnerOverlay",
+};
 </script>

@@ -6,35 +6,49 @@
           <img src="@/assets/img/logo.svg" />
         </div>
         <div class="card-body">
-          <h1 class="h3 text-shadow text-center">{{ $t('Forgot password') }}</h1>
+          <h1 class="h3 text-shadow text-center">
+            {{ $t("Forgot password") }}
+          </h1>
           <hr />
           <div v-if="!sent && !haveCode">
             <p>
-              <small>{{ $t('Please provide your email address, we\'ll send you an email with instructions to reset your password.') }}</small>
+              <small>{{
+                $t(
+                  "Please provide your email address, we'll send you an email with instructions to reset your password."
+                )
+              }}</small>
             </p>
             <b-form class="floating-labels" @submit.prevent="onSubmit">
-              <b-alert v-if="form.hasErrors" variant="danger" dismissible show class="text-sm">
+              <b-alert
+                v-if="form.hasErrors"
+                variant="danger"
+                dismissible
+                show
+                class="text-sm"
+              >
                 <i class="mdi mdi-close-octagon"></i>
                 {{ form.errors.message }}
               </b-alert>
               <div class="form-label-group required">
                 <b-form-input
-                  type="text"
                   id="username"
-                  :disabled="form.busy"
                   v-model="form.username"
+                  v-validate="'required|email'"
+                  type="text"
+                  :disabled="form.busy"
                   :placeholder="$t('Username')"
                   :state="$validateState('username', form)"
                   autocomplete="new-username"
                   name="username"
                   autofocus
-                  v-validate="'required|email'"
                 ></b-form-input>
                 <label for="username">
                   <i class="mdi mdi-account"></i>
-                  {{ $t('Username') }}
+                  {{ $t("Username") }}
                 </label>
-                <b-form-invalid-feedback>{{ $displayError('username', form) }}</b-form-invalid-feedback>
+                <b-form-invalid-feedback>{{
+                  $displayError("username", form)
+                }}</b-form-invalid-feedback>
               </div>
               <div class="mb-3">
                 <hr />
@@ -45,48 +59,58 @@
                   :loading="form.busy"
                   :block="true"
                   variant="primary"
-                >{{ $t('Send instructions') }}</loading-button>
+                  >{{ $t("Send instructions") }}</loading-button
+                >
               </div>
             </b-form>
           </div>
           <div v-else>
             <p class="alert alert-success">
               <i class="mdi mdi-check"></i>
-              {{ $t('Please check your email inbox, we just sent you an email with a PIN to reset your password.') }}
+              {{
+                $t(
+                  "Please check your email inbox, we just sent you an email with a PIN to reset your password."
+                )
+              }}
             </p>
 
             <div>
               <b-form class="floating-labels" @submit.prevent="verify">
-                <b-alert v-if="form.hasErrors" variant="danger" dismissible show class="text-sm">
+                <b-alert
+                  v-if="form.hasErrors"
+                  variant="danger"
+                  dismissible
+                  show
+                  class="text-sm"
+                >
                   <i class="mdi mdi-close-octagon"></i>
                   {{ form.errors.message }}
                 </b-alert>
                 <div class="form-label-group required">
                   <b-form-input
-                    type="text"
                     id="code"
-                    :disabled="form.busy"
                     v-model="form.code"
+                    v-validate="'required|length:6'"
+                    type="text"
+                    :disabled="form.busy"
                     :placeholder="$t('Received code')"
                     :state="$validateState('code', form)"
                     autocomplete="new-code"
                     name="code"
                     autofocus
-                    v-validate="'required|length:6'"
                   ></b-form-input>
                   <label for="code">
                     <i class="mdi mdi-dialpad"></i>
-                    {{ $t('Received code') }}
+                    {{ $t("Received code") }}
                   </label>
-                  <b-form-invalid-feedback>{{ $displayError('code', form) }}</b-form-invalid-feedback>
+                  <b-form-invalid-feedback>{{
+                    $displayError("code", form)
+                  }}</b-form-invalid-feedback>
                 </div>
                 <p v-if="showResend" class="text-center">
                   <small>
                     {{ $t("Didn't get the email?") }}
-                    <a
-                      href
-                      @click.prevent="resend"
-                    >{{ $t('Try Again') }}</a>
+                    <a href @click.prevent="resend">{{ $t("Try Again") }}</a>
                   </small>
                 </p>
                 <div class="mb-3">
@@ -98,7 +122,8 @@
                     :loading="form.busy"
                     :block="true"
                     variant="primary"
-                  >{{ $t('Reset my password') }}</loading-button>
+                    >{{ $t("Reset my password") }}</loading-button
+                  >
                 </div>
               </b-form>
             </div>
@@ -106,7 +131,9 @@
         </div>
       </div>
       <div class="text-center">
-        <router-link :to="{name:'login'}" class="text-sm">{{ $t('Remember password?') }}</router-link>
+        <router-link :to="{ name: 'login' }" class="text-sm">{{
+          $t("Remember password?")
+        }}</router-link>
       </div>
     </div>
   </external-layout>
@@ -114,24 +141,26 @@
 <script>
 import { mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
+import { blockUi, unblockUi } from "@/lib/utils";
+
 export default {
   data: () => ({
     // Create a new form instance
     form: new GQLForm({
       username: "",
-      code: null
+      code: null,
     }),
     sent: false,
     showResend: false,
-    haveCode:false,
+    haveCode: false,
   }),
   computed: {
     ...mapGetters({
-      loaded: "app/loaded"
-    })
+      loaded: "app/loaded",
+    }),
   },
   mounted() {
-    this.form.fields.username = this.$route.query["email"];
+    this.form.fields.username = this.$route.query.email;
   },
   methods: {
     async onSubmit() {
@@ -149,8 +178,7 @@ export default {
           this.showResend = true;
         }, 30000);
       } catch (ex) {
-        
-        //console.log(processGraphQLErrors(ex));
+        console.log(ex);
       } finally {
         this.$validator.reset();
       }
@@ -163,22 +191,39 @@ export default {
         }
         this.$validator.reset();
         await this.$store.dispatch("auth/resetPassword", this.form);
-        
-        //await this.$router.replace("/");
-        window.location.reload();
+        blockUi();
+        //  await this.$router.push("/login");
+        /*   await this.$router.push({
+          name: "my-profile",
+          params: {
+						i: new Date().getTime()
+            //token: this.form.code,
+          },
+        }); */
+        /*      await this.$router.push(
+          {
+            name: "login",
+          },
+          () => {},
+          () => {}
+        ); */
+        // window.location.reload();
+        this.$router.go(this.$router.currentRoute, {
+          query: { i: new Date().getTime() },
+        });
       } catch (ex) {
-        if(ex.code==='TOKEN_EXPIRED'){
+        if (ex.code === "TOKEN_EXPIRED") {
           this.resend();
         }
-       
       } finally {
-        //this.$validator.reset();
+        // this.$validator.reset();
+        unblockUi();
       }
     },
     resend() {
       this.$validator.reset();
       this.sent = false;
-    }
-  }
+    },
+  },
 };
 </script>
