@@ -5,12 +5,24 @@
         {{ $t("Edit idea") }}
       </div>
       <div class="idea_edit_path_container-header-close"></div>
+
       <b-button
-        style="overflow: hidden; min-width: 100px"
+        v-if="!ideaContentIsDirty"
+        style="width: 60px; margin-top: 15px; margin-right: 15px; height: 29.2px"
         @click="closeIdeaEdit"
       >
         <span> {{ $t("close") }} </span>
       </b-button>
+
+      <confirm-button
+        v-else
+        style="width: 60px; margin-top: 15px; margin-right: 15px;height:30px"
+        @confirm="closeIdeaEdit"
+        :confirmPlacement="'left'"
+        :confirmMessage="$t('Unsaved Idea Data')"
+      >
+        <span> {{ $t("close") }} </span>
+      </confirm-button>
     </div>
     <div class="idea_edit_path_container-body">
       <div
@@ -319,6 +331,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    ideaContentIsDirty: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {
@@ -444,7 +460,6 @@ export default {
         const operation = stage.operations.find(
           (x) => x.id === path.operationId
         );
-        console.log(operation.companyRoles);
         this.selectablePathRoles = operation.companyRoles;
       }
 
@@ -456,7 +471,6 @@ export default {
         this.selectablePathRoles = phase.companyRoles;
       }
 
-      console.log(this.selectablePathRoles);
       this.roleIntent = Math.random();
     },
     changeStage() {

@@ -85,6 +85,10 @@ export default {
     border-radius: 3px;
     background: #fff;
 		margin-top:10px;
+		&:hover {
+			background: #d0424d;
+			color: #fff;
+		}
   }
   .video-remove-icon {
     cursor: pointer;

@@ -97,6 +97,7 @@ export default {
           to: pos + node.nodeSize,
           comment: JSON.parse(node.attrs.comment),
           shouldDelete: false,
+					content: node.content
         });
       });
 
@@ -107,14 +108,15 @@ export default {
 
         if (!shouldRemoveComment) continue;
 
-        const textContent = doc.textBetween(from, to);
+        // const textContent = doc.textBetween(from, to);
 
-        const paragraphContent = schema.text(textContent || " ");
+        // const paragraphContent = schema.text(textContent || " ");
 
-        const newParagraphWithContent = schema.nodes.paragraph.create(
-          {},
-          paragraphContent
-        );
+        // const newParagraphWithContent = schema.nodes.paragraph.create(
+        //   {},
+        //   paragraphContent
+        // );
+				 const newParagraphWithContent = schema.nodes.paragraph.create({}, comment.content);
 
         const replaceTransaction = tr.replaceRangeWith(
           from,
@@ -152,11 +154,17 @@ export default {
         this.isEditable,
         this.value.markup,
         {
-          onUpdate: (content) =>
+          onUpdate: (content) => {
+						console.log("UPDATED CONTEN!");
             this.$emit("input", {
               contentType: this.value.contentType,
               markup: content,
-            }),
+            });
+
+						if(this.isEditable && this.value.markup && content) {
+							console.log("IS EDITING IDEA CONTETN!");
+						}
+          },
         },
         fileHandlers,
         saveContent

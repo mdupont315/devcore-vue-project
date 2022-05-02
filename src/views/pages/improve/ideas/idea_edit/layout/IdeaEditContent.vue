@@ -2,7 +2,9 @@
   <div class="idea_edit_content_container">
     <div class="idea_edit_content_container_content-header">
       <div class="idea_edit_content_container_content-header-title">
-        {{ idea.title ? idea.title : $t("action.create", { name: $t("idea") }) }}
+        {{
+          idea.title ? idea.title : $t("action.create", { name: $t("idea") })
+        }}
       </div>
       <div class="idea_edit_content_container_content-header-button">
         <b-button
@@ -72,7 +74,7 @@
       @fileAdded="setFile"
       @fileRemoved="removeFile"
       @saveContent="saveContent"
-      @initialized="isEditable = true"
+      @initialized="setIsInitialized"
       :contentType="contentType"
     />
     <div v-else class="ideaContent-empty-spinner">
@@ -130,6 +132,9 @@ export default {
       },
       set(value) {
         this.$emit("input", value);
+        if (this.isInitialized && this.isEditable) {
+          this.$emit("isDirty");
+        }
       },
     },
   },
@@ -137,9 +142,14 @@ export default {
     contentType: "Custom",
     selectingType: false,
     isEditable: false,
+    isInitialized: false,
     newType: "",
   }),
   methods: {
+    setIsInitialized() {
+      this.isEditable = true;
+      this.isInitialized = true;
+    },
     saveContent() {
       this.$emit("saveIdeaContent");
     },

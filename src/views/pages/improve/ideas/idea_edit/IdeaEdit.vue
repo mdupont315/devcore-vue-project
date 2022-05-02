@@ -11,6 +11,7 @@
         @fileRemoved="removeFile"
         @selectedType="setContentType"
         @saveIdeaContent="saveIdeaVersion"
+        @isDirty="setIsDirty"
         :isSaving="isSaving"
         v-model="getIdeaContent"
       ></idea-edit-content>
@@ -21,6 +22,7 @@
         @updateStatus="updateIdeaVersionStatus"
         :isLoading="isLoading"
         v-model="getIdeaPath"
+				:ideaContentIsDirty="ideaContentIsDirty"
         :idea="getIdea"
         v-if="isLoaded"
       ></idea-edit-path>
@@ -62,6 +64,7 @@ export default {
     filesChanged: false,
     defaultContentName: "Custom",
     selectedCategoryIndex: 2,
+		ideaContentIsDirty: false,
     ideaForm: new GQLForm({
       id: undefined,
       processId: null,
@@ -178,6 +181,10 @@ export default {
           this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
         contentForm.markup = JSON.stringify(value.markup);
         contentForm.contentType = value.contentType;
+
+        if (contentForm.markup) {
+          console.log("EDITED!");
+        }
       },
     },
   },
@@ -185,6 +192,10 @@ export default {
     await this.closeIdeaEdit();
   },
   methods: {
+    setIsDirty() {
+      console.log("IS DIRTY");
+			this.ideaContentIsDirty = true;
+    },
     removeFile(file) {
       if (file.src && file.id) {
         this.filesChanged = true;

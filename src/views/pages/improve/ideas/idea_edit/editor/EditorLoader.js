@@ -23,6 +23,43 @@ import {
   TrailingNode
 } from "./extensions";
 
+const dedupeCommentNodes = (editor) => {
+  const { state: { doc, tr, schema }, view: { dispatch } } = editor;
+
+  const comments = [];
+
+  doc.descendants((node, pos) => {
+    if (node.type.name !== "comment") return;
+
+    comments.push({
+      from: pos,
+      to: pos + node.nodeSize,
+      comment: JSON.parse(node.attrs.comment),
+      shouldDelete: false,
+      content: node.content
+    });
+  });
+
+  for (const comment of comments) {
+    const { from, to, comment: commentData } = comment;
+
+    const commentsWithSameUuid = comments.filter((c) => c.comment.uuid === commentData.uuid);
+
+    if (commentsWithSameUuid.length === 1) continue;
+
+    const commentToRemove = commentsWithSameUuid[0]
+
+    let replaceTransaction = tr
+
+    const newParagraphWithContent = schema.nodes.paragraph.create({}, commentToRemove.content);
+
+    replaceTransaction = replaceTransaction.replaceRangeWith(from, to, newParagraphWithContent)
+
+    dispatch(replaceTransaction)
+  }
+}
+
+
 export default class ContentEditor {
   constructor(editable, value, options, fileHandlers, saveContent) {
     this.editable = editable;
@@ -65,6 +102,7 @@ export default class ContentEditor {
       Comment.configure({ saveContent })
     ];
     this.editor = this.getEditorInstance();
+    this.dedupedCommentNodes = false
   }
 
   getEditorInstance() {
@@ -96,15 +134,23 @@ export default class ContentEditor {
       },
       onUpdate: ({ editor }) => {
         setTimeout(() => {
+          if (!this.dedupedCommentNodes) {
+            this.dedupedCommentNodes = true
+
+            if (editor.isActive('comment')) setTimeout(() => dedupeCommentNodes(editor))
+          }
+
+          this.dedupedCommentNodes = false
+
           const json = editor.getJSON();
 
           this.options.onUpdate(json);
         });
       },
-      onFocus: ({ editor }) => {
-        const json = editor.getJSON();
-        this.options.onUpdate(json);
-      }
+      // onFocus: ({ editor }) => {
+      //   const json = editor.getJSON();
+      //   this.options.onUpdate(json);
+      // }
     });
   }
 

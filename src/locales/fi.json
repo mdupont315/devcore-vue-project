@@ -243,7 +243,7 @@
   "Issue Evaluation Restriction Info": "Valitut roolit eivät pysty asettamaan hukan määrää mobiilissa jaa ongelma ominaisuudesta.",
   "Issue Template Restriction": "Ongelman vaikutuksen rajoitus",
   "Issue Template Restriction Info": "Valitut roolit eivät pysty asettamaan ongelman vaikutusta mobiilissa jaa ongelma ominaisuudesta.",
-
+  "Unsaved Idea Data": "Sinulla on tallentamattomia muutoksia. Muutokset hylätään jos poistut.",
   "Project Advanced": "Lisäasetukset",
   "Milestone reward text": "Palkinto/Kannustus tähän",
   "Engage": "Sitouta",
@@ -571,7 +571,7 @@
   "seconds.count": "0 sekunttia | 1 sekuntti | {count} sekunttia",
   "hours.count": "0 tuntia | 1 tunti | {count} tuntia",
   "days.count": "0 päivää | 1 päivä | {count} päivää",
-  "h.count":  "{count}t",
+  "h.count": "{count}t",
   "module.count": "0 moduulia | 1 moduuli | {count} moduulia",
   "evaluation.count": "0 arviointia | 1 arviointi | {count} arviointia",
   "time.ago": "{count} sitten",

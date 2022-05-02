@@ -7,8 +7,12 @@
         v-if="getAttrs.preview"
         style="display: flex; flex-direction: column"
       >
-        <div style="margin-right: 5px; margin-bottom:10px;">
-          <img :src="getAttrs.src" :alt="getAttrs.title" style="width:100%;height:100%"/>
+        <div style="margin-right: 5px; margin-bottom: 10px">
+          <img
+            :src="getAttrs.src"
+            :alt="getAttrs.title"
+            style="width: 100%; height: 100%"
+          />
         </div>
         <button @click="remove" class="file-remove-button">
           {{ $t("Remove") }}
@@ -82,6 +86,10 @@ export default {
     border-radius: 3px;
     background: #fff;
     bottom: 2px;
+    &:hover {
+      background: #d0424d;
+      color: #fff;
+    }
   }
   .file-remove-icon {
     cursor: pointer;

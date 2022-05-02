@@ -7,6 +7,47 @@ import {
 import { Plugin, TextSelection } from "prosemirror-state";
 import CommentNodeView from "./CommentNodeView.vue";
 
+
+// TODO: find a way to do it internally with the help of appendTransaction so we don't need to
+// TODO: do it with help of `onUpdate` hook from TipTap
+
+// const dedupeComments = (editor) => {
+//   // const { state: { tr, doc, schema }, view: { dispatch } } = editor as Editor
+//   const { state: { tr, doc, schema }, view: { dispatch } } = editor
+
+//   const comments = [];
+
+//   doc.descendants((node, pos) => {
+//     if (node.type.name !== "comment") return;
+
+//     comments.push({
+//       from: pos,
+//       to: pos + node.nodeSize,
+//       comment: JSON.parse(node.attrs.comment),
+//       shouldDelete: false,
+//       content: node.content
+//     });
+//   });
+
+//   let replaceTransaction = tr
+
+//   for (const comment of comments) {
+//     const { from, to, comment: commentData } = comment;
+
+//     const commentsWithSameUuid = comments.filter((c) => c.comment.uuid === commentData.uuid);
+
+//     if (commentsWithSameUuid.length === 1) continue;
+
+//     const commentToRemove = commentsWithSameUuid[0]
+
+//     const newParagraphWithContent = schema.nodes.paragraph.create({}, commentToRemove.content);
+
+//     replaceTransaction = replaceTransaction.replaceRangeWith(from, to, newParagraphWithContent)
+//   }
+
+//   dispatch(replaceTransaction)
+// }
+
 export const Comment = Node.create({
   name: "comment",
 
@@ -45,10 +86,10 @@ export const Comment = Node.create({
   },
 
   addCommands() {
-    const { saveContent } = this.options;
+    const { saveContent } = this.options
+
     return {
-      setComment: comment => ({ commands }) =>
-        commands.setNode(this.name, { comment }),
+      setComment: comment => ({ commands }) => commands.setNode(this.name, { comment }),
 
       saveReply: () => () => saveContent()
     };
@@ -78,7 +119,10 @@ export const Comment = Node.create({
 
             return true;
           }
-        }
+        },
+        // appendTransaction: () => {
+        //   // setTimeout(() => dedupeComments(editor));
+        // },
       })
     ];
 

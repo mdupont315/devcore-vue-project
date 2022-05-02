@@ -162,6 +162,7 @@ export const Indent = Extension.create({
   addKeyboardShortcuts() {
     return {
       Tab: () => {
+        console.log("HELLO")
         if (
           !(
             this.editor.isActive("bulletList") ||

@@ -244,6 +244,7 @@
   "Issue Evaluation Restriction Info": "Selected roles are restricted to evaluate issue loss amounts in mobile report issue feature.",
   "Issue Template Restriction": "Issue Effect Restriction",
   "Issue Template Restriction Info": "Selected roles are restricted to set issue template in mobile report issue feature.",
+  "Unsaved Idea Data": "You have unsaved data. Closing edit will discard pending changes",
   "Project Advanced": "Advanced settings",
   "Milestone reward": "Reward",
   "Engage": "Engage",
