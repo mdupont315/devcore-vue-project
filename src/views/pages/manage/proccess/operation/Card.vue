@@ -8,24 +8,24 @@
   >
     <b-card no-body class="shadow-sm mb-3 bg-white border stage-card">
       <div v-if="item">
-        <b-card-header class="header" style="width:100%">
+        <b-card-header class="header" style="width: 100%">
           <div
             class="title pl-0"
             style="display: flex; justify-content: space-between"
           >
-              <div
-                class="h5 m-0 text-capitalize text-left text-overflow text-bold"
-              >
-                {{ item.title }}
-              </div>
+            <div
+              class="h5 m-0 text-capitalize text-left text-overflow text-bold"
+            >
+              {{ item.title }}
+            </div>
             <div style="display: flex">
-              <div
+              <!-- <div
                 class="btn-action2"
                 @click="toggleView"
                 style="margin-right: 10px; cursor: pointer"
               >
                 <i class="mdi mdi-eye"></i>
-              </div>
+              </div> -->
               <div
                 v-if="$can('process/operation/update', item)"
                 class="btn-action2"
@@ -38,10 +38,10 @@
           </div>
         </b-card-header>
         <b-card-body class="pt-0">
-          <p class="p-0 m-0 text-gray text-justify text-multiline" v-if="item.description">
+          <p class="p-0 m-0 text-gray text-justify" v-if="item.description">
             {{ item.description }}
           </p>
-          <div>
+          <!-- <div>
             <div
               v-if="item.companyRoles && item.companyRoles.length > 0"
               class="stacked-avatars px-0"
@@ -56,7 +56,7 @@
                 <img :src="role.getAvatarUrl('50x50')" height="21" />
               </div>
             </div>
-          </div>
+          </div> -->
           <div class="list-group border-0 border-top-1">
             <dragable
               v-model="phases"
@@ -126,7 +126,7 @@
                 <div class="form-group my-0">
                   {{ item.description }}
                 </div>
-                <div>
+                <!-- <div>
                   <ul
                     v-if="item.companyRoles && item.companyRoles.length > 0"
                     class="list-inline break mb-0"
@@ -145,7 +145,7 @@
                       />
                     </li>
                   </ul>
-                </div>
+                </div> -->
               </b-card>
             </b-col>
           </b-row>
@@ -182,13 +182,16 @@
                       $displayError("title", editForm)
                     }}</b-form-invalid-feedback>
                   </div>
-                  <div class="form-group my-0">
+                  <div
+                    class="form-group my-0"
+                    style="overflow: hidden"
+                  >
                     <b-textarea
                       :key="intent"
                       v-model="editForm.description"
                       v-autoresize
                       class="no-style my-0"
-                      style="min-height: 20px; overflow: hidden"
+                      style="min-height: 70px; max-height:200px;overflow: scroll"
                       :placeholder="$t('Operation description')"
                       :state="$validateState('description', editForm)"
                       name="description"
@@ -198,20 +201,43 @@
                     }}</b-form-invalid-feedback>
                   </div>
                 </b-card>
-                <div class="mt-3">
-                  <loading-button
-                    size="md"
-                    :loading="editForm.busy"
-                    :disabled="vErrors.any() || editForm.busy"
-                    type="submit"
-                    class="padding shadow-sm"
-                    >{{ $t("Save") }}</loading-button
+                <div style="display: flex; width: 100%">
+                  <div class="mt-3" style="flex-grow: 1">
+                    <loading-button
+                      size="md"
+                      :loading="editForm.busy"
+                      :disabled="vErrors.any() || editForm.busy"
+                      type="submit"
+                      class="padding shadow-sm"
+                      style="display: flex; align-items: center"
+                      >{{ $t("Save") }}</loading-button
+                    >
+                  </div>
+                  <div
+                    v-if="$can('process/operation/delete', editItem)"
+                    class="mt-3"
+                    style="flex-grow: 1"
                   >
+                    <confirm-button
+                      variant="transparent"
+                      :confirm-message="$t('This action cannot be undone!')"
+                      :confirm-title="$t('Delete operation') + '?'"
+                      :confirm-text="$t('Delete operation')"
+                      btn-class="text-white border outline-none"
+                      size="xs"
+                      :show-overlay="false"
+                      :btnStyle="'height:100%'"
+                      style="height: 100%"
+                      block
+                      @confirm="deleteItem"
+                      >{{ $t("Delete operation") }}</confirm-button
+                    >
+                  </div>
                 </div>
               </b-col>
             </b-row>
           </div>
-          <b-popover
+          <!-- <b-popover
             :key="intent"
             placement="rightbottom"
             :show="true"
@@ -290,7 +316,7 @@
                 >{{ $t("Delete operation") }}</confirm-button
               >
             </div>
-          </b-popover>
+          </b-popover> -->
         </b-form>
       </layer>
     </div>
@@ -343,21 +369,21 @@ export default {
     ...mapGetters({
       allRoles: "companyRole/all",
     }),
-    availableRoles: {
-      get() {
-        // return this.stage.companyRoles.map(r =>
-        //   this.allRoles.find(o => o.id === r.id)
-        // );
-        return this.allRoles;
-      },
-    },
-    selectedRoles: {
-      get() {
-        return this.availableRoles
-          .filter((r) => this.editForm.companyRoles.includes(r.id))
-          .sort((a, b) => (a.name > b.name ? 1 : -1));
-      },
-    },
+    // availableRoles: {
+    //   get() {
+    //     // return this.stage.companyRoles.map(r =>
+    //     //   this.allRoles.find(o => o.id === r.id)
+    //     // );
+    //     return this.allRoles;
+    //   },
+    // },
+    // selectedRoles: {
+    //   get() {
+    //     return this.availableRoles
+    //       .filter((r) => this.editForm.companyRoles.includes(r.id))
+    //       .sort((a, b) => (a.name > b.name ? 1 : -1));
+    //   },
+    // },
     phases: {
       get() {
         return [...this.item.phases].sort((a, b) => {
@@ -402,7 +428,7 @@ export default {
             stageId: this.editItem.stageId,
             title: this.editItem.title,
             description: this.editItem.description,
-            companyRoles: this.editItem.companyRoles.map((r) => r.id),
+            companyRoles: this.allRoles.map((r) => r.id),
           });
           this.$validator.reset();
           this.$validator.resume();

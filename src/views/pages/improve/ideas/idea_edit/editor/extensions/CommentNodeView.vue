@@ -105,8 +105,6 @@ export default {
 
   methods: {
     openReplyForm(comment) {
-      console.log(this);
-      console.log("OPEN FORM!");
 
       this.isReplying = comment.id;
     },

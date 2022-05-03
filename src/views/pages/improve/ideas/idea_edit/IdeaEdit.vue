@@ -169,8 +169,10 @@ export default {
     },
     getIdeaContent: {
       get() {
+
         const contentForm =
           this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+					console.log(JSON.parse(contentForm.markup))
         return {
           contentType: contentForm.contentType,
           markup: JSON.parse(contentForm.markup),
@@ -179,12 +181,10 @@ export default {
       set(value) {
         const contentForm =
           this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+
         contentForm.markup = JSON.stringify(value.markup);
         contentForm.contentType = value.contentType;
 
-        if (contentForm.markup) {
-          console.log("EDITED!");
-        }
       },
     },
   },

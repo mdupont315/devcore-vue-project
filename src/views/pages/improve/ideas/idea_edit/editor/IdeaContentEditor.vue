@@ -142,7 +142,6 @@ export default {
       };
 
       const saveContent = async (content) => {
-        console.log("transforming");
         this.transformProcessedCommentNodesToParagraph();
 
         setTimeout(() => {
@@ -155,15 +154,11 @@ export default {
         this.value.markup,
         {
           onUpdate: (content) => {
-						console.log("UPDATED CONTEN!");
             this.$emit("input", {
               contentType: this.value.contentType,
               markup: content,
             });
 
-						if(this.isEditable && this.value.markup && content) {
-							console.log("IS EDITING IDEA CONTETN!");
-						}
           },
         },
         fileHandlers,

@@ -35,7 +35,7 @@
               <b-form-invalid-feedback>{{ $displayError('description', form) }}</b-form-invalid-feedback>
             </div>
           </b-col>
-          <b-col cols="12">
+          <!-- <b-col cols="12">
             <div class="form-group">
               <company-role-selector
                 v-model="form.companyRoles"
@@ -48,7 +48,7 @@
               ></company-role-selector>
               <b-form-invalid-feedback>{{ $displayError('companyRoles', form) }}</b-form-invalid-feedback>
             </div>
-          </b-col>
+          </b-col> -->
         </b-row>
         <b-row>
           <b-col>

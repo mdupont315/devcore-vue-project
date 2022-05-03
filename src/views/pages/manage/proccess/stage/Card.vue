@@ -46,7 +46,7 @@
               <i class="mdi mdi-pencil"></i>
             </div>
           </div>
-          <hr class="m-0 mt-2" />
+          <!-- <hr class="m-0 mt-2" />
           <div class="companyRoles">
             <div v-if="item.companyRoles && item.companyRoles.length > 0">
               <div class="stacked-avatars left" style="display: block">
@@ -64,7 +64,7 @@
 
               <hr class="my-0" />
             </div>
-          </div>
+          </div> -->
         </b-card-header>
         <b-card-body>
           <draggable
@@ -126,7 +126,10 @@
                     ref="editRolesPlaceholder"
                     style="height: 1px; position: absolute; width: 100%"
                   ></div>
-                  <div class="form-group my-0">
+                  <div
+                    class="form-group my-0"
+                    style="overflow: hidden"
+                  >
                     <b-textarea
                       :key="intent"
                       v-model="editForm.title"
@@ -134,7 +137,7 @@
                       v-autoresize
                       v-validate="'required|min:4'"
                       class="no-style my-0"
-                      style="min-height: 70px; overflow: hidden"
+                      style="min-height: 70px; max-height: 200px; overflow: scroll"
                       :state="$validateState('title', editForm)"
                       name="title"
                     ></b-textarea>
@@ -143,20 +146,44 @@
                     }}</b-form-invalid-feedback>
                   </div>
                 </b-card>
-                <div class="mt-3">
-                  <loading-button
-                    :loading="editForm.busy"
-                    :disabled="vErrors.any() || editForm.busy"
-                    size="md"
-                    type="submit"
-                    class="padding shadow-sm"
-                    >{{ $t("Save") }}</loading-button
+                <div style="display: flex; width: 100%">
+                  <div class="mt-3" style="flex-grow: 1">
+                    <loading-button
+                      :loading="editForm.busy"
+                      :disabled="vErrors.any() || editForm.busy"
+                      size="md"
+                      type="submit"
+                      class="padding shadow-sm"
+                      style="display: flex; align-items: center"
+                      >{{ $t("Save") }}</loading-button
+                    >
+                  </div>
+                  <div
+                    v-if="$can('process/stage/delete', editItem)"
+                    class="mt-3"
+                    style="flex-grow: 1"
                   >
+                    <confirm-button
+                      v-if="$can('process/stage/delete', editItem)"
+                      variant="transparent"
+                      :confirm-message="$t('This action cannot be undone!')"
+                      :confirm-title="$t('Delete stage') + '?'"
+                      :confirm-text="$t('Delete stage')"
+                      btn-class="text-white border outline-none"
+                      size="xs"
+                      :show-overlay="false"
+                      :btnStyle="'height:100%'"
+                      style="height: 100%"
+                      block
+                      @confirm="deleteItem"
+                      >{{ $t("Delete stage") }}</confirm-button
+                    >
+                  </div>
                 </div>
               </b-col>
             </b-row>
           </div>
-          <b-popover
+          <!-- <b-popover
             :key="intent"
             placement="right"
             :show="true"
@@ -238,7 +265,7 @@
                 >{{ $t("Delete stage") }}</confirm-button
               >
             </div>
-          </b-popover>
+          </b-popover> -->
         </b-form>
       </layer>
     </div>
@@ -285,13 +312,13 @@ export default {
       companyRoles: "companyRole/all",
       show_inner_overlay: "app/show_inner_overlay",
     }),
-    selectedRoles: {
-      get() {
-        return this.companyRoles
-          .filter((r) => this.editForm.companyRoles.includes(r.id))
-          .sort((a, b) => (a.name > b.name ? 1 : -1));
-      },
-    },
+    // selectedRoles: {
+    //   get() {
+    //     return this.companyRoles
+    //       .filter((r) => this.editForm.companyRoles.includes(r.id))
+    //       .sort((a, b) => (a.name > b.name ? 1 : -1));
+    //   },
+    // },
     operations: {
       get() {
         return [...this.item.operations].sort((a, b) => {
@@ -331,11 +358,17 @@ export default {
         if (this.item) {
           this.intent++;
           this.editItem = new ProcessStage().deserialize(this.item);
+          // this.editForm = new GQLForm({
+          //   id: this.editItem.id,
+          //   processId: this.editItem.processId,
+          //   title: this.editItem.title,
+          //   companyRoles: this.editItem.companyRoles.map((r) => r.id),
+          // });
           this.editForm = new GQLForm({
             id: this.editItem.id,
             processId: this.editItem.processId,
             title: this.editItem.title,
-            companyRoles: this.editItem.companyRoles.map((r) => r.id),
+            companyRoles: this.companyRoles.map((r) => r.id),
           });
           this.$validator.reset();
           this.$validator.resume();

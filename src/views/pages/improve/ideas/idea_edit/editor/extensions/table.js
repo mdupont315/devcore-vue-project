@@ -14,66 +14,95 @@ const getElementWithAttributes = (name, attrs) => {
   return el;
 };
 
+const stopAndPreventEvent = (e) => {
+  if (!e) return false
+
+  e.preventDefault()
+  e.stopPropagation()
+
+  return true
+}
+
+
 const focusTable = (editor, getPos) => {
-  const currentTablePos = getPos()
+  const currentTablePos = getPos();
 
-  const { state } = editor
+  const { state } = editor;
 
-  const { doc, selection } = state
+  const { doc, selection } = state;
 
-  const { from: selectionFrom, to: selectionTo } = selection
+  const { from: selectionFrom, to: selectionTo } = selection;
 
-  let positionToFocus = null
+  let positionToFocus = null;
 
   doc.descendants((node, pos) => {
-    if (node.type.name !== 'table' || positionToFocus) return
+    if (node.type.name !== "table" || positionToFocus) return;
 
-    const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize]
+    const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
 
-    const isCurrentNodeTableToFind = nodeFrom <= currentTablePos && currentTablePos <= nodeTo
+    const isCurrentNodeTableToFind =
+      nodeFrom <= currentTablePos && currentTablePos <= nodeTo;
 
-    const isSelectionInsideTableToFind = nodeFrom <= selectionFrom && selectionTo <= nodeTo
+    const isSelectionInsideTableToFind =
+      nodeFrom <= selectionFrom && selectionTo <= nodeTo;
 
-    if (isCurrentNodeTableToFind && !isSelectionInsideTableToFind) positionToFocus = pos
-  })
+    if (isCurrentNodeTableToFind && !isSelectionInsideTableToFind) {
+      positionToFocus = nodeTo - 4;
+    }
+    // if (isCurrentNodeTableToFind && !isSelectionInsideTableToFind) positionToFocus = pos
+  });
 
-  if (positionToFocus) editor.commands.focus(positionToFocus + 1)
-}
+  // if (positionToFocus) editor.commands.focus(positionToFocus + 1)
+  if (positionToFocus) editor.commands.focus(positionToFocus);
+};
 
 const rowControlButtonsData = [
   {
     name: "Remove Row",
     text: "-",
-    action: editor =>
-      editor
-        .chain()
-        .focus()
-        .deleteRow()
-        .run(),
+    action: (editor, getPos) => {
+      focusTable(editor, getPos);
 
+      setTimeout(() => {
+        editor
+          .chain()
+          .focus()
+          .deleteRow()
+          .run();
+      });
+    }
   },
   {
     name: "Add Row",
     text: "+",
-    action: editor =>
-      editor
-        .chain()
-        .focus()
-        .addRowAfter()
-        .run()
+
+    action: (editor, getPos) => {
+      focusTable(editor, getPos);
+
+      setTimeout(() => {
+        editor
+          .chain()
+          .focus()
+          .addRowAfter()
+          .run();
+      });
+    }
   }
 ];
 
-const getRowControlButtons = (editor) => {
-  const containerClass = "row-control-button-container"
+// const getRowControlButtons = editor => {
+const getRowControlButtons = (editor, getPos) => {
+  const containerClass = "row-control-button-container";
   const container = getElementWithAttributes("div", { class: containerClass });
 
-  const buttonClass = "table-control-button "
+  const buttonClass = "table-control-button ";
   for (const el of rowControlButtonsData) {
     const btn = getElementWithAttributes("button", { class: buttonClass });
     btn.innerText = el.text;
 
-    btn.addEventListener("click", () => el.action(editor));
+    // btn.addEventListener("click", () => el.action(editor));
+    // btn.addEventListener("click", () => el.action(editor, getPos));
+    btn.addEventListener("click", (e) => stopAndPreventEvent(e) && el.action(editor, getPos));
 
     btn.setAttribute("data-tooltip", el.name);
 
@@ -86,9 +115,9 @@ const getRowControlButtons = (editor) => {
 const deleteTableButtonData = {
   name: "Delete Table",
   action: (editor, getPos) => {
-    focusTable(editor, getPos)
+    focusTable(editor, getPos);
 
-    setTimeout(() => editor.commands.deleteTable())
+    setTimeout(() => editor.commands.deleteTable());
   },
   text: "Remove"
 };
@@ -100,7 +129,8 @@ const getDeleteTableButton = (editor, getPos) => {
     class: "delete-table-button"
   });
 
-  el.addEventListener("click", () => action(editor, getPos));
+  // el.addEventListener("click", () => action(editor, getPos));
+  el.addEventListener("click", (e) => stopAndPreventEvent(e) && action(editor, getPos));
   el.innerText = text;
 
   el.setAttribute("data-tooltip", name);
@@ -111,36 +141,46 @@ const getDeleteTableButton = (editor, getPos) => {
 const colControlButtonsData = [
   {
     name: "Remove Col",
-    action: editor =>
-      editor
-        .chain()
-        .focus()
-        .deleteColumn()
-        .run(),
-    text: "-"
+    text: "-",
+    action: (editor, getPos) => {
+      focusTable(editor, getPos);
+      setTimeout(() => {
+        editor
+          .chain()
+          .focus()
+          .deleteColumn()
+          .run();
+      });
+    }
   },
   {
     name: "Add Col",
-    action: editor =>
-      editor
-        .chain()
-        .focus()
-        .addColumnAfter()
-        .run(),
-    text: "+"
+    text: "+",
+    action: (editor, getPos) => {
+      focusTable(editor, getPos);
+
+      setTimeout(() => {
+        editor
+          .chain()
+          .focus()
+          .addColumnAfter()
+          .run();
+      });
+    }
   }
 ];
-
-const getColControlButtons = (editor) => {
-  const containerClass = "col-control-button-container"
+const getColControlButtons = (editor, getPos) => {
+  const containerClass = "col-control-button-container";
   const container = getElementWithAttributes("div", { class: containerClass });
 
-  const buttonClass = "table-control-button "
+  const buttonClass = "table-control-button ";
   for (const el of colControlButtonsData) {
     const btn = getElementWithAttributes("button", { class: buttonClass });
     btn.innerText = el.text;
 
-    btn.addEventListener("click", () => el.action(editor));
+    // btn.addEventListener("click", () => el.action(editor));
+    // btn.addEventListener("click", () => el.action(editor, getPos));
+    btn.addEventListener("click", (e) => stopAndPreventEvent(e) && el.action(editor, getPos));
 
     btn.setAttribute("data-tooltip", el.name);
 
@@ -264,7 +304,8 @@ export const CustomTable = Table.extend({
         });
 
         tableSecondRow.appendChild(getDeleteTableButton(editor, getPos));
-        tableSecondRow.appendChild(getRowControlButtons(editor));
+        // tableSecondRow.appendChild(getRowControlButtons(editor));
+        tableSecondRow.appendChild(getRowControlButtons(editor, getPos));
         tableSecondRow.appendChild(getElementWithAttributes("div", {}));
 
         const tableLeftContainer = getElementWithAttributes("section", {
@@ -275,7 +316,8 @@ export const CustomTable = Table.extend({
           class: "tableRightSection"
         });
 
-        tableRightContainer.appendChild(getColControlButtons(editor));
+        // tableRightContainer.appendChild(getColControlButtons(editor));
+        tableRightContainer.appendChild(getColControlButtons(editor, getPos));
 
         tableFirstRow.appendChild(tableLeftContainer);
         tableFirstRow.appendChild(tableRightContainer);
@@ -298,14 +340,17 @@ export const CustomTable = Table.extend({
         dom,
         contentDOM,
         ignoreMutation: mutation => {
-          const isMutationOfTypeAttribute = mutation.type === "attributes"
-          const isMutationTargetTable = mutation.target === table
-          const colgroupContainsTarget = colgroup.contains(mutation.target)
+          const isMutationOfTypeAttribute = mutation.type === "attributes";
+          const isMutationTargetTable = mutation.target === table;
+          const colgroupContainsTarget = colgroup.contains(mutation.target);
 
-          return isMutationOfTypeAttribute && (isMutationTargetTable || colgroupContainsTarget)
+          return (
+            isMutationOfTypeAttribute &&
+            (isMutationTargetTable || colgroupContainsTarget)
+          );
         },
         update: node => {
-          if (node.type !== nodeViewNode.type) return false
+          if (node.type !== nodeViewNode.type) return false;
 
           tempNode = node;
 
