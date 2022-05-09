@@ -16,8 +16,8 @@ export const EventHandler = Extension.create({
             console.log("Double Clicked!");
           },
           handlePaste(view, event, slice) {
-            console.log(slice)
-            console.log("Pasted Content!");
+          //  console.log(slice)
+          //  console.log("Pasted Content!");
           }
           // … and many, many more.
           // Here is the full list: https://prosemirror.net/docs/ref/#view.EditorProps

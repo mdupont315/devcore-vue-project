@@ -1,16 +1,38 @@
 import { Plugin } from "prosemirror-state";
-
+const mammoth = require("mammoth");
 /**
  * function for image drag n drop(for tiptap)
  * @see https://gist.github.com/slava-vishnyakov/16076dff1a77ddaca93c4bccd4ec4521#gistcomment-3744392
  */
 
+// function parseWordDocxFile(inputElement) {
+//   var files = inputElement.files || [];
+//   if (!files.length) return;
+//   var file = files[0];
+
+//   console.time();
+//   var reader = new FileReader();
+//   reader.onloadend = function(event) {
+//     var arrayBuffer = reader.result;
+//     let file = null;
+//     // debugger
+
+//     mammoth
+//       .convertToHtml({ arrayBuffer: arrayBuffer })
+//       .then(function(resultObject) {
+//         file = resultObject.value;
+//         console.log(resultObject.value);
+//       });
+//     console.log(file);
+//   };
+//   reader.readAsArrayBuffer(file);
+// }
+
 const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
   const { schema } = view.state;
-  console.log("item", item);
 
   if (!item) return;
-  if (item.size > 1000000) {
+  if (item.size > 10000000) {
     console.log("ERROR, File size too big!");
     return;
   }
@@ -22,7 +44,6 @@ const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
       type: item.type,
       preview
     });
-    console.log(node);
 
     const transaction = view.state.tr.insert(coordinates.pos, node);
     view.dispatch(transaction);
@@ -49,15 +70,9 @@ const uploadFilePlugin = addFile => {
         }
         const coordinates = { pos, inside: 0 };
 
-        console.log("ADD FILE ", addFile)
-
-        console.log(this);
         for (const item of items) {
-          console.log("item", item);
-          console.log(item.kind);
           if (item.kind != "file") return;
           if (item.type.indexOf("image") === 0) {
-            console.log("ITEM IS IMAGE ! ");
             event.preventDefault();
             const preview = true;
 
@@ -93,17 +108,21 @@ const uploadFilePlugin = addFile => {
             return false;
           }
 
-          console.log(event.dataTransfer);
-
-          console.log("ADD FILE ", addFile)
           const data = Array.from(event.dataTransfer?.files ?? []);
+          console.log(data);
+
+
+
           const previewFiles = data.filter(file => /image/i.test(file.type));
           const nonPreviewFiles = data.filter(
             file => !/image/i.test(file.type)
           );
 
-          console.log("data", data);
-          console.log("nonPreviewFiles", nonPreviewFiles);
+        //  const docxFiles = data.filter(file => /vnd.openxmlformats-officedocument.wordprocessingml.document/i.test(file.type));
+
+        //  console.log(data)
+        //  console.log(docxFiles);
+        //  parseWordDocxFile(docxFiles)
 
           event.preventDefault();
           const coordinates = view.posAtCoords({
@@ -112,7 +131,6 @@ const uploadFilePlugin = addFile => {
           });
 
           if (previewFiles.length > 0) {
-            console.log(previewFiles);
             previewFiles.forEach(async item => {
               const preview = true;
               addFile(item);
@@ -121,7 +139,6 @@ const uploadFilePlugin = addFile => {
           }
 
           if (nonPreviewFiles.length > 0) {
-            console.log(data);
             nonPreviewFiles.forEach(async item => {
               const preview = false;
               addFile(item);

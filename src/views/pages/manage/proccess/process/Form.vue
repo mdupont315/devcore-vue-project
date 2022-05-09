@@ -77,6 +77,7 @@ export default {
   },
   methods: {
     async initForm() {
+			console.log(this.input)
       Object.keys(this.input || {})
         .filter(key => key in this.form)
         .forEach(key => (this.form[key] = this.input[key]));

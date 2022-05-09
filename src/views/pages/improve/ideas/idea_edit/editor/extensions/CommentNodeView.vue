@@ -1,5 +1,9 @@
 <template>
-  <node-view-wrapper as="div" class="comment-component">
+  <node-view-wrapper
+    as="div"
+    class="comment-component"
+    :class="`comment-container-${ideaUUID}`"
+  >
     <inner-overlay
       v-if="isReplying"
       @click="closeOverlay()"
@@ -43,7 +47,7 @@
 
             <span
               v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
-              :title="$t('reply')"
+              :title="$t('Leave a reply')"
               :class="`comment_replyIcon-${comment.id}`"
               :ref="`comment_replyIcon-${comment.id}`"
             >
@@ -100,27 +104,41 @@ export default {
       CommentIcon,
       FolderIcon,
       isReplying: null,
+      activeCommentIndex: null,
     };
   },
 
   methods: {
-    openReplyForm(comment) {
-
+    openReplyForm(comment, index) {
+      this.activeCommentIndex = index;
       this.isReplying = comment.id;
     },
     savedReply(id) {
       this.isReplying = null;
 
       const data = {
+        uuid: this.commentEntity.uuid,
+        ideaUuid: this.commentEntity.ideaUuid,
         comments: this.commentEntity.comments.filter((x) => x.id !== id),
       };
-      this.updateAttributes({ comment: JSON.stringify(data) });
+
+      this.updateAttributes({
+        comment: JSON.stringify(data),
+      });
+
+      const { editor, getPos, node } = this;
+
+			console.log(editor)
+
+      const from = getPos();
+      const to = from + node.nodeSize;
 
       if (this.editor) {
-        this.editor.commands.saveReply();
+        this.editor.commands.saveReply(to);
       }
     },
     closeOverlay() {
+      this.activeCommentIndex = null;
       this.isReplying = null;
     },
 
@@ -147,13 +165,16 @@ export default {
     comments() {
       return this.commentEntity?.comments || [];
     },
+    ideaUUID() {
+      //TODO: ideauuid gets overwritten when reply and updateattributes doesnt set it
+      return this.commentEntity?.uuid || "";
+    },
   },
 };
 </script>
 
 <style lang="scss">
 .comment-component {
-
   .comment-actions {
     margin-left: 10px;
   }

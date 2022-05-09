@@ -2,7 +2,11 @@
   <div>
     <div class="p-2">
       <b-card>
-        <b-form class="hide-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
+        <b-form
+          class="hide-labels"
+          @submit.prevent="save"
+          @keyup="$validator.validateAll()"
+        >
           <b-row>
             <b-col cols="12">
               <div class="form-group">
@@ -18,8 +22,10 @@
                   :state="$validateState('title', form)"
                   autofocus
                 ></b-form-input>
-                <label for="name">{{ $t('Name') }}</label>
-                <b-form-invalid-feedback>{{ $displayError('title', form) }}</b-form-invalid-feedback>
+                <label for="name">{{ $t("Name") }}</label>
+                <b-form-invalid-feedback>{{
+                  $displayError("title", form)
+                }}</b-form-invalid-feedback>
               </div>
             </b-col>
             <!-- <b-col cols="12">
@@ -43,8 +49,9 @@
                 size="lg"
                 block
                 :loading="form.busy"
-                :disabled="vErrors.any()||form.busy"
-              >{{ $t('Save changes') }}</loading-button>
+                :disabled="vErrors.any() || form.busy"
+                >{{ $t("Save changes") }}</loading-button
+              >
             </b-col>
           </b-row>
         </b-form>
@@ -54,12 +61,18 @@
 </template>
 <script>
 import GQLForm from "@/lib/gqlform";
+import { /* mapState, */ mapGetters } from "vuex";
 
 export default {
   props: {
     value: {
-      required: true
-    }
+      required: true,
+    },
+  },
+  computed: {
+    ...mapGetters({
+      allRoles: "companyRole/all",
+    }),
   },
   data: () => ({
     input: null,
@@ -67,8 +80,8 @@ export default {
       // id: undefined,
       processId: null,
       title: null,
-      companyRoles: []
-    })
+      companyRoles: [],
+    }),
   }),
   mounted() {
     this.$store.dispatch("app/showInnerOverlay", true);
@@ -78,8 +91,9 @@ export default {
   methods: {
     async initForm() {
       Object.keys(this.input || {})
-        .filter(key => key in this.form)
-        .forEach(key => (this.form[key] = this.input[key]));
+        .filter((key) => key in this.form)
+        .forEach((key) => (this.form[key] = this.input[key]));
+      this.form._fields.companyRoles = this.allRoles.map((x) => x.id);
     },
     async save() {
       await this.$validator.validateAll();
@@ -92,7 +106,7 @@ export default {
     close() {
       this.$store.dispatch("app/showInnerOverlay", false);
       this.$emit("close");
-    }
-  }
+    },
+  },
 };
 </script>

@@ -141,11 +141,9 @@ export const File = Node.create({
   },
 
   addCommands() {
-    console.log(this.options);
     const { addFile } = this.options;
     return {
       setImage: attrs => ({ view, tr }) => {
-        console.log("SETTING IMAGE ");
         let pos = 1;
         if (tr && tr.curSelection && tr.curSelection.$head) {
           pos = tr.curSelection.$head.pos;
@@ -154,6 +152,8 @@ export const File = Node.create({
         const input = attrs ? attrs : [];
         const files = Array.from(input);
         const previewFiles = files.filter(file => /image/i.test(file.type));
+
+        console.log(files)
 
         if (previewFiles.length > 0) {
           previewFiles.forEach(async item => {

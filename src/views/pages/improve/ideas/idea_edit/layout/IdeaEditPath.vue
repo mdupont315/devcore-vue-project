@@ -8,7 +8,12 @@
 
       <b-button
         v-if="!ideaContentIsDirty"
-        style="width: 60px; margin-top: 15px; margin-right: 15px; height: 29.2px"
+        style="
+          width: 60px;
+          margin-top: 15px;
+          margin-right: 15px;
+          height: 29.2px;
+        "
         @click="closeIdeaEdit"
       >
         <span> {{ $t("close") }} </span>
@@ -16,7 +21,7 @@
 
       <confirm-button
         v-else
-        style="width: 60px; margin-top: 15px; margin-right: 15px;height:30px"
+        style="width: 60px; margin-top: 15px; margin-right: 15px; height: 30px"
         @confirm="closeIdeaEdit"
         :confirmPlacement="'left'"
         :confirmMessage="$t('Unsaved Idea Data')"
@@ -248,6 +253,7 @@
                     idea.status === 'NEW' &&
                     $can('improve/idea/change_status', idea)
                   "
+                  :disabled="vErrors.any() || isLoading"
                   variant="primary"
                   size="lg"
                   style="
@@ -268,6 +274,7 @@
                   variant="primary"
                   size="lg"
                   :loading="isLoading"
+                  :disabled="vErrors.any() || isLoading"
                   style="
                     overflow: hidden;
                     height: 40px;
@@ -360,15 +367,18 @@ export default {
     },
     getSelectableRoles: {
       get() {
-        console.log(this.getParentRoles);
-        return this.allRoles.filter((role) =>
-          this.getParentRoles.includes(role.id)
-        );
+				return this.allRoles;
+        // if (this.getParentRoles.length > 0) {
+        //   return this.allRoles.filter((role) =>
+        //     this.getParentRoles.includes(role.id)
+        //   );
+        // } else {
+        //   return this.allRoles;
+        // }
       },
     },
     mutateForm: {
       get() {
-        console.log("mutateForm", this.value);
         return this.value;
       },
       set(value) {
@@ -434,7 +444,6 @@ export default {
       }
     },
     async save() {
-      console.log(this.value.changes);
       await this.$validator.validateAll();
       if (!this.vErrors.any()) {
         this.$validator.reset();

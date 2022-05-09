@@ -22,7 +22,7 @@
         @updateStatus="updateIdeaVersionStatus"
         :isLoading="isLoading"
         v-model="getIdeaPath"
-				:ideaContentIsDirty="ideaContentIsDirty"
+        :ideaContentIsDirty="ideaContentIsDirty"
         :idea="getIdea"
         v-if="isLoaded"
       ></idea-edit-path>
@@ -64,7 +64,7 @@ export default {
     filesChanged: false,
     defaultContentName: "Custom",
     selectedCategoryIndex: 2,
-		ideaContentIsDirty: false,
+    ideaContentIsDirty: false,
     ideaForm: new GQLForm({
       id: undefined,
       processId: null,
@@ -93,7 +93,17 @@ export default {
         name: "Cheatsheet",
         contentForm: new GQLForm({
           id: undefined,
-          markup: null,
+          markup: JSON.stringify({
+            type: "doc",
+            content: [
+              {
+                attrs: {
+                  indent: 0,
+                },
+                type: "paragraph",
+              },
+            ],
+          }),
           ideaId: null,
           version: 1,
           contentType: null,
@@ -103,7 +113,17 @@ export default {
         name: "Learn",
         contentForm: new GQLForm({
           id: undefined,
-          markup: null,
+          markup: JSON.stringify({
+            type: "doc",
+            content: [
+              {
+                attrs: {
+                  indent: 0,
+                },
+                type: "paragraph",
+              },
+            ],
+          }),
           ideaId: null,
           version: 1,
           contentType: null,
@@ -113,7 +133,17 @@ export default {
         name: "Custom",
         contentForm: new GQLForm({
           id: undefined,
-          markup: null,
+          markup: JSON.stringify({
+            type: "doc",
+            content: [
+              {
+                attrs: {
+                  indent: 0,
+                },
+                type: "paragraph",
+              },
+            ],
+          }),
           ideaId: null,
           version: 1,
           contentType: null,
@@ -169,10 +199,8 @@ export default {
     },
     getIdeaContent: {
       get() {
-
         const contentForm =
           this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
-					console.log(JSON.parse(contentForm.markup))
         return {
           contentType: contentForm.contentType,
           markup: JSON.parse(contentForm.markup),
@@ -181,10 +209,8 @@ export default {
       set(value) {
         const contentForm =
           this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
-
         contentForm.markup = JSON.stringify(value.markup);
         contentForm.contentType = value.contentType;
-
       },
     },
   },
@@ -193,8 +219,7 @@ export default {
   },
   methods: {
     setIsDirty() {
-      console.log("IS DIRTY");
-			this.ideaContentIsDirty = true;
+      this.ideaContentIsDirty = true;
     },
     removeFile(file) {
       if (file.src && file.id) {
@@ -293,8 +318,8 @@ export default {
     },
 
     async saveIdea() {
-      console.log(this.files);
-      this.ideaForm.fields.file = this.files.filter((x) => x.size && !x.uri);
+      this.ideaForm._fields.file = this.files.filter((x) => x.size && !x.uri);
+
       let ideaSave = null;
       this.ideaForm.processId = this.processPath.process.id;
       if (this.ideaForm.id) {
@@ -325,7 +350,6 @@ export default {
 
     syncFiles() {
       const fileNodesInContent = this.getImageNodesFromContent();
-      console.log(fileNodesInContent);
       if (fileNodesInContent.length === 0) {
         this.ideaForm._fields.removeFile = true;
       } else {
@@ -416,16 +440,23 @@ export default {
       });
     },
     async updateIdeaVersionStatus() {
-      const editForm = new GQLForm({
-        id: this.getIdea.id,
-        status: this.getIdea.status === "NEW" ? "TESTING" : "ADOPTED",
-      });
-      await this.$store.dispatch(`idea/changeStatus`, editForm);
-      this.$store.dispatch(`idea/findByProcess`, {
-        id: this.getIdea.processId,
-        force: true,
-      });
-      await this.closeIdeaEdit();
+      this.isLoading = true;
+      try {
+        const editForm = new GQLForm({
+          id: this.getIdea.id,
+          status: this.getIdea.status === "NEW" ? "TESTING" : "ADOPTED",
+        });
+        await this.$store.dispatch(`idea/changeStatus`, editForm);
+        this.$store.dispatch(`idea/findByProcess`, {
+          id: this.getIdea.processId,
+          force: true,
+        });
+      } catch (e) {
+        console.log(e);
+      } finally {
+        this.isLoading = false;
+        await this.closeIdeaEdit();
+      }
     },
     async deleteIdeaVersion() {
       const editForm = new GQLForm({

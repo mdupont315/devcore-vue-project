@@ -1,8 +1,12 @@
 <template>
   <div>
     <inner-overlay @click="close"></inner-overlay>
-    <b-card style="position:relative;z-index:1000">
-      <b-form class="hide-labels" @submit.prevent="save" @keyup="$validator.validateAll()">
+    <b-card style="position: relative; z-index: 1000">
+      <b-form
+        class="hide-labels"
+        @submit.prevent="save"
+        @keyup="$validator.validateAll()"
+      >
         <b-row>
           <b-col cols="12">
             <div class="form-group">
@@ -17,8 +21,10 @@
                 name="title"
                 :state="$validateState('title', form)"
               ></b-form-input>
-              <label for="name">{{ $t('Name') }}</label>
-              <b-form-invalid-feedback>{{ $displayError('title', form) }}</b-form-invalid-feedback>
+              <label for="name">{{ $t("Name") }}</label>
+              <b-form-invalid-feedback>{{
+                $displayError("title", form)
+              }}</b-form-invalid-feedback>
             </div>
           </b-col>
           <b-col cols="12">
@@ -31,8 +37,10 @@
                 name="description"
                 :state="$validateState('description', form)"
               ></b-form-textarea>
-              <label for="name">{{ $t('Name') }}</label>
-              <b-form-invalid-feedback>{{ $displayError('description', form) }}</b-form-invalid-feedback>
+              <label for="name">{{ $t("Name") }}</label>
+              <b-form-invalid-feedback>{{
+                $displayError("description", form)
+              }}</b-form-invalid-feedback>
             </div>
           </b-col>
           <!-- <b-col cols="12">
@@ -57,8 +65,9 @@
               size="lg"
               block
               :loading="form.busy"
-              :disabled="vErrors.any()||form.busy"
-            >{{ $t('Save changes') }}</loading-button>
+              :disabled="vErrors.any() || form.busy"
+              >{{ $t("Save changes") }}</loading-button
+            >
           </b-col>
         </b-row>
       </b-form>
@@ -72,11 +81,11 @@ import GQLForm from "@/lib/gqlform";
 export default {
   props: {
     value: {
-      required: true
+      required: true,
     },
     operation: {
-      required: true
-    }
+      required: true,
+    },
   },
   data: () => ({
     input: null,
@@ -85,12 +94,12 @@ export default {
       operationId: null,
       title: null,
       description: null,
-      companyRoles: []
-    })
+      companyRoles: [],
+    }),
   }),
   computed: {
     ...mapGetters({
-      allRoles: "companyRole/all"
+      allRoles: "companyRole/all",
     }),
     availableRoles: {
       get() {
@@ -98,19 +107,23 @@ export default {
         //   this.allRoles.find(o => o.id === r.id)
         // );
         return this.allRoles;
-      }
-    }
+      },
+    },
   },
   mounted() {
     this.$store.dispatch("app/showInnerOverlay", true);
     this.input = this.value;
+    this.form._fields.companyRoles = this.allRoles.map((x) => x.id);
+
     this.initForm();
   },
   methods: {
     async initForm() {
+      console.log(this.input);
       Object.keys(this.input || {})
-        .filter(key => key in this.form)
-        .forEach(key => (this.form[key] = this.input[key]));
+        .filter((key) => key in this.form)
+        .forEach((key) => (this.form[key] = this.input[key]));
+      this.form._fields.companyRoles = this.allRoles.map((x) => x.id);
     },
     async save() {
       await this.$validator.validateAll();
@@ -123,7 +136,7 @@ export default {
     close() {
       this.$store.dispatch("app/showInnerOverlay", false);
       this.$emit("close");
-    }
-  }
+    },
+  },
 };
 </script>

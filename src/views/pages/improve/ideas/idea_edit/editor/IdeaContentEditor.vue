@@ -55,6 +55,10 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    scrollToSelection: {
+			type: Number,
+      default: () => null,
+    },
   },
   computed: {
     ...mapGetters({
@@ -62,10 +66,17 @@ export default {
     }),
   },
   watch: {
+    "value.markup": {
+      handler(newVal) {
+        //Todo scroll to content
+      },
+    },
     isEditable: {
       handler(newVal) {
         this.editor.setEditable(newVal);
-        if (newVal) this.focusEditor();
+        if (newVal) {
+          this.focusEditor();
+        }
       },
     },
   },
@@ -97,7 +108,7 @@ export default {
           to: pos + node.nodeSize,
           comment: JSON.parse(node.attrs.comment),
           shouldDelete: false,
-					content: node.content
+          content: node.content,
         });
       });
 
@@ -108,15 +119,10 @@ export default {
 
         if (!shouldRemoveComment) continue;
 
-        // const textContent = doc.textBetween(from, to);
-
-        // const paragraphContent = schema.text(textContent || " ");
-
-        // const newParagraphWithContent = schema.nodes.paragraph.create(
-        //   {},
-        //   paragraphContent
-        // );
-				 const newParagraphWithContent = schema.nodes.paragraph.create({}, comment.content);
+        const newParagraphWithContent = schema.nodes.paragraph.create(
+          {},
+          comment.content
+        );
 
         const replaceTransaction = tr.replaceRangeWith(
           from,
@@ -141,10 +147,12 @@ export default {
         },
       };
 
-      const saveContent = async (content) => {
+      const saveContent = async (scrollToSelection) => {
         this.transformProcessedCommentNodesToParagraph();
 
         setTimeout(() => {
+
+          this.$emit("contentScrollPosition", scrollToSelection);
           this.$emit("saveContent");
         }, 200);
       };
@@ -158,7 +166,6 @@ export default {
               contentType: this.value.contentType,
               markup: content,
             });
-
           },
         },
         fileHandlers,
@@ -167,9 +174,16 @@ export default {
 
       this.editor = editorInstance.editor;
       this.$emit("initialized");
+      if (this.scrollToSelection) {
+        setTimeout(() => {
+					console.log(this.scrollToSelection)
+          this.editor.commands.focus(this.scrollToSelection);
+          this.$emit("contentScrollPosition", null);
+        });
+      }
     },
     addParagraphAtEnd() {
-      if (!this.editor) throw new Error("`editor` not defined");
+      if (!this.editor) throw new Error("editor not defined");
 
       this.editor.commands.focus("end");
       this.editor.commands.insertContent("<p> </p>");

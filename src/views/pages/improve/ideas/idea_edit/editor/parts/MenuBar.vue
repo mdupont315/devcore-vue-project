@@ -204,58 +204,59 @@ export default {
           iconType: "inline",
           title: "comment",
           action: () => {
-            const editor = this.editor;
+            return this.editor.commands.scrollToNextComment();
+            //{
+            // const editor = this.editor;
 
-            const {
-              state: { doc, tr, selection },
-              view: { dispatch },
-            } = editor;
+            // const {
+            //   state: { doc, tr, selection },
+            //   view: { dispatch },
+            // } = editor;
 
-            const { from: selectionFrom, to: selectionTo } = selection;
+            // const { from: selectionFrom, to: selectionTo } = selection;
 
-            const commentNodes = [];
+            // const commentNodes = [];
 
-            doc.descendants((node, pos) => {
-              if (node.type.name !== "comment") return;
+            // doc.descendants((node, pos) => {
+            //   if (node.type.name !== "comment") return;
 
-              const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
+            //   const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
 
-              commentNodes.push({ nodeFrom, nodeTo });
-            });
+            //   commentNodes.push({ nodeFrom, nodeTo });
+            // });
 
-            let focusNextCommentNode = false;
-            let coordsOfCommentToFocus = null;
+            // let focusNextCommentNode = false;
+            // let coordsOfCommentToFocus = null;
 
-            for (const commentNode of commentNodes) {
-              const { nodeFrom, nodeTo } = commentNode;
+            // for (const commentNode of commentNodes) {
+            //   const { nodeFrom, nodeTo } = commentNode;
 
-              if (focusNextCommentNode) {
-                coordsOfCommentToFocus = commentNode;
-                break;
-              }
+            //   if (focusNextCommentNode) {
+            //     coordsOfCommentToFocus = commentNode;
+            //     break;
+            //   }
 
-              const isSelectionInsideCommentNode =
-                nodeFrom <= selectionFrom && selectionTo <= nodeTo + 1;
+            //   const isSelectionInsideCommentNode =
+            //     nodeFrom <= selectionFrom && selectionTo <= nodeTo + 1;
 
-              focusNextCommentNode = isSelectionInsideCommentNode;
-            }
+            //   focusNextCommentNode = isSelectionInsideCommentNode;
+            // }
 
-            if (!coordsOfCommentToFocus && commentNodes.length) {
-              coordsOfCommentToFocus = commentNodes[0];
-            }
+            // if (!coordsOfCommentToFocus && commentNodes.length) {
+            //   coordsOfCommentToFocus = commentNodes[0];
+            // }
 
-            const { nodeFrom, nodeTo } = coordsOfCommentToFocus;
+            // const { nodeFrom, nodeTo } = coordsOfCommentToFocus;
 
-            const [$from, $to] = [doc.resolve(nodeFrom + 1), doc.resolve(nodeTo)]
-						const sel = new TextSelection($from, $to)
-            dispatch(tr.setSelection(sel).scrollIntoView())
+            // const [$from, $to] = [doc.resolve(nodeFrom + 1), doc.resolve(nodeTo)]
+            // const sel = new TextSelection($from, $to)
+            // dispatch(tr.setSelection(sel).scrollIntoView())
 
-            setTimeout(() => {
-              const selCommentStart = new TextSelection($from)
+            // setTimeout(() => {
+            //   const selCommentStart = new TextSelection($from)
 
-              dispatch(tr.setSelection(selCommentStart))
-            }, 300)
-
+            //   dispatch(tr.setSelection(selCommentStart))
+            // }, 300)
           },
           isActive: () => this.editor.isActive("comment"),
         },
