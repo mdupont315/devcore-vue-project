@@ -126,9 +126,7 @@ export default {
         comment: JSON.stringify(data),
       });
 
-      const { editor, getPos, node } = this;
-
-			console.log(editor)
+      const { getPos, node } = this;
 
       const from = getPos();
       const to = from + node.nodeSize;

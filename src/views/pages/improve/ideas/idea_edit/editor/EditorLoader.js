@@ -12,6 +12,7 @@ import History from "@tiptap/extension-history";
 import FontFamily from "@tiptap/extension-font-family";
 import Link from "@tiptap/extension-link";
 import { Color } from "@tiptap/extension-color";
+import { debounce } from "lodash";
 import {
   Indent,
   EventHandler,
@@ -22,81 +23,47 @@ import {
   ExternalVideo,
   TrailingNode
 } from "./extensions";
-// const Buffer = require("buffer/").Buffer;
-// const mammoth = require("mammoth");
-// const dedupeCommentNodes = (editor) => {
-//   const { state: { doc, tr, schema }, view: { dispatch } } = editor;
 
-//   const comments = [];
-
-//   doc.descendants((node, pos) => {
-//     if (node.type.name !== "comment") return;
-
-//     comments.push({
-//       from: pos,
-//       to: pos + node.nodeSize,
-//       comment: JSON.parse(node.attrs.comment),
-//       shouldDelete: false,
-//       content: node.content
-//     });
-//   });
-
-//   for (const comment of comments) {
-//     const { from, to, comment: commentData } = comment;
-
-//     const commentsWithSameUuid = comments.filter((c) => c.comment.uuid === commentData.uuid);
-
-//     if (commentsWithSameUuid.length === 1) continue;
-
-//     const commentToRemove = commentsWithSameUuid[0]
-
-//     let replaceTransaction = tr
-
-//     const newParagraphWithContent = schema.nodes.paragraph.create({}, commentToRemove.content);
-
-//     replaceTransaction = replaceTransaction.replaceRangeWith(from, to, newParagraphWithContent)
-
-//     dispatch(replaceTransaction)
-//   }
-// }
-const dedupeCommentNodes = editor => {
-  const {
-    state: { doc, tr, schema },
-    view: { dispatch }
-  } = editor;
+const dedupeCommentNodes = (editor) => {
+  const { state: { doc, tr, schema }, view: { dispatch } } = editor;
 
   const comments = [];
-
-  let uuidOfActiveComment = JSON.parse(editor.getAttributes("comment")?.comment)
-    ?.uuid;
-
-  if (!uuidOfActiveComment) return;
 
   doc.descendants((node, pos) => {
     if (node.type.name !== "comment") return;
 
-    const [from, to] = [pos, pos + node.nodeSize];
+    const [from, to] = [pos, pos + node.nodeSize]
 
-    const [comment, content] = [JSON.parse(node.attrs.comment), node.content];
+    const [comment, content] = [JSON.parse(node.attrs.comment), node.content]
 
-    if (comment.uuid === uuidOfActiveComment) {
-      comments.push({ from, to, comment, content });
-    }
+    comments.push({ from, to, comment, content });
   });
 
-  if (comments.length === 1) return;
+  const mapOfUuidAndComments = {}
 
-  const commentToRemove = comments[0];
+  for (const comment of comments) {
+    const uuid = comment.comment.uuid
 
-  const { from, to } = commentToRemove;
+    if (mapOfUuidAndComments[uuid]) mapOfUuidAndComments[uuid].push(comment)
+    else mapOfUuidAndComments[uuid] = [comment]
+  }
 
-  const newParagraphWithContent = schema.nodes.paragraph.create(
-    {},
-    commentToRemove.content
-  );
+  const replaceTr = tr
 
-  dispatch(tr.replaceRangeWith(from, to, newParagraphWithContent));
-};
+  for (const [, comments] of Object.entries(mapOfUuidAndComments).filter(([, c]) => c.length > 1)) {
+    comments.pop()
+
+    for (const comment of comments) {
+      const { from } = comment
+
+      replaceTr.setNodeMarkup(from, schema.nodes.paragraph)
+    }
+  }
+
+  dispatch(replaceTr)
+}
+
+const debouncedDedupeCommentNodes = debounce(dedupeCommentNodes, 300)
 
 export default class ContentEditor {
   constructor(editable, value, options, fileHandlers, saveContent) {
@@ -161,52 +128,52 @@ export default class ContentEditor {
           const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
           // console.log(_formatHTML)
           return _formatHTML;
-        },
-        transformPastedHTML(html) {
-          console.log(html);
-          // 1. remove line breaks / Mso classes
-          let stringStripper = /(\n|\r| class=(")?Mso[a-zA-Z]+(")?)/g;
-          let output = html.replace(stringStripper, " ");
-          // 2. strip Word generated HTML comments
-          let commentSripper = new RegExp("<!--(.*?)-->", "g");
-          output = output.replace(commentSripper, "");
-          let tagStripper = new RegExp(
-            "<(/)*(meta|link|span|\\?xml:|st1:|o:|font)(.*?)>",
-            "gi"
-          );
-          // 3. remove tags leave content if any
-          output = output.replace(tagStripper, "");
-          // 4. Remove everything in between and including tags '<style(.)style(.)>'
-          let badTags = [
-            "style",
-            "script",
-            "applet",
-            "embed",
-            "noframes",
-            "noscript"
-          ];
-
-          for (let i = 0; i < badTags.length; i++) {
-            tagStripper = new RegExp(
-              "<" + badTags[i] + ".*?" + badTags[i] + "(.*?)>",
-              "gi"
-            );
-            output = output.replace(tagStripper, "");
-          }
-          // 5. remove attributes ' style="..."'
-          let badAttributes = ["start", "style"];
-          for (let i = 0; i < badAttributes.length; i++) {
-            let attributeStripper = new RegExp(
-              " " + badAttributes[i] + '="(.*?)"',
-              "gi"
-            );
-            output = output.replace(attributeStripper, "");
-          }
-
-          console.log(output);
-          //    console.log(output)
-          return output.replace(/&nbsp;/g, " ");
         }
+        // transformPastedHTML(html) {
+        //   console.log(html);
+        //   // 1. remove line breaks / Mso classes
+        //   let stringStripper = /(\n|\r| class=(")?Mso[a-zA-Z]+(")?)/g;
+        //   let output = html.replace(stringStripper, " ");
+        //   // 2. strip Word generated HTML comments
+        //   let commentSripper = new RegExp("<!--(.*?)-->", "g");
+        //   output = output.replace(commentSripper, "");
+        //   let tagStripper = new RegExp(
+        //     "<(/)*(meta|link|span|\\?xml:|st1:|o:|font)(.*?)>",
+        //     "gi"
+        //   );
+        //   // 3. remove tags leave content if any
+        //   output = output.replace(tagStripper, "");
+        //   // 4. Remove everything in between and including tags '<style(.)style(.)>'
+        //   let badTags = [
+        //     "style",
+        //     "script",
+        //     "applet",
+        //     "embed",
+        //     "noframes",
+        //     "noscript"
+        //   ];
+
+        //   for (let i = 0; i < badTags.length; i++) {
+        //     tagStripper = new RegExp(
+        //       "<" + badTags[i] + ".*?" + badTags[i] + "(.*?)>",
+        //       "gi"
+        //     );
+        //     output = output.replace(tagStripper, "");
+        //   }
+        //   // 5. remove attributes ' style="..."'
+        //   let badAttributes = ["start", "style"];
+        //   for (let i = 0; i < badAttributes.length; i++) {
+        //     let attributeStripper = new RegExp(
+        //       " " + badAttributes[i] + '="(.*?)"',
+        //       "gi"
+        //     );
+        //     output = output.replace(attributeStripper, "");
+        //   }
+
+        //   console.log(output);
+        //   //    console.log(output)
+        //   return output.replace(/&nbsp;/g, " ");
+        // }
         //   transformPastedHTML(html) {
         //     // const htmlBuffer = Buffer.from(html);
         //     // const arrayBuffer = htmlBuffer.buffer.slice(
@@ -287,13 +254,24 @@ export default class ContentEditor {
         //     return _formatHTML;
         //   }
       },
+      transformPastedHTML(html) {
+        console.log(html);
+        //Remove spaces
+        const formatHTML = html.replace(/&nbsp;/g, " ");
+
+        //Remove comments
+        const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
+
+        return _formatHTML;
+      },
+
       onUpdate: ({ editor }) => {
         setTimeout(() => {
           if (!this.dedupedCommentNodes) {
             this.dedupedCommentNodes = true;
 
             if (editor.isActive("comment")) {
-              setTimeout(() => dedupeCommentNodes(editor));
+              setTimeout(() => setTimeout(() => debouncedDedupeCommentNodes(editor)));
             }
           }
 

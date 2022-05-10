@@ -161,20 +161,20 @@ export default {
   data: () => ({
     showPopOverFeedback: false,
   }),
-  // mounted() {
-  //   const route = this.$router.currentRoute;
-  //   if (route.query) {
-  //     if (route.query.uuid) {
-  //       if (this.idea.uuid == route.query.uuid) {
-  //         this.$nextTick(() => {
-  //           setTimeout(() => {
-  //             this.toggleIdea();
-  //           }, 1000);
-  //         });
-  //       }
-  //     }
-  //   }
-  // },
+  mounted() {
+    const route = this.$router.currentRoute;
+    if (route.query) {
+      if (route.query.uuid) {
+        if (this.idea.uuid == route.query.uuid) {
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.toggleIdea();
+            }, 1000);
+          });
+        }
+      }
+    }
+  },
   computed: {
     ...mapGetters({
       allProcess: "process/all",

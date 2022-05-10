@@ -71,6 +71,7 @@ const uploadFilePlugin = addFile => {
         const coordinates = { pos, inside: 0 };
 
         for (const item of items) {
+          console.log(item)
           if (item.kind != "file") return;
           if (item.type.indexOf("image") === 0) {
             event.preventDefault();

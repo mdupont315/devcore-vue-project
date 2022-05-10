@@ -108,6 +108,8 @@ export const File = Node.create({
           type: dom.getAttribute("type"),
           preview: dom.getAttribute("preview")
         };
+
+        console.log(obj)
         return obj;
       }
     },
