@@ -239,21 +239,21 @@ export default {
     ...mapGetters({
       allRoles: "companyRole/all",
     }),
-    // availableRoles: {
-    //   get() {
-    //     // return this.operation.companyRoles.map(r =>
-    //     //   this.allRoles.find(o => o.id === r.id)
-    //     // );
-    //     return this.allRoles;
-    //   },
-    // },
-    // selectedRoles: {
-    //   get() {
-    //     return this.availableRoles
-    //       .filter((r) => this.editForm.companyRoles.includes(r.id))
-    //       .sort((a, b) => (a.name > b.name ? 1 : -1));
-    //   },
-    // },
+    availableRoles: {
+      get() {
+        // return this.operation.companyRoles.map(r =>
+        //   this.allRoles.find(o => o.id === r.id)
+        // );
+        return this.allRoles;
+      },
+    },
+    selectedRoles: {
+      get() {
+        return this.availableRoles
+          .filter((r) => this.editForm.companyRoles.includes(r.id))
+          .sort((a, b) => (a.name > b.name ? 1 : -1));
+      },
+    },
   },
   async mounted() {
     await this.$store.dispatch("companyRole/findAll");

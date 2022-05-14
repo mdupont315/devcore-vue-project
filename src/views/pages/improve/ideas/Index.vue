@@ -273,7 +273,7 @@ export default {
     getIsIdeaInEdit: {
       get() {
         if (this.ideaInEdit) {
-					console.log(this.ideaInEdit);
+          console.log(this.ideaInEdit);
           const isEditingOrCreating = this.ideaInEdit.editIdeaMode;
           if (isEditingOrCreating === "EDIT") {
             return this.ideaInEdit;
@@ -288,8 +288,6 @@ export default {
     },
   },
   async mounted() {
-
-
     if (this.user.can("core/company/manage")) {
       await this.$router.replace("/manage/companies");
     }
@@ -320,8 +318,12 @@ export default {
       console.log("data");
       console.log(data);
       const tabName =
-        data && data.form && data.form.tab ? data.form.tab : "New";
-      await this.closeIdeaEdit();
+        data && data.form && data.form.tab ? data.form.tab : "new";
+
+      if (this.getIsIdeaInEdit) {
+        await this.closeIdeaEdit();
+      }
+
       const ref = `ideas_innerView_${tabName}`;
       if (this.$refs[ref] && this.$refs[ref].$el) {
         this.$nextTick(() => {
@@ -330,53 +332,55 @@ export default {
       }
     });
 
-    // EventBus.$on("idea/currentIdea", (data) => {
-    //   if (data.form) {
-    //     // this.currentComponent = (data) => import("./idea_edit/IdeaEdit.vue")
-    //   } else {
-    //  //   this.loadComponent();
-    //   }
-    // });
+    //  EventBus.$on("idea/currentIdea", (data) => {
 
-    // if (
-    //   this.$router.currentRoute.query &&
-    //   Object.keys(this.$router.currentRoute.query).length > 0
-    // ) {
-    //   await this.goToIdeaByQuery();
+    console.log(this.$router.currentRoute.query);
+    if (
+      this.$router.currentRoute.query &&
+      Object.keys(this.$router.currentRoute.query).length > 0
+    ) {
+      await this.goToIdeaByQuery();
+    }
+    //  });
     // }
   },
   methods: {
-    // async goToIdeaByQuery() {
-    //   // Navigated through link
-    //   if (this.$router.currentRoute.query) {
-    //     const query = {
-    //       processId: this.$router.currentRoute.query.processId ?? null,
-    //       stageId: this.$router.currentRoute.query.stageId ?? null,
-    //       operationId: this.$router.currentRoute.query.operationId ?? null,
-    //       phaseId: this.$router.currentRoute.query.phaseId ?? null,
-    //       ideaId: this.$router.currentRoute.query.ideaId ?? null,
-    //     };
-    //     await this.navigateToIdea(query);
-    //     const editIdea = await this.$store.dispatch("idea/findById", {
-    //       id: query.ideaId,
-    //       force: true,
-    //     });
-    //     await this.$store.dispatch("idea/setIdeaInEdit", {
-    //       editIdeaMeta: {
-    //         editStartedAt: new Date().getTime(),
-    //       },
-    //       editIdea,
-		// 					editIdeaMode: "EDIT",
-    //     editIdeaId: idea.id,
-    //     });
-    //   }
-    // },
+    async goToIdeaByQuery() {
+      // Navigated through link
+      if (this.$router.currentRoute.query) {
+        const query = {
+          processId: this.$router.currentRoute.query.processId ?? null,
+          stageId: this.$router.currentRoute.query.stageId ?? null,
+          operationId: this.$router.currentRoute.query.operationId ?? null,
+          phaseId: this.$router.currentRoute.query.phaseId ?? null,
+          ideaId: this.$router.currentRoute.query.id ?? null,
+        };
+        if (!query.processId || !query.ideaId) return;
+        await this.navigateToIdea(query);
+
+        const editIdea = await this.$store.dispatch("idea/findById", {
+          id: query.ideaId,
+          force: true,
+        });
+
+        if (!editIdea || !editIdea.id) return;
+        await this.$store.dispatch("idea/setIdeaInEdit", {
+          editIdeaMeta: {
+            editStartedAt: new Date().getTime(),
+          },
+          editIdea,
+          editIdeaMode: "EDIT",
+          editIdeaId: editIdea.id,
+        });
+      }
+    },
     async navigateToIdea({
       processId = null,
       stageId = null,
       operationId = null,
       phaseId = null,
     }) {
+      console.log("@navigateToIdea");
       const processPath = this.processes.find((p) => p.id == processId);
       const stagePath =
         processPath && processPath.stages.length > 0
@@ -481,14 +485,11 @@ export default {
     },
 
     async setComponent(component) {
-      console.log("SET !!");
       await this.closeIdeaEdit();
       await this.loadComponent(component);
     },
 
     async loadComponent(component) {
-      console.log("SET COMPONENT!");
-      console.log(component);
       if (!component) {
         this.currentComponent = () =>
           import(

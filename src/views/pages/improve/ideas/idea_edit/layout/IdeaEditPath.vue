@@ -157,38 +157,34 @@
                     :disabled="mutateForm.busy"
                     v-model="mutateForm.companyRoleIds"
                     :show-field="true"
-                    style="z-index: 1; position: relative"
                     :state="$validateState('companyRoleIds', mutateForm)"
                     :items="selectablePathRoles"
                     :show-add-btn="false"
                     :key="roleIntent"
                   ></role-selector>
                 </div>
-                <!-- <div class="form-label-group select">
+                <div class="form-label-group select">
                   <div
                     class="idea_edit_path_container-body-process-select-title"
                   >
                     {{ $t("tool") }}
                   </div>
-                  <v-select
-                    v-model="mutateForm.companyToolId"
-                    label="name"
-                    data-vv-name="tool"
-                    :placeholder="$t('Tool')"
-                    :reduce="(tool) => tool.id"
-                    :options="tools"
-                    class="text-capitalize"
-                    :class="{
-                      'is-invalid':
-                        $validateState('tool', mutateForm) === false,
-                      'is-valid': $validateState('tool', mutateForm) === true,
-                    }"
-                  ></v-select>
-                  <label for="stage">{{ $t("Tool") }}</label>
-                  <b-form-invalid-feedback>{{
-                    $displayError("tool", mutateForm)
-                  }}</b-form-invalid-feedback>
-                </div> -->
+
+                  <idea-tool-selector
+                    v-if="toolIntent"
+                    name="tools"
+                    id="tools"
+                    autocomplete="tools"
+                    :placeholder="$t('tools')"
+                    :disabled="mutateForm.busy"
+                    v-model="mutateForm.companyToolIds"
+                    :show-field="true"
+                    :state="$validateState('companyRoleIds', mutateForm)"
+                    :items="allTools"
+                    :show-add-btn="false"
+                    :key="toolIntent"
+                  ></idea-tool-selector>
+                </div>
                 <div class="form-group">
                   <div
                     class="idea_edit_path_container-body-process-select-title"
@@ -367,7 +363,7 @@ export default {
     },
     getSelectableRoles: {
       get() {
-				return this.allRoles;
+        return this.allRoles;
         // if (this.getParentRoles.length > 0) {
         //   return this.allRoles.filter((role) =>
         //     this.getParentRoles.includes(role.id)
@@ -426,10 +422,12 @@ export default {
     hasChanges: false,
     selectablePathRoles: [],
     roleIntent: null,
+		toolIntent: null
   }),
   mounted() {
     this.selectablePathRoles = this.getSelectableRoles;
     this.roleIntent = Math.random();
+    this.toolIntent = Math.random();
   },
   methods: {
     getSelectableProcessPathRoles() {
@@ -456,55 +454,55 @@ export default {
     async deleteItem() {
       this.$emit("deleteIdea");
     },
-    setSelectableRoles(path) {
-      if (!path || !path.stageId) return;
+    // setSelectableRoles(path) {
+    //   if (!path || !path.stageId) return;
 
-      const stage = this.process.process.stages.find(
-        (x) => x.id === path.stageId
-      );
-      if (path.stageId) {
-        this.selectablePathRoles = stage.companyRoles;
-      }
-      if (path.operationId) {
-        const operation = stage.operations.find(
-          (x) => x.id === path.operationId
-        );
-        this.selectablePathRoles = operation.companyRoles;
-      }
+    //   const stage = this.process.process.stages.find(
+    //     (x) => x.id === path.stageId
+    //   );
+    //   if (path.stageId) {
+    //     this.selectablePathRoles = stage.companyRoles;
+    //   }
+    //   if (path.operationId) {
+    //     const operation = stage.operations.find(
+    //       (x) => x.id === path.operationId
+    //     );
+    //     this.selectablePathRoles = operation.companyRoles;
+    //   }
 
-      if (path.phaseId) {
-        const operation = stage.operations.find(
-          (x) => x.id === path.operationId
-        );
-        const phase = operation.phases.find((x) => x.id === path.phaseId);
-        this.selectablePathRoles = phase.companyRoles;
-      }
+    //   if (path.phaseId) {
+    //     const operation = stage.operations.find(
+    //       (x) => x.id === path.operationId
+    //     );
+    //     const phase = operation.phases.find((x) => x.id === path.phaseId);
+    //     this.selectablePathRoles = phase.companyRoles;
+    //   }
 
-      this.roleIntent = Math.random();
-    },
+    //   this.roleIntent = Math.random();
+    // },
     changeStage() {
       this.mutateForm.operationId = null;
       this.mutateForm.phaseId = null;
       if (this.value.stageId) {
-        this.setSelectableRoles({ stageId: this.value.stageId });
+     //   this.setSelectableRoles({ stageId: this.value.stageId });
       }
     },
     changeOperation() {
       this.mutateForm.phaseId = null;
       if (this.value.operationId) {
-        this.setSelectableRoles({
-          operationId: this.value.operationId,
-          stageId: this.value.stageId,
-        });
+        // this.setSelectableRoles({
+        //   operationId: this.value.operationId,
+        //   stageId: this.value.stageId,
+        // });
       }
     },
     changePhase() {
       if (this.value.phaseId) {
-        this.setSelectableRoles({
-          phaseId: this.value.phaseId,
-          operationId: this.value.operationId,
-          stageId: this.value.stageId,
-        });
+        // this.setSelectableRoles({
+        //   phaseId: this.value.phaseId,
+        //   operationId: this.value.operationId,
+        //   stageId: this.value.stageId,
+        // });
       }
     },
     closeIdeaEdit() {

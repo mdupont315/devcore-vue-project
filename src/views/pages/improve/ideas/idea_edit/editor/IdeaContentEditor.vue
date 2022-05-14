@@ -24,7 +24,6 @@
 import { mapGetters } from "vuex";
 import { EditorContent, BubbleMenu } from "@tiptap/vue-2";
 import { MenuBar } from "./parts";
-import { TextSelection } from "prosemirror-state";
 import ContentEditor from "./EditorLoader.js";
 
 /* eslint-disable */
@@ -56,7 +55,7 @@ export default {
       default: () => false,
     },
     scrollToSelection: {
-			type: Number,
+      type: Number,
       default: () => null,
     },
   },
@@ -145,13 +144,38 @@ export default {
         removeFile: (file) => {
           this.$emit("fileRemoved", file);
         },
+        notify: (file, limit) => {
+          const formatSize = (bytes, decimalPoint) => {
+              if (bytes == 0) return "0 Bytes";
+              var k = 1000,
+                dm = decimalPoint || 2,
+                sizes = [
+                  "Bytes",
+                  "KB",
+                  "MB",
+                  "GB",
+                ],
+                i = Math.floor(Math.log(bytes) / Math.log(k));
+              return (
+                parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) +
+                " " +
+                sizes[i]
+              );
+          };
+
+          const message = this.$t("File size too big", {
+            file: file.name,
+            size: formatSize(file.size, 2),
+            limit: formatSize(limit),
+          });
+          window.vm.$snotify.error(window.vm.$t(message));
+        },
       };
 
       const saveContent = async (scrollToSelection) => {
         this.transformProcessedCommentNodesToParagraph();
 
         setTimeout(() => {
-
           this.$emit("contentScrollPosition", scrollToSelection);
           this.$emit("saveContent");
         }, 200);
@@ -175,8 +199,9 @@ export default {
       this.editor = editorInstance.editor;
       this.$emit("initialized");
       if (this.scrollToSelection) {
+        console.log(this.scrollToSelection);
         setTimeout(() => {
-					console.log(this.scrollToSelection)
+          console.log(this.scrollToSelection);
           this.editor.commands.focus(this.scrollToSelection);
           this.$emit("contentScrollPosition", null);
         });

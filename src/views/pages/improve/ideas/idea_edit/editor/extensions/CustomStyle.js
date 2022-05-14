@@ -72,7 +72,6 @@ export const CustomStyle = Extension.create({
           color: {
             default: null,
             renderHTML: attributes => {
-              console.log(attributes)
               if (!attributes.color) {
                 return {
                   style: `color:${paragraphText.color}`

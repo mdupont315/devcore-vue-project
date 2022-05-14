@@ -31,6 +31,7 @@
     }
   },
   "responses": {
+    "invalidData": "The given data was invalid!",
     "milestoneCreate": "Milestone created succesfully!",
     "milestoneUpdateOrDeleteMany": "Milestones updated succesfully!",
     "projectCreate": "Project created succesfully!",
@@ -654,5 +655,10 @@
   "View all": "View all",
   "Back To Process": "Back",
   "Super Admininstrator Panel": "Super Admininstrator Panel",
-  "Page Under Construction": "{page} will be available soon!"
+  "Page Under Construction": "{page} will be available soon!",
+  "File size too big": "Tiedosto {file} ({size}) on liian suuri. Suurin sallittu koko on {limit}.",
+  "The given data was invalid.": "The given data was invalid.",
+  "Table": "Table",
+  "Insert": "Insert",
+  "AddNewTable": "Add New Table"
 }

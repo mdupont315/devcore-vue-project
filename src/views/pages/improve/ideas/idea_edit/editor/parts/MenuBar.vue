@@ -35,6 +35,9 @@
         class="idea_editor_header_item"
       />
     </template>
+
+    <table-modal v-model="showTablePrompt" @tableCreate="createTable" />
+    <image-modal v-model="showImagePrompt" />
   </div>
 </template>
 
@@ -44,7 +47,7 @@ import MenuList from "./MenuList.vue";
 import MenuFile from "./MenuFile";
 import MenuPrompt from "./MenuPrompt";
 import { CommentIcon } from "@/assets";
-import { TextSelection } from "prosemirror-state";
+import { TableModal, ImageModal } from "./modals";
 
 export default {
   components: {
@@ -52,8 +55,21 @@ export default {
     "menu-list": MenuList,
     "menu-file-field": MenuFile,
     "menu-prompt": MenuPrompt,
+    "table-modal": TableModal,
+    "image-modal": ImageModal,
   },
   methods: {
+    createTable(data) {
+      const setRows = data.rows ?? 1;
+      const setCols = data.cols ?? 1;
+      this.editor
+        .chain()
+        .focus()
+        .insertTable({ rows: setRows, cols: setCols, withHeaderRow: true })
+        .run();
+
+      this.tablePromptOpen = !this.tablePromptOpen;
+    },
     toggleDropArea() {
       this.dropAreaOpen = !this.dropAreaOpen;
     },
@@ -64,8 +80,28 @@ export default {
       required: true,
     },
   },
+  computed: {
+    showTablePrompt: {
+      get() {
+        return this.tablePromptOpen;
+      },
+      set(val) {
+        this.tablePromptOpen = val;
+      },
+    },
+    showImagePrompt: {
+      get() {
+        return this.imagePromptOpen;
+      },
+      set(val) {
+        this.imagePromptOpen = val;
+      },
+    },
+  },
   data() {
     return {
+      tablePromptOpen: false,
+      imagePromptOpen: false,
       dropAreaOpen: false,
       activeHeading: "h-3",
       items: [
@@ -150,7 +186,9 @@ export default {
           iconType: "remix",
           type: "file",
           title: "Image",
-          action: (file) => this.editor.commands.setImage(file),
+          action: () => (this.imagePromptOpen = !this.imagePromptOpen),
+
+          //action: (file) => this.editor.commands.setImage(file),
         },
         {
           icon: "vidicon-line",
@@ -191,73 +229,26 @@ export default {
           icon: "grid-line",
           iconType: "remix",
           title: "table",
-          action: () =>
-            this.editor
-              .chain()
-              .focus()
-              .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-              .run(),
+          action: () => (this.tablePromptOpen = !this.tablePromptOpen),
+          // action: () =>
+          //   this.editor
+          //     .chain()
+          //     .focus()
+          //     .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+          //     .run(),
           isActive: () => this.editor.isActive("table"),
         },
         {
           icon: CommentIcon,
           iconType: "inline",
           title: "comment",
+          //  action: () => this.editor.commands.scrollToNextComment(),
+
           action: () => {
             return this.editor.commands.scrollToNextComment();
             //{
-            // const editor = this.editor;
-
-            // const {
-            //   state: { doc, tr, selection },
-            //   view: { dispatch },
-            // } = editor;
-
-            // const { from: selectionFrom, to: selectionTo } = selection;
-
-            // const commentNodes = [];
-
-            // doc.descendants((node, pos) => {
-            //   if (node.type.name !== "comment") return;
-
-            //   const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
-
-            //   commentNodes.push({ nodeFrom, nodeTo });
-            // });
-
-            // let focusNextCommentNode = false;
-            // let coordsOfCommentToFocus = null;
-
-            // for (const commentNode of commentNodes) {
-            //   const { nodeFrom, nodeTo } = commentNode;
-
-            //   if (focusNextCommentNode) {
-            //     coordsOfCommentToFocus = commentNode;
-            //     break;
-            //   }
-
-            //   const isSelectionInsideCommentNode =
-            //     nodeFrom <= selectionFrom && selectionTo <= nodeTo + 1;
-
-            //   focusNextCommentNode = isSelectionInsideCommentNode;
-            // }
-
-            // if (!coordsOfCommentToFocus && commentNodes.length) {
-            //   coordsOfCommentToFocus = commentNodes[0];
-            // }
-
-            // const { nodeFrom, nodeTo } = coordsOfCommentToFocus;
-
-            // const [$from, $to] = [doc.resolve(nodeFrom + 1), doc.resolve(nodeTo)]
-            // const sel = new TextSelection($from, $to)
-            // dispatch(tr.setSelection(sel).scrollIntoView())
-
-            // setTimeout(() => {
-            //   const selCommentStart = new TextSelection($from)
-
-            //   dispatch(tr.setSelection(selCommentStart))
-            // }, 300)
           },
+
           isActive: () => this.editor.isActive("comment"),
         },
       ],

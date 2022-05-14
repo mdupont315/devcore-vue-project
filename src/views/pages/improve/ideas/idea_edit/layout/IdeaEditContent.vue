@@ -75,9 +75,9 @@
       @fileRemoved="removeFile"
       @saveContent="saveContent"
       @initialized="setIsInitialized"
-			@contentScrollPosition="setContentScrollPosition"
+      @contentScrollPosition="setContentScrollPosition"
       :scrollToSelection="contentScrollPosition"
-			:contentType="contentType"
+      :contentType="contentType"
     />
     <div v-else class="ideaContent-empty-spinner">
       <b-spinner />
@@ -146,12 +146,12 @@ export default {
     isEditable: false,
     isInitialized: false,
     newType: "",
-		contentScrollPosition: null
+    contentScrollPosition: null,
   }),
   methods: {
-		setContentScrollPosition(val) {
-			this.contentScrollPosition = val
-		},
+    setContentScrollPosition(val) {
+      this.contentScrollPosition = val;
+    },
     setIsInitialized() {
       this.isEditable = true;
       this.isInitialized = true;

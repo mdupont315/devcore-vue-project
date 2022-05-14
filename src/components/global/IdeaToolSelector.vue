@@ -1,13 +1,13 @@
 <template>
   <super-select
-    :items="roles"
+    :items="tools"
     class="image-selector display-selector"
+		style="z-index:0"
     selector-class="columns columns-3"
     v-model="dataValue"
     :v-bind="$props"
-		style="z-index:0"
     ref="selector"
-    :placeholder="placeholder ? placeholder : $t('companyRoles')"
+    :placeholder="placeholder"
     v-if="ready"
     :state="state"
     :outside-close="!showPopOver"
@@ -20,7 +20,7 @@
     :key="intent"
   >
     <template slot="selection-count" slot-scope="props">{{
-      $tc("role.count", props.values.length)
+      $tc("tool.count", props.values.length)
     }}</template>
     <template slot="dropdown-item" slot-scope="props">
       <div class="text-center">
@@ -91,7 +91,7 @@
 import { /* mapState, */ mapGetters } from "vuex";
 
 export default {
-  name: "RoleSelector",
+  name: "IdeaToolSelector",
   props: {
     items: {
       required: false,
@@ -138,11 +138,11 @@ export default {
   }),
   computed: {
     ...mapGetters({
-      allRoles: "companyRole/all",
+      allTools: "companyTools/all",
     }),
-    roles: {
+    tools: {
       get() {
-        return (this.items || this.allRoles).sort((a, b) =>
+        return (this.items || this.allTools).sort((a, b) =>
           a.firstName > b.firstName ? 1 : -1
         );
       },
@@ -150,7 +150,7 @@ export default {
 
     selectedItems: {
       get() {
-        return this.roles
+        return this.tools
           .filter((r) => this.dataValue.includes(r.id))
           .sort((a, b) => (a.name > b.name ? 1 : -1));
       },
@@ -159,10 +159,10 @@ export default {
   mounted() {
     if (this.value) {
       if (this.value.length > 0) {
-        const roles = this.value.filter(
-          (o) => this.roles.find((u) => u.id === o) != null
+        const tools = this.value.filter(
+          (o) => this.tools.find((u) => u.id === o) != null
         );
-        this.dataValue = roles;
+        this.dataValue = tools;
       } else {
         this.dataValue = [];
       }
@@ -201,9 +201,9 @@ export default {
       if (event) {
         event.stopPropagation();
       }
-      let ret = this.roles;
+      let ret = this.tools;
       if (value) {
-        ret = this.roles.filter(
+        ret = this.tools.filter(
           (i) =>
             i.fullName.toLowerCase().includes(value.toLowerCase()) ||
             (i.email

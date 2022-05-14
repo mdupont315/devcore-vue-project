@@ -82,12 +82,19 @@ export function showMessageFromResponse(response) {
     window.vm.$snotify.error(window.vm.$t(response.message));
     return;
   }
-  if (!response.data) return;
+  if (response.statusCode === 500) {
+    console.log(response.message)
+    window.vm.$snotify.error(window.vm.$t(response.message));
+    return
+  }
+  console.log(response)
 
   const translationKey = `responses.${Object.keys(response.data)[0]}`;
   if (window.vm.$t(translationKey) == translationKey) {
     return;
   }
+
+  console.log(translationKey)
   if (response.statusCode > 300) {
     window.vm.$snotify.error(window.vm.$t(`${translationKey}Fail`));
   } else {

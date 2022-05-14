@@ -23,48 +23,74 @@ import {
   ExternalVideo,
   TrailingNode
 } from "./extensions";
+const mammoth = require("mammoth");
 
-const dedupeCommentNodes = (editor) => {
-  const { state: { doc, tr, schema }, view: { dispatch } } = editor;
+const dedupeCommentNodes = editor => {
+  const {
+    state: { doc, tr, schema },
+    view: { dispatch }
+  } = editor;
 
   const comments = [];
 
   doc.descendants((node, pos) => {
     if (node.type.name !== "comment") return;
 
-    const [from, to] = [pos, pos + node.nodeSize]
+    const [from, to] = [pos, pos + node.nodeSize];
 
-    const [comment, content] = [JSON.parse(node.attrs.comment), node.content]
+    const [comment, content] = [JSON.parse(node.attrs.comment), node.content];
 
     comments.push({ from, to, comment, content });
   });
 
-  const mapOfUuidAndComments = {}
+  const mapOfUuidAndComments = {};
 
   for (const comment of comments) {
-    const uuid = comment.comment.uuid
+    const uuid = comment.comment.uuid;
 
-    if (mapOfUuidAndComments[uuid]) mapOfUuidAndComments[uuid].push(comment)
-    else mapOfUuidAndComments[uuid] = [comment]
+    if (mapOfUuidAndComments[uuid]) mapOfUuidAndComments[uuid].push(comment);
+    else mapOfUuidAndComments[uuid] = [comment];
   }
 
-  const replaceTr = tr
+  const replaceTr = tr;
 
-  for (const [, comments] of Object.entries(mapOfUuidAndComments).filter(([, c]) => c.length > 1)) {
-    comments.pop()
+  for (const [, comments] of Object.entries(mapOfUuidAndComments).filter(
+    ([, c]) => c.length > 1
+  )) {
+    comments.pop();
 
     for (const comment of comments) {
-      const { from } = comment
+      const { from } = comment;
 
-      replaceTr.setNodeMarkup(from, schema.nodes.paragraph)
+      replaceTr.setNodeMarkup(from, schema.nodes.paragraph);
     }
   }
 
-  dispatch(replaceTr)
+  dispatch(replaceTr);
+};
+
+const debouncedDedupeCommentNodes = debounce(dedupeCommentNodes, 300);
+
+function cleanContentAfterBody(htmlString) {
+  const bodyCloseTag = "</body>";
+  const htmlCloseTag = "</html>";
+
+  const bodyCloseIndex = htmlString.indexOf(bodyCloseTag);
+
+  if (bodyCloseIndex < 0) {
+    return htmlString;
+  }
+
+  const htmlCloseIndex = htmlString.indexOf(
+    htmlCloseTag,
+    bodyCloseIndex + bodyCloseTag.length
+  );
+
+  return (
+    htmlString.substring(0, bodyCloseIndex + bodyCloseTag.length) +
+    (htmlCloseIndex >= 0 ? htmlString.substring(htmlCloseIndex) : "")
+  );
 }
-
-const debouncedDedupeCommentNodes = debounce(dedupeCommentNodes, 300)
-
 export default class ContentEditor {
   constructor(editable, value, options, fileHandlers, saveContent) {
     this.editable = editable;
@@ -102,7 +128,8 @@ export default class ContentEditor {
       TrailingNode,
       File.configure({
         addFile: fileHandlers.addFile,
-        removeFile: fileHandlers.removeFile
+        removeFile: fileHandlers.removeFile,
+        notify: fileHandlers.notify
       }),
       Comment.configure({ saveContent })
     ];
@@ -128,6 +155,79 @@ export default class ContentEditor {
           const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
           // console.log(_formatHTML)
           return _formatHTML;
+        },
+        transformPastedHTML(html) {
+          // console.log(html)
+          // console.log(html);
+          //Remove spaces
+          // const contents = cleanContentAfterBody(html);
+          // console.log(contents);
+
+          // const file = new Blob([JSON.stringify(contents)], {
+          //   type: "application/json"
+          // });
+
+          // let fileReader = new FileReader(); // not a arguments
+
+
+          // fileReader.onloadend = function(event) {
+          //   const arrayBuffer = fileReader.result;
+          //   console.log("reading");
+          //   console.log(arrayBuffer)
+          //   mammoth
+          //     .convertToHtml({ arrayBuffer: arrayBuffer })
+          //     .then(function(resultObject) {
+          //       console.log("resultObject.value");
+          //       console.log(resultObject.value);
+          //     });
+          // };
+
+          // fileReader.readAsArrayBuffer(file);
+
+          // let blob = new Blob([contents], {
+          //   type:
+          //     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          // });
+
+          // async function blobToArrayBuffer(blob) {
+          //   if ("arrayBuffer" in blob) return await blob.arrayBuffer();
+
+          //   return new Promise((resolve, reject) => {
+          //     const reader = new FileReader();
+          //     reader.onload = () => resolve(reader.result);
+          //     reader.onerror = () => reject;
+          //     reader.readAsArrayBuffer(blob);
+          //   });
+          // }
+
+          // await blobToArrayBuffer(blob).then(arrayBuffer => {
+          //   mammoth.extractRawText({ arrayBuffer }, {}).then(docx => {
+          //     console.log("最终结果：", docx);
+          //   });
+          // });
+
+          // reader.onloadend = function() {
+          //   const arrayBuffer = reader.result;
+          //   console.log("reading")
+          //   mammoth
+          //     .convertToHtml({ arrayBuffer: arrayBuffer })
+          //     .then(function(resultObject) {
+          //       console.log("resultObject.value");
+          //       console.log(resultObject.value);
+          //     });
+          // };
+
+          const formatHTML = html.replace(/&nbsp;/g, " ");
+
+          //Remove comments
+          const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
+          const __formatHTML = _formatHTML.replace(/ style(.*?)">/g, ">");
+          const ___formatHTML = __formatHTML.replace(/<br>/g, " ");
+
+          console.log(html)
+
+         // console.log(_stylesRemoved)
+          return ___formatHTML;
         }
         // transformPastedHTML(html) {
         //   console.log(html);
@@ -254,15 +354,15 @@ export default class ContentEditor {
         //     return _formatHTML;
         //   }
       },
-      transformPastedHTML(html) {
-        console.log(html);
-        //Remove spaces
-        const formatHTML = html.replace(/&nbsp;/g, " ");
 
-        //Remove comments
-        const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
-
-        return _formatHTML;
+      onTransaction({ editor, transaction }) {
+     //   console.log(transaction)
+        // console.log("transaction")
+        // console.log(transaction)
+        // if (!this.dedupedCommentNodes) {
+        //   this.dedupedCommentNodes = true;
+        // }
+        // this.dedupedCommentNodes = false;
       },
 
       onUpdate: ({ editor }) => {
@@ -271,7 +371,9 @@ export default class ContentEditor {
             this.dedupedCommentNodes = true;
 
             if (editor.isActive("comment")) {
-              setTimeout(() => setTimeout(() => debouncedDedupeCommentNodes(editor)));
+              setTimeout(() =>
+                setTimeout(() => debouncedDedupeCommentNodes(editor))
+              );
             }
           }
 

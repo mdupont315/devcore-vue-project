@@ -132,6 +132,8 @@ export default {
       const to = from + node.nodeSize;
 
       if (this.editor) {
+				//textSelection({})
+				this.editor.commands.focus('start')
         this.editor.commands.saveReply(to);
       }
     },

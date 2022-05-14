@@ -101,14 +101,14 @@ export default {
     ...mapGetters({
       allRoles: "companyRole/all",
     }),
-    // availableRoles: {
-    //   get() {
-    //     // return this.stage.companyRoles.map(r =>
-    //     //   this.allRoles.find(o => o.id === r.id)
-    //     // );
-    //     return this.allRoles;
-    //   }
-    // }
+    availableRoles: {
+      get() {
+        // return this.stage.companyRoles.map(r =>
+        //   this.allRoles.find(o => o.id === r.id)
+        // );
+        return this.allRoles;
+      }
+    }
   },
   mounted() {
     this.$store.dispatch("app/showInnerOverlay", true);
@@ -124,7 +124,7 @@ export default {
         .filter((key) => key in this.form)
         .forEach((key) => (this.form[key] = this.input[key]));
 
-      this.form._fields.companyRoles = this.allRoles.map((x) => x.id);
+       this.form._fields.companyRoles = this.allRoles.map((x) => x.id);
     },
     async save() {
       await this.$validator.validateAll();

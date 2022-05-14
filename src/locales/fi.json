@@ -686,5 +686,10 @@
   "Idea Template": "Idea pohja",
   "View all": "Katso kaikki",
   "Super Admininstrator Panel": "Super-järjestelmänvalvojan paneeli",
-  "Page Under Construction": "{page} välilehti on kehityksen alla ja saatavilla pian!"
+  "Page Under Construction": "{page} välilehti on kehityksen alla ja saatavilla pian!",
+  "File size too big": "{file} ({size}) is too big. Size limit for files is {limit}.",
+  "The given data was invalid.": "Annetut tiedot eivät kelpaa",
+  "Table": "Taulukko",
+  "Insert": "Aseta",
+  "AddNewTable": "Lisää uusi taulukko"
 }

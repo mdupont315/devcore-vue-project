@@ -1,5 +1,7 @@
 import { Plugin } from "prosemirror-state";
 const mammoth = require("mammoth");
+
+const FILE_SIZE_LIMIT = 2000000;
 /**
  * function for image drag n drop(for tiptap)
  * @see https://gist.github.com/slava-vishnyakov/16076dff1a77ddaca93c4bccd4ec4521#gistcomment-3744392
@@ -28,19 +30,28 @@ const mammoth = require("mammoth");
 //   reader.readAsArrayBuffer(file);
 // }
 
+const validateFileSize = (notify, file) => {
+  let valid = true;
+  console.log(file);
+  if (file.size > FILE_SIZE_LIMIT) {
+    notify(file, FILE_SIZE_LIMIT);
+    console.log("ERROR, File size too big!");
+    valid = false;
+  }
+  return valid;
+};
+
 const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
   const { schema } = view.state;
 
   if (!item) return;
-  if (item.size > 10000000) {
-    console.log("ERROR, File size too big!");
-    return;
-  }
+
   const reader = new FileReader();
   reader.onload = readerEvent => {
     const node = schema.nodes.file.create({
       src: readerEvent.target?.result,
       title: item.name,
+      size: item.size,
       type: item.type,
       preview
     });
@@ -51,7 +62,7 @@ const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
   reader.readAsDataURL(item);
 };
 
-const uploadFilePlugin = addFile => {
+const uploadFilePlugin = (addFile, notify) => {
   return new Plugin({
     props: {
       handlePaste(view, event, slice) {
@@ -71,31 +82,37 @@ const uploadFilePlugin = addFile => {
         const coordinates = { pos, inside: 0 };
 
         for (const item of items) {
-          console.log(item)
+          // console.log(item.getAsString(data => console.log(data)));
           if (item.kind != "file") return;
           if (item.type.indexOf("image") === 0) {
             event.preventDefault();
             const preview = true;
 
             const itemAsFile = item.getAsFile();
-
-            addFile(itemAsFile);
-            renderFileInBase64ToCoordinates(
-              itemAsFile,
-              view,
-              coordinates,
-              preview
-            );
+            const valid = validateFileSize(notify, itemAsFile);
+            if (valid) {
+              addFile(itemAsFile);
+              renderFileInBase64ToCoordinates(
+                itemAsFile,
+                view,
+                coordinates,
+                preview
+              );
+            }
           } else {
             const preview = false;
             const itemAsFile = item.getAsFile();
-            addFile(itemAsFile);
-            renderFileInBase64ToCoordinates(
-              itemAsFile,
-              view,
-              coordinates,
-              preview
-            );
+
+            const valid = validateFileSize(notify, itemAsFile);
+            if (valid) {
+              addFile(itemAsFile);
+              renderFileInBase64ToCoordinates(
+                itemAsFile,
+                view,
+                coordinates,
+                preview
+              );
+            }
           }
         }
         return false;
@@ -112,18 +129,16 @@ const uploadFilePlugin = addFile => {
           const data = Array.from(event.dataTransfer?.files ?? []);
           console.log(data);
 
-
-
           const previewFiles = data.filter(file => /image/i.test(file.type));
           const nonPreviewFiles = data.filter(
             file => !/image/i.test(file.type)
           );
 
-        //  const docxFiles = data.filter(file => /vnd.openxmlformats-officedocument.wordprocessingml.document/i.test(file.type));
+          //  const docxFiles = data.filter(file => /vnd.openxmlformats-officedocument.wordprocessingml.document/i.test(file.type));
 
-        //  console.log(data)
-        //  console.log(docxFiles);
-        //  parseWordDocxFile(docxFiles)
+          //  console.log(data)
+          //  console.log(docxFiles);
+          //  parseWordDocxFile(docxFiles)
 
           event.preventDefault();
           const coordinates = view.posAtCoords({
@@ -134,16 +149,32 @@ const uploadFilePlugin = addFile => {
           if (previewFiles.length > 0) {
             previewFiles.forEach(async item => {
               const preview = true;
-              addFile(item);
-              renderFileInBase64ToCoordinates(item, view, coordinates, preview);
+              const valid = validateFileSize(notify, item);
+              if (valid) {
+                addFile(item);
+                renderFileInBase64ToCoordinates(
+                  item,
+                  view,
+                  coordinates,
+                  preview
+                );
+              }
             });
           }
 
           if (nonPreviewFiles.length > 0) {
             nonPreviewFiles.forEach(async item => {
               const preview = false;
-              addFile(item);
-              renderFileInBase64ToCoordinates(item, view, coordinates, preview);
+              const valid = validateFileSize(notify, item);
+              if (valid) {
+                addFile(item);
+                renderFileInBase64ToCoordinates(
+                  item,
+                  view,
+                  coordinates,
+                  preview
+                );
+              }
             });
           }
 

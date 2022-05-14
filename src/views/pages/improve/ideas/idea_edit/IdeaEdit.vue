@@ -74,8 +74,8 @@ export default {
       file: [],
       removeFile: false,
       removeFileIds: [],
-      companyRoleIds: null,
-      companyToolId: null,
+      companyRoleIds: [],
+      companyToolIds: null,
       description: null,
       title: null,
       type: null,
@@ -215,7 +215,22 @@ export default {
     },
   },
   async beforeDestroy() {
-    await this.closeIdeaEdit();
+    //  await this.closeIdeaEdit();
+
+    if (this.ideaInEdit) {
+      await this.$store.dispatch("idea/setIdeaInEdit", null);
+    }
+  },
+  mounted() {
+    if (this.getIdea && this.getIdea.id) {
+      console.log(this.getIdea.id);
+      console.log(this.getIdea);
+      // const roleIds = this.getIdea.companyRoles.map(
+      //   (x) => x.id
+      // );
+      // console.log(roleIds)
+      this.ideaForm._fields.companyRoleIds = this.getIdea.companyRoleIds;
+    }
   },
   methods: {
     setIsDirty() {
@@ -355,6 +370,8 @@ export default {
       } else {
         this.ideaForm._fields.removeFile = false;
       }
+
+			console.log(this.getImageNodesFromContent())
       //   this.ideaForm.removeFileIds = [];
 
       //   const uploadedFilesInContent = fileNodesInContent.filter(
@@ -409,16 +426,17 @@ export default {
             this.formFieldMapper(mapTo, mapFrom);
           }
         }
+
+        if (this.ideaInEdit.editIdeaMode === "CREATE") {
+          await this.navigateToPath();
+          await this.closeIdeaEdit();
+        }
         return ideaSave;
       } catch (e) {
         console.log(e);
       } finally {
         this.isSaving = false;
         this.isLoading = false;
-        if (this.ideaInEdit.editIdeaMode === "CREATE") {
-          await this.navigateToPath();
-          await this.closeIdeaEdit();
-        }
       }
     },
     async navigateToPath() {
@@ -441,6 +459,7 @@ export default {
     },
     async updateIdeaVersionStatus() {
       this.isLoading = true;
+
       try {
         const editForm = new GQLForm({
           id: this.getIdea.id,
@@ -475,6 +494,16 @@ export default {
     },
     async closeIdeaEdit() {
       this.$emit("close");
+
+      if (
+        this.$router.currentRoute.query &&
+        this.$router.currentRoute.query.id
+      ) {
+        const query = {};
+
+        this.$router.replace({ query });
+      }
+
       await this.$store.dispatch("idea/setIdeaInEdit", null);
     },
   },

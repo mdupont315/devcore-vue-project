@@ -15,11 +15,11 @@ export const PROCESS_PHASE_FRAGMENT = gql `
           ideas
           toolIdeas
       },
-      companyRoles{
-          id,
-          name,
-          avatarUrl
-      },
+    #  companyRoles{
+    #      id,
+    #      name,
+     #     avatarUrl
+    #  },
       updatedAt,
       createdAt,
       _metadata{

@@ -6,6 +6,7 @@ import {
 } from "./uploadFile";
 import FileNodeView from "./FileNodeView.vue";
 import { VueNodeViewRenderer } from "@tiptap/vue-2";
+const mammoth = require("mammoth");
 
 const IMAGE_INPUT_REGEX = /!\[(.+|:?)\]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
 
@@ -17,7 +18,8 @@ export const File = Node.create({
       inline: false,
       HTMLAttributes: {},
       addFile: () => {},
-      removeFile: () => {}
+      removeFile: () => {},
+      notify: () => {},
     };
   },
 
@@ -36,14 +38,14 @@ export const File = Node.create({
       size: {
         default: null,
         parseHTML: el => {
-          return el.getAttribute("title");
+          return el.getAttribute("size");
         },
         renderHTML: attrs => ({ size: attrs.size })
       },
       href: {
         default: null,
         parseHTML: el => {
-          return el.getAttribute("title");
+          return el.getAttribute("href");
         },
         renderHTML: attrs => ({ href: attrs.href })
       },
@@ -91,9 +93,7 @@ export const File = Node.create({
       }
     };
   },
-  // parseHTML() {
-  //   return [{ tag: "span[file]" }];
-  // },
+
   parseHTML: () => [
     {
       tag: "img[src]",
@@ -102,6 +102,7 @@ export const File = Node.create({
         const obj = {
           id: dom.getAttribute("id"),
           src: dom.getAttribute("src"),
+          size: dom.getAttribute("size"),
           title: dom.getAttribute("title"),
           alt: dom.getAttribute("alt"),
           style: dom.getAttribute("style"),
@@ -109,7 +110,7 @@ export const File = Node.create({
           preview: dom.getAttribute("preview")
         };
 
-        console.log(obj)
+        console.log(obj);
         return obj;
       }
     },
@@ -120,6 +121,7 @@ export const File = Node.create({
         const obj = {
           id: dom.getAttribute("id"),
           src: dom.getAttribute("src"),
+          size: dom.getAttribute("size"),
           href: dom.getAttribute("href"),
           title: dom.getAttribute("title"),
           style: dom.getAttribute("style"),
@@ -131,12 +133,12 @@ export const File = Node.create({
     }
   ],
   renderHTML: ({ HTMLAttributes }) => {
-    const { href, title, src, alt, style, preview } = HTMLAttributes;
+    const { href, title, src, alt, style, preview, size} = HTMLAttributes;
 
     if (!preview) {
-      return ["a", { href, title, style }, title];
+      return ["a", { href, title, style, size, alt }, title];
     }
-    return ["img", { title, src, alt, style }];
+    return ["img", { title, src, alt, style, size }];
   },
   addNodeView() {
     return VueNodeViewRenderer(FileNodeView);
@@ -155,7 +157,7 @@ export const File = Node.create({
         const files = Array.from(input);
         const previewFiles = files.filter(file => /image/i.test(file.type));
 
-        console.log(files)
+        console.log(files);
 
         if (previewFiles.length > 0) {
           previewFiles.forEach(async item => {
@@ -192,6 +194,7 @@ export const File = Node.create({
   },
   addProseMirrorPlugins() {
     const { addFile } = this.options;
-    return [uploadFilePlugin(addFile)];
+    const { notify } = this.options;
+    return [uploadFilePlugin(addFile, notify)];
   }
 });

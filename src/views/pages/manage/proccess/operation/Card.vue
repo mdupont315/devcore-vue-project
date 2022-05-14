@@ -369,21 +369,21 @@ export default {
     ...mapGetters({
       allRoles: "companyRole/all",
     }),
-    // availableRoles: {
-    //   get() {
-    //     // return this.stage.companyRoles.map(r =>
-    //     //   this.allRoles.find(o => o.id === r.id)
-    //     // );
-    //     return this.allRoles;
-    //   },
-    // },
-    // selectedRoles: {
-    //   get() {
-    //     return this.availableRoles
-    //       .filter((r) => this.editForm.companyRoles.includes(r.id))
-    //       .sort((a, b) => (a.name > b.name ? 1 : -1));
-    //   },
-    // },
+    availableRoles: {
+      get() {
+        // return this.stage.companyRoles.map(r =>
+        //   this.allRoles.find(o => o.id === r.id)
+        // );
+        return this.allRoles;
+      },
+    },
+    selectedRoles: {
+      get() {
+        return this.availableRoles
+          .filter((r) => this.editForm.companyRoles.includes(r.id))
+          .sort((a, b) => (a.name > b.name ? 1 : -1));
+      },
+    },
     phases: {
       get() {
         return [...this.item.phases].sort((a, b) => {
@@ -474,7 +474,7 @@ export default {
     preparePhase() {
       this.newPhase = new ProcessPhase().deserialize({
         operationId: this.item.id,
-        companyRoles: [],
+       // companyRoles: [],
       });
       this.$nextTick(() => {
         document.getElementById("main").scrollTop =
@@ -507,7 +507,7 @@ export default {
               id: event.added.element.id,
               operationId: this.item.id,
               dOrder: newOrder,
-              companyRoles: event.added.element.companyRoles.map((i) => i.id),
+            //  companyRoles: event.added.element.companyRoles.map((i) => i.id),
               title: event.added.element.title,
               description: event.added.element.description,
             })
