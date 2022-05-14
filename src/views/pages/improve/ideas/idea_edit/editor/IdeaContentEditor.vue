@@ -146,21 +146,14 @@ export default {
         },
         notify: (file, limit) => {
           const formatSize = (bytes, decimalPoint) => {
-              if (bytes == 0) return "0 Bytes";
-              var k = 1000,
-                dm = decimalPoint || 2,
-                sizes = [
-                  "Bytes",
-                  "KB",
-                  "MB",
-                  "GB",
-                ],
-                i = Math.floor(Math.log(bytes) / Math.log(k));
-              return (
-                parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) +
-                " " +
-                sizes[i]
-              );
+            if (bytes == 0) return "0 Bytes";
+            var k = 1000,
+              dm = decimalPoint || 2,
+              sizes = ["Bytes", "KB", "MB", "GB"],
+              i = Math.floor(Math.log(bytes) / Math.log(k));
+            return (
+              parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
+            );
           };
 
           const message = this.$t("File size too big", {
@@ -394,12 +387,17 @@ export default {
     font-size: 14px !important;
     font-family: FuturaLight !important;
     font-weight: 400;
+    margin-bottom: 4px !important;
+    margin-top: 4px !important;
+    margin-block-start: 4px !important;
+    margin-block-end: 4px !important;
   }
   h1 {
     color: #242526 !important;
     font-size: 18px !important;
     font-family: FuturaBold !important;
     font-weight: 400;
+    margin-bottom: 0.5em;
   }
   h2 {
     color: #242526 !important;
@@ -474,7 +472,7 @@ export default {
 }
 .ProseMirror {
   > * + * {
-    margin-top: 0.75em;
+    margin-top: 0.5em;
   }
 
   ul,

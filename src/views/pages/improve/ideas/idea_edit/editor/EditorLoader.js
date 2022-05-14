@@ -11,6 +11,8 @@ import TextStyle from "@tiptap/extension-text-style";
 import History from "@tiptap/extension-history";
 import FontFamily from "@tiptap/extension-font-family";
 import Link from "@tiptap/extension-link";
+
+import HardBreak from "@tiptap/extension-hard-break";
 import { Color } from "@tiptap/extension-color";
 import { debounce } from "lodash";
 import {
@@ -21,9 +23,9 @@ import {
   File,
   Comment,
   ExternalVideo,
+  customNewline,
   TrailingNode
 } from "./extensions";
-const mammoth = require("mammoth");
 
 const dedupeCommentNodes = editor => {
   const {
@@ -99,8 +101,18 @@ export default class ContentEditor {
     this.fileHandlers = fileHandlers;
     this.extensions = [
       StarterKit.configure({
-        history: false
+        history: false,
+        hardBreak: false
       }),
+      HardBreak.extend({
+        addKeyboardShortcuts() {
+          return {
+            "Mod-Enter": () => this.editor.commands.addNewLine(),
+            "Shift-Enter": () => this.editor.commands.addNewLine()
+          };
+        }
+      }),
+      customNewline,
       History.configure({ depth: 10 }),
       FontFamily.configure({
         types: ["textStyle"]
@@ -169,7 +181,6 @@ export default class ContentEditor {
 
           // let fileReader = new FileReader(); // not a arguments
 
-
           // fileReader.onloadend = function(event) {
           //   const arrayBuffer = fileReader.result;
           //   console.log("reading");
@@ -224,9 +235,9 @@ export default class ContentEditor {
           const __formatHTML = _formatHTML.replace(/ style(.*?)">/g, ">");
           const ___formatHTML = __formatHTML.replace(/<br>/g, " ");
 
-          console.log(html)
+          console.log(html);
 
-         // console.log(_stylesRemoved)
+          // console.log(_stylesRemoved)
           return ___formatHTML;
         }
         // transformPastedHTML(html) {
@@ -356,7 +367,7 @@ export default class ContentEditor {
       },
 
       onTransaction({ editor, transaction }) {
-     //   console.log(transaction)
+        //   console.log(transaction)
         // console.log("transaction")
         // console.log(transaction)
         // if (!this.dedupedCommentNodes) {
