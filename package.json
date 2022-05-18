@@ -61,6 +61,7 @@
     "remixicon": "^2.5.0",
     "ua-parser-js": "^0.7.21",
     "util": "^0.12.3",
+    "uuid": "^8.3.2",
     "vee-validate": "^2.2.15",
     "vue": "^2.6.11",
     "vue-apollo": "^3.0.5",

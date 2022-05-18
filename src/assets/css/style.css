@@ -38898,7 +38898,7 @@
 
   .super-select .input-wrapper .field,.super-select .input-wrapper .field:focus {
     border: 1px solid rgba(60,60,60,.26);
-    background: #f6f8f9!important;
+    background: #fff !important;
     font-size: 16px;
     height: 38px;
     padding: .375rem .75rem;

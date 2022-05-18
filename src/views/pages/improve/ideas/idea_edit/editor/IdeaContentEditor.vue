@@ -222,6 +222,10 @@ export default {
 <style lang="scss" >
 /* Setup */
 
+.editor__header {
+  border-top: 1px solid lightgray;
+}
+
 .editor_header_border {
   border-bottom: 1px solid lightgray;
 }

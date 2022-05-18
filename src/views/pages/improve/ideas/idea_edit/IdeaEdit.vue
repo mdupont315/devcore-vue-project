@@ -223,12 +223,7 @@ export default {
   },
   mounted() {
     if (this.getIdea && this.getIdea.id) {
-      console.log(this.getIdea.id);
-      console.log(this.getIdea);
-      // const roleIds = this.getIdea.companyRoles.map(
-      //   (x) => x.id
-      // );
-      // console.log(roleIds)
+
       this.ideaForm._fields.companyRoleIds = this.getIdea.companyRoleIds;
     }
   },
@@ -237,6 +232,10 @@ export default {
       this.ideaContentIsDirty = true;
     },
     removeFile(file) {
+			//TODO: check that removeFileIds work as intended => set saved files to array.
+
+			if (this.isSaving) return;
+      this.files = this.files.filter((_file) => _file.uuid !== file.uuid);
       if (file.src && file.id) {
         this.filesChanged = true;
         this.ideaForm._fields.removeFileIds.push(file.id);
@@ -333,7 +332,13 @@ export default {
     },
 
     async saveIdea() {
-      this.ideaForm._fields.file = this.files.filter((x) => x.size && !x.uri);
+      this.ideaForm._fields.file = this.files
+        .map((fileEntity) => fileEntity.file)
+        .filter((x) => x.size && !x.uri);
+
+				console.log("saveIdea: ");
+				console.log(this.files)
+				console.log(this.ideaForm._fields.file)
 
       let ideaSave = null;
       this.ideaForm.processId = this.processPath.process.id;
@@ -371,7 +376,7 @@ export default {
         this.ideaForm._fields.removeFile = false;
       }
 
-			console.log(this.getImageNodesFromContent())
+      console.log(this.getImageNodesFromContent());
       //   this.ideaForm.removeFileIds = [];
 
       //   const uploadedFilesInContent = fileNodesInContent.filter(

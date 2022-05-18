@@ -241,7 +241,7 @@ export default {
 .idea_edit_content_container_content-header-title {
   height: 60px;
   padding: 20px;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .idea_edit_content_container_content-header-button {

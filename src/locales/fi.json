@@ -691,5 +691,7 @@
   "The given data was invalid.": "Annetut tiedot eivät kelpaa",
   "Table": "Taulukko",
   "Insert": "Aseta",
-  "AddNewTable": "Lisää uusi taulukko"
+  "AddNewTable": "Lisää uusi taulukko",
+  "Select or Drag Image": "Valitse tai raahaa tiedostosi tähän",
+  "You can upload up to size": "Voit valita tiedostoja, joiden koko on enintään {size} mb"
 }

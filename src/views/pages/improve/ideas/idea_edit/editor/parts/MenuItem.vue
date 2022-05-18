@@ -64,8 +64,8 @@ export default {
   padding: 0.25rem;
   margin-right: 0.25rem;
   cursor: pointer;
-  max-width: 30px;
-  max-height: 30px;
+  max-width: 28px;
+  max-height: 28px;
   margin: auto;
 
   svg {
@@ -76,15 +76,16 @@ export default {
   &.is-active,
   &:hover {
     color: #fff;
-    background-color: #0d0d0d;
-    &.menu-item-comment {
-      color: #fff;
-      background-color: #fff;
-    }
+    background-color: #4294d0;
     &.menu-item-table {
       color: #fff;
-      background-color: #fff;
+      background-color: #4294d0;
+      > svg {
+        fill: #fff;
+      }
     }
   }
 }
+
+
 </style>

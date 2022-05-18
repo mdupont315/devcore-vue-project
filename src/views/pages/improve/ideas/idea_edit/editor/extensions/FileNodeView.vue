@@ -58,6 +58,8 @@ export default {
     },
   },
   beforeDestroy() {
+		console.log("DESTROYED")
+		console.log(this.fileEntity)
     this.editor.commands.removeFile(this.fileEntity);
   },
   methods: {

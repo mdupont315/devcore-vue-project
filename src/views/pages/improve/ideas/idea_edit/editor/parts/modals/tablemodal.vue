@@ -8,13 +8,16 @@
           <div class="table-modal-prompt-container-header">
             <div class="table-modal-prompt-text">
               {{ $t("AddNewTable") }}
+              <div class="table-modal-close-container" @click="$emit('input', false)">
+                <i class="ri-close-line table-modal-close"></i>
+              </div>
             </div>
 
             <div class="table-modal-prompt-badge">
               <div class="table-modal-prompt-badge-text">
-                {{ tableGridX }}
+                {{ hoverPosition ? tableGridX : 0 }}
                 x
-                {{ tableGridY }}
+                {{ hoverPosition ? tableGridY : 0 }}
                 {{ $t("Table") }}
               </div>
             </div>
@@ -51,13 +54,13 @@
           <div class="table-modal-prompt-container-footer">
             <div class="table-modal-prompt-action">
               <loading-button
-                :disabled="vErrors.any()"
+                :disabled="vErrors.any() || (allowSelectionHover || !hoverPosition || !tableGridX || !tableGridY)"
                 size="lg"
                 style="height: 40px; width: 100%"
                 @click="saveItem"
                 block
                 type="submit"
-                >{{ $t("Insert") }} {{ $t("Table") }}</loading-button
+                >{{ $t("Insert").toUpperCase() }} {{ $t("Table").toUpperCase() }}</loading-button
               >
             </div>
           </div>
@@ -183,6 +186,22 @@ export default {
 </script>
 
 <style lang="scss">
+.table-modal-close-container {
+  border-radius: 50%;
+  display: flex;
+  width: 24px;
+  height: 24px;
+  align-self: center;
+  justify-content: center;
+  text-align-last: center;
+	cursor:pointer;
+}
+.table-modal-close {
+  color: lightgray;
+  transform: scale(1.3);
+}
+
+
 .table-modal-prompt-wrapper {
   z-index: 2;
   position: absolute;
@@ -190,11 +209,12 @@ export default {
   height: 348px;
   margin: auto;
   position: absolute;
-  top: 20%;
-  left: 50%;
+  top: 45%;
+  left: 40%;
   margin-top: -50px;
   margin-left: -50px;
   border-radius: 3px;
+
 }
 .table-modal-prompt-container {
   background: #fff;
@@ -205,19 +225,35 @@ export default {
   justify-content: space-between;
   padding: 10px;
   border-radius: 3px;
+  padding: 10px 0 15px 0;
 }
 .table-modal-prompt-badge {
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  background: #ecf4fa;
   height: 30px;
-  border-radius: 50px;
+  margin-right: 40px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   color: #4294d0;
 }
+.table-modal-prompt-badge-text {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  background: #ecf4fa;
+	font-family: FuturaLight;
+  width: 90px;
+  justify-content: center;
+  border-radius: 50px;
+}
 
-.table-modal-prompt-container-header,
+.table-modal-prompt-container-header {
+  padding-top: 5px;
+  padding-left: 40px;
+}
+
 .table-modal-prompt-container-body,
 .table-modal-prompt-container-footer {
   padding: 5px 40px;
@@ -234,15 +270,15 @@ export default {
   height: 100%;
 }
 
-.table-modal-prompt-action {
-  margin: 0 5px;
-}
-
 .table-modal-prompt-text {
   font-size: 18px;
   font-family: FuturaBold;
   display: flex;
-  justify-content: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  justify-content: space-between;
+  margin-left: 50px;
+  margin-right: 20px;
 }
 
 .table-modal-prompt-action {

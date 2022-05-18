@@ -1,38 +1,14 @@
 import { Plugin } from "prosemirror-state";
-const mammoth = require("mammoth");
+import { v4 as uuidv4 } from "uuid";
 
-const FILE_SIZE_LIMIT = 2000000;
+const FILE_SIZE_LIMIT = 6000000;
 /**
  * function for image drag n drop(for tiptap)
  * @see https://gist.github.com/slava-vishnyakov/16076dff1a77ddaca93c4bccd4ec4521#gistcomment-3744392
  */
 
-// function parseWordDocxFile(inputElement) {
-//   var files = inputElement.files || [];
-//   if (!files.length) return;
-//   var file = files[0];
-
-//   console.time();
-//   var reader = new FileReader();
-//   reader.onloadend = function(event) {
-//     var arrayBuffer = reader.result;
-//     let file = null;
-//     // debugger
-
-//     mammoth
-//       .convertToHtml({ arrayBuffer: arrayBuffer })
-//       .then(function(resultObject) {
-//         file = resultObject.value;
-//         console.log(resultObject.value);
-//       });
-//     console.log(file);
-//   };
-//   reader.readAsArrayBuffer(file);
-// }
-
 const validateFileSize = (notify, file) => {
   let valid = true;
-  console.log(file);
   if (file.size > FILE_SIZE_LIMIT) {
     notify(file, FILE_SIZE_LIMIT);
     console.log("ERROR, File size too big!");
@@ -41,11 +17,18 @@ const validateFileSize = (notify, file) => {
   return valid;
 };
 
-const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
+const renderFileInBase64ToCoordinates = (
+  item,
+  view,
+  coordinates,
+  preview,
+  uuid
+) => {
   const { schema } = view.state;
 
   if (!item) return;
 
+  console.log(coordinates);
   const reader = new FileReader();
   reader.onload = readerEvent => {
     const node = schema.nodes.file.create({
@@ -53,6 +36,8 @@ const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
       title: item.name,
       size: item.size,
       type: item.type,
+      pos: coordinates.pos,
+      uuid,
       preview
     });
 
@@ -91,12 +76,14 @@ const uploadFilePlugin = (addFile, notify) => {
             const itemAsFile = item.getAsFile();
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {
-              addFile(itemAsFile);
+              const uuid = uuidv4();
+              addFile({ uuid, file: itemAsFile });
               renderFileInBase64ToCoordinates(
                 itemAsFile,
                 view,
                 coordinates,
-                preview
+                preview,
+                uuid
               );
             }
           } else {
@@ -105,12 +92,14 @@ const uploadFilePlugin = (addFile, notify) => {
 
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {
-              addFile(itemAsFile);
+              const uuid = uuidv4();
+              addFile({ uuid, file: itemAsFile });
               renderFileInBase64ToCoordinates(
                 itemAsFile,
                 view,
                 coordinates,
-                preview
+                preview,
+                uuid
               );
             }
           }
@@ -151,12 +140,14 @@ const uploadFilePlugin = (addFile, notify) => {
               const preview = true;
               const valid = validateFileSize(notify, item);
               if (valid) {
-                addFile(item);
+                const uuid = uuidv4();
+                addFile({ uuid, file: item });
                 renderFileInBase64ToCoordinates(
                   item,
                   view,
                   coordinates,
-                  preview
+                  preview,
+                  uuid
                 );
               }
             });
@@ -167,12 +158,14 @@ const uploadFilePlugin = (addFile, notify) => {
               const preview = false;
               const valid = validateFileSize(notify, item);
               if (valid) {
-                addFile(item);
+                const uuid = uuidv4();
+                addFile({ uuid, file: item });
                 renderFileInBase64ToCoordinates(
                   item,
                   view,
                   coordinates,
-                  preview
+                  preview,
+                  uuid
                 );
               }
             });
@@ -185,4 +178,4 @@ const uploadFilePlugin = (addFile, notify) => {
   });
 };
 
-export { renderFileInBase64ToCoordinates, uploadFilePlugin };
+export { renderFileInBase64ToCoordinates, uploadFilePlugin, validateFileSize };

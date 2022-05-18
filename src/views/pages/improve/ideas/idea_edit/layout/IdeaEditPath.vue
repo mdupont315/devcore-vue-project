@@ -45,18 +45,23 @@
           v-if="mutateForm"
         >
           <b-card no-body class="d-block">
+            <!--  -->
             <b-card-body
               class="p-0 ideaEditPath-form-fields"
-              :style="idea.hasReviews ? 'max-height:35vh;' : 'max-height:60vh'"
+              :style="idea.hasReviews ? 'max-height:35vh;' : 'max-height:65vh'"
             >
-              <div class="form-group">
-                <div class="form-label-group select required">
+              <div class="form-group" style="max-height: calc(82vh - 160px)">
+                <div
+                  class="form-label-group select required"
+                  style="margin-top: 0"
+                >
                   <div
                     class="idea_edit_path_container-body-process-select-title"
                   >
                     {{ $t("stage") }}
                   </div>
                   <v-select
+                    class="idea_edit_path_select___stage"
                     v-model="mutateForm.stageId"
                     v-validate="'required'"
                     label="title"
@@ -64,7 +69,6 @@
                     :placeholder="$t('Stage')"
                     :reduce="(stage) => stage.id"
                     :options="process.process.stages"
-                    class="text-capitalize"
                     :class="{
                       'is-invalid':
                         $validateState('stage_id', mutateForm) === false,
@@ -88,6 +92,7 @@
                     {{ $t("operation") }}
                   </div>
                   <v-select
+                    class="idea_edit_path_select___operation"
                     v-model="mutateForm.operationId"
                     v-if="mutateForm.stageId"
                     v-validate="''"
@@ -95,7 +100,6 @@
                     data-vv-name="operation_id"
                     :placeholder="$t('Operation')"
                     :reduce="(operation) => operation.id"
-                    class="text-capitalize"
                     :options="operations"
                     :class="{
                       'is-invalid':
@@ -121,6 +125,7 @@
                     {{ $t("phase") }}
                   </div>
                   <v-select
+                    class="idea_edit_path_select___phase"
                     v-if="mutateForm.operationId"
                     v-model="mutateForm.phaseId"
                     v-validate="''"
@@ -128,7 +133,6 @@
                     data-vv-name="phase_id"
                     :placeholder="$t('Phase')"
                     :reduce="(phase) => phase.id"
-                    class="text-capitalize"
                     :options="phases"
                     @input="changePhase"
                     :class="{
@@ -152,6 +156,7 @@
                     v-if="roleIntent"
                     name="idea_roles"
                     id="idea_roles"
+                    class="idea_edit_path_select_idea_roles"
                     autocomplete="idea_roles"
                     :placeholder="$t('roles')"
                     :disabled="mutateForm.busy"
@@ -173,6 +178,7 @@
                   <idea-tool-selector
                     v-if="toolIntent"
                     name="tools"
+                    class="idea_edit_path_select_tools"
                     id="tools"
                     autocomplete="tools"
                     :placeholder="$t('tools')"
@@ -193,6 +199,7 @@
                   </div>
                   <b-form-input
                     id="title"
+                    class="idea_edit_path_select_title"
                     v-model.trim="mutateForm.title"
                     v-validate="'required|min:4'"
                     v-autofocus
@@ -210,7 +217,10 @@
                   }}</b-form-invalid-feedback>
                 </div>
 
-                <div class="form-group">
+                <div
+                  class="form-group"
+                  style="max-height: 200px; overflow: hidden"
+                >
                   <div
                     class="idea_edit_path_container-body-process-select-title"
                   >
@@ -218,13 +228,19 @@
                   </div>
                   <b-form-textarea
                     id="description"
+                    class="idea_edit_path_select_description"
                     v-model="mutateForm.description"
                     v-autoresize
                     v-validate="''"
                     no-resize
                     :disabled="mutateForm.busy"
                     :placeholder="$t('Idea description')"
-                    style="min-height: 150px; max-height: 250px"
+                    style="
+                      border: none;
+                      border-bottom: 1px solid lightgray;
+                      max-height: 150px;
+                      overflow: scroll;
+                    "
                     name="description"
                     :state="$validateState('description', mutateForm)"
                   ></b-form-textarea>
@@ -422,7 +438,7 @@ export default {
     hasChanges: false,
     selectablePathRoles: [],
     roleIntent: null,
-		toolIntent: null
+    toolIntent: null,
   }),
   mounted() {
     this.selectablePathRoles = this.getSelectableRoles;
@@ -484,7 +500,7 @@ export default {
       this.mutateForm.operationId = null;
       this.mutateForm.phaseId = null;
       if (this.value.stageId) {
-     //   this.setSelectableRoles({ stageId: this.value.stageId });
+        //   this.setSelectableRoles({ stageId: this.value.stageId });
       }
     },
     changeOperation() {
@@ -514,9 +530,15 @@ export default {
 
 
 <style scoped>
+.form-label-group {
+  margin: 15px 0;
+}
+
 .ideaEditPath-form-actions {
   padding: 0;
+  border: none;
 }
+
 .idea_edit_path_container-body {
   height: 100%;
 }
@@ -524,10 +546,18 @@ export default {
 .idea_edit_path_container {
   display: flex;
   flex-direction: column;
+  /* min-height: 82vh; */
+  background: #fff;
 }
 
 .ideaEditPath-form-fields {
   overflow-y: scroll;
+  display: flex;
+  width: 100%;
+}
+
+.ideaEditPath-form-fields > .form-group {
+  width: 100%;
 }
 
 .idea_edit_path_container-header-title {
@@ -538,6 +568,15 @@ export default {
 .idea_edit_path_container-header-close,
 .idea_edit_path_container-body-process-select-title {
   text-transform: uppercase;
+}
+
+.idea_edit_path_container-header-title {
+  font-size: 16px;
+}
+
+.idea_edit_path_container-body-process-select-title {
+  margin-left: 5px;
+  /* font-family: FuturaBold; */
 }
 
 .idea_edit_path_container {
@@ -562,10 +601,10 @@ export default {
 
 .idea_edit_path_container-body-process-select {
   list-style-type: none;
-  padding: 20px;
   height: calc(100% - 60px);
   border-radius: 3px;
   background: #fff;
+  padding: 20px 20px 7px 20px;
 }
 
 .idea_edit_path_container-body-process-select-title {
@@ -574,6 +613,13 @@ export default {
 </style>
 
 <style>
+.v-select .vs__open-indicator {
+  fill: lightgray;
+}
+
+.v-select .vs__clear {
+  fill: #fff;
+}
 .ideaEditPath-remove-idea-button:hover {
   height: 100%;
   place-items: center;
@@ -581,5 +627,77 @@ export default {
   place-content: center;
   background: #cc454b;
   color: #fff;
+}
+
+.idea_edit_path_select___phase
+  > .vs__dropdown-toggle
+  > .vs__selected-options
+  > .vs__selected,
+.idea_edit_path_select___operation
+  > .vs__dropdown-toggle
+  > .vs__selected-options
+  > .vs__selected,
+.idea_edit_path_select___stage
+  > .vs__dropdown-toggle
+  > .vs__selected-options
+  > .vs__selected {
+  color: #4294d0 !important;
+}
+
+.idea_edit_path_select___stage > .vs__dropdown-toggle > ul > li {
+  color: #4294d0 !important;
+}
+
+.idea_edit_path_select_idea_roles > .input-wrapper > div > .items {
+  /* background: #fff; */
+  border-top: 1px solid #fff !important;
+  border-left: 1px solid #fff !important;
+  border-right: 1px solid #fff !important;
+  border-bottom: 1px solid lightgray;
+  margin-left: -10px;
+}
+.idea_edit_path_select_idea_roles > .input-wrapper > div > .counter {
+  color: #4294d0;
+  z-index: 1;
+}
+
+.idea_edit_path_select_tools,
+.idea_edit_path_select_idea_roles {
+  margin-left: -5px;
+}
+
+.idea_edit_path_select_tools > .input-wrapper > div > .items {
+  /* background: #fff; */
+  border-top: 1px solid #fff !important;
+  border-left: 1px solid #fff !important;
+  border-right: 1px solid #fff !important;
+  border-bottom: 1px solid lightgray;
+  margin-left: -10px;
+}
+.idea_edit_path_select_tools > .input-wrapper > div > .counter {
+  color: #4294d0;
+  z-index: 1;
+}
+
+.idea_edit_path_select_title {
+  border-top: 1px solid #fff !important;
+  border-left: 1px solid #fff !important;
+  border-right: 1px solid #fff !important;
+}
+
+.idea_edit_path_select___phase > div,
+.idea_edit_path_select___operation > div,
+.idea_edit_path_select___stage > div {
+  background: #fff !important;
+  border-top: 1px solid #fff !important;
+  border-left: 1px solid #fff !important;
+  border-right: 1px solid #fff !important;
+  border-bottom: 1px solid lightgray;
+  margin-left: -10px;
+}
+
+.idea_edit_path_select_title,
+.idea_edit_path_select_description {
+  margin-left: -5px;
 }
 </style>

@@ -14,12 +14,12 @@
         class="idea_editor_header_item"
       />
 
-      <menu-file-field
+      <!-- <menu-file-field
         v-else-if="item.type === 'file'"
         :key="index + '-file'"
         :item="item"
         :editor="editor"
-      />
+      /> -->
 
       <menu-prompt
         v-else-if="item.type === 'prompt'"
@@ -37,14 +37,13 @@
     </template>
 
     <table-modal v-model="showTablePrompt" @tableCreate="createTable" />
-    <image-modal v-model="showImagePrompt" />
+    <image-modal v-model="showImagePrompt" @setFiles="setFiles" />
   </div>
 </template>
 
 <script>
 import MenuItem from "./MenuItem.vue";
 import MenuList from "./MenuList.vue";
-import MenuFile from "./MenuFile";
 import MenuPrompt from "./MenuPrompt";
 import { CommentIcon } from "@/assets";
 import { TableModal, ImageModal } from "./modals";
@@ -53,12 +52,17 @@ export default {
   components: {
     "menu-item": MenuItem,
     "menu-list": MenuList,
-    "menu-file-field": MenuFile,
     "menu-prompt": MenuPrompt,
     "table-modal": TableModal,
     "image-modal": ImageModal,
   },
   methods: {
+    setFiles(files) {
+      console.log(files);
+
+      this.imagePromptOpen = !this.imagePromptOpen;
+			this.editor.commands.setImage(files);
+    },
     createTable(data) {
       const setRows = data.rows ?? 1;
       const setCols = data.cols ?? 1;
@@ -69,9 +73,6 @@ export default {
         .run();
 
       this.tablePromptOpen = !this.tablePromptOpen;
-    },
-    toggleDropArea() {
-      this.dropAreaOpen = !this.dropAreaOpen;
     },
   },
   props: {
@@ -102,7 +103,6 @@ export default {
     return {
       tablePromptOpen: false,
       imagePromptOpen: false,
-      dropAreaOpen: false,
       activeHeading: "h-3",
       items: [
         {
@@ -184,9 +184,11 @@ export default {
         {
           icon: "image-line",
           iconType: "remix",
-          type: "file",
           title: "Image",
-          action: () => (this.imagePromptOpen = !this.imagePromptOpen),
+          action: () => {
+            this.imagePromptOpen = !this.imagePromptOpen;
+            console.log("HELLO");
+          },
 
           //action: (file) => this.editor.commands.setImage(file),
         },

@@ -1,14 +1,16 @@
 <template>
   <div class="menubar-prompt-input-field-container">
-    <label
-      class="menubar-prompt-input-field"
-      v-b-modal.modal-1
-      style="margin: 0"
-    >
-      <svg class="remix" v-b-modal.modal-1>
-        <use :xlink:href="`${remixiconUrl}#ri-${item.icon}`" />
-      </svg>
-    </label>
+    <div class="menubar-prompt-input">
+      <label
+        class="menubar-prompt-input-field"
+        v-b-modal.modal-1
+        style="margin: 0"
+      >
+        <svg class="remix" v-b-modal.modal-1>
+          <use :xlink:href="`${remixiconUrl}#ri-${item.icon}`" />
+        </svg>
+      </label>
+    </div>
     <div>
       <b-modal
         id="modal-1"
@@ -145,6 +147,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.menubar-prompt-input {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  &:hover {
+    background: #4294d0;
+    > label > svg {
+      fill: #fff;
+    }
+  }
+}
 .menubar-prompt-input-field-container {
   width: 100%;
   height: 100%;
@@ -171,7 +186,7 @@ export default {
 }
 
 .idea_edit_menu_prompt_button:hover {
-  background-color: #000;
+  background-color: #4294d0;
   fill: #fff;
 }
 

@@ -2,11 +2,12 @@ import { Node, nodeInputRule } from "@tiptap/core";
 
 import {
   uploadFilePlugin,
-  renderFileInBase64ToCoordinates
+  renderFileInBase64ToCoordinates,
+  validateFileSize
 } from "./uploadFile";
 import FileNodeView from "./FileNodeView.vue";
 import { VueNodeViewRenderer } from "@tiptap/vue-2";
-const mammoth = require("mammoth");
+import { v4 as uuidv4 } from "uuid";
 
 const IMAGE_INPUT_REGEX = /!\[(.+|:?)\]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
 
@@ -19,7 +20,7 @@ export const File = Node.create({
       HTMLAttributes: {},
       addFile: () => {},
       removeFile: () => {},
-      notify: () => {},
+      notify: () => {}
     };
   },
 
@@ -90,6 +91,13 @@ export const File = Node.create({
           return el.getAttribute("src");
         },
         renderHTML: attrs => ({ src: attrs.src })
+      },
+      uuid: {
+        default: null,
+        parseHTML: el => {
+          return el.getAttribute("uuid");
+        },
+        renderHTML: attrs => ({ uuid: attrs.uuid })
       }
     };
   },
@@ -107,7 +115,8 @@ export const File = Node.create({
           alt: dom.getAttribute("alt"),
           style: dom.getAttribute("style"),
           type: dom.getAttribute("type"),
-          preview: dom.getAttribute("preview")
+          preview: dom.getAttribute("preview"),
+          uuid: dom.getAttribute("uuid"),
         };
 
         console.log(obj);
@@ -126,26 +135,36 @@ export const File = Node.create({
           title: dom.getAttribute("title"),
           style: dom.getAttribute("style"),
           type: dom.getAttribute("type"),
-          preview: dom.getAttribute("preview")
+          preview: dom.getAttribute("preview"),
+          uuid: dom.getAttribute("uuid"),
         };
         return obj;
       }
     }
   ],
   renderHTML: ({ HTMLAttributes }) => {
-    const { href, title, src, alt, style, preview, size} = HTMLAttributes;
+    const {
+      href,
+      title,
+      src,
+      alt,
+      style,
+      preview,
+      size,
+      uuid
+    } = HTMLAttributes;
 
     if (!preview) {
-      return ["a", { href, title, style, size, alt }, title];
+      return ["a", { href, title, style, size, alt, uuid }, title];
     }
-    return ["img", { title, src, alt, style, size }];
+    return ["img", { title, src, alt, style, size, uuid }];
   },
   addNodeView() {
     return VueNodeViewRenderer(FileNodeView);
   },
 
   addCommands() {
-    const { addFile } = this.options;
+    const { addFile, notify } = this.options;
     return {
       setImage: attrs => ({ view, tr }) => {
         let pos = 1;
@@ -156,20 +175,30 @@ export const File = Node.create({
         const input = attrs ? attrs : [];
         const files = Array.from(input);
         const previewFiles = files.filter(file => /image/i.test(file.type));
+        const nonPreviewFiles = files.filter(file => !/image/i.test(file.type));
 
         console.log(files);
-
         if (previewFiles.length > 0) {
           previewFiles.forEach(async item => {
             const preview = true;
-            addFile(item);
-            renderFileInBase64ToCoordinates(item, view, coordinates, preview);
+            const valid = validateFileSize(notify, item);
+            if (valid) {
+              const uuid = uuidv4();
+              addFile({ uuid, file: item });
+              renderFileInBase64ToCoordinates(item, view, coordinates, preview, uuid);
+            }
           });
-        } else {
-          files.forEach(async item => {
+        }
+
+        if (nonPreviewFiles.length > 0) {
+          nonPreviewFiles.forEach(async item => {
             const preview = false;
-            addFile(item);
-            renderFileInBase64ToCoordinates(item, view, coordinates, preview);
+            const valid = validateFileSize(notify, item);
+            if (valid) {
+              const uuid = uuidv4();
+              addFile({ uuid, file: item });
+              renderFileInBase64ToCoordinates(item, view, coordinates, preview, uuid);
+            }
           });
         }
       },

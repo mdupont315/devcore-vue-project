@@ -660,5 +660,7 @@
   "The given data was invalid.": "The given data was invalid.",
   "Table": "Table",
   "Insert": "Insert",
-  "AddNewTable": "Add New Table"
+  "AddNewTable": "Add new table",
+  "Select or Drag Image": "Select images from files or drag your images here",
+  "You can upload up to size": "You can upload images with size up {size} mb"
 }

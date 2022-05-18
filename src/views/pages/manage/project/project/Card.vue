@@ -71,7 +71,10 @@
               detail-card
             "
           >
-            <div class="card-body px-3 py-2">
+            <div
+              class="card-body px-3 py-2"
+              style="display: flex; flex-direction: column"
+            >
               <layer v-if="showIdeas" @closed="toggleIdeas">
                 <div class="details-popup">
                   <idea-table
@@ -229,10 +232,12 @@ export default {
       await this.loadDetails();
     },
     initEdit() {
+			console.log(this.item)
+			const companyTools = [...new Set(this.item.companyTools?.map((i) => i.id))] ?? []
       this.editItem = {
         id: this.item.id,
         ideaIds: [...new Set(this.item.ideas.map((i) => i.ideaId))],
-        toolIds: [...new Set(this.item.companyTools.map((i) => i.id))],
+        toolIds: companyTools,
         userIds: this.item.users.map((i) => i.id),
         name: this.item.name,
         budget: this.item.budget,

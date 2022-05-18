@@ -135,7 +135,7 @@ export default {
   &.is-active,
   &:hover {
     color: #fff;
-    background-color: #0d0d0d;
+    background-color: #4294d0;;
   }
 }
 </style>

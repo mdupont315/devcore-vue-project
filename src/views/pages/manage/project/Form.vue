@@ -9,15 +9,15 @@
         <b-col class="col-12" ref="projectFormNameField">
           <div class="form-label-group required form-group">
             <b-form-input
-              id="project_name"
-              name="project_name"
+              id="name"
               v-model.trim="form.name"
               v-validate="'required|min:4'"
+							autocomplete="off"
               v-autofocus
+							name="name"
               :disabled="form.busy"
               :placeholder="$t('Project name')"
               type="text"
-              autocomplete="project_name"
               :state="$validateState('name', form)"
             ></b-form-input>
             <b-form-invalid-feedback>{{
@@ -53,7 +53,7 @@
               id="project_tools"
               name="project_tools"
               :show-field="true"
-              :items="toolsForStage"
+              :items="getTools"
               :place-holder-text="$t('Test Tools')"
               :state="$validateState('tools', form)"
               :show-add-btn="false"
@@ -524,6 +524,11 @@ export default {
         return result;
       },
     },
+    getTools: {
+      get() {
+        return this.allTools?.filter((x) => x.type === "TOOL") ?? [];
+      },
+    },
     ...mapGetters({
       filteredProjects: "project/filteredItems",
       currentProcess: "process/current",
@@ -575,24 +580,21 @@ export default {
 
       this.form.processId = this.process.id;
 
-      const allTools = this.allTools.filter((tool) => tool.type === "TOOL");
-      this.toolsForStage = [...allTools];
-
       if (this.input) {
         if (this.input.toolIds) {
-          const selectedProjectForStage = this.filteredProjects.find(
-            (proj) => proj.id == this.input.id
-          );
+          // const selectedProjectForStage = this.filteredProjects.find(
+          //   (proj) => proj.id == this.input.id
+          // );
 
-          const availableToolsForStage = selectedProjectForStage?.tools.filter(
-            (x) => x.stageId == this.stage?.id
-          );
+          // const availableToolsForStage = selectedProjectForStage?.tools.filter(
+          //   (x) => x.stageId == this.stage?.id
+          // );
 
-          const availableToolIdsForStage = availableToolsForStage
-            .filter((x) => this.input.toolIds.indexOf(x.toolId) >= 0)
-            .map((x) => x.toolId);
+          // const availableToolIdsForStage = availableToolsForStage
+          //   .filter((x) => this.input.toolIds.indexOf(x.toolId) >= 0)
+          //   .map((x) => x.toolId);
 
-          this.form.companyToolIds = [...availableToolIdsForStage];
+          this.form.companyToolIds = this.input.toolIds;
         }
 
         if (this.input.ideaIds) {
