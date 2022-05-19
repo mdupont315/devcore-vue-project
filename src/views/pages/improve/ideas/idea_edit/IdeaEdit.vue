@@ -24,7 +24,7 @@
         v-model="getIdeaPath"
         :ideaContentIsDirty="ideaContentIsDirty"
         :idea="getIdea"
-        v-if="isLoaded"
+
       ></idea-edit-path>
     </div>
   </div>
@@ -223,7 +223,6 @@ export default {
   },
   mounted() {
     if (this.getIdea && this.getIdea.id) {
-
       this.ideaForm._fields.companyRoleIds = this.getIdea.companyRoleIds;
     }
   },
@@ -232,9 +231,9 @@ export default {
       this.ideaContentIsDirty = true;
     },
     removeFile(file) {
-			//TODO: check that removeFileIds work as intended => set saved files to array.
+      //TODO: check that removeFileIds work as intended => set saved files to array.
 
-			if (this.isSaving) return;
+      if (this.isSaving) return;
       this.files = this.files.filter((_file) => _file.uuid !== file.uuid);
       if (file.src && file.id) {
         this.filesChanged = true;
@@ -336,9 +335,9 @@ export default {
         .map((fileEntity) => fileEntity.file)
         .filter((x) => x.size && !x.uri);
 
-				console.log("saveIdea: ");
-				console.log(this.files)
-				console.log(this.ideaForm._fields.file)
+      console.log("saveIdea: ");
+      console.log(this.files);
+      console.log(this.ideaForm._fields.file);
 
       let ideaSave = null;
       this.ideaForm.processId = this.processPath.process.id;
@@ -519,17 +518,18 @@ export default {
 <style lang="scss" scoped>
 .idea_edit_container {
   width: 100%;
-  max-height: 82vh;
+  // max-height: 82vh;
   overflow: hidden;
   height: 100%;
   margin-top: 0px;
-  min-height: 82vh;
+  // min-height: 82vh;
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
 }
 
 .idea_edit-wrapper {
-  margin: 20px 20px 0 20px;
+  //margin: 20px 10px 0 10px;
+	height: 100%;
 }
 </style>

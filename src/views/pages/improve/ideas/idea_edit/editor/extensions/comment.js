@@ -23,7 +23,12 @@ export const Comment = Node.create({
         default: null,
         parseHTML: el => el.getAttribute("comment"),
         renderHTML: attrs => ({ comment: attrs.comment })
-      }
+      },
+      visible: {
+        default: null,
+        parseHTML: el => el.getAttribute("visible"),
+        renderHTML: attrs => ({ visible: attrs.visible })
+      },
     };
   },
 
@@ -104,85 +109,85 @@ export const Comment = Node.create({
 
   addKeyboardShortcuts: () => {
     return {
-      Backspace: ({ editor }) => {
-        const {
-          state: {
-            doc,
-            selection: { from: selFrom, to: selTo },
-            schema,
-            tr
-          },
-          view: { dispatch }
-        } = editor;
+      // Backspace: ({ editor }) => {
+      //   const {
+      //     state: {
+      //       doc,
+      //       selection: { from: selFrom, to: selTo },
+      //       schema,
+      //       tr
+      //     },
+      //     view: { dispatch }
+      //   } = editor;
 
-        let [commentNode, nodeBeforeCommentNode, lastNode] = new Array(3).fill(
-          null
-        );
+      //   let [commentNode, nodeBeforeCommentNode, lastNode] = new Array(3).fill(
+      //     null
+      //   );
 
-        doc.descendants((node, pos) => {
-          if (!node.isBlock || commentNode) return;
+      //   doc.descendants((node, pos) => {
+      //     if (!node.isBlock || commentNode) return;
 
-          if (node.type.name === "comment") {
-            const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
+      //     if (node.type.name === "comment") {
+      //       const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
 
-            const isNodeActiveCommentNode =
-              nodeFrom <= selFrom && selTo <= nodeTo;
+      //       const isNodeActiveCommentNode =
+      //         nodeFrom <= selFrom && selTo <= nodeTo;
 
-            if (isNodeActiveCommentNode) {
-              commentNode = { node, from: pos, to: pos + node.nodeSize };
-              nodeBeforeCommentNode = lastNode;
-            }
-          } else {
-            lastNode = {
-              node,
-              from: pos,
-              to: pos + node.nodeSize,
-              isEmpty: !node.textContent.length
-            };
-          }
-        });
+      //       if (isNodeActiveCommentNode) {
+      //         commentNode = { node, from: pos, to: pos + node.nodeSize };
+      //         nodeBeforeCommentNode = lastNode;
+      //       }
+      //     } else {
+      //       lastNode = {
+      //         node,
+      //         from: pos,
+      //         to: pos + node.nodeSize,
+      //         isEmpty: !node.textContent.length
+      //       };
+      //     }
+      //   });
 
-        if (
-          commentNode &&
-          nodeBeforeCommentNode &&
-          selFrom === commentNode.from + 1 &&
-          selTo === commentNode.from + 1
-        ) {
-          const beforeContent = nodeBeforeCommentNode.node.content;
-          const commentContent = commentNode.node.content;
+      //   if (
+      //     commentNode &&
+      //     nodeBeforeCommentNode &&
+      //     selFrom === commentNode.from + 1 &&
+      //     selTo === commentNode.from + 1
+      //   ) {
+      //     const beforeContent = nodeBeforeCommentNode.node.content;
+      //     const commentContent = commentNode.node.content;
 
-          const combinedContent = beforeContent.append(commentContent);
+      //     const combinedContent = beforeContent.append(commentContent);
 
-          const newCommentWithCombinedContent = schema.nodes.comment.create(
-            commentNode.node.attrs,
-            combinedContent
-          );
+      //     const newCommentWithCombinedContent = schema.nodes.comment.create(
+      //       commentNode.node.attrs,
+      //       combinedContent
+      //     );
 
-          let replaceTr = tr.replaceRangeWith(
-            nodeBeforeCommentNode.from,
-            commentNode.to - 2,
-            newCommentWithCombinedContent
-          );
+      //     let replaceTr = tr.replaceRangeWith(
+      //       nodeBeforeCommentNode.from,
+      //       commentNode.to - 2,
+      //       newCommentWithCombinedContent
+      //     );
 
-          dispatch(replaceTr);
+      //     dispatch(replaceTr);
 
-          // setTimeout(() => {
-          //   if (nodeBeforeCommentNode.isEmpty) {
-          //     const focusPos = editor.state.doc.resolve(nodeBeforeCommentNode.from)
+      //     // setTimeout(() => {
+      //     //   if (nodeBeforeCommentNode.isEmpty) {
+      //     //     const focusPos = editor.state.doc.resolve(nodeBeforeCommentNode.from)
 
-          //     const newSel = new TextSelection(focusPos)
+      //     //     const newSel = new TextSelection(focusPos)
 
-          //     editor.view.dispatch(editor.state.tr.setSelection(newSel))
-          //   }
-          // }, 100);
-        } else {
-          const resolvedPos = doc.resolve(selFrom);
+      //     //     editor.view.dispatch(editor.state.tr.setSelection(newSel))
+      //     //   }
+      //     // }, 100);
+      //   } else {
+      //     const resolvedPos = doc.resolve(selFrom);
 
-          const newSel = new TextSelection(resolvedPos);
+      //     const newSel = new TextSelection(resolvedPos);
 
-          dispatch(tr.setSelection(newSel));
-        }
-      }
+      //     dispatch(tr.setSelection(newSel));
+      //   }
+      // }
     };
   },
 

@@ -3,6 +3,7 @@
     <div class="menubar-prompt-input">
       <label
         class="menubar-prompt-input-field"
+        :class="`prompt-field-${item.title}`"
         v-b-modal.modal-1
         style="margin: 0"
       >
@@ -12,12 +13,8 @@
       </label>
     </div>
     <div>
-      <b-modal
-        id="modal-1"
-        ref="idea_insert_iframe"
-        :title="$t('setUrl')"
-        hide-footer
-      >
+      <layer style="z-index: 2" @closed="$emit('input', false)" />
+      <div class="menu-prompt-content-wrapper">
         <b-form>
           <b-row>
             <b-col class="col-12" ref="insert_iframe-url">
@@ -33,33 +30,6 @@
                 ></b-form-input>
               </div>
             </b-col>
-            <!-- <b-col class="col-12" ref="insert_iframe-widthHeight">
-              <b-row style="margin: auto">
-                <div class="form-label-group required form-group">
-                  <b-form-input
-                    id="insert_iframe-width"
-                    name="insert_iframe-width"
-                    v-model="form.width"
-                    v-validate="'required'"
-                    v-autofocus
-                    placeholder="Insert Width"
-                    type="text"
-                  ></b-form-input></div
-              ></b-row>
-              <b-row style="margin: auto">
-                <div class="form-label-group required form-group">
-                  <b-form-input
-                    id="insert_iframe-height"
-                    name="insert_iframe-height"
-                    v-model="form.height"
-                    v-validate="'required'"
-                    v-autofocus
-                    placeholder="Insert Height"
-                    type="text"
-                  ></b-form-input></div
-              ></b-row>
-            </b-col> -->
-
             <b-col cols="3">
               <b-button
                 class="mt-3"
@@ -80,7 +50,7 @@
             </b-col>
           </b-row>
         </b-form>
-      </b-modal>
+      </div>
     </div>
   </div>
 </template>
@@ -139,9 +109,7 @@ export default {
 
       return ret;
     },
-    previewFiles(event) {
-      this.item.action(event.target.files);
-    },
+
   },
 };
 </script>
@@ -201,17 +169,7 @@ export default {
   justify-content: center;
   width: 100%;
 }
-.menu-prompt {
-  width: 1.75rem;
-  height: 1.75rem;
-  display: flex;
-  color: #0d0d0d;
-  border: none;
-  background-color: transparent;
-  border-radius: 0.4rem;
-  padding: 0.25rem;
-  margin-right: 0.25rem;
-
+.menubar-prompt-input-field > label {
   svg {
     width: 100%;
     height: 100%;
@@ -227,5 +185,19 @@ export default {
       }
     }
   }
+}
+
+.menu-prompt-content-wrapper {
+	margin: 20px;
+	background: #fff;
+  z-index: 2;
+  position: absolute;
+  margin: auto;
+  position: absolute;
+  top: 45%;
+  left: 40%;
+  margin-top: -50px;
+  margin-left: -50px;
+  border-radius: 3px;
 }
 </style>

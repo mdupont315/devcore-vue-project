@@ -12,7 +12,7 @@ import History from "@tiptap/extension-history";
 import FontFamily from "@tiptap/extension-font-family";
 import Link from "@tiptap/extension-link";
 
-import HardBreak from "@tiptap/extension-hard-break";
+// import HardBreak from "@tiptap/extension-hard-break";
 import { Color } from "@tiptap/extension-color";
 import { debounce } from "lodash";
 import {
@@ -23,9 +23,90 @@ import {
   File,
   Comment,
   ExternalVideo,
-  customNewline,
+  // customNewline,
   TrailingNode
 } from "./extensions";
+
+const dedupeComments = editor => {
+  const {
+    state: { doc, tr, schema },
+    view: { dispatch }
+  } = editor;
+
+  const comments = [];
+
+  doc.descendants((node, pos) => {
+    if (node.type.name !== "comment") return;
+
+    const [from, to] = [pos, pos + node.nodeSize];
+
+    const [comment, content] = [JSON.parse(node.attrs.comment), node.content];
+
+    comments.push({ from, to, comment, content });
+  });
+
+  console.log(comments);
+
+  comments.forEach((comment, index) => {
+    // console.log(index);
+    // console.log(comment);
+    if (comment && comments[index + 1]) {
+      const curComment = comment;
+      const nextComment = comments[index + 1];
+
+      const sameUuid = curComment.comment.uuid === nextComment.comment.uuid;
+      const sameNode = curComment.to === nextComment.from;
+
+      console.log(curComment)
+      console.log(nextComment)
+
+      if (sameUuid && sameNode) {
+        console.log("IS SAME!");
+        console.log(curComment);
+        console.log(nextComment);
+        const emptyComment = JSON.parse(curComment.comment)
+        console.log(emptyComment)
+        // let replaceTr = tr.setNodeMarkup(
+        //   thisComment.from,
+        //   undefined,
+        //   emptyComment
+        // );
+        // dispatch(replaceTr);
+      }
+
+      // console.log(sameUuid);
+      // console.log(sameParent);
+      // if (sameUuid && sameParent) {
+      //   editor.commands.setNode("comment", {});
+      //   //editor.commands.setComment(JSON.stringify(dataToInsert));
+      // }
+      // const mapOfUuidAndComments = {};
+
+      // for (const comment of comments) {
+      //   const uuid = comment.comment.uuid;
+
+      //   if (mapOfUuidAndComments[uuid]) mapOfUuidAndComments[uuid].push(comment);
+      //   else mapOfUuidAndComments[uuid] = [comment];
+      // }
+
+      // const replaceTr = tr;
+
+      // for (const [, comments] of Object.entries(mapOfUuidAndComments).filter(
+      //   ([, c]) => c.length > 1
+      // )) {
+      //   comments.pop();
+
+      //   for (const comment of comments) {
+      //     const { from } = comment;
+
+      //     replaceTr.setNodeMarkup(from, schema.nodes.paragraph);
+      //   }
+      // }
+
+      // dispatch(replaceTr);
+    }
+  });
+};
 
 const dedupeCommentNodes = editor => {
   const {
@@ -71,6 +152,8 @@ const dedupeCommentNodes = editor => {
   dispatch(replaceTr);
 };
 
+const debounceCommentNodes = debounce(dedupeComments, 300);
+
 const debouncedDedupeCommentNodes = debounce(dedupeCommentNodes, 300);
 
 function cleanContentAfterBody(htmlString) {
@@ -101,18 +184,18 @@ export default class ContentEditor {
     this.fileHandlers = fileHandlers;
     this.extensions = [
       StarterKit.configure({
-        history: false,
-        hardBreak: false
+        history: false
+        // hardBreak: false
       }),
-      HardBreak.extend({
-        addKeyboardShortcuts() {
-          return {
-            "Mod-Enter": () => this.editor.commands.addNewLine(),
-            "Shift-Enter": () => this.editor.commands.addNewLine()
-          };
-        }
-      }),
-      customNewline,
+      // HardBreak.extend({
+      //   addKeyboardShortcuts() {
+      //     return {
+      //       "Mod-Enter": () => this.editor.commands.addNewLine(),
+      //       "Shift-Enter": () => this.editor.commands.addNewLine()
+      //     };
+      //   }
+      // }),
+      // customNewline,
       History.configure({ depth: 10 }),
       FontFamily.configure({
         types: ["textStyle"]
@@ -383,7 +466,8 @@ export default class ContentEditor {
 
             if (editor.isActive("comment")) {
               setTimeout(() =>
-                setTimeout(() => debouncedDedupeCommentNodes(editor))
+                // setTimeout(() => debouncedDedupeCommentNodes(editor))
+                setTimeout(() => debounceCommentNodes(editor))
               );
             }
           }

@@ -692,6 +692,6 @@
   "Table": "Taulukko",
   "Insert": "Aseta",
   "AddNewTable": "Lisää uusi taulukko",
-  "Select or Drag Image": "Valitse tai raahaa tiedostosi tähän",
-  "You can upload up to size": "Voit valita tiedostoja, joiden koko on enintään {size} mb"
+  "Select or Drag Image": "Valitse kuva tietokoneelta tai raahaa tähän.",
+  "You can upload up to size": "Suurin kuvakoko on {size} mb. Tuetut formaatit: JPEG, PNG, GIF, SVG"
 }

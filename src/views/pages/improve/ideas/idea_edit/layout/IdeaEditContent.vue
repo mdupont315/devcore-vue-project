@@ -249,6 +249,7 @@ export default {
 }
 .idea_edit_content_container {
   background: #fff;
+	margin: 20px;
   border-radius: 3px;
   width: 75%;
   overflow: hidden;

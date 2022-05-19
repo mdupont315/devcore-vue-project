@@ -39049,7 +39049,7 @@
     flex-grow: 0;
     background: #4294d0;
     color: #fff;
-    padding: 5px;
+			padding: 5px 10px 5px 10px;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;

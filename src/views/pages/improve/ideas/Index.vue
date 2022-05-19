@@ -96,9 +96,10 @@
     <div
       v-if="process.process && process.process.stages.length > 0"
       id="main-content"
-      class="has-top-bar p-3"
-      style="overflow: auto; overflow-x: hidden; height: calc(100vh - 105px)"
+      class="has-top-bar"
+      style="overflow: auto; overflow-x: hidden; height: calc(100% - 45px)"
     >
+		<!--  class="has-top-bar p-3" -->
       <component
         :is="currentComponent"
         v-if="currentProcess && currentComponent && !getIsIdeaInEdit"

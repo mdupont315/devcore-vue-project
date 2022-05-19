@@ -1,7 +1,6 @@
 <template>
   <div
     class="idea_editor_content"
-    @click="focusEditor()"
     id="idea_editor_content"
   >
     <div class="editor" v-if="editor">
@@ -12,6 +11,7 @@
         class="editor__content"
         id="editor__content"
         :editor="editor"
+        style="min-height: 70vh"
         ref="editor_content"
       />
 
@@ -89,6 +89,7 @@ export default {
   },
   methods: {
     focusEditor() {
+			console.log("focusing")
       this.editor?.commands.focus();
     },
     transformProcessedCommentNodesToParagraph() {
@@ -396,6 +397,9 @@ export default {
     margin-block-start: 4px !important;
     margin-block-end: 4px !important;
   }
+	p > a {
+		cursor:pointer;
+	}
   h1 {
     color: #242526 !important;
     font-size: 18px !important;

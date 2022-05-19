@@ -8,7 +8,10 @@
           <div class="table-modal-prompt-container-header">
             <div class="table-modal-prompt-text">
               {{ $t("AddNewTable") }}
-              <div class="table-modal-close-container" @click="$emit('input', false)">
+              <div
+                class="table-modal-close-container"
+                @click="$emit('input', false)"
+              >
                 <i class="ri-close-line table-modal-close"></i>
               </div>
             </div>
@@ -54,13 +57,20 @@
           <div class="table-modal-prompt-container-footer">
             <div class="table-modal-prompt-action">
               <loading-button
-                :disabled="vErrors.any() || (allowSelectionHover || !hoverPosition || !tableGridX || !tableGridY)"
+                :disabled="
+                  vErrors.any() ||
+                  allowSelectionHover ||
+                  !hoverPosition ||
+                  !tableGridX ||
+                  !tableGridY
+                "
                 size="lg"
                 style="height: 40px; width: 100%"
                 @click="saveItem"
                 block
                 type="submit"
-                >{{ $t("Insert").toUpperCase() }} {{ $t("Table").toUpperCase() }}</loading-button
+                >{{ $t("Insert").toUpperCase() }}
+                {{ $t("Table").toUpperCase() }}</loading-button
               >
             </div>
           </div>
@@ -81,7 +91,7 @@ export default {
     },
   },
   methods: {
-    saveItem() {
+			saveItem() {
       this.$emit("tableCreate", {
         cols: this.tableGridX,
         rows: this.tableGridY,
@@ -179,6 +189,12 @@ export default {
       },
       set(value) {
         this.$emit("close", value);
+				console.log(value)
+        if (!value) {
+          this.tableGridY = null;
+          this.tableGridX = null;
+          this.hoverPosition = null;
+        }
       },
     },
   },
@@ -194,13 +210,12 @@ export default {
   align-self: center;
   justify-content: center;
   text-align-last: center;
-	cursor:pointer;
+  cursor: pointer;
 }
 .table-modal-close {
   color: lightgray;
   transform: scale(1.3);
 }
-
 
 .table-modal-prompt-wrapper {
   z-index: 2;
@@ -214,7 +229,6 @@ export default {
   margin-top: -50px;
   margin-left: -50px;
   border-radius: 3px;
-
 }
 .table-modal-prompt-container {
   background: #fff;
@@ -243,7 +257,7 @@ export default {
   display: flex;
   align-items: center;
   background: #ecf4fa;
-	font-family: FuturaLight;
+  font-family: FuturaLight;
   width: 90px;
   justify-content: center;
   border-radius: 50px;

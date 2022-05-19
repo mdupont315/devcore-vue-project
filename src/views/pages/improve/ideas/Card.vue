@@ -5,6 +5,7 @@
     class="mb-3 idea-card"
     :class="showDetail ? 'idea-card-expanded' : 'idea-card-shrunk'"
   >
+	<layer v-if="showPopOverFeedback" @closed="togglePopOverFeedback" />
     <div class="idea_card_container" v-if="!showDetail">
       <b-card-header class="bg-white border-0">
         <div style="line-height: 1em">
@@ -105,11 +106,11 @@
             @close="closeIdeaForFeedback"
             :openState="showPopOverFeedback"
           >
-            <small
+            <!-- <small
               class="d-block text-gray"
               style="line-height: 1em; align-self: center"
               >{{ $t("Feedback") }}</small
-            >
+            > -->
           </idea-feedback>
 
           <span v-if="idea.evaluationsCount > 0" class="font-15x ml-2">

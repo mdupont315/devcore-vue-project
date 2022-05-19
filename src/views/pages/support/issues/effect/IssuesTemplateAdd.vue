@@ -184,7 +184,7 @@
             </div>
             <div
               style="overflow: scroll; max-height: 230px"
-							:key="intent"
+              :key="intent"
               v-if="
                 !issueEffectIsCreating &&
                 !issueEffectIsSelecting &&
@@ -208,7 +208,7 @@
                     @click="toggleIssueTemplateForm('select', item, index)"
                   >
                     <div
-                      style="flex-grow: 1; padding: 10px"
+                      style="flex-grow: 1; padding: 10px; max-width: 30px"
                       v-if="loadingIndex !== index"
                     >
                       <icoCheck width="10" height="10"></icoCheck>
@@ -389,7 +389,6 @@ export default {
             (x) => x.issueActiveId == this.issue.id
           );
           if (active) {
-
             return [
               ...new Set(this.items.filter((x) => x.id != active.effectId)),
             ];
@@ -421,7 +420,7 @@ export default {
   },
   data: () => ({
     storeName: "issueEffect",
-		intent: Math.random(),
+    intent: Math.random(),
     isSelectionOpen: null,
     loadingIndex: null,
     inputsAreNotValid: false,
@@ -546,7 +545,7 @@ export default {
       this.loadingIndex = loadingIndex;
       this.initForm = null;
       let effect = this.defaultForm;
-			this.intent = Math.random()
+      this.intent = Math.random();
       if (item) {
         try {
           effect = await this.$store.dispatch("issueEffect/findById", {

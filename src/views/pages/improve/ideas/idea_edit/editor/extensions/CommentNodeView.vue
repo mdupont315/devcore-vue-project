@@ -159,6 +159,7 @@ export default {
 
   computed: {
     commentEntity() {
+			console.log(this.node.attrs)
       const stringCommentEntity = this.node?.attrs?.comment;
       return stringCommentEntity ? JSON.parse(stringCommentEntity) : {};
     },

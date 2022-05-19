@@ -127,7 +127,7 @@ export default {
   color: #707070;
   font-size: 14px;
   font-weight: 400;
-	text-align: center;
+  text-align: center;
 }
 .choose_file_dropzone_dropArea {
   width: 100%;
@@ -167,11 +167,13 @@ input[type="file"] {
   transform: translate(0px, 100px);
 }
 .dropzone-footer {
-  transform: translate(0px, -45px);
+  transform: translate(0px, -65px);
   align-self: center;
   color: #c4c4c4;
   font-family: FuturaLight;
   font-size: 16px;
+  max-width: 325px;
+  text-align: center;
 }
 .image-modal-dropzone-wrapper {
   display: flex;
@@ -180,7 +182,7 @@ input[type="file"] {
   width: 100%;
   flex-direction: row;
   width: 100%;
-	border-radius: 3px;
+  border-radius: 3px;
 }
 
 .image-modal-dropzone-wrapper > .drop-zone {
@@ -192,6 +194,9 @@ input[type="file"] {
 }
 .image-modal-close-container {
   border-radius: 50%;
+	    margin-top: 35px;
+    margin-right: 20px;
+
   display: flex;
   height: 100%;
   display: flex;
@@ -199,8 +204,6 @@ input[type="file"] {
   justify-content: center;
   text-align-last: center;
   cursor: pointer;
-  margin-top: 20px;
-  margin-right: 20px;
 }
 .image-modal-close {
   color: lightgray;
@@ -221,12 +224,11 @@ input[type="file"] {
   width: 484px;
   height: 340px;
   margin: auto;
+  position: absolute;
   top: 45%;
-  margin-left: -105px;
+  left: 40%;
   margin-top: -50px;
+  margin-left: -50px;
   border-radius: 3px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
 </style>

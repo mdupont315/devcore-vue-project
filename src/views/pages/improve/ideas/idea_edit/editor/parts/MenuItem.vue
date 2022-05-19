@@ -54,6 +54,17 @@ export default {
   cursor: pointer;
 }
 
+.menu-item-comment {
+  background: transparent !important;
+}
+.menu-item-comment:hover {
+  background-color: transparent !important;
+}
+
+.menu-item.menu-item-link {
+  transform: rotate(45deg);
+}
+
 .menu-item {
   padding: 1rem;
   display: flex;
@@ -86,6 +97,4 @@ export default {
     }
   }
 }
-
-
 </style>

@@ -371,6 +371,7 @@
   "Please provide your username, we'll send you an email with instructions to change your password.": "Please provide your username, we'll send you an email with instructions to change your password.",
   "Add": "Add",
   "roles": "roles",
+  "Roles": "Roles",
   "We will send a new password to": "We will send a new password to",
   "Price models": "Price models",
   "Product categories": "Product categories",
@@ -661,6 +662,6 @@
   "Table": "Table",
   "Insert": "Insert",
   "AddNewTable": "Add new table",
-  "Select or Drag Image": "Select images from files or drag your images here",
-  "You can upload up to size": "You can upload images with size up {size} mb"
+  "Select or Drag Image": "Select images from files or drag your images here.",
+  "You can upload up to size": "You can upload image sizes up to {size} mb. Supported formats JPEG, PNG, GIF, SVG."
 }

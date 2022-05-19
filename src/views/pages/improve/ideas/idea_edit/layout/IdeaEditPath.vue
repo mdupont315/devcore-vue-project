@@ -17,6 +17,7 @@
         @click="closeIdeaEdit"
       >
         <span> {{ $t("close") }} </span>
+        <div><i class="ri-close-line table-modal-close"></i></div>
       </b-button>
 
       <confirm-button
@@ -26,7 +27,9 @@
         :confirmPlacement="'left'"
         :confirmMessage="$t('Unsaved Idea Data')"
       >
-        <span> {{ $t("close") }} </span>
+        <span>
+          {{ $t("close") }} <i class="ri-close-line table-modal-close"></i>
+        </span>
       </confirm-button>
     </div>
     <div class="idea_edit_path_container-body">
@@ -48,9 +51,35 @@
             <!--  -->
             <b-card-body
               class="p-0 ideaEditPath-form-fields"
-              :style="idea.hasReviews ? 'max-height:35vh;' : 'max-height:65vh'"
+              :style="idea.hasReviews ? 'max-height:28vh;' : 'max-height:65vh'"
             >
               <div class="form-group" style="max-height: calc(82vh - 160px)">
+                <div class="form-group">
+                  <div
+                    class="idea_edit_path_container-body-process-select-title"
+                  >
+                    {{ $t("Instruction title") }}
+                  </div>
+                  <b-form-input
+                    id="title"
+                    class="idea_edit_path_select_title"
+                    v-model.trim="mutateForm.title"
+                    v-validate="'required|min:4'"
+                    v-autofocus
+                    :disabled="mutateForm.busy"
+                    :placeholder="$t('Idea title')"
+                    type="text"
+                    name="title"
+                    autocomplete="off"
+                    autofocus
+                    :state="$validateState('title', mutateForm)"
+                  ></b-form-input>
+                  <label for="title">{{ $t("Idea title") }}</label>
+                  <b-form-invalid-feedback>{{
+                    $displayError("title", mutateForm)
+                  }}</b-form-invalid-feedback>
+                </div>
+
                 <div
                   class="form-label-group select required"
                   style="margin-top: 0"
@@ -158,7 +187,7 @@
                     id="idea_roles"
                     class="idea_edit_path_select_idea_roles"
                     autocomplete="idea_roles"
-                    :placeholder="$t('roles')"
+                    :placeholder="$t('Roles')"
                     :disabled="mutateForm.busy"
                     v-model="mutateForm.companyRoleIds"
                     :show-field="true"
@@ -172,7 +201,7 @@
                   <div
                     class="idea_edit_path_container-body-process-select-title"
                   >
-                    {{ $t("tool") }}
+                    {{ $t("Tools") }}
                   </div>
 
                   <idea-tool-selector
@@ -181,7 +210,7 @@
                     class="idea_edit_path_select_tools"
                     id="tools"
                     autocomplete="tools"
-                    :placeholder="$t('tools')"
+                    :placeholder="$t('Tools')"
                     :disabled="mutateForm.busy"
                     v-model="mutateForm.companyToolIds"
                     :show-field="true"
@@ -190,31 +219,6 @@
                     :show-add-btn="false"
                     :key="toolIntent"
                   ></idea-tool-selector>
-                </div>
-                <div class="form-group">
-                  <div
-                    class="idea_edit_path_container-body-process-select-title"
-                  >
-                    {{ $t("Instruction title") }}
-                  </div>
-                  <b-form-input
-                    id="title"
-                    class="idea_edit_path_select_title"
-                    v-model.trim="mutateForm.title"
-                    v-validate="'required|min:4'"
-                    v-autofocus
-                    :disabled="mutateForm.busy"
-                    :placeholder="$t('Idea title')"
-                    type="text"
-                    name="title"
-                    autocomplete="off"
-                    autofocus
-                    :state="$validateState('title', mutateForm)"
-                  ></b-form-input>
-                  <label for="title">{{ $t("Idea title") }}</label>
-                  <b-form-invalid-feedback>{{
-                    $displayError("title", mutateForm)
-                  }}</b-form-invalid-feedback>
                 </div>
 
                 <div
@@ -233,14 +237,9 @@
                     v-autoresize
                     v-validate="''"
                     no-resize
+                    size="sm"
                     :disabled="mutateForm.busy"
                     :placeholder="$t('Idea description')"
-                    style="
-                      border: none;
-                      border-bottom: 1px solid lightgray;
-                      max-height: 150px;
-                      overflow: scroll;
-                    "
                     name="description"
                     :state="$validateState('description', mutateForm)"
                   ></b-form-textarea>
@@ -256,8 +255,11 @@
                 style="
                   display: flex;
                   justify-content: space-between;
+                  margin-top: 10px;
                   flex-direction: row;
                   padding: 10px 0px;
+                  height: 60px;
+                  align-items: self-end;
                 "
               >
                 <loading-button
@@ -547,13 +549,17 @@ export default {
   display: flex;
   flex-direction: column;
   /* min-height: 82vh; */
-  background: #fff;
+  /* background: #fff; */
+
+  max-height: 95%;
 }
 
 .ideaEditPath-form-fields {
   overflow-y: scroll;
   display: flex;
   width: 100%;
+  ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .ideaEditPath-form-fields > .form-group {
@@ -564,10 +570,19 @@ export default {
   padding: 20px;
 }
 
-.idea_edit_path_container-header-title,
-.idea_edit_path_container-header-close,
 .idea_edit_path_container-body-process-select-title {
   text-transform: uppercase;
+}
+
+.idea_edit_path_select_description {
+  border: none;
+  border-bottom: 1px solid lightgray;
+  max-height: 150px;
+  margin-left: 0px;
+  overflow: scroll;
+  font-family: "FuturaBQ";
+  ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .idea_edit_path_container-header-title {
@@ -580,12 +595,10 @@ export default {
 }
 
 .idea_edit_path_container {
-  overflow: hidden;
-  height: 100%;
-  margin-left: 20px;
   border-radius: 5px;
   width: 25%;
   min-width: 300px;
+  margin: 20px 20px 20px 0px;
 }
 
 .idea_edit_path_container-header {
@@ -594,6 +607,8 @@ export default {
   height: 60px;
   border-bottom: 1px solid lightgray;
   background: #fff;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
 }
 .idea_edit_path_container-header > button {
   margin: 20px 20px 10px 20px;

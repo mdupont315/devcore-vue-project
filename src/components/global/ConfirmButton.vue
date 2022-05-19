@@ -27,13 +27,13 @@
       <slot name="confirm">
         <b-card no-body style="width: 200px" class="text-center light">
           <b-card-header>
-            <strong class="h6 text-bold">{{ confirmTitle }}</strong>
+            <strong class="h6 text-bold" style="font-size: 14px;">{{ confirmTitle }}</strong>
           </b-card-header>
           <b-card-body>
-            <p class="m-0">{{ confirmMessage }}</p>
+            <p class="m-0" style="font-size: 14px;">{{ confirmMessage }}</p>
           </b-card-body>
           <b-card-footer>
-            <b-button :class="confirmClass" block @click="confirm">{{
+            <b-button :class="confirmClass" style="font-size: 14px;" block @click="confirm">{{
               confirmText
             }}</b-button>
             <b-button
@@ -43,7 +43,7 @@
               block
               @click="cancel"
             >
-              <small>{{ cancelText }}</small>
+              <small style="font-size: 14px;">{{ cancelText }}</small>
             </b-button>
           </b-card-footer>
         </b-card>

@@ -38,6 +38,12 @@
 
     <table-modal v-model="showTablePrompt" @tableCreate="createTable" />
     <image-modal v-model="showImagePrompt" @setFiles="setFiles" />
+    <embed-modal
+      v-model="showEmbedPrompt"
+      @setEmbed="setEmbed"
+      :previousUrl="getPreviousUrl"
+      :type="embedType"
+    />
   </div>
 </template>
 
@@ -46,7 +52,7 @@ import MenuItem from "./MenuItem.vue";
 import MenuList from "./MenuList.vue";
 import MenuPrompt from "./MenuPrompt";
 import { CommentIcon } from "@/assets";
-import { TableModal, ImageModal } from "./modals";
+import { TableModal, ImageModal, EmbedModal } from "./modals";
 
 export default {
   components: {
@@ -55,13 +61,48 @@ export default {
     "menu-prompt": MenuPrompt,
     "table-modal": TableModal,
     "image-modal": ImageModal,
+    "embed-modal": EmbedModal,
   },
   methods: {
+    isYoutubeUrl(url) {
+      return true;
+    },
+    parseYoutubeUrl(url) {
+      const regExp =
+        /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return match && match[7].length === 11 ? match[7] : false;
+    },
+    setVideo(dataUrl) {
+      let url = null;
+      if (this.isYoutubeUrl(dataUrl)) {
+        const embedParse = this.parseYoutubeUrl(dataUrl);
+        url = `https://www.youtube.com/embed/${embedParse}`;
+
+        if (url) {
+          this.editor.commands.setExternalVideo({
+            src: url,
+          });
+        }
+      }
+    },
+    setEmbed(data) {
+      if (data.type === "video") {
+        this.setVideo(data.url);
+      }
+
+      if (data.type === "link") {
+        this.editor.commands.setLink({ href: data.url, target: "_blank" });
+      }
+
+      this.embedPromptOpen = false;
+      this.embedType = null;
+    },
     setFiles(files) {
       console.log(files);
 
       this.imagePromptOpen = !this.imagePromptOpen;
-			this.editor.commands.setImage(files);
+      this.editor.commands.setImage(files);
     },
     createTable(data) {
       const setRows = data.rows ?? 1;
@@ -82,6 +123,25 @@ export default {
     },
   },
   computed: {
+    getPreviousUrl: {
+      get() {
+        if (this.embedType === "link" && this.editor) {
+          const { state } = this.editor;
+          const { from, to } = state.selection;
+          let marks = [];
+          state.doc.nodesBetween(from, to, (node) => {
+            marks = [...marks, ...node.marks];
+          });
+          const mark = marks.find((markItem) => markItem.type.name === "link");
+					console.log(mark)
+
+          if (mark && mark.attrs && mark.attrs.href) {
+            return mark.attrs.href;
+          }
+        }
+        return null;
+      },
+    },
     showTablePrompt: {
       get() {
         return this.tablePromptOpen;
@@ -98,11 +158,21 @@ export default {
         this.imagePromptOpen = val;
       },
     },
+    showEmbedPrompt: {
+      get() {
+        return this.embedPromptOpen;
+      },
+      set(val) {
+        this.embedPromptOpen = val;
+      },
+    },
   },
   data() {
     return {
+      embedType: "",
       tablePromptOpen: false,
       imagePromptOpen: false,
+      embedPromptOpen: false,
       activeHeading: "h-3",
       items: [
         {
@@ -182,29 +252,6 @@ export default {
           type: "divider",
         },
         {
-          icon: "image-line",
-          iconType: "remix",
-          title: "Image",
-          action: () => {
-            this.imagePromptOpen = !this.imagePromptOpen;
-            console.log("HELLO");
-          },
-
-          //action: (file) => this.editor.commands.setImage(file),
-        },
-        {
-          icon: "vidicon-line",
-          iconType: "remix",
-          title: "video",
-          type: "prompt",
-          action: (file) =>
-            this.editor.commands.setExternalVideo({
-              src: file.src,
-              width: file.width,
-              height: file.height,
-            }),
-        },
-        {
           icon: "list-unordered",
           iconType: "remix",
           title: "Bullet List",
@@ -220,6 +267,43 @@ export default {
         },
         {
           type: "divider",
+        },
+        {
+          icon: "link",
+          iconType: "remix",
+          title: "link",
+          action: (file) => {
+            this.embedType = "link";
+            this.embedPromptOpen = !this.embedPromptOpen;
+          },
+
+          //action: (file) => this.editor.commands.setImage(file),
+        },
+        {
+          icon: "image-line",
+          iconType: "remix",
+          title: "Image",
+          action: () => {
+            this.imagePromptOpen = !this.imagePromptOpen;
+            console.log("HELLO");
+          },
+
+          //action: (file) => this.editor.commands.setImage(file),
+        },
+        {
+          icon: "vidicon-line",
+          iconType: "remix",
+          title: "video",
+          action: (file) => {
+            this.embedType = "video";
+            this.embedPromptOpen = !this.embedPromptOpen;
+          },
+
+          // this.editor.commands.setExternalVideo({
+          //   src: file.src,
+          //   width: file.width,
+          //   height: file.height,
+          // }),
         },
         {
           icon: "separator",
