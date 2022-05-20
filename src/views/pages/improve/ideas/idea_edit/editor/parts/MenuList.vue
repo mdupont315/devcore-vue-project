@@ -6,7 +6,7 @@
       ref="btnMenuListPopover"
       tabindex="0"
       :class="{ 'is-active': selectionOpen }"
-      style="width: 100%; height: 100%; margin: 0;margin-left:15px"
+      style="width: 100%; height: 100%; margin: 0;margin-left:10px"
     >
       <div class="menu-list-active-text" @click="setActive(activeIcon)">
         <div
@@ -18,7 +18,8 @@
           @mouseenter="isHovering = true"
           @mouseleave="isHovering = false"
         >
-          {{ getActiveText(activeIcon) }}
+				<span style="padding-left:5px">
+          {{ getActiveText(activeIcon) }}</span>
           <i
             class="ri-arrow-down-s-fill"
             style="font-size: 14px"

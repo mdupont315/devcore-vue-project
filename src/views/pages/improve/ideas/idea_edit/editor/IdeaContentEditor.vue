@@ -235,22 +235,24 @@ export default {
           console.log("Transforming!");
           if (!this.editor.isActive("comment")) return;
           const curNode = JSON.parse(node.attrs.comment);
-
-          const setComment = (curNode) => {
-            console.log(curNode);
-            this.editor.commands.setComment(
+					this.editor.commands.focus();
+					this.editor.commands.setComment(
               JSON.stringify({
                 ...curNode,
               })
             );
-          };
 
-          const debounceCommentNodes = debounce(setComment, 100);
+          // const setComment = (curNode) => {
+          //   console.log(curNode);
 
-          if (this.editor.isActive("comment")) {
-            console.log("ASDJASD");
-            setTimeout(() => {debounceCommentNodes(curNode)});
-          }
+          // };
+
+          // const debounceCommentNodes = debounce(setComment, 100);
+
+          // if (this.editor.isActive("comment")) {
+          //   console.log("ASDJASD");
+          //   setTimeout(() => {debounceCommentNodes(curNode)});
+          // }
 
           //  this.editor.commands.toggleHighlight({ color: "#ffcc00" });
         },
