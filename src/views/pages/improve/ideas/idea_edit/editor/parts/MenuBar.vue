@@ -99,17 +99,16 @@ export default {
       this.embedType = null;
     },
     setFiles(files) {
-      console.log(files);
-
       this.imagePromptOpen = !this.imagePromptOpen;
       this.editor.commands.setImage(files);
     },
     createTable(data) {
       const setRows = data.rows ?? 1;
       const setCols = data.cols ?? 1;
+
       this.editor
         .chain()
-        .focus()
+        .focus(this.editor.state.selection.$to.pos + 1)
         .insertTable({ rows: setRows, cols: setCols, withHeaderRow: true })
         .run();
 
@@ -133,7 +132,6 @@ export default {
             marks = [...marks, ...node.marks];
           });
           const mark = marks.find((markItem) => markItem.type.name === "link");
-					console.log(mark)
 
           if (mark && mark.attrs && mark.attrs.href) {
             return mark.attrs.href;
@@ -268,24 +266,23 @@ export default {
         {
           type: "divider",
         },
-        {
-          icon: "link",
-          iconType: "remix",
-          title: "link",
-          action: (file) => {
-            this.embedType = "link";
-            this.embedPromptOpen = !this.embedPromptOpen;
-          },
+        // {
+        //   icon: "link",
+        //   iconType: "remix",
+        //   title: "link",
+        //   action: (file) => {
+        //     this.embedType = "link";
+        //     this.embedPromptOpen = !this.embedPromptOpen;
+        //   },
 
-          //action: (file) => this.editor.commands.setImage(file),
-        },
+        //   //action: (file) => this.editor.commands.setImage(file),
+        // },
         {
           icon: "image-line",
           iconType: "remix",
           title: "Image",
           action: () => {
             this.imagePromptOpen = !this.imagePromptOpen;
-            console.log("HELLO");
           },
 
           //action: (file) => this.editor.commands.setImage(file),
@@ -310,6 +307,9 @@ export default {
           iconType: "remix",
           title: "Horizontal Rule",
           action: () => this.editor.chain().focus().setHorizontalRule().run(),
+        },
+        {
+          type: "divider",
         },
         {
           icon: "grid-line",
@@ -353,10 +353,10 @@ export default {
 }
 
 .idea_editor_header_item {
-  max-height: 50px;
-  max-width: 50px;
-  width: 50px;
-  height: 50px;
+  max-height: 35px;
+  max-width: 35px;
+  width: 35px;
+  height: 35px;
   display: flex;
   align-items: center;
   margin: 0;

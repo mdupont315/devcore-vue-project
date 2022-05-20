@@ -12,7 +12,7 @@
 
     <node-view-content class="content-dom" />
 
-    <section v-if="comments.length" class="comment-details">
+    <section v-if="comments.length > 0" class="comment-details">
       <template class="comment" v-for="(comment, i) in comments">
         <article v-if="!isCommentReplied(comment)" :key="i" class="comment">
           <span :class="`idea_comment_${comment.type}`">
@@ -107,6 +107,20 @@ export default {
       activeCommentIndex: null,
     };
   },
+  created() {
+    if (this.editor && this.editor.isActive("comment")) {
+      setTimeout(() => {
+        this.editor.commands.dedupeComments(this.node);
+      });
+    }
+  },
+  beforeDestroy() {
+    if (this.editor && this.editor.isActive("comment")) {
+      setTimeout(() => {
+        this.editor.commands.transformComments(this.node);
+      });
+    }
+  },
 
   methods: {
     openReplyForm(comment, index) {
@@ -132,22 +146,14 @@ export default {
       const to = from + node.nodeSize;
 
       if (this.editor) {
-				//textSelection({})
-				this.editor.commands.focus('start')
+        //textSelection({})
+        this.editor.commands.focus("start");
         this.editor.commands.saveReply(to);
       }
     },
     closeOverlay() {
       this.activeCommentIndex = null;
       this.isReplying = null;
-    },
-
-    getReplyIconRef(id) {
-      return `comment_replyIcon-${id}`;
-    },
-
-    getCommentRef(comment) {
-      return `comment_replyIcon-${comment.id}`;
     },
     openUrl(link) {
       window.open(link, "__blank");
@@ -159,7 +165,6 @@ export default {
 
   computed: {
     commentEntity() {
-			console.log(this.node.attrs)
       const stringCommentEntity = this.node?.attrs?.comment;
       return stringCommentEntity ? JSON.parse(stringCommentEntity) : {};
     },
@@ -175,6 +180,7 @@ export default {
 </script>
 
 <style lang="scss">
+
 .comment-component {
   .comment-actions {
     margin-left: 10px;

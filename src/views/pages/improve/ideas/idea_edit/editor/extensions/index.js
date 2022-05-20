@@ -8,4 +8,5 @@ export * from "./file";
 export * from "./heading";
 export * from "./customLine";
 export * from './trailingNode'
+export * from './customParagraph'
 export { default as Draggable } from "./draggable";

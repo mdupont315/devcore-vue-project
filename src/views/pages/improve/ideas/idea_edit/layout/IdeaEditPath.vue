@@ -6,30 +6,23 @@
       </div>
       <div class="idea_edit_path_container-header-close"></div>
 
-      <b-button
+      <div
         v-if="!ideaContentIsDirty"
-        style="
-          width: 60px;
-          margin-top: 15px;
-          margin-right: 15px;
-          height: 29.2px;
-        "
+        class="ideaEdit_path_noEdit_content"
         @click="closeIdeaEdit"
       >
-        <span> {{ $t("close") }} </span>
-        <div><i class="ri-close-line table-modal-close"></i></div>
-      </b-button>
+        <i class="ri-close-line table-modal-close"></i>
+      </div>
 
       <confirm-button
         v-else
-        style="width: 60px; margin-top: 15px; margin-right: 15px; height: 30px"
+        class="ideaEdit_path_Edit_content"
         @confirm="closeIdeaEdit"
+        :customButton="true"
         :confirmPlacement="'left'"
         :confirmMessage="$t('Unsaved Idea Data')"
       >
-        <span>
-          {{ $t("close") }} <i class="ri-close-line table-modal-close"></i>
-        </span>
+        <i class="ri-close-line table-modal-close"></i>
       </confirm-button>
     </div>
     <div class="idea_edit_path_container-body">
@@ -47,7 +40,6 @@
           @submit.prevent="save"
           v-if="mutateForm"
         >
-          <b-card no-body class="d-block">
             <!--  -->
             <b-card-body
               class="p-0 ideaEditPath-form-fields"
@@ -254,12 +246,12 @@
               <b-col
                 style="
                   display: flex;
-                  justify-content: space-between;
+                  justify-content: space-evenly;
                   margin-top: 10px;
                   flex-direction: row;
                   padding: 10px 0px;
                   height: 60px;
-                  align-items: self-end;
+                  gap: 12px;
                 "
               >
                 <loading-button
@@ -270,12 +262,7 @@
                   :disabled="vErrors.any() || isLoading"
                   variant="primary"
                   size="lg"
-                  style="
-                    overflow: hidden;
-                    height: 40px;
-                    margin-right: 10px;
-                    width: 100%;
-                  "
+                  style="flex-grow: 1; width: 30%;border-radius:3px;"
                   :loading="isLoading"
                   @click="updateStatus"
                   >{{ $t("Test") }}</loading-button
@@ -288,13 +275,8 @@
                   variant="primary"
                   size="lg"
                   :loading="isLoading"
+                  style="flex-grow: 1; width: 30%;border-radius:3px;"
                   :disabled="vErrors.any() || isLoading"
-                  style="
-                    overflow: hidden;
-                    height: 40px;
-                    margin-right: 10px;
-                    width: 100%;
-                  "
                   @click="updateStatus"
                   >{{ $t("Adopt") }}</loading-button
                 >
@@ -302,20 +284,24 @@
                   :disabled="vErrors.any() || isLoading"
                   :loading="isLoading"
                   size="lg"
-                  style="height: 40px; width: 100%"
                   block
+                  style="flex-grow: 1; width: 30%;border-radius:3px;"
                   type="submit"
                   >{{ $t("Save") }}</loading-button
                 >
                 <confirm-button
-                  variant="outline-danger"
+                  buttonVariant="outline-danger"
                   size="lg"
-                  class="pl-2"
-                  style="height: 40px; width: 100%"
+                  :isDisabled="isLoading"
+                  :btnClass="
+                    isLoading
+                      ? 'ideaEdit_path_remove_button-disabled'
+                      : 'ideaEdit_path_remove_button-enabled'
+                  "
                   :confirm-title="$t('Delete') + ' ' + mutateForm.title + '?'"
                   :confirmPlacement="'top'"
+                  style="width: 30%; flex-grow: 1;border-radius:3px;"
                   :confirm-message="$t('This action cannot be undone!')"
-                  :btnStyle="'background:#fff;height:41px;width:100%;color:#cc454b;padding:0'"
                   @confirm="deleteItem"
                 >
                   <div class="ideaEditPath-remove-idea-button">
@@ -324,7 +310,6 @@
                 </confirm-button>
               </b-col>
             </b-card-footer>
-          </b-card>
         </b-form>
       </div>
     </div>
@@ -543,6 +528,7 @@ export default {
 
 .idea_edit_path_container-body {
   height: 100%;
+  overflow: hidden;
 }
 
 .idea_edit_path_container {
@@ -616,7 +602,6 @@ export default {
 
 .idea_edit_path_container-body-process-select {
   list-style-type: none;
-  height: calc(100% - 60px);
   border-radius: 3px;
   background: #fff;
   padding: 20px 20px 7px 20px;
@@ -625,9 +610,33 @@ export default {
 .idea_edit_path_container-body-process-select-title {
   padding: 10px 0;
 }
+.idea_edit_path_container-body-process {
+  height: 100%;
+}
 </style>
 
 <style>
+.ideaEdit_path_noEdit_content {
+  width: 36px;
+  margin-top: 15px;
+  margin-right: 15px;
+  height: 30px;
+  font-size: 24px;
+  color: lightgray;
+  margin-left: 30px;
+  cursor: pointer;
+  text-align: center;
+}
+.ideaEdit_path_Edit_content {
+  width: 60px;
+  margin-top: 15px;
+  margin-right: 15px;
+  height: 30px;
+  font-size: 24px;
+  color: lightgray;
+  margin-left: 30px;
+  cursor: pointer;
+}
 .v-select .vs__open-indicator {
   fill: lightgray;
 }
@@ -640,8 +649,6 @@ export default {
   place-items: center;
   display: flex;
   place-content: center;
-  background: #cc454b;
-  color: #fff;
 }
 
 .idea_edit_path_select___phase

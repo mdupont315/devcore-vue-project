@@ -13,7 +13,9 @@ export const Comment = Node.create({
     return {
       HTMLAttributes: {},
       isCommentModeOn: () => false,
-      saveContent: () => {}
+      saveContent: () => {},
+      dedupeComments: () => {},
+      transformComments: () => {}
     };
   },
 
@@ -23,12 +25,7 @@ export const Comment = Node.create({
         default: null,
         parseHTML: el => el.getAttribute("comment"),
         renderHTML: attrs => ({ comment: attrs.comment })
-      },
-      visible: {
-        default: null,
-        parseHTML: el => el.getAttribute("visible"),
-        renderHTML: attrs => ({ visible: attrs.visible })
-      },
+      }
     };
   },
 
@@ -43,13 +40,15 @@ export const Comment = Node.create({
   },
 
   addCommands() {
-    const { saveContent } = this.options;
+    const { saveContent, dedupeComments, transformComments } = this.options;
 
     return {
       setComment: comment => ({ commands }) =>
         commands.setNode(this.name, { comment }),
 
       saveReply: ideaUUID => ({ commands }) => saveContent(ideaUUID),
+      dedupeComments: node => ({ commands }) => dedupeComments(node),
+      transformComments: node => ({ commands }) => transformComments(node),
 
       scrollToNextComment: () => ({ commands }) => {
         const editor = this.editor;
@@ -109,6 +108,7 @@ export const Comment = Node.create({
 
   addKeyboardShortcuts: () => {
     return {
+      Backspace: ({ editor }) => {}
       // Backspace: ({ editor }) => {
       //   const {
       //     state: {

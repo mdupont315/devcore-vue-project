@@ -173,6 +173,7 @@ input[type="file"] {
   font-family: FuturaLight;
   font-size: 16px;
   max-width: 325px;
+	margin: auto;
   text-align: center;
 }
 .image-modal-dropzone-wrapper {

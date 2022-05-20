@@ -54,6 +54,14 @@ export const Indent = Extension.create({
       indent: () => ({ tr, state, dispatch, editor }) => {
         const { selection } = state;
         tr = tr.setSelection(selection);
+
+        if (this.editor.isActive("comment") || selection.node) {
+          return this.editor
+            .chain()
+            .focus()
+            .run();
+        }
+
         tr = updateIndentLevel(
           tr,
           this.options,
@@ -72,6 +80,12 @@ export const Indent = Extension.create({
       },
       outdent: () => ({ tr, state, dispatch, editor }) => {
         const { selection } = state;
+        if (this.editor.isActive("comment") || selection.node) {
+          return this.editor
+            .chain()
+            .focus()
+            .run();
+        }
         tr = tr.setSelection(selection);
         tr = updateIndentLevel(
           tr,

@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="idea_editor_content"
-    id="idea_editor_content"
-  >
+  <div class="idea_editor_content" id="idea_editor_content">
     <div class="editor" v-if="editor">
       <div class="editor_header_border">
         <menu-bar class="editor__header" :editor="editor" />
@@ -25,6 +22,8 @@ import { mapGetters } from "vuex";
 import { EditorContent, BubbleMenu } from "@tiptap/vue-2";
 import { MenuBar } from "./parts";
 import ContentEditor from "./EditorLoader.js";
+import { TextSelection, NodeSelection } from "prosemirror-state";
+import { debounce } from "lodash";
 
 /* eslint-disable */
 export default {
@@ -89,7 +88,7 @@ export default {
   },
   methods: {
     focusEditor() {
-			console.log("focusing")
+      console.log("focusing");
       this.editor?.commands.focus();
     },
     transformProcessedCommentNodesToParagraph() {
@@ -175,6 +174,88 @@ export default {
         }, 200);
       };
 
+      const commentHandlers = {
+        dedupeComments: async (node) => {
+          if (!this.editor.isActive("comment")) return;
+					console.log("DEDUPE!")
+          const curNode = JSON.parse(node.attrs.comment);
+          const {
+            state: { doc, tr, schema },
+            view: { dispatch },
+          } = this.editor;
+          const comments = [];
+          doc.descendants((node, pos) => {
+            if (node.type.name !== "comment") return;
+            const [from, to] = [pos, pos + node.nodeSize];
+
+            const [comment, content] = [
+              JSON.parse(node.attrs.comment),
+              node.content,
+            ];
+
+            comments.push({ from, to, comment, content });
+          });
+
+          const currentComments = comments;
+          const mapOfUuidAndComments = {};
+
+          for (const comment of currentComments) {
+            const uuid = comment.comment.uuid;
+
+            if (mapOfUuidAndComments[uuid])
+              mapOfUuidAndComments[uuid].push(comment);
+            else mapOfUuidAndComments[uuid] = [comment];
+          }
+
+          const replaceTr = tr;
+
+          for (const [, comments] of Object.entries(
+            mapOfUuidAndComments
+          ).filter(
+            ([key, _comments]) => _comments.length > 1 && key === curNode.uuid
+          )) {
+            comments.pop();
+
+            for (const comment of comments) {
+              const { from } = comment;
+              const emptyComment = JSON.stringify({
+                comments: [],
+                ideaUuid: comment.comment.ideaUuid,
+                uuid: comment.comment.uuid,
+              });
+              replaceTr.setNodeMarkup(from, schema.nodes.comment, {
+                comment: emptyComment,
+              });
+            }
+          }
+
+          dispatch(replaceTr);
+        },
+        transformComments: async (node) => {
+          console.log("Transforming!");
+          if (!this.editor.isActive("comment")) return;
+          const curNode = JSON.parse(node.attrs.comment);
+
+          const setComment = (curNode) => {
+            console.log(curNode);
+            this.editor.commands.setComment(
+              JSON.stringify({
+                ...curNode,
+              })
+            );
+          };
+
+          const debounceCommentNodes = debounce(setComment, 100);
+
+          if (this.editor.isActive("comment")) {
+            console.log("ASDJASD");
+            setTimeout(() => {debounceCommentNodes(curNode)});
+          }
+
+          //  this.editor.commands.toggleHighlight({ color: "#ffcc00" });
+        },
+      };
+
       const editorInstance = new ContentEditor(
         this.isEditable,
         this.value.markup,
@@ -187,7 +268,8 @@ export default {
           },
         },
         fileHandlers,
-        saveContent
+        saveContent,
+        commentHandlers
       );
 
       this.editor = editorInstance.editor;
@@ -225,6 +307,7 @@ export default {
 
 .editor__header {
   border-top: 1px solid lightgray;
+	    max-height: 35px;
 }
 
 .editor_header_border {
@@ -397,9 +480,9 @@ export default {
     margin-block-start: 4px !important;
     margin-block-end: 4px !important;
   }
-	p > a {
-		cursor:pointer;
-	}
+  p > a {
+    cursor: pointer;
+  }
   h1 {
     color: #242526 !important;
     font-size: 18px !important;

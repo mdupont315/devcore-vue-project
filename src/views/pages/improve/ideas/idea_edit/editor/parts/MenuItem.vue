@@ -10,7 +10,6 @@
       :title="item.title"
     >
       <svg
-        :class="item.title ? item.title : ''"
         class="remix"
         width="20"
         height="20"
@@ -47,8 +46,8 @@ export default {
   width: 100%;
   height: 100%;
   display: flex;
-  max-width: 50px;
-  max-height: 50px;
+  max-width: 35px;
+  max-height: 35px;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -56,12 +55,21 @@ export default {
 
 .menu-item-comment {
   background: transparent !important;
+  > img {
+    height: 15px;
+    width: 15px;
+  }
+}
+
+.menubar-item-field-container > div > svg {
+	width: 15px;
+	height: 15px;
 }
 .menu-item-comment:hover {
   background-color: transparent !important;
 }
 
-.menu-item.menu-item-link {
+.menu-item.menu-item-link > svg {
   transform: rotate(45deg);
 }
 

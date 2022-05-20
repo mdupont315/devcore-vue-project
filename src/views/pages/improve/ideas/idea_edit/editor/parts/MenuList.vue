@@ -6,11 +6,25 @@
       ref="btnMenuListPopover"
       tabindex="0"
       :class="{ 'is-active': selectionOpen }"
-      style="width: 100%; height: 100%; margin: 0"
+      style="width: 100%; height: 100%; margin: 0;margin-left:15px"
     >
       <div class="menu-list-active-text" @click="setActive(activeIcon)">
-        <div class="menu-list-active-text-icon">
+        <div
+          class="menu-list-active-text-icon"
+          :style="{
+            background: isHovering ? '#4294d0' : '#fff',
+            color: isHovering ? '#fff' : '#000',
+          }"
+          @mouseenter="isHovering = true"
+          @mouseleave="isHovering = false"
+        >
           {{ getActiveText(activeIcon) }}
+          <i
+            class="ri-arrow-down-s-fill"
+            style="font-size: 14px"
+            v-if="isHovering"
+          ></i>
+          <i class="ri-arrow-up-s-fill" style="font-size: 14px" v-else></i>
         </div>
       </div>
       <!-- <svg class="remix">
@@ -24,7 +38,12 @@
       :target="() => $refs.btnMenuListPopover"
       placement="bottom"
     >
-      <b-card no-body style="align-items: center; width: 150px">
+      <b-card
+        no-body
+        style="align-items: center; width: 150px"
+        @mouseenter="isHovering = true"
+        @mouseleave="isHovering = false"
+      >
         <div
           v-for="(listItem, index) in item.listItems"
           :key="index"
@@ -130,6 +149,7 @@ export default {
 
   data() {
     return {
+      isHovering: false,
       selectionOpen: false,
       activeHeadingIndex: null,
       remixiconUrl,
@@ -151,6 +171,7 @@ export default {
 }
 .menu-list-active-text-icon {
   width: 25px;
+  font-size: 15px;
   height: 25px;
   display: flex;
   align-items: center;

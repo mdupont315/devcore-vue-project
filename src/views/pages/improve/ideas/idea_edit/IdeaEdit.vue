@@ -24,7 +24,6 @@
         v-model="getIdeaPath"
         :ideaContentIsDirty="ideaContentIsDirty"
         :idea="getIdea"
-
       ></idea-edit-path>
     </div>
   </div>
@@ -231,16 +230,15 @@ export default {
       this.ideaContentIsDirty = true;
     },
     removeFile(file) {
-      //TODO: check that removeFileIds work as intended => set saved files to array.
-
       if (this.isSaving) return;
-      this.files = this.files.filter((_file) => _file.uuid !== file.uuid);
       if (file.src && file.id) {
         this.filesChanged = true;
         this.ideaForm._fields.removeFileIds.push(file.id);
       }
     },
     async setFile(file) {
+      console.log("@setting file!");
+      console.log(file);
       const items = [...this.files, file];
       this.files = items;
       this.filesChanged = true;
@@ -283,7 +281,7 @@ export default {
       );
     },
     async initializeForms() {
-      if (this.ideaInEdit.editIdeaMode === "EDIT") {
+      if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
         this.ideaFormFieldMapper();
         this.ideaContentFormFieldMapper();
       }
@@ -335,12 +333,9 @@ export default {
         .map((fileEntity) => fileEntity.file)
         .filter((x) => x.size && !x.uri);
 
-      console.log("saveIdea: ");
-      console.log(this.files);
-      console.log(this.ideaForm._fields.file);
-
       let ideaSave = null;
       this.ideaForm.processId = this.processPath.process.id;
+      console.log(this.ideaForm);
       if (this.ideaForm.id) {
         ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
       } else {
@@ -369,25 +364,29 @@ export default {
 
     syncFiles() {
       const fileNodesInContent = this.getImageNodesFromContent();
+      const allFilesInContent = fileNodesInContent.map((x) => x.attrs);
+      const savedFiles = this.getIdea.files.map((file) => file.uri);
+
+      if (allFilesInContent.length > 0) {
+        savedFiles.forEach((uri) => {
+          //file id in content is file uri in server
+          const contentFileIds = allFilesInContent.map((x) => x.id);
+          if (
+            !contentFileIds.includes(uri) &&
+            !this.ideaForm._fields.removeFileIds.includes(uri)
+          ) {
+            this.ideaForm._fields.removeFileIds.push(uri);
+          }
+        });
+      }
+
+      console.log("Removing resources: ", this.ideaForm._fields.removeFileIds);
+
       if (fileNodesInContent.length === 0) {
         this.ideaForm._fields.removeFile = true;
       } else {
         this.ideaForm._fields.removeFile = false;
       }
-
-      console.log(this.getImageNodesFromContent());
-      //   this.ideaForm.removeFileIds = [];
-
-      //   const uploadedFilesInContent = fileNodesInContent.filter(
-      //     (node) => node.attrs.id
-      //   );
-
-      //   const uploadedFiles = uploadedFilesInContent.map((node) => node.attrs.id);
-
-      //   const removeFiles = this.files.filter(
-      //     (file) => !uploadedFiles.includes(file.uri)
-      //   );
-      //  // this.ideaForm.removeFileIds = removeFiles.map((file) => file.id) ?? [];
     },
     async saveIdeaVersion() {
       this.isLoading = true;
@@ -395,7 +394,7 @@ export default {
       try {
         //Sync files in server with files in content
         this.syncFiles();
-        this.getCommentNodesFromContent();
+        //this.getCommentNodesFromContent();
 
         const ideaSave = await this.saveIdea();
         //reset removeFileIds
@@ -530,6 +529,6 @@ export default {
 
 .idea_edit-wrapper {
   //margin: 20px 10px 0 10px;
-	height: 100%;
+  height: 100%;
 }
 </style>

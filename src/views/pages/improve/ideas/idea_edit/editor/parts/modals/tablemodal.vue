@@ -90,8 +90,21 @@ export default {
       default: () => false,
     },
   },
+  watch: {
+    value: {
+      handler(newVal) {
+        console.log(newVal);
+        if (!newVal) {
+          this.hoverPosition = null;
+          this.tableGridX = null;
+          this.tableGridY = null;
+          this.allowSelectionHover = true;
+        }
+      },
+    },
+  },
   methods: {
-			saveItem() {
+    saveItem() {
       this.$emit("tableCreate", {
         cols: this.tableGridX,
         rows: this.tableGridY,
@@ -161,11 +174,9 @@ export default {
       hoverPosition: null,
       tableGridX: null,
       tableGridY: null,
+      allowSelectionHover: true,
       tableGridMaxWidth: TABLE_MAX_GRID_WIDTH,
       tableGridMaxHeight: TABLE_MAX_GRID_HEIGHT,
-      allowSelectionHover: true,
-      tableSelectedGridWidth: 0,
-      tableSelectedGridHeight: 0,
     };
   },
   computed: {
@@ -189,7 +200,7 @@ export default {
       },
       set(value) {
         this.$emit("close", value);
-				console.log(value)
+        console.log(value);
         if (!value) {
           this.tableGridY = null;
           this.tableGridX = null;

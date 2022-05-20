@@ -23,170 +23,185 @@ import {
   File,
   Comment,
   ExternalVideo,
-  // customNewline,
+  Paragraph,
   TrailingNode
 } from "./extensions";
 
-const dedupeComments = editor => {
-  const {
-    state: { doc, tr, schema },
-    view: { dispatch }
-  } = editor;
+// const dedupeComments = editor => {
+//   const {
+//     state: { doc, tr, schema },
+//     view: { dispatch }
+//   } = editor;
 
-  const comments = [];
+//   const comments = [];
 
-  doc.descendants((node, pos) => {
-    if (node.type.name !== "comment") return;
+//   doc.descendants((node, pos) => {
+//     if (node.type.name !== "comment") return;
 
-    const [from, to] = [pos, pos + node.nodeSize];
+//     const [from, to] = [pos, pos + node.nodeSize];
 
-    const [comment, content] = [JSON.parse(node.attrs.comment), node.content];
+//     const [comment, content] = [JSON.parse(node.attrs.comment), node.content];
 
-    comments.push({ from, to, comment, content });
-  });
+//     comments.push({ from, to, comment, content });
+//   });
 
-  console.log(comments);
+//   console.log(comments);
 
-  comments.forEach((comment, index) => {
-    // console.log(index);
-    // console.log(comment);
-    if (comment && comments[index + 1]) {
-      const curComment = comment;
-      const nextComment = comments[index + 1];
+//   comments.forEach((comment, index) => {
+//     // console.log(index);
+//     // console.log(comment);
+//     if (comment && comments[index + 1]) {
+//       const curComment = comment;
+//       const nextComment = comments[index + 1];
 
-      const sameUuid = curComment.comment.uuid === nextComment.comment.uuid;
-      const sameNode = curComment.to === nextComment.from;
+//       const sameUuid = curComment.comment.uuid === nextComment.comment.uuid;
+//       const sameNode = curComment.to === nextComment.from;
 
-      console.log(curComment)
-      console.log(nextComment)
+//       console.log(curComment);
+//       console.log(nextComment);
+//       return;
 
-      if (sameUuid && sameNode) {
-        console.log("IS SAME!");
-        console.log(curComment);
-        console.log(nextComment);
-        const emptyComment = JSON.parse(curComment.comment)
-        console.log(emptyComment)
-        // let replaceTr = tr.setNodeMarkup(
-        //   thisComment.from,
-        //   undefined,
-        //   emptyComment
-        // );
-        // dispatch(replaceTr);
-      }
+//       if (sameUuid && sameNode) {
+//         console.log("IS SAME!");
+//         console.log(curComment);
+//         console.log(nextComment);
+//         curComment.comment.comments = [];
+//         const emptyComment = {
+//           comment: JSON.stringify({ ...curComment.comment, comments: [] }),
+//           uuid: curComment.comment.uuid,
+//           visible: false
+//         };
+//         console.log(emptyComment);
+//         let replaceTr = tr.setNodeMarkup(
+//           curComment.from,
+//           undefined,
+//           emptyComment
+//         );
+//         dispatch(replaceTr);
+//       }
 
-      // console.log(sameUuid);
-      // console.log(sameParent);
-      // if (sameUuid && sameParent) {
-      //   editor.commands.setNode("comment", {});
-      //   //editor.commands.setComment(JSON.stringify(dataToInsert));
-      // }
-      // const mapOfUuidAndComments = {};
+// console.log(sameUuid);
+// console.log(sameParent);
+// if (sameUuid && sameParent) {
+//   editor.commands.setNode("comment", {});
+//   //editor.commands.setComment(JSON.stringify(dataToInsert));
+// }
+// const mapOfUuidAndComments = {};
 
-      // for (const comment of comments) {
-      //   const uuid = comment.comment.uuid;
+// for (const comment of comments) {
+//   const uuid = comment.comment.uuid;
 
-      //   if (mapOfUuidAndComments[uuid]) mapOfUuidAndComments[uuid].push(comment);
-      //   else mapOfUuidAndComments[uuid] = [comment];
-      // }
+//   if (mapOfUuidAndComments[uuid]) mapOfUuidAndComments[uuid].push(comment);
+//   else mapOfUuidAndComments[uuid] = [comment];
+// }
 
-      // const replaceTr = tr;
+// const replaceTr = tr;
 
-      // for (const [, comments] of Object.entries(mapOfUuidAndComments).filter(
-      //   ([, c]) => c.length > 1
-      // )) {
-      //   comments.pop();
+// for (const [, comments] of Object.entries(mapOfUuidAndComments).filter(
+//   ([, c]) => c.length > 1
+// )) {
+//   comments.pop();
 
-      //   for (const comment of comments) {
-      //     const { from } = comment;
+//   for (const comment of comments) {
+//     const { from } = comment;
 
-      //     replaceTr.setNodeMarkup(from, schema.nodes.paragraph);
-      //   }
-      // }
+//     replaceTr.setNodeMarkup(from, schema.nodes.paragraph);
+//   }
+// }
 
-      // dispatch(replaceTr);
-    }
-  });
-};
+// dispatch(replaceTr);
+//     }
+//   });
+// };
 
-const dedupeCommentNodes = editor => {
-  const {
-    state: { doc, tr, schema },
-    view: { dispatch }
-  } = editor;
+// const dedupeCommentNodes = editor => {
+//   const {
+//     state: { doc, tr, schema },
+//     view: { dispatch }
+//   } = editor;
 
-  const comments = [];
+//   const comments = [];
 
-  doc.descendants((node, pos) => {
-    if (node.type.name !== "comment") return;
+//   doc.descendants((node, pos) => {
+//     if (node.type.name !== "comment") return;
 
-    const [from, to] = [pos, pos + node.nodeSize];
+//     const [from, to] = [pos, pos + node.nodeSize];
 
-    const [comment, content] = [JSON.parse(node.attrs.comment), node.content];
+//     const [comment, content] = [JSON.parse(node.attrs.comment), node.content];
 
-    comments.push({ from, to, comment, content });
-  });
+//     comments.push({ from, to, comment, content });
+//   });
 
-  const mapOfUuidAndComments = {};
+//   const mapOfUuidAndComments = {};
 
-  for (const comment of comments) {
-    const uuid = comment.comment.uuid;
+//   for (const comment of comments) {
+//     const uuid = comment.comment.uuid;
 
-    if (mapOfUuidAndComments[uuid]) mapOfUuidAndComments[uuid].push(comment);
-    else mapOfUuidAndComments[uuid] = [comment];
-  }
+//     if (mapOfUuidAndComments[uuid]) mapOfUuidAndComments[uuid].push(comment);
+//     else mapOfUuidAndComments[uuid] = [comment];
+//   }
 
-  const replaceTr = tr;
+//   const replaceTr = tr;
 
-  for (const [, comments] of Object.entries(mapOfUuidAndComments).filter(
-    ([, c]) => c.length > 1
-  )) {
-    comments.pop();
+//   for (const [, comments] of Object.entries(mapOfUuidAndComments).filter(
+//     ([, c]) => c.length > 1
+//   )) {
+//     comments.pop();
 
-    for (const comment of comments) {
-      const { from } = comment;
+//     for (const comment of comments) {
+//       const { from } = comment;
 
-      replaceTr.setNodeMarkup(from, schema.nodes.paragraph);
-    }
-  }
+//       replaceTr.setNodeMarkup(from, schema.nodes.paragraph);
+//     }
+//   }
 
-  dispatch(replaceTr);
-};
+//   dispatch(replaceTr);
+// };
 
-const debounceCommentNodes = debounce(dedupeComments, 300);
+//const debounceCommentNodes = debounce(dedupeComments, 300);
 
-const debouncedDedupeCommentNodes = debounce(dedupeCommentNodes, 300);
+//const debouncedDedupeCommentNodes = debounce(dedupeCommentNodes, 300);
 
-function cleanContentAfterBody(htmlString) {
-  const bodyCloseTag = "</body>";
-  const htmlCloseTag = "</html>";
+// function cleanContentAfterBody(htmlString) {
+//   const bodyCloseTag = "</body>";
+//   const htmlCloseTag = "</html>";
 
-  const bodyCloseIndex = htmlString.indexOf(bodyCloseTag);
+//   const bodyCloseIndex = htmlString.indexOf(bodyCloseTag);
 
-  if (bodyCloseIndex < 0) {
-    return htmlString;
-  }
+//   if (bodyCloseIndex < 0) {
+//     return htmlString;
+//   }
 
-  const htmlCloseIndex = htmlString.indexOf(
-    htmlCloseTag,
-    bodyCloseIndex + bodyCloseTag.length
-  );
+//   const htmlCloseIndex = htmlString.indexOf(
+//     htmlCloseTag,
+//     bodyCloseIndex + bodyCloseTag.length
+//   );
 
-  return (
-    htmlString.substring(0, bodyCloseIndex + bodyCloseTag.length) +
-    (htmlCloseIndex >= 0 ? htmlString.substring(htmlCloseIndex) : "")
-  );
-}
+//   return (
+//     htmlString.substring(0, bodyCloseIndex + bodyCloseTag.length) +
+//     (htmlCloseIndex >= 0 ? htmlString.substring(htmlCloseIndex) : "")
+//   );
+// }
 export default class ContentEditor {
-  constructor(editable, value, options, fileHandlers, saveContent) {
+  constructor(
+    editable,
+    value,
+    options,
+    fileHandlers,
+    saveContent,
+    commentHandlers
+  ) {
     this.editable = editable;
     this.content = value;
     this.options = options;
     this.fileHandlers = fileHandlers;
     this.extensions = [
       StarterKit.configure({
-        history: false
+        history: false,
+        paragraph: false
         // hardBreak: false
       }),
+      Paragraph,
       // HardBreak.extend({
       //   addKeyboardShortcuts() {
       //     return {
@@ -195,7 +210,6 @@ export default class ContentEditor {
       //     };
       //   }
       // }),
-      // customNewline,
       History.configure({ depth: 10 }),
       FontFamily.configure({
         types: ["textStyle"]
@@ -226,7 +240,10 @@ export default class ContentEditor {
         removeFile: fileHandlers.removeFile,
         notify: fileHandlers.notify
       }),
-      Comment.configure({ saveContent })
+      Comment.configure({
+        saveContent,
+        ...commentHandlers
+      })
     ];
     this.editor = this.getEditorInstance();
     this.dedupedCommentNodes = false;
@@ -449,27 +466,18 @@ export default class ContentEditor {
         //   }
       },
 
-      onTransaction({ editor, transaction }) {
-        //   console.log(transaction)
-        // console.log("transaction")
-        // console.log(transaction)
-        // if (!this.dedupedCommentNodes) {
-        //   this.dedupedCommentNodes = true;
-        // }
-        // this.dedupedCommentNodes = false;
-      },
 
       onUpdate: ({ editor }) => {
         setTimeout(() => {
           if (!this.dedupedCommentNodes) {
             this.dedupedCommentNodes = true;
 
-            if (editor.isActive("comment")) {
-              setTimeout(() =>
-                // setTimeout(() => debouncedDedupeCommentNodes(editor))
-                setTimeout(() => debounceCommentNodes(editor))
-              );
-            }
+            // if (editor.isActive("comment")) {
+            //   setTimeout(() =>
+            //     // setTimeout(() => debouncedDedupeCommentNodes(editor))
+            // //    setTimeout(() => debounceCommentNodes(editor))
+            //   );
+            // }
           }
 
           this.dedupedCommentNodes = false;
