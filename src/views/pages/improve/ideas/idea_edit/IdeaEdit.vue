@@ -364,13 +364,20 @@ export default {
 
     syncFiles() {
       const fileNodesInContent = this.getImageNodesFromContent();
+			//console.log(fileNodesInContent)
       const allFilesInContent = fileNodesInContent.map((x) => x.attrs);
       const savedFiles = this.getIdea.files.map((file) => file.uri);
 
       if (allFilesInContent.length > 0) {
+				//console.log(allFilesInContent.map((x) => x.id));
+				//console.log(savedFiles);
         savedFiles.forEach((uri) => {
           //file id in content is file uri in server
           const contentFileIds = allFilesInContent.map((x) => x.id);
+					//console.log("uri should be included: ", uri)
+					//console.log("in array: ", contentFileIds)
+					//console.log( !contentFileIds.includes(uri) )
+					//console.log( !this.ideaForm._fields.removeFileIds.includes(uri) )
           if (
             !contentFileIds.includes(uri) &&
             !this.ideaForm._fields.removeFileIds.includes(uri)

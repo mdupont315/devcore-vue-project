@@ -92,102 +92,117 @@ export const Comment = Node.create({
         }
 
         const { nodeFrom, nodeTo } = coordsOfCommentToFocus;
+        console.log(coordsOfCommentToFocus)
 
         const [$from, $to] = [doc.resolve(nodeFrom + 1), doc.resolve(nodeTo)];
         const sel = new TextSelection($from, $to);
+
+        console.log(sel)
         dispatch(tr.setSelection(sel).scrollIntoView());
 
         setTimeout(() => {
-          const selCommentStart = new TextSelection($from);
+          const selCommentStart = new TextSelection($to);
 
           dispatch(tr.setSelection(selCommentStart));
-        }, 300);
+        }, 100);
       }
     };
   },
 
   addKeyboardShortcuts: () => {
     return {
-      Backspace: ({ editor }) => {}
-      // Backspace: ({ editor }) => {
-      //   const {
-      //     state: {
-      //       doc,
-      //       selection: { from: selFrom, to: selTo },
-      //       schema,
-      //       tr
-      //     },
-      //     view: { dispatch }
-      //   } = editor;
+      Backspace: ({ editor }) => {
+        editor.commands.first(({ commands }) => [
+          // () => commands.undoInputRule(),
+          () => commands.deleteSelection(),
+          () => commands.joinBackward(),
+          () => commands.selectNodeBackward()
+        ]);
+        //   console.log("creaíng!");
+        //  // editor.commands.clearNodes();
 
-      //   let [commentNode, nodeBeforeCommentNode, lastNode] = new Array(3).fill(
-      //     null
-      //   );
+        //   // Backspace: ({ editor }) => {
+        //   const {
+        //     state: {
+        //       doc,
+        //       selection: { from: selFrom, to: selTo },
+        //       schema,
+        //       tr
+        //     },
+        //     view: { dispatch }
+        //   } = editor;
 
-      //   doc.descendants((node, pos) => {
-      //     if (!node.isBlock || commentNode) return;
+        //   let [commentNode, nodeBeforeCommentNode, lastNode] = new Array(3).fill(
+        //     null
+        //   );
 
-      //     if (node.type.name === "comment") {
-      //       const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
+        //   doc.descendants((node, pos) => {
+        //     if (!node.isBlock || commentNode) return;
 
-      //       const isNodeActiveCommentNode =
-      //         nodeFrom <= selFrom && selTo <= nodeTo;
+        //     if (node.type.name === "comment") {
+        //       const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
 
-      //       if (isNodeActiveCommentNode) {
-      //         commentNode = { node, from: pos, to: pos + node.nodeSize };
-      //         nodeBeforeCommentNode = lastNode;
-      //       }
-      //     } else {
-      //       lastNode = {
-      //         node,
-      //         from: pos,
-      //         to: pos + node.nodeSize,
-      //         isEmpty: !node.textContent.length
-      //       };
-      //     }
-      //   });
+        //       const isNodeActiveCommentNode =
+        //         nodeFrom <= selFrom && selTo <= nodeTo;
 
-      //   if (
-      //     commentNode &&
-      //     nodeBeforeCommentNode &&
-      //     selFrom === commentNode.from + 1 &&
-      //     selTo === commentNode.from + 1
-      //   ) {
-      //     const beforeContent = nodeBeforeCommentNode.node.content;
-      //     const commentContent = commentNode.node.content;
+        //       if (isNodeActiveCommentNode) {
+        //         commentNode = { node, from: pos, to: pos + node.nodeSize };
+        //         nodeBeforeCommentNode = lastNode;
+        //       }
+        //     } else {
+        //       lastNode = {
+        //         node,
+        //         from: pos,
+        //         to: pos + node.nodeSize,
+        //         isEmpty: !node.textContent.length
+        //       };
+        //     }
+        //   });
 
-      //     const combinedContent = beforeContent.append(commentContent);
+        //   if (
+        //     commentNode &&
+        //     nodeBeforeCommentNode &&
+        //     selFrom === commentNode.from + 1 &&
+        //     selTo === commentNode.from + 1
+        //   ) {
+        //     const beforeContent = nodeBeforeCommentNode.node.content;
+        //     const commentContent = commentNode.node.content;
 
-      //     const newCommentWithCombinedContent = schema.nodes.comment.create(
-      //       commentNode.node.attrs,
-      //       combinedContent
-      //     );
+        //     const combinedContent = beforeContent.append(commentContent);
 
-      //     let replaceTr = tr.replaceRangeWith(
-      //       nodeBeforeCommentNode.from,
-      //       commentNode.to - 2,
-      //       newCommentWithCombinedContent
-      //     );
+        //     const newCommentWithCombinedContent = schema.nodes.comment.create(
+        //       commentNode.node.attrs,
+        //       combinedContent
+        //     );
 
-      //     dispatch(replaceTr);
+        //     let replaceTr = tr.replaceRangeWith(
+        //       nodeBeforeCommentNode.from,
+        //       commentNode.to - 2,
+        //       newCommentWithCombinedContent
+        //     );
 
-      //     // setTimeout(() => {
-      //     //   if (nodeBeforeCommentNode.isEmpty) {
-      //     //     const focusPos = editor.state.doc.resolve(nodeBeforeCommentNode.from)
+        //     console.log(replaceTr);
+        //     dispatch(replaceTr);
 
-      //     //     const newSel = new TextSelection(focusPos)
+        //     setTimeout(() => {
+        //       if (nodeBeforeCommentNode.isEmpty) {
+        //         const focusPos = editor.state.doc.resolve(
+        //           nodeBeforeCommentNode.from
+        //         );
 
-      //     //     editor.view.dispatch(editor.state.tr.setSelection(newSel))
-      //     //   }
-      //     // }, 100);
-      //   } else {
-      //     const resolvedPos = doc.resolve(selFrom);
+        //         const newSel = new TextSelection(focusPos);
 
-      //     const newSel = new TextSelection(resolvedPos);
+        //         editor.view.dispatch(editor.state.tr.setSelection(newSel));
+        //       }
+        //     }, 100);
+        //   } else {
+        //     const resolvedPos = doc.resolve(selFrom);
 
-      //     dispatch(tr.setSelection(newSel));
-      //   }
-      // }
+        //     const newSel = new TextSelection(resolvedPos);
+
+        //     dispatch(tr.setSelection(newSel));
+        //   }
+      }
     };
   },
 

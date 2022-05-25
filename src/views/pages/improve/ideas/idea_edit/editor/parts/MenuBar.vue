@@ -51,9 +51,8 @@
 import MenuItem from "./MenuItem.vue";
 import MenuList from "./MenuList.vue";
 import MenuPrompt from "./MenuPrompt";
-import { CommentIcon } from "@/assets";
 import { TableModal, ImageModal, EmbedModal } from "./modals";
-
+import { CommentIcon } from "@/assets";
 export default {
   components: {
     "menu-item": MenuItem,
@@ -108,7 +107,8 @@ export default {
 
       this.editor
         .chain()
-        .focus(this.editor.state.selection.$to.pos + 1)
+        .focus()
+        .setHardBreak()
         .insertTable({ rows: setRows, cols: setCols, withHeaderRow: true })
         .run();
 
@@ -250,6 +250,20 @@ export default {
           type: "divider",
         },
         {
+          icon: "indent-decrease",
+          iconType: "remix",
+          title: "outdent",
+          action: () => this.editor.chain().focus().outdent().run(),
+          isActive: () => this.editor.isActive("outdent"),
+        },
+        {
+          icon: "indent-increase",
+          iconType: "remix",
+          title: "indent",
+          action: () => this.editor.chain().focus().indent().run(),
+          isActive: () => this.editor.isActive("indent"),
+        },
+        {
           icon: "list-unordered",
           iconType: "remix",
           title: "Bullet List",
@@ -277,16 +291,7 @@ export default {
 
         //   //action: (file) => this.editor.commands.setImage(file),
         // },
-        {
-          icon: "image-line",
-          iconType: "remix",
-          title: "Image",
-          action: () => {
-            this.imagePromptOpen = !this.imagePromptOpen;
-          },
 
-          //action: (file) => this.editor.commands.setImage(file),
-        },
         {
           icon: "vidicon-line",
           iconType: "remix",
@@ -303,13 +308,20 @@ export default {
           // }),
         },
         {
+          icon: "image-line",
+          iconType: "remix",
+          title: "Image",
+          action: () => {
+            this.imagePromptOpen = !this.imagePromptOpen;
+          },
+
+          //action: (file) => this.editor.commands.setImage(file),
+        },
+        {
           icon: "separator",
           iconType: "remix",
           title: "Horizontal Rule",
           action: () => this.editor.chain().focus().setHorizontalRule().run(),
-        },
-        {
-          type: "divider",
         },
         {
           icon: "grid-line",
@@ -325,16 +337,15 @@ export default {
           isActive: () => this.editor.isActive("table"),
         },
         {
-          icon: CommentIcon,
+          type: "divider",
+        },
+        {
+          icon:CommentIcon,
           iconType: "inline",
           title: "comment",
           //  action: () => this.editor.commands.scrollToNextComment(),
 
-          action: () => {
-            return this.editor.commands.scrollToNextComment();
-            //{
-          },
-
+          action: () => this.editor.chain().focus().scrollToNextComment().run(),
           isActive: () => this.editor.isActive("comment"),
         },
       ],

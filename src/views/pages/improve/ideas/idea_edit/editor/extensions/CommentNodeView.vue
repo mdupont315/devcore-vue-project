@@ -118,7 +118,7 @@ export default {
     if (this.editor && this.editor.isActive("comment")) {
       setTimeout(() => {
         this.editor.commands.transformComments(this.node);
-      });
+      }, 300);
     }
   },
 
@@ -180,7 +180,6 @@ export default {
 </script>
 
 <style lang="scss">
-
 .comment-component {
   .comment-actions {
     margin-left: 10px;
@@ -211,9 +210,20 @@ export default {
       margin: 2px 0;
     }
 
+    // @keyframes opacityanimation {
+    //   from {
+    //     opacity: 0;
+    //   }
+    //   to {
+    //     opacity: 1;
+    //   }
+    // }
+
     .comment {
       color: #fff;
       display: flex;
+    // animation-name: opacityanimation;
+   //   animation-duration: 1s;
 
       .file {
         margin-left: 10px;
@@ -221,27 +231,12 @@ export default {
           cursor: pointer;
           pointer-events: all;
           text-decoration: underline;
-
-          // &:hover {
-          //   &::after {
-          //     content: attr(data-title);
-          //     margin: 0 4px;
-          //     z-index: 1;
-          //     position: absolute;
-          //     background: white;
-          //     border-radius: 8px;
-          //     padding: 4px;
-          //     box-shadow: 0 0 5px rgba(gray, 0.5);
-          //     text-decoration: underline;
-          //   }
-          // }
         }
       }
 
       .comment-icon {
         transform: translate(0px, 2px);
         cursor: pointer;
-        margin-left: 1em;
         height: 16px;
 
         &:hover {

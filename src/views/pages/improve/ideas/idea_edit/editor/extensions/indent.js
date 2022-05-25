@@ -38,7 +38,7 @@ export const Indent = Extension.create({
           indent: {
             default: this.options.defaultIndentLevel,
             renderHTML: attributes => ({
-              style: `margin-left: ${attributes.indent}px!important;`
+              style: `margin-left: ${attributes.indent}px !important;`
             }),
             parseHTML: element =>
               parseInt(element.style.marginLeft, 10) ||

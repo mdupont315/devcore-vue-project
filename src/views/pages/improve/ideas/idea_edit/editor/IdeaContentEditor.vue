@@ -23,7 +23,6 @@ import { EditorContent, BubbleMenu } from "@tiptap/vue-2";
 import { MenuBar } from "./parts";
 import ContentEditor from "./EditorLoader.js";
 import { TextSelection, NodeSelection } from "prosemirror-state";
-import { debounce } from "lodash";
 
 /* eslint-disable */
 export default {
@@ -88,7 +87,6 @@ export default {
   },
   methods: {
     focusEditor() {
-      console.log("focusing");
       this.editor?.commands.focus();
     },
     transformProcessedCommentNodesToParagraph() {
@@ -177,7 +175,6 @@ export default {
       const commentHandlers = {
         dedupeComments: async (node) => {
           if (!this.editor.isActive("comment")) return;
-					console.log("DEDUPE!")
           const curNode = JSON.parse(node.attrs.comment);
           const {
             state: { doc, tr, schema },
@@ -207,17 +204,20 @@ export default {
             else mapOfUuidAndComments[uuid] = [comment];
           }
 
-          const replaceTr = tr;
-
+          let replaceTr = tr;
           for (const [, comments] of Object.entries(
             mapOfUuidAndComments
           ).filter(
             ([key, _comments]) => _comments.length > 1 && key === curNode.uuid
           )) {
+            //console.log(comments);
             comments.pop();
 
             for (const comment of comments) {
               const { from } = comment;
+
+            //  replaceTr.setNodeMarkup(from, schema.nodes.paragraph);
+
               const emptyComment = JSON.stringify({
                 comments: [],
                 ideaUuid: comment.comment.ideaUuid,
@@ -226,35 +226,54 @@ export default {
               replaceTr.setNodeMarkup(from, schema.nodes.comment, {
                 comment: emptyComment,
               });
+              // const [$start, $end] = [
+              //   doc.resolve(comment.from),
+              //   doc.resolve(comment.to),
+              // ];
+              // replaceTr = replaceTr.setSelection(
+              //   new TextSelection($start, $end)
+              // );
             }
           }
+          // this.editor.commands.clearNodes();
+          //	this.editor.commands.toggleHighlight({ color: "#ffcc00" });
 
           dispatch(replaceTr);
         },
-        transformComments: async (node) => {
-          console.log("Transforming!");
-          if (!this.editor.isActive("comment")) return;
+        transformComments: (node) => {
           const curNode = JSON.parse(node.attrs.comment);
-					this.editor.commands.focus();
-					this.editor.commands.setComment(
-              JSON.stringify({
-                ...curNode,
-              })
-            );
+          console.log("current node: ", curNode);
+          const {
+            state: { doc, tr, schema },
+            view: { dispatch },
+          } = this.editor;
+          const comments = [];
+          doc.descendants((node, pos) => {
+            if (node.type.name !== "comment") return;
+            const [from, to] = [pos, pos + node.nodeSize];
 
-          // const setComment = (curNode) => {
-          //   console.log(curNode);
+            const [comment, content] = [
+              JSON.parse(node.attrs.comment),
+              node.content,
+            ];
 
-          // };
+            comments.push({ from, to, comment, content });
+          });
 
-          // const debounceCommentNodes = debounce(setComment, 100);
+          const curComment = comments.filter(
+            (commentEntity) => commentEntity.comment.uuid === curNode.uuid
+          );
+          console.log(curComment);
+          // console.log({comments})
+          //           this.editor.chain().focus().setComment(
+          //   JSON.stringify({
+          //     this.editor.commands.setComment(JSON.stringify(dataToInsert));,
+          //   })
 
-          // if (this.editor.isActive("comment")) {
-          //   console.log("ASDJASD");
-          //   setTimeout(() => {debounceCommentNodes(curNode)});
-          // }
+          console.log(curNode);
+          console.log(comments);
 
-          //  this.editor.commands.toggleHighlight({ color: "#ffcc00" });
+          this.editor.commands.setComment(JSON.stringify(curNode));
         },
       };
 
@@ -277,9 +296,7 @@ export default {
       this.editor = editorInstance.editor;
       this.$emit("initialized");
       if (this.scrollToSelection) {
-        console.log(this.scrollToSelection);
         setTimeout(() => {
-          console.log(this.scrollToSelection);
           this.editor.commands.focus(this.scrollToSelection);
           this.$emit("contentScrollPosition", null);
         });
@@ -309,7 +326,6 @@ export default {
 
 .editor__header {
   border-top: 1px solid lightgray;
-	    max-height: 35px;
 }
 
 .editor_header_border {
