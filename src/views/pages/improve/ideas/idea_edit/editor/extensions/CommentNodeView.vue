@@ -115,10 +115,10 @@ export default {
     }
   },
   beforeDestroy() {
-    if (this.editor && this.editor.isActive("comment")) {
+    if (this.editor && (this.editor.isActive("paragraph") || this.editor.isActive("comment"))) {
       setTimeout(() => {
         this.editor.commands.transformComments(this.node);
-      }, 300);
+      }, 100);
     }
   },
 
@@ -186,7 +186,6 @@ export default {
   }
   .content-dom {
     border-radius: 4px;
-    padding: 4px;
     color: #707070 !important;
     font-size: 14px !important;
     font-family: FuturaLight !important;
@@ -194,7 +193,7 @@ export default {
 
   .comment-details {
     border-radius: 8px;
-    padding: 8px;
+    padding: 8px 8px 8px 0;
 
     .idea_comment_IMPROVEMENT {
       background: #d0e4f3;
@@ -222,8 +221,8 @@ export default {
     .comment {
       color: #fff;
       display: flex;
-    // animation-name: opacityanimation;
-   //   animation-duration: 1s;
+      // animation-name: opacityanimation;
+      //   animation-duration: 1s;
 
       .file {
         margin-left: 10px;

@@ -53,6 +53,8 @@ import MenuList from "./MenuList.vue";
 import MenuPrompt from "./MenuPrompt";
 import { TableModal, ImageModal, EmbedModal } from "./modals";
 import { CommentIcon } from "@/assets";
+import { TextSelection, NodeSelection } from "prosemirror-state";
+
 export default {
   components: {
     "menu-item": MenuItem,
@@ -105,10 +107,36 @@ export default {
       const setRows = data.rows ?? 1;
       const setCols = data.cols ?? 1;
 
+      //set selection to end of paragraph if inserting in the middle
+
+      //   if (this.editor.isActive("table")) return;
+      console.log("selection ", this.editor.view.state.selection);
+      let $anchor = this.editor.view.state.selection.$anchor;
+
+      //  let pos = this.editor.view.state.selection;
+
+      // this.editor
+      //   .chain()
+      //   .selectParentNode(this.editor.view.state.selection).focus('end')
+      //   .setHighlight({ color: "#ffcc00" }).run();
+
+      // if (this.editor && this.editor.isActive("comment")) {
+      console.log($anchor);
+      if ($anchor && $anchor.nodeAfter) {
+        const posAfter = new NodeSelection($anchor);
+        console.log({ posAfter });
+        $anchor = posAfter.to;
+      } else {
+        $anchor = $anchor.pos;
+      }
+
+      // } else {
+      //   $anchor = $anchor.head;
+      // }
+
       this.editor
         .chain()
-        .focus()
-        .setHardBreak()
+        .focus($anchor)
         .insertTable({ rows: setRows, cols: setCols, withHeaderRow: true })
         .run();
 
@@ -260,14 +288,20 @@ export default {
           icon: "indent-increase",
           iconType: "remix",
           title: "indent",
-          action: () => this.editor.chain().focus().indent().run(),
+          action: () => {
+            if (this.editor.isActive("comment")) return;
+            return this.editor.chain().focus().indent().run();
+          },
           isActive: () => this.editor.isActive("indent"),
         },
         {
           icon: "list-unordered",
           iconType: "remix",
           title: "Bullet List",
-          action: () => this.editor.chain().focus().toggleBulletList().run(),
+          action: () => {
+            if (this.editor.isActive("comment")) return;
+            return this.editor.chain().focus().toggleBulletList().run();
+          },
           isActive: () => this.editor.isActive("bulletList"),
         },
         {
@@ -340,7 +374,7 @@ export default {
           type: "divider",
         },
         {
-          icon:CommentIcon,
+          icon: CommentIcon,
           iconType: "inline",
           title: "comment",
           //  action: () => this.editor.commands.scrollToNextComment(),

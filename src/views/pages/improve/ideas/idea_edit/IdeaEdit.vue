@@ -387,6 +387,9 @@ export default {
         });
       }
 
+			console.log(allFilesInContent)
+			console.log(this.ideaForm._fields.removeFileIds)
+
       console.log("Removing resources: ", this.ideaForm._fields.removeFileIds);
 
       if (fileNodesInContent.length === 0) {
@@ -445,6 +448,7 @@ export default {
       } catch (e) {
         console.log(e);
       } finally {
+				this.ideaForm._fields.removeFileIds = [];
         this.isSaving = false;
         this.isLoading = false;
       }

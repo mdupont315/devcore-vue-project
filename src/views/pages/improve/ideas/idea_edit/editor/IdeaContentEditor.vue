@@ -86,6 +86,13 @@ export default {
     };
   },
   methods: {
+    handleKeyup(e) {
+      console.log(e);
+      if (e && e.keyCode === 9) {
+        e.preventDefault();
+      }
+    	return;
+    },
     focusEditor() {
       this.editor?.commands.focus();
     },
@@ -215,17 +222,20 @@ export default {
 
             for (const comment of comments) {
               const { from } = comment;
+              console.log(comment);
 
-            //  replaceTr.setNodeMarkup(from, schema.nodes.paragraph);
+              replaceTr.setNodeMarkup(from, schema.nodes.paragraph, {
+                id: comment.comment.uuid,
+              });
 
-              const emptyComment = JSON.stringify({
-                comments: [],
-                ideaUuid: comment.comment.ideaUuid,
-                uuid: comment.comment.uuid,
-              });
-              replaceTr.setNodeMarkup(from, schema.nodes.comment, {
-                comment: emptyComment,
-              });
+              // const emptyComment = JSON.stringify({
+              //   comments: [],
+              //   ideaUuid: comment.comment.ideaUuid,
+              //   uuid: comment.comment.uuid,
+              // });
+              // replaceTr.setNodeMarkup(from, schema.nodes.comment, {
+              //   comment: emptyComment,
+              // });
               // const [$start, $end] = [
               //   doc.resolve(comment.from),
               //   doc.resolve(comment.to),
@@ -243,37 +253,75 @@ export default {
         transformComments: (node) => {
           const curNode = JSON.parse(node.attrs.comment);
           console.log("current node: ", curNode);
+					// console.log()
+          if (
+            !this.editor.view.state.selection.empty ||
+            (!this.editor.isActive("paragraph") &&
+              this.editor.isActive("comment"))
+          ) {
+            return;
+          }
+
           const {
             state: { doc, tr, schema },
             view: { dispatch },
           } = this.editor;
-          const comments = [];
-          doc.descendants((node, pos) => {
-            if (node.type.name !== "comment") return;
-            const [from, to] = [pos, pos + node.nodeSize];
 
-            const [comment, content] = [
-              JSON.parse(node.attrs.comment),
-              node.content,
-            ];
+          // const paragraphs = [];
+          // const comments = [];
+          // doc.descendants((node, pos) => {
+          //   if (node.type.name !== "comment") return;
+          //   const [from, to] = [pos, pos + node.nodeSize];
 
-            comments.push({ from, to, comment, content });
-          });
+          //   const [comment, content] = [
+          //     JSON.parse(node.attrs.comment),
+          //     node.content,
+          //   ];
 
-          const curComment = comments.filter(
-            (commentEntity) => commentEntity.comment.uuid === curNode.uuid
-          );
-          console.log(curComment);
+          //   comments.push({ from, to, comment, content });
+          // });
+
+          console.log("selection ", this.editor.view.state.selection);
+          this.editor
+            .chain()
+            .focus()
+            .selectParentNode(this.editor.view.state.selection)
+            .setComment(JSON.stringify(curNode))
+            .run();
+
+          //this.editor.commands.setComment(JSON.stringify(curNode));
+
+          // this.editor.commands.setHighlight({ color: "#ffcc00" });
+          // console.log("is empty ", this.editor.view.state.selection.empty);
+          // const [$from, $to] = [
+          //   doc.resolve(paragraphs[0].from),
+          //   doc.resolve(paragraphs[0].to),
+          // ];
+          // const sel = new TextSelection($from, $to);
+          // console.log($from, $to)
+          // console.log(sel);
+          // dispatch(tr.setSelection(sel));
+          // //	const sel = new TextSelection($from, $to);
+          // setTimeout(() => {
+          //   this.editor.commands.setHighlight({ color: "#ffcc00" });
+          // });
+
+          //		this.editor.commands.toggleHighlight();
+
+          // const curComment = comments.filter(
+          //   (commentEntity) => commentEntity.comment.uuid === curNode.uuid
+          // );
+          //  console.log(curComment);
           // console.log({comments})
           //           this.editor.chain().focus().setComment(
           //   JSON.stringify({
           //     this.editor.commands.setComment(JSON.stringify(dataToInsert));,
           //   })
 
-          console.log(curNode);
-          console.log(comments);
+          //   console.log(curNode);
+          // console.log(comments);
 
-          this.editor.commands.setComment(JSON.stringify(curNode));
+          //   this.editor.commands.setComment(JSON.stringify(curNode));
         },
       };
 
@@ -311,11 +359,12 @@ export default {
   },
 
   mounted() {
+    document.addEventListener("keydown", this.handleKeyup);
     this.initEditor();
   },
   beforeDestroy() {
     this.editor.destroy();
-    // this.provider.destroy();
+		document.removeEventListener("keydown", this.handleKeyup);
   },
 };
 </script>
@@ -746,9 +795,22 @@ export default {
     width: 90%;
 
     .delete-table-button {
-      background-color: transparent;
-      color: red;
-      border: 1px solid gray;
+      // background-color: transparent;
+      // color: red;
+      // border: 1px solid gray;
+      font-family: "FuturaMedium";
+      color: #d0424d;
+      border: 1px solid lightgray;
+      width: 60px;
+      height: 20px;
+      position: relative;
+      border-radius: 3px;
+      background: #fff;
+      bottom: 2px;
+      &:hover {
+        background: #d0424d;
+        color: #fff;
+      }
     }
 
     .row-control-button-container {

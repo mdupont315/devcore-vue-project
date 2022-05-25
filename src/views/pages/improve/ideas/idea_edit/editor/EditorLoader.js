@@ -11,6 +11,7 @@ import TextStyle from "@tiptap/extension-text-style";
 import History from "@tiptap/extension-history";
 import FontFamily from "@tiptap/extension-font-family";
 import Link from "@tiptap/extension-link";
+import ListItem from "@tiptap/extension-list-item";
 
 // import HardBreak from "@tiptap/extension-hard-break";
 import { Color } from "@tiptap/extension-color";
@@ -23,7 +24,7 @@ import {
   File,
   Comment,
   ExternalVideo,
-  //Paragraph,
+  Paragraph,
   TrailingNode
 } from "./extensions";
 
@@ -197,11 +198,12 @@ export default class ContentEditor {
     this.fileHandlers = fileHandlers;
     this.extensions = [
       StarterKit.configure({
-        history: false
-        // paragraph: false
+        history: false,
+        paragraph: false,
+        listItem: false
         // hardBreak: false
       }),
-      // Paragraph,
+      Paragraph,
       // HardBreak.extend({
       //   addKeyboardShortcuts() {
       //     return {
@@ -210,6 +212,7 @@ export default class ContentEditor {
       //     };
       //   }
       // }),
+      ListItem,
       History.configure({ depth: 10 }),
       FontFamily.configure({
         types: ["textStyle"]
@@ -285,14 +288,46 @@ export default class ContentEditor {
 
       onUpdate: ({ editor }) => {
         setTimeout(() => {
+          editor.state.doc.descendants((node, pos, parent) => {
+            if (
+              ["orderedList", "bulletList", "listItem"].includes(node.type.name)
+            ) {
+              return true;
+            }
+
+            if (
+              node.type.name === "paragraph" &&
+              parent.type.name === "listItem" &&
+              node.attrs.indent > 0
+            ) {
+              editor.view.dispatch(
+                editor.state.tr.setNodeMarkup(pos, null, { indent: 0 })
+              );
+            }
+
+            return false;
+          });
+
           if (!this.dedupedCommentNodes) {
             this.dedupedCommentNodes = true;
 
-            if (editor && editor.isActive("comment")) {
-              setTimeout(() => {
-                this.editor.commands.transformComments(this.node);
-              }, 300);
-            }
+            // console.log(editor.isActive("paragraph"));
+
+            // console.log(editor.state.selection);
+            //   const $cursor = editor.state.selection.$cursor;
+
+            // console.log(editor)
+            // console.log("cursor position:", $cursor.pos);
+            // case delete from paragraph 1
+            // insert node between
+            // case backspace from comment
+            //  const hadComment = editor.state.selection.$head.parent
+            //    console.log($cursor)
+            // if (editor && editor.isActive("comment")) {
+            //   setTimeout(() => {
+            //     this.editor.commands.transformComments(this.node);
+            //   }, 300);
+            // }
             // if (editor.isActive("comment")) {
             //   setTimeout(() =>
             //     // setTimeout(() => debouncedDedupeCommentNodes(editor))
@@ -307,6 +342,12 @@ export default class ContentEditor {
 
           this.options.onUpdate(json);
         });
+      },
+      onTransaction: ({ editor }) => {
+        // //  setTimeout(() => {
+        //     const $cursor = editor.state.selection.$cursor;
+        //     console.log("on transaction position:", $cursor);
+        // //  }, 300);
       }
 
       // onFocus: ({ editor }) => {

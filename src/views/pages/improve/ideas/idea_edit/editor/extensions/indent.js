@@ -7,15 +7,6 @@ import {
 } from "@tiptap/core";
 import { TextSelection, Transaction } from "prosemirror-state";
 
-// declare module '@tiptap/core' {
-//   interface Commands<ReturnType> {
-//     indent: {
-//       indent: () => ReturnType
-//       outdent: () => ReturnType
-//     }
-//   }
-// }
-
 export const Indent = Extension.create({
   name: "indent",
 
@@ -78,7 +69,7 @@ export const Indent = Extension.create({
           .run();
         return false;
       },
-      outdent: () => ({ tr, state, dispatch, editor }) => {
+      outdent: (backspace = false) => ({ tr, state, dispatch, editor }) => {
         const { selection } = state;
         if (this.editor.isActive("comment") || selection.node) {
           return this.editor
@@ -86,6 +77,24 @@ export const Indent = Extension.create({
             .focus()
             .run();
         }
+        console.log("backspace", backspace);
+        console.log("selection", selection.$anchor.parentOffset);
+        console.log("fromto", selection.from !== selection.to);
+
+        if (backspace && selection.$anchor.parentOffset === 0) {
+          console.log("OUTDENTING!")
+          return false
+        }
+        if (
+          backspace &&
+          (selection.$anchor.parentOffset > 0 ||
+            selection.from !== selection.to)
+        ) {
+          console.log("backspace", backspace);
+          console.log(selection.from !== selection.to);
+          return false;
+        }
+
         tr = tr.setSelection(selection);
         tr = updateIndentLevel(
           tr,
@@ -170,13 +179,14 @@ const indent = () => ({ editor }) => {
   return false;
 };
 const outdent = outdentOnlyAtHead => ({ editor }) => {
+  console.log(outdentOnlyAtHead);
   if (
     !(
       isList(editor.state.doc.type.name, editor.extensionManager.extensions) ||
       (outdentOnlyAtHead && editor.state.selection.$head.parentOffset !== 0)
     )
   ) {
-    return editor.commands.outdent();
+    return editor.commands.outdent(outdentOnlyAtHead);
   }
   return false;
 };
