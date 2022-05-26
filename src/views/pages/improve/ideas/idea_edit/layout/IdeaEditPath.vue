@@ -40,276 +40,265 @@
           @submit.prevent="save"
           v-if="mutateForm"
         >
-            <!--  -->
-            <b-card-body
-              class="p-0 ideaEditPath-form-fields"
-              :style="idea.hasReviews ? 'max-height:28vh;' : 'max-height:65vh'"
-            >
-              <div class="form-group" style="max-height: calc(82vh - 160px)">
-                <div class="form-group">
-                  <div
-                    class="idea_edit_path_container-body-process-select-title"
-                  >
-                    {{ $t("Instruction title") }}
-                  </div>
-                  <b-form-input
-                    id="title"
-                    class="idea_edit_path_select_title"
-                    v-model.trim="mutateForm.title"
-                    v-validate="'required|min:4'"
-                    v-autofocus
-                    :disabled="mutateForm.busy"
-                    :placeholder="$t('Idea title')"
-                    type="text"
-                    name="title"
-                    autocomplete="off"
-                    autofocus
-                    :state="$validateState('title', mutateForm)"
-                  ></b-form-input>
-                  <label for="title">{{ $t("Idea title") }}</label>
-                  <b-form-invalid-feedback>{{
-                    $displayError("title", mutateForm)
-                  }}</b-form-invalid-feedback>
+          <!--  -->
+          <b-card-body
+            class="p-0 ideaEditPath-form-fields"
+            :style="idea.hasReviews ? 'max-height:28vh;' : 'max-height:65vh'"
+          >
+            <div class="form-group" style="max-height: calc(82vh - 160px)">
+              <div class="form-group">
+                <div class="idea_edit_path_container-body-process-select-title">
+                  {{ $t("Instruction title") }}
                 </div>
-
-                <div
-                  class="form-label-group select required"
-                  style="margin-top: 0"
-                >
-                  <div
-                    class="idea_edit_path_container-body-process-select-title"
-                  >
-                    {{ $t("stage") }}
-                  </div>
-                  <v-select
-                    class="idea_edit_path_select___stage"
-                    v-model="mutateForm.stageId"
-                    v-validate="'required'"
-                    label="title"
-                    data-vv-name="stage_id"
-                    :placeholder="$t('Stage')"
-                    :reduce="(stage) => stage.id"
-                    :options="process.process.stages"
-                    :class="{
-                      'is-invalid':
-                        $validateState('stage_id', mutateForm) === false,
-                      'is-valid':
-                        $validateState('stage_id', mutateForm) === true,
-                    }"
-                    @input="changeStage"
-                  ></v-select>
-                  <label for="stage">{{ $t("Stage") }}</label>
-                  <b-form-invalid-feedback>{{
-                    $displayError("stage_id", mutateForm)
-                  }}</b-form-invalid-feedback>
-                </div>
-                <div
-                  v-if="mutateForm.stageId"
-                  class="form-label-group select required"
-                >
-                  <div
-                    class="idea_edit_path_container-body-process-select-title"
-                  >
-                    {{ $t("operation") }}
-                  </div>
-                  <v-select
-                    class="idea_edit_path_select___operation"
-                    v-model="mutateForm.operationId"
-                    v-if="mutateForm.stageId"
-                    v-validate="''"
-                    label="title"
-                    data-vv-name="operation_id"
-                    :placeholder="$t('Operation')"
-                    :reduce="(operation) => operation.id"
-                    :options="operations"
-                    :class="{
-                      'is-invalid':
-                        $validateState('operation', mutateForm) === false,
-                      'is-valid':
-                        $validateState('operation', mutateForm) === true,
-                    }"
-                    @input="changeOperation"
-                  ></v-select>
-                  <label for="operation">{{ $t("Operation") }}</label>
-                  <b-form-invalid-feedback>{{
-                    $displayError("operation_id", mutateForm)
-                  }}</b-form-invalid-feedback>
-                </div>
-
-                <div
-                  v-if="mutateForm.operationId"
-                  class="form-label-group select required"
-                >
-                  <div
-                    class="idea_edit_path_container-body-process-select-title"
-                  >
-                    {{ $t("phase") }}
-                  </div>
-                  <v-select
-                    class="idea_edit_path_select___phase"
-                    v-if="mutateForm.operationId"
-                    v-model="mutateForm.phaseId"
-                    v-validate="''"
-                    label="title"
-                    data-vv-name="phase_id"
-                    :placeholder="$t('Phase')"
-                    :reduce="(phase) => phase.id"
-                    :options="phases"
-                    @input="changePhase"
-                    :class="{
-                      'is-invalid':
-                        $validateState('phase', mutateForm) === false,
-                      'is-valid': $validateState('phase', mutateForm) === true,
-                    }"
-                  ></v-select>
-                  <label for="operation">{{ $t("Operation") }}</label>
-                  <b-form-invalid-feedback>{{
-                    $displayError("operation_id", mutateForm)
-                  }}</b-form-invalid-feedback>
-                </div>
-                <div class="form-group">
-                  <div
-                    class="idea_edit_path_container-body-process-select-title"
-                  >
-                    {{ $t("roles") }}
-                  </div>
-                  <role-selector
-                    v-if="roleIntent"
-                    name="idea_roles"
-                    id="idea_roles"
-                    class="idea_edit_path_select_idea_roles"
-                    autocomplete="idea_roles"
-                    :placeholder="$t('Roles')"
-                    :disabled="mutateForm.busy"
-                    v-model="mutateForm.companyRoleIds"
-                    :show-field="true"
-                    :state="$validateState('companyRoleIds', mutateForm)"
-                    :items="selectablePathRoles"
-                    :show-add-btn="false"
-                    :key="roleIntent"
-                  ></role-selector>
-                </div>
-                <div class="form-label-group select">
-                  <div
-                    class="idea_edit_path_container-body-process-select-title"
-                  >
-                    {{ $t("Tools") }}
-                  </div>
-
-                  <idea-tool-selector
-                    v-if="toolIntent"
-                    name="tools"
-                    class="idea_edit_path_select_tools"
-                    id="tools"
-                    autocomplete="tools"
-                    :placeholder="$t('Tools')"
-                    :disabled="mutateForm.busy"
-                    v-model="mutateForm.companyToolIds"
-                    :show-field="true"
-                    :state="$validateState('companyRoleIds', mutateForm)"
-                    :items="allTools"
-                    :show-add-btn="false"
-                    :key="toolIntent"
-                  ></idea-tool-selector>
-                </div>
-
-                <div
-                  class="form-group"
-                  style="max-height: 200px; overflow: hidden"
-                >
-                  <div
-                    class="idea_edit_path_container-body-process-select-title"
-                  >
-                    {{ $t("Instruction description") }}
-                  </div>
-                  <b-form-textarea
-                    id="description"
-                    class="idea_edit_path_select_description"
-                    v-model="mutateForm.description"
-                    v-autoresize
-                    v-validate="''"
-                    no-resize
-                    size="sm"
-                    :disabled="mutateForm.busy"
-                    :placeholder="$t('Idea description')"
-                    name="description"
-                    :state="$validateState('description', mutateForm)"
-                  ></b-form-textarea>
-                  <label for="description">{{ $t("Idea description") }}</label>
-                  <b-form-invalid-feedback>{{
-                    $displayError("description", mutateForm)
-                  }}</b-form-invalid-feedback>
-                </div>
+                <b-form-input
+                  id="title"
+                  class="idea_edit_path_select_title"
+                  v-model.trim="mutateForm.title"
+                  v-validate="'required|min:4'"
+                  v-autofocus
+                  :disabled="mutateForm.busy"
+                  :placeholder="$t('Idea title')"
+                  type="text"
+                  name="title"
+                  autocomplete="off"
+                  autofocus
+                  :state="$validateState('title', mutateForm)"
+                ></b-form-input>
+                <label for="title">{{ $t("Idea title") }}</label>
+                <b-form-invalid-feedback>{{
+                  $displayError("title", mutateForm)
+                }}</b-form-invalid-feedback>
               </div>
-            </b-card-body>
-            <b-card-footer class="ideaEditPath-form-actions">
-              <b-col
-                style="
-                  display: flex;
-                  justify-content: space-evenly;
-                  margin-top: 10px;
-                  flex-direction: row;
-                  padding: 10px 0px;
-                  height: 60px;
-                  gap: 12px;
-                "
+
+              <div
+                class="form-label-group select required"
+                style="margin-top: 0"
               >
-                <loading-button
-                  v-if="
-                    idea.status === 'NEW' &&
-                    $can('improve/idea/change_status', idea)
-                  "
-                  :disabled="vErrors.any() || isLoading"
-                  variant="primary"
-                  size="lg"
-                  style="flex-grow: 1; width: 30%;border-radius:3px;"
-                  :loading="isLoading"
-                  @click="updateStatus"
-                  >{{ $t("Test") }}</loading-button
-                >
-                <loading-button
-                  v-if="
-                    idea.status === 'TESTING' &&
-                    $can('improve/idea/change_status', idea)
-                  "
-                  variant="primary"
-                  size="lg"
-                  :loading="isLoading"
-                  style="flex-grow: 1; width: 30%;border-radius:3px;"
-                  :disabled="vErrors.any() || isLoading"
-                  @click="updateStatus"
-                  >{{ $t("Adopt") }}</loading-button
-                >
-                <loading-button
-                  :disabled="vErrors.any() || isLoading"
-                  :loading="isLoading"
-                  size="lg"
-                  block
-                  style="flex-grow: 1; width: 30%;border-radius:3px;"
-                  type="submit"
-                  >{{ $t("Save") }}</loading-button
-                >
-                <confirm-button
-                  buttonVariant="outline-danger"
-                  size="lg"
-                  :isDisabled="isLoading"
-                  :btnClass="
-                    isLoading
-                      ? 'ideaEdit_path_remove_button-disabled'
-                      : 'ideaEdit_path_remove_button-enabled'
-                  "
-                  :confirm-title="$t('Delete') + ' ' + mutateForm.title + '?'"
-                  :confirmPlacement="'top'"
-                  style="width: 30%; flex-grow: 1;border-radius:3px;"
-                  :confirm-message="$t('This action cannot be undone!')"
-                  @confirm="deleteItem"
-                >
-                  <div class="ideaEditPath-remove-idea-button">
-                    {{ $t("Remove") }}
-                  </div>
-                </confirm-button>
-              </b-col>
-            </b-card-footer>
+                <div class="idea_edit_path_container-body-process-select-title">
+                  {{ $t("stage") }}
+                </div>
+                <v-select
+                  class="idea_edit_path_select___stage"
+                  v-model="mutateForm.stageId"
+                  v-validate="'required'"
+                  label="title"
+                  data-vv-name="stage_id"
+                  :placeholder="$t('Stage')"
+                  :reduce="(stage) => stage.id"
+                  :options="process.process.stages"
+                  :class="{
+                    'is-invalid':
+                      $validateState('stage_id', mutateForm) === false,
+                    'is-valid': $validateState('stage_id', mutateForm) === true,
+                  }"
+                  @input="changeStage"
+                ></v-select>
+                <label for="stage">{{ $t("Stage") }}</label>
+                <b-form-invalid-feedback>{{
+                  $displayError("stage_id", mutateForm)
+                }}</b-form-invalid-feedback>
+              </div>
+              <div
+                v-if="mutateForm.stageId"
+                class="form-label-group select required"
+              >
+                <div class="idea_edit_path_container-body-process-select-title">
+                  {{ $t("operation") }}
+                </div>
+                <v-select
+                  class="idea_edit_path_select___operation"
+                  v-model="mutateForm.operationId"
+                  v-if="mutateForm.stageId"
+                  v-validate="''"
+                  label="title"
+                  data-vv-name="operation_id"
+                  :placeholder="$t('Operation')"
+                  :reduce="(operation) => operation.id"
+                  :options="operations"
+                  :class="{
+                    'is-invalid':
+                      $validateState('operation', mutateForm) === false,
+                    'is-valid':
+                      $validateState('operation', mutateForm) === true,
+                  }"
+                  @input="changeOperation"
+                ></v-select>
+                <label for="operation">{{ $t("Operation") }}</label>
+                <b-form-invalid-feedback>{{
+                  $displayError("operation_id", mutateForm)
+                }}</b-form-invalid-feedback>
+              </div>
+
+              <div
+                v-if="mutateForm.operationId"
+                class="form-label-group select required"
+              >
+                <div class="idea_edit_path_container-body-process-select-title">
+                  {{ $t("phase") }}
+                </div>
+                <v-select
+                  class="idea_edit_path_select___phase"
+                  v-if="mutateForm.operationId"
+                  v-model="mutateForm.phaseId"
+                  v-validate="''"
+                  label="title"
+                  data-vv-name="phase_id"
+                  :placeholder="$t('Phase')"
+                  :reduce="(phase) => phase.id"
+                  :options="phases"
+                  @input="changePhase"
+                  :class="{
+                    'is-invalid': $validateState('phase', mutateForm) === false,
+                    'is-valid': $validateState('phase', mutateForm) === true,
+                  }"
+                ></v-select>
+                <label for="operation">{{ $t("Operation") }}</label>
+                <b-form-invalid-feedback>{{
+                  $displayError("operation_id", mutateForm)
+                }}</b-form-invalid-feedback>
+              </div>
+              <div class="form-group">
+                <div class="idea_edit_path_container-body-process-select-title">
+                  {{ $t("roles") }}
+                </div>
+                <role-selector
+                  v-if="roleIntent"
+                  name="idea_roles"
+                  id="idea_roles"
+                  class="idea_edit_path_select_idea_roles"
+                  autocomplete="idea_roles"
+                  :placeholder="$t('Roles')"
+                  :disabled="mutateForm.busy"
+                  v-model="mutateForm.companyRoleIds"
+                  :show-field="true"
+                  :state="$validateState('companyRoleIds', mutateForm)"
+                  :items="selectablePathRoles"
+                  :show-add-btn="false"
+                  :key="roleIntent"
+                ></role-selector>
+              </div>
+              <div class="form-label-group select">
+                <div class="idea_edit_path_container-body-process-select-title">
+                  {{ $t("Tools") }}
+                </div>
+
+                <idea-tool-selector
+                  v-if="toolIntent"
+                  name="tools"
+                  class="idea_edit_path_select_tools"
+                  id="tools"
+                  autocomplete="tools"
+                  :placeholder="$t('Tools')"
+                  :disabled="mutateForm.busy"
+                  v-model="mutateForm.companyToolIds"
+                  :show-field="true"
+                  :state="$validateState('companyRoleIds', mutateForm)"
+                  :items="allTools"
+                  :show-add-btn="false"
+                  :key="toolIntent"
+                ></idea-tool-selector>
+              </div>
+
+              <div
+                class="form-group"
+                style="max-height: 200px; overflow: hidden"
+              >
+                <div class="idea_edit_path_container-body-process-select-title">
+                  {{ $t("Instruction description") }}
+                </div>
+                <b-form-textarea
+                  id="description"
+                  class="idea_edit_path_select_description"
+                  v-model="mutateForm.description"
+                  v-autoresize
+                  v-validate="''"
+                  no-resize
+                  size="sm"
+                  :disabled="mutateForm.busy"
+                  :placeholder="$t('Idea description')"
+                  name="description"
+                  :state="$validateState('description', mutateForm)"
+                ></b-form-textarea>
+                <label for="description">{{ $t("Idea description") }}</label>
+                <b-form-invalid-feedback>{{
+                  $displayError("description", mutateForm)
+                }}</b-form-invalid-feedback>
+              </div>
+            </div>
+          </b-card-body>
+          <b-card-footer class="ideaEditPath-form-actions">
+            <b-col
+              style="
+                display: flex;
+                justify-content: space-evenly;
+                margin-top: 10px;
+                flex-direction: row;
+                padding: 10px 0px;
+                height: 60px;
+                gap: 12px;
+              "
+            >
+              <loading-button
+                v-if="
+                  idea.status === 'NEW' &&
+                  $can('improve/idea/change_status', idea)
+                "
+                :disabled="vErrors.any() || isLoading"
+                variant="primary"
+                size="lg"
+                style="flex-grow: 1; width: 30%; border-radius: 3px"
+                :loading="false"
+                @click="updateStatus"
+                >{{ $t("Test") }}</loading-button
+              >
+              <loading-button
+                v-if="
+                  idea.status === 'TESTING' &&
+                  $can('improve/idea/change_status', idea)
+                "
+                variant="primary"
+                size="lg"
+                :loading="false"
+                style="flex-grow: 1; width: 30%; border-radius: 3px"
+                :disabled="vErrors.any() || isLoading"
+                @click="updateStatus"
+                >{{ $t("Adopt") }}</loading-button
+              >
+              <loading-button
+                :disabled="vErrors.any() || isLoading"
+                :loading="false"
+                size="lg"
+                block
+                style="flex-grow: 1; width: 30%; border-radius: 3px"
+                type="submit"
+                >{{ $t("Save") }}</loading-button
+              >
+              <confirm-button
+                buttonVariant="outline-danger"
+                size="lg"
+                :isDisabled="isLoading"
+                :btnClass="
+                  isLoading
+                    ? 'ideaEdit_path_remove_button-disabled'
+                    : 'ideaEdit_path_remove_button-enabled'
+                "
+                :confirm-title="$t('Delete') + ' ' + mutateForm.title + '?'"
+                :confirmPlacement="'top'"
+                style="
+                  width: 30%;
+                  flex-grow: 1;
+                  border-radius: 3px;
+                  text-align: center;
+                "
+                :confirm-message="$t('This action cannot be undone!')"
+                @confirm="deleteItem"
+              >
+                <div class="ideaEditPath-remove-idea-button">
+                  {{ $t("Remove") }}
+                </div>
+              </confirm-button>
+            </b-col>
+          </b-card-footer>
         </b-form>
       </div>
     </div>
@@ -644,10 +633,19 @@ export default {
 .v-select .vs__clear {
   fill: #fff;
 }
-.ideaEditPath-remove-idea-button:hover {
+.ideaEdit_path_remove_button-enabled > .ideaEditPath-remove-idea-button:hover {
   height: 100%;
   place-items: center;
   display: flex;
+  place-content: center;
+  border: none;
+}
+
+.ideaEditPath-remove-idea-button {
+  padding: 0;
+  height: 100%;
+  display: flex;
+  place-items: center;
   place-content: center;
 }
 

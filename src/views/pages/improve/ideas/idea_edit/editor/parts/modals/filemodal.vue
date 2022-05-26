@@ -26,10 +26,11 @@
             <div @drop="dragFile" class="choose_file_dropzone_dropArea">
               <div class="dropzone-content">
                 <div class="dropzone-custom-image">
-                  <i class="ri-image-line ri-4x" style="color: #c4c4c4"></i>
+                  <i class="ri-image-line ri-4x" style="color: #c4c4c4" v-if="fileModalTexts.type === 'preview'"></i>
+                  <i class="ri-file-3-line ri-4x" style="color: #c4c4c4" v-else></i>
                 </div>
                 <div class="dropzone-custom-title">
-                  {{ $t("Select or Drag Image") }}
+                  {{ fileModalTexts.primary }}
                 </div>
               </div>
             </div>
@@ -43,11 +44,7 @@
         </div>
 
         <div class="dropzone-footer">
-          {{
-            $t("You can upload up to size", {
-              size: maxFilesize,
-            })
-          }}
+          {{ fileModalTexts.secondary }}
         </div>
       </div>
     </div>
@@ -61,11 +58,14 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    fileModalTexts: {
+      type: Object,
+      default: () => {},
+    },
   },
 
   data: function () {
     return {
-      maxFilesize: 6,
       fileAdded: false,
       draggingFile: false,
     };
@@ -173,7 +173,7 @@ input[type="file"] {
   font-family: FuturaLight;
   font-size: 16px;
   max-width: 325px;
-	margin: auto;
+  margin: auto;
   text-align: center;
 }
 .image-modal-dropzone-wrapper {
@@ -195,8 +195,8 @@ input[type="file"] {
 }
 .image-modal-close-container {
   border-radius: 50%;
-	    margin-top: 35px;
-    margin-right: 20px;
+  margin-top: 35px;
+  margin-right: 20px;
 
   display: flex;
   height: 100%;

@@ -277,6 +277,14 @@
   "ideas": "ideat",
   "budget": "budjetti",
   "type": "tyyppi",
+  "ADDROW": "Lisää rivi",
+  "REMOVEROW": "Poista rivi",
+  "ADDCOL": "Lisää sarake",
+  "REMOVECOL": "Poista sarake",
+  "REMOVETABLE": "Poista taulukko",
+  "REMOVE": "Poista",
+  "InsertLinkTitle": "Aseta hyperlinkki",
+  "InsertVideoTitle": "Aseta www sivujen osoite",
   "NoRolesSelected": "Aseta",
   "AdvancedForm-switch-info": "Lisäasetukset",
   "inUse": "ovat käytössä",
@@ -693,5 +701,7 @@
   "Insert": "Aseta",
   "AddNewTable": "Lisää uusi taulukko",
   "Select or Drag Image": "Valitse kuva tietokoneelta tai raahaa tähän.",
-  "You can upload up to size": "Suurin kuvakoko on {size} mb. Tuetut formaatit: JPEG, PNG, GIF, SVG"
+  "You can upload up to size": "Suurin kuvakoko on {size} mb. Tuetut formaatit: JPEG, PNG, GIF, SVG",
+  "Select or Drag Attachment": "Valitse liite tietokoneelta tai raahaa tähän.",
+  "You can upload attachment up to size": "Suurin liitekoko on {size} mb."
 }

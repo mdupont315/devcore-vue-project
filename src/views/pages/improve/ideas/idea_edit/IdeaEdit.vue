@@ -237,8 +237,6 @@ export default {
       }
     },
     async setFile(file) {
-      console.log("@setting file!");
-      console.log(file);
       const items = [...this.files, file];
       this.files = items;
       this.filesChanged = true;
@@ -335,7 +333,6 @@ export default {
 
       let ideaSave = null;
       this.ideaForm.processId = this.processPath.process.id;
-      console.log(this.ideaForm);
       if (this.ideaForm.id) {
         ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
       } else {
@@ -364,20 +361,12 @@ export default {
 
     syncFiles() {
       const fileNodesInContent = this.getImageNodesFromContent();
-			//console.log(fileNodesInContent)
       const allFilesInContent = fileNodesInContent.map((x) => x.attrs);
       const savedFiles = this.getIdea.files.map((file) => file.uri);
 
       if (allFilesInContent.length > 0) {
-				//console.log(allFilesInContent.map((x) => x.id));
-				//console.log(savedFiles);
         savedFiles.forEach((uri) => {
-          //file id in content is file uri in server
           const contentFileIds = allFilesInContent.map((x) => x.id);
-					//console.log("uri should be included: ", uri)
-					//console.log("in array: ", contentFileIds)
-					//console.log( !contentFileIds.includes(uri) )
-					//console.log( !this.ideaForm._fields.removeFileIds.includes(uri) )
           if (
             !contentFileIds.includes(uri) &&
             !this.ideaForm._fields.removeFileIds.includes(uri)
@@ -387,10 +376,14 @@ export default {
         });
       }
 
-			console.log(allFilesInContent)
-			console.log(this.ideaForm._fields.removeFileIds)
+      // dont remove files that actually exist in content
+			const allFilesInContentIds = allFilesInContent.map((x) => x.id)
 
-      console.log("Removing resources: ", this.ideaForm._fields.removeFileIds);
+      this.ideaForm._fields.removeFileIds = this.ideaForm._fields.removeFileIds.filter((uri) => {
+				if (allFilesInContentIds.includes(uri)) return false
+				return true
+      });
+
 
       if (fileNodesInContent.length === 0) {
         this.ideaForm._fields.removeFile = true;
@@ -448,7 +441,7 @@ export default {
       } catch (e) {
         console.log(e);
       } finally {
-				this.ideaForm._fields.removeFileIds = [];
+        this.ideaForm._fields.removeFileIds = [];
         this.isSaving = false;
         this.isLoading = false;
       }

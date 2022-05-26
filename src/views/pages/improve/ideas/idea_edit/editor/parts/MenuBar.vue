@@ -37,11 +37,15 @@
     </template>
 
     <table-modal v-model="showTablePrompt" @tableCreate="createTable" />
-    <image-modal v-model="showImagePrompt" @setFiles="setFiles" />
+    <file-modal
+      v-model="showImagePrompt"
+      @setFiles="setFiles"
+      :fileModalTexts="fileModalTexts"
+    />
     <embed-modal
       v-model="showEmbedPrompt"
       @setEmbed="setEmbed"
-      :previousUrl="getPreviousUrl"
+      :configs="getConfigs"
       :type="embedType"
     />
   </div>
@@ -51,9 +55,10 @@
 import MenuItem from "./MenuItem.vue";
 import MenuList from "./MenuList.vue";
 import MenuPrompt from "./MenuPrompt";
-import { TableModal, ImageModal, EmbedModal } from "./modals";
+import { TableModal, FileModal, EmbedModal } from "./modals";
 import { CommentIcon } from "@/assets";
-import { TextSelection, NodeSelection } from "prosemirror-state";
+import { NodeSelection } from "prosemirror-state";
+import { MAX_FILE_SIZE } from "./modals/constants";
 
 export default {
   components: {
@@ -61,7 +66,7 @@ export default {
     "menu-list": MenuList,
     "menu-prompt": MenuPrompt,
     "table-modal": TableModal,
-    "image-modal": ImageModal,
+    "file-modal": FileModal,
     "embed-modal": EmbedModal,
   },
   methods: {
@@ -100,7 +105,7 @@ export default {
       this.embedType = null;
     },
     setFiles(files) {
-      this.imagePromptOpen = !this.imagePromptOpen;
+      this.filePromptOpen = !this.filePromptOpen;
       this.editor.commands.setImage(files);
     },
     createTable(data) {
@@ -142,6 +147,29 @@ export default {
 
       this.tablePromptOpen = !this.tablePromptOpen;
     },
+
+    setFilePromptOpen(type) {
+      switch (type) {
+        case "nonpreview":
+          this.fileModalTexts = {
+            type: "nonpreview",
+            primary: this.$t("Select or Drag Attachment"),
+            secondary: this.$t("You can upload attachment up to size", {
+              size: MAX_FILE_SIZE,
+            }),
+          };
+          break;
+        default:
+          this.fileModalTexts = {
+            type: "preview",
+            primary: this.$t("Select or Drag Image"),
+            secondary: this.$t("You can upload image up to size", {
+              size: MAX_FILE_SIZE,
+            }),
+          };
+      }
+      this.filePromptOpen = !this.filePromptOpen;
+    },
   },
   props: {
     editor: {
@@ -150,20 +178,38 @@ export default {
     },
   },
   computed: {
-    getPreviousUrl: {
+    getConfigs: {
       get() {
-        if (this.embedType === "link" && this.editor) {
+        if (!this.editor) return;
+        if (this.embedType === "link") {
           const { state } = this.editor;
           const { from, to } = state.selection;
+          let configs = {
+            url: "",
+            title: this.$t("InsertLinkTitle"),
+            placeholder: "Https://",
+						text: ""
+          };
+
           let marks = [];
           state.doc.nodesBetween(from, to, (node) => {
             marks = [...marks, ...node.marks];
           });
           const mark = marks.find((markItem) => markItem.type.name === "link");
-
+					console.log(mark)
           if (mark && mark.attrs && mark.attrs.href) {
-            return mark.attrs.href;
+            configs.url = mark.attrs.href;
           }
+          return configs;
+        }
+        if (this.embedType == "video") {
+          let configs = {
+            url: "",
+            title: this.$t("InsertVideoTitle"),
+            placeholder: "Https://",
+						text: null
+          };
+          return configs;
         }
         return null;
       },
@@ -178,10 +224,10 @@ export default {
     },
     showImagePrompt: {
       get() {
-        return this.imagePromptOpen;
+        return this.filePromptOpen;
       },
       set(val) {
-        this.imagePromptOpen = val;
+        this.filePromptOpen = val;
       },
     },
     showEmbedPrompt: {
@@ -196,8 +242,14 @@ export default {
   data() {
     return {
       embedType: "",
+      fileModalTexts: {
+        primary: this.$t("Select or Drag Image"),
+        secondary: this.$t("You can upload up to size", {
+          size: MAX_FILE_SIZE,
+        }),
+      },
       tablePromptOpen: false,
-      imagePromptOpen: false,
+      filePromptOpen: false,
       embedPromptOpen: false,
       activeHeading: "h-3",
       items: [
@@ -314,17 +366,22 @@ export default {
         {
           type: "divider",
         },
-        // {
-        //   icon: "link",
-        //   iconType: "remix",
-        //   title: "link",
-        //   action: (file) => {
-        //     this.embedType = "link";
-        //     this.embedPromptOpen = !this.embedPromptOpen;
-        //   },
-
-        //   //action: (file) => this.editor.commands.setImage(file),
-        // },
+        {
+          icon: "link",
+          iconType: "remix",
+          title: "link",
+          action: (file) => {
+            this.embedType = "link";
+            this.embedPromptOpen = !this.embedPromptOpen;
+          },
+          isActive: () => this.editor.isActive("link"),
+        },
+        {
+          icon: "separator",
+          iconType: "remix",
+          title: "Horizontal Rule",
+          action: () => this.editor.chain().focus().setHorizontalRule().run(),
+        },
 
         {
           icon: "vidicon-line",
@@ -341,21 +398,22 @@ export default {
           //   height: file.height,
           // }),
         },
+
         {
           icon: "image-line",
           iconType: "remix",
           title: "Image",
           action: () => {
-            this.imagePromptOpen = !this.imagePromptOpen;
+            this.setFilePromptOpen("preview");
           },
-
-          //action: (file) => this.editor.commands.setImage(file),
         },
         {
-          icon: "separator",
+          icon: "file-3-line",
           iconType: "remix",
-          title: "Horizontal Rule",
-          action: () => this.editor.chain().focus().setHorizontalRule().run(),
+          title: "Attachment",
+          action: () => {
+            this.setFilePromptOpen("nonpreview");
+          },
         },
         {
           icon: "grid-line",

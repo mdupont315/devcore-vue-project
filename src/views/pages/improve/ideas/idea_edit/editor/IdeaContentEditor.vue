@@ -91,7 +91,7 @@ export default {
       if (e && e.keyCode === 9) {
         e.preventDefault();
       }
-    	return;
+      return;
     },
     focusEditor() {
       this.editor?.commands.focus();
@@ -253,7 +253,7 @@ export default {
         transformComments: (node) => {
           const curNode = JSON.parse(node.attrs.comment);
           console.log("current node: ", curNode);
-					// console.log()
+          // console.log()
           if (
             !this.editor.view.state.selection.empty ||
             (!this.editor.isActive("paragraph") &&
@@ -267,21 +267,32 @@ export default {
             view: { dispatch },
           } = this.editor;
 
-          // const paragraphs = [];
-          // const comments = [];
-          // doc.descendants((node, pos) => {
-          //   if (node.type.name !== "comment") return;
-          //   const [from, to] = [pos, pos + node.nodeSize];
+//           const paragraphs = [];
+//           const comments = [];
+//           doc.descendants((node, pos) => {
+//             if (node.type.name !== "comment") return;
+//             const [from, to] = [pos, pos + node.nodeSize];
 
-          //   const [comment, content] = [
-          //     JSON.parse(node.attrs.comment),
-          //     node.content,
-          //   ];
+//             const [comment, content] = [
+//               JSON.parse(node.attrs.comment),
+//               node.content,
+//             ];
 
-          //   comments.push({ from, to, comment, content });
-          // });
+// console.log(this.editor.view.state.selection)
+// console.log(to)
+// console.log(from)
+//             if (
+//               from >= this.editor.view.state.selection &&
+//               to <= this.editor.view.state.selection
+//             ) {
+//               comments.push({ from, to, comment, content });
+//             }
+//           });
 
-          console.log("selection ", this.editor.view.state.selection);
+//           console.log({ comments });
+
+//           console.log("selection ", this.editor.view.state.selection);
+//           comments.filter();
           this.editor
             .chain()
             .focus()
@@ -364,7 +375,7 @@ export default {
   },
   beforeDestroy() {
     this.editor.destroy();
-		document.removeEventListener("keydown", this.handleKeyup);
+    document.removeEventListener("keydown", this.handleKeyup);
   },
 };
 </script>

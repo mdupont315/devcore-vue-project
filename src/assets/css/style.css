@@ -40262,7 +40262,7 @@
     text-align: center;
     right: 0;
     z-index: 1;
-    width: calc(100vw - 250px);
+    width: calc(100% - 250px);
     border-bottom: 1px solid rgba(60,60,60,.26);
   }
 

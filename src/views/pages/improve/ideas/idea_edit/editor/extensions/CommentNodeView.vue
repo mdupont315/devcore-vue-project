@@ -221,11 +221,12 @@ export default {
     .comment {
       color: #fff;
       display: flex;
+			padding-top:2px;
       // animation-name: opacityanimation;
       //   animation-duration: 1s;
 
       .file {
-        margin-left: 10px;
+        margin-right: 8px;
         a {
           cursor: pointer;
           pointer-events: all;

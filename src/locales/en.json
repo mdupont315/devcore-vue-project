@@ -518,6 +518,14 @@
   "Remove": "Remove",
   "Files": "Files",
   "Add new": "Add new",
+  "ADDROW": "Add row",
+  "REMOVEROW": "Remove row",
+  "ADDCOL": "Add column",
+  "REMOVECOL": "Remove column",
+  "REMOVETABLE": "Remove table",
+  "REMOVE": "Remove",
+  "InsertLinkTitle": "Insert hyperlink",
+  "InsertVideoTitle": "Insert www-address",
   "Value": "Value",
   "Archived": "Archived",
   "Archived ideas": "Archived instructions",
@@ -663,5 +671,7 @@
   "Insert": "Insert",
   "AddNewTable": "Add new table",
   "Select or Drag Image": "Select images from files or drag your images here.",
-  "You can upload up to size": "You can upload image sizes up to {size} mb. Supported formats JPEG, PNG, GIF, SVG."
+  "You can upload image up to size": "You can upload image sizes up to {size} mb. Supported formats JPEG, PNG, GIF, SVG.",
+  "Select or Drag Attachment": "Select attachments from files or drag your attachments here.",
+  "You can upload attachment up to size": "You can upload attachment sizes up to {size} mb."
 }

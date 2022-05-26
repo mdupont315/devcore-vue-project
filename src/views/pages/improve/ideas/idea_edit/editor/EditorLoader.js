@@ -25,7 +25,7 @@ import {
   Comment,
   ExternalVideo,
   Paragraph,
-  TrailingNode
+  TrailingNode,
 } from "./extensions";
 
 // const dedupeComments = editor => {
@@ -221,7 +221,7 @@ export default class ContentEditor {
       // Draggable,
       Link.configure({
         HTMLAttributes: { target: "_blank" },
-        linkOnPaste: false,
+        linkOnPaste: true,
         openOnClick: true
       }),
       TextStyle,

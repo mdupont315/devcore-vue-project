@@ -98,94 +98,14 @@ export const Comment = Node.create({
 
         dispatch(tr.setSelection(sel).scrollIntoView());
 
+        console.log(sel)
+
         setTimeout(() => {
-          const selCommentStart = new TextSelection($to);
+          const selCommentStart = new TextSelection($from);
 
           dispatch(tr.setSelection(selCommentStart));
         }, 100);
       },
-      setCommentsToParent: () => ({ editor, commands }) => {
-        const {
-          state: {
-            doc,
-            selection: { from: selFrom, to: selTo },
-            schema,
-            tr
-          },
-          view: { dispatch }
-        } = editor;
-
-        let [commentNode, nodeBeforeCommentNode, lastNode] = new Array(3).fill(
-          null
-        );
-
-        doc.descendants((node, pos) => {
-          if (!node.isBlock || commentNode) return;
-
-          if (node.type.name === "comment") {
-            const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
-
-            const isNodeActiveCommentNode =
-              nodeFrom <= selFrom && selTo <= nodeTo;
-
-            if (isNodeActiveCommentNode) {
-              commentNode = { node, from: pos, to: pos + node.nodeSize };
-              nodeBeforeCommentNode = lastNode;
-            }
-          } else {
-            lastNode = {
-              node,
-              from: pos,
-              to: pos + node.nodeSize,
-              isEmpty: !node.textContent.length
-            };
-          }
-        });
-
-        if (
-          commentNode &&
-          nodeBeforeCommentNode &&
-          selFrom === commentNode.from + 1 &&
-          selTo === commentNode.from + 1
-        ) {
-          const beforeContent = nodeBeforeCommentNode.node.content;
-          const commentContent = commentNode.node.content;
-
-          const combinedContent = beforeContent.append(commentContent);
-
-          const newCommentWithCombinedContent = schema.nodes.comment.create(
-            commentNode.node.attrs,
-            combinedContent
-          );
-
-          let replaceTr = tr.replaceRangeWith(
-            nodeBeforeCommentNode.from,
-            commentNode.to - 2,
-            newCommentWithCombinedContent
-          );
-
-          console.log(replaceTr);
-          dispatch(replaceTr);
-
-          setTimeout(() => {
-            if (nodeBeforeCommentNode.isEmpty) {
-              const focusPos = editor.state.doc.resolve(
-                nodeBeforeCommentNode.from
-              );
-
-              const newSel = new TextSelection(focusPos);
-
-              editor.view.dispatch(editor.state.tr.setSelection(newSel));
-            }
-          }, 100);
-        } else {
-          const resolvedPos = doc.resolve(selFrom);
-
-          const newSel = new TextSelection(resolvedPos);
-
-          dispatch(tr.setSelection(newSel));
-        }
-      }
     };
   },
 

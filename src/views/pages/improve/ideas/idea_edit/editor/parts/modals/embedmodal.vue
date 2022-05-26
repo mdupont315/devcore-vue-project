@@ -1,22 +1,35 @@
 <template>
   <div>
-    <div v-if="getValue && type">
+    <div v-if="getValue && type && configs">
       <layer style="z-index: 2" @closed="$emit('input', false)" />
 
       <div class="embed-modal-prompt-wrapper">
         <div class="embed-modal-prompt-container">
           <div>
-            <div class="embed-modal-prompt-container-title">{{ type }}</div>
+            <div class="embed-modal-prompt-container-title">
+              {{ configs.title }}
+            </div>
             <b-form>
               <b-row>
                 <b-col class="col-12" ref="insert_iframe-url">
+                  <div class="form-label-group required form-group">
+                    <b-form-input
+                      v-if="configs.text"
+                      id="idea_edit_insert__url"
+                      name="idea_edit_insert__url"
+                      v-model="text"
+                      v-validate="'required'"
+                      :placeholder="configs.placeholder"
+                      type="text"
+                    ></b-form-input>
+                  </div>
                   <div class="form-label-group required form-group">
                     <b-form-input
                       id="idea_edit_insert__url"
                       name="idea_edit_insert__url"
                       v-model="url"
                       v-validate="'required'"
-                      :placeholder="getPlaceholder"
+                      :placeholder="configs.placeholder"
                       type="text"
                     ></b-form-input>
                   </div>
@@ -59,16 +72,17 @@ export default {
       type: String,
       default: () => "",
     },
-    previousUrl: {
-      type: String,
-      defautl: () => "",
+    configs: {
+      type: Object,
+      default: () => null,
     },
   },
   methods: {
     save() {
       this.$emit("setEmbed", {
         type: this.type,
-        url: this.url,
+				text: this.text,
+        url: this.url
       });
     },
     cancel() {
@@ -77,33 +91,23 @@ export default {
     },
   },
   watch: {
-    value: {
+    configs: {
+      deep: true,
       handler(newVal) {
-        if (!newVal) this.url = "https://";
-      },
-    },
-    previousUrl: {
-      handler(newVal) {
-        console.log(newVal);
-        if (newVal) this.url = newVal;
+        if (newVal) {
+          this.url = newVal.url;
+          this.text = newVal.text;
+        }
       },
     },
   },
   data() {
     return {
       url: "https://",
-      videoPlaceholder: "Insert video url",
-      linkPlaceholder: "Insert hyperlink url",
+      text: null,
     };
   },
   computed: {
-    getPlaceholder: {
-      get() {
-        return this.type === "video"
-          ? this.videoPlaceholder
-          : this.linkPlaceholder;
-      },
-    },
     getValue: {
       get() {
         return this.value;

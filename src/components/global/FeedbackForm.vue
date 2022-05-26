@@ -288,6 +288,8 @@ export default {
 }
 .feedback-form-footer-body {
   display: flex;
+    justify-content: space-around;
+
 }
 .feedbackIcon {
   border-radius: 50%;
