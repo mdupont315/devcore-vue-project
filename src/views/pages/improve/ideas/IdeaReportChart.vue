@@ -272,7 +272,7 @@ export default {
     width: calc(100%- 20px);
   }
   .idea-report {
-    height: 340px;
+    height: 255px;
   }
 }
 @media screen and (min-height: 900px) {
