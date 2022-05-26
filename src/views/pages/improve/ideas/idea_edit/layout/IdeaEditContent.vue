@@ -249,9 +249,19 @@ export default {
 }
 .idea_edit_content_container {
   background: #fff;
-	margin: 20px;
+  margin: 20px;
   border-radius: 3px;
   width: 75%;
   overflow: hidden;
+}
+@media screen and (max-height: 900px) {
+  .idea_edit_content_container {
+    margin-bottom: 20px;
+  }
+}
+@media screen and (min-height: 900px) {
+  .idea_edit_content_container {
+    margin-bottom: 0;
+  }
 }
 </style>

@@ -31,7 +31,10 @@
         class="bg-gray d-flex flex-column justify-content-center"
         style="min-height: 200px"
       >
-        <report-chart :idea="idea"></report-chart>
+        <report-chart
+          :idea="idea"
+          class="ideaEditPath-report-chart"
+        ></report-chart>
       </div>
       <div class="idea_edit_path_container-body-process">
         <b-form
@@ -43,7 +46,11 @@
           <!--  -->
           <b-card-body
             class="p-0 ideaEditPath-form-fields"
-            :style="idea.hasReviews ? 'max-height:28vh;' : 'max-height:65vh'"
+            :class="
+              idea.hasReviews
+                ? 'ideaEdit-form-hasReviews'
+                : 'ideaEdit-form-noReviews'
+            "
           >
             <div class="form-group" style="max-height: calc(82vh - 160px)">
               <div class="form-group">
@@ -556,7 +563,6 @@ export default {
   margin-left: 0px;
   overflow: scroll;
   font-family: "FuturaBQ";
-  ms-overflow-style: none;
   scrollbar-width: none;
 }
 
@@ -573,7 +579,7 @@ export default {
   border-radius: 5px;
   width: 25%;
   min-width: 300px;
-  margin: 20px 20px 20px 0px;
+  margin: 20px 20px 0px 0px;
 }
 
 .idea_edit_path_container-header {
@@ -703,6 +709,12 @@ export default {
   border-top: 1px solid #fff !important;
   border-left: 1px solid #fff !important;
   border-right: 1px solid #fff !important;
+  background: #fff;
+}
+.idea_edit_path_select_title:focus,
+.idea_edit_path_select_description:focus {
+  box-shadow: none !important;
+  border-bottom: 1px solid lightgray;
 }
 
 .idea_edit_path_select___phase > div,
@@ -719,5 +731,30 @@ export default {
 .idea_edit_path_select_title,
 .idea_edit_path_select_description {
   margin-left: -5px;
+}
+
+@media screen and (max-height: 900px) {
+  .ideaEditPath-report-chart > div > .idea-report {
+    max-height: 350px !important;
+    min-height: 350px !important;
+  }
+  .ideaEdit-form-hasReviews {
+    max-height: 20vh;
+  }
+  .ideaEdit-form-noReviews {
+    max-height: 57vh;
+  }
+}
+@media screen and (min-height: 900px) {
+  .ideaEditPath-report-chart > div > .idea-report {
+    max-height: 250px !important;
+    min-height: 250px !important;
+  }
+  .ideaEdit-form-hasReviews {
+    max-height: 27vh;
+  }
+  .ideaEdit-form-noReviews {
+    max-height: 64vh;
+  }
 }
 </style>

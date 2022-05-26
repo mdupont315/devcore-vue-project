@@ -377,13 +377,13 @@ export default {
       }
 
       // dont remove files that actually exist in content
-			const allFilesInContentIds = allFilesInContent.map((x) => x.id)
+      const allFilesInContentIds = allFilesInContent.map((x) => x.id);
 
-      this.ideaForm._fields.removeFileIds = this.ideaForm._fields.removeFileIds.filter((uri) => {
-				if (allFilesInContentIds.includes(uri)) return false
-				return true
-      });
-
+      this.ideaForm._fields.removeFileIds =
+        this.ideaForm._fields.removeFileIds.filter((uri) => {
+          if (allFilesInContentIds.includes(uri)) return false;
+          return true;
+        });
 
       if (fileNodesInContent.length === 0) {
         this.ideaForm._fields.removeFile = true;
@@ -519,9 +519,11 @@ export default {
 
 
 <style lang="scss" scoped>
+
 .idea_edit_container {
   width: 100%;
   // max-height: 82vh;
+	height: 90%;
   overflow: hidden;
   height: 100%;
   margin-top: 0px;

@@ -507,3 +507,16 @@ export default {
 </script>
 
 
+<style lang="scss">
+@media screen and (max-height: 1286px) and (min-height: 700px) {
+  #main-content {
+    max-height: 85vh;
+  }
+}
+@media screen and (min-height: 1286px) {
+  #main-content {
+    max-height: 100vh;
+  }
+}
+
+</style>

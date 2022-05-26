@@ -1,7 +1,7 @@
 <template>
   <div
     class="idea-report idea-report-chart report-chart d-flex flex-column"
-    style="min-height: 350px; padding: 20px; background: #fff"
+    style="min-height: 250px; padding: 20px; background: #fff"
   >
     <div
       class="period-selector text-right p-2 px-4 flex-grow-0 position-relative"
@@ -34,7 +34,7 @@
       <idea-chart
         :data="chartData.data"
         :options="chartData.options"
-        style="height: 300px; width: calc(100%- 20px)"
+        class="idea_chart_canvas_container"
       ></idea-chart>
     </div>
     <div
@@ -264,3 +264,25 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+@media screen and (max-height: 900px) {
+  .idea_chart_canvas_container {
+    height: 200px;
+    width: calc(100%- 20px);
+  }
+  .idea-report {
+    height: 340px;
+  }
+}
+@media screen and (min-height: 900px) {
+  .idea_chart_canvas_container {
+    height: 300px;
+    width: calc(100%- 20px);
+  }
+
+  .idea-report {
+    height: 340px;
+  }
+}
+</style>
