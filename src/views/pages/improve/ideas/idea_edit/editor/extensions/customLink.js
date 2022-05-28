@@ -47,7 +47,6 @@ export const CustomLink = Link.extend({
     ];
   },
   renderHTML({ mark, HTMLAttributes }) {
-    console.log(HTMLAttributes);
     const { uuid, href, target } = HTMLAttributes;
     return [
       "span",
@@ -67,9 +66,6 @@ export const CustomLink = Link.extend({
   addProseMirrorPlugins() {
     const { options } = this;
     const { removeLink } = options;
-    const { uuid, href } = options;
-
-    console.log(options);
 
     const plugins = [
       new Plugin({
@@ -80,7 +76,6 @@ export const CustomLink = Link.extend({
                 event.target.localName === "a" ||
                 event.target.getAttribute("uuid")
               ) {
-                console.log(event.target);
                 const uuid = event.target.getAttribute("data-uuid");
                 const href = event.target.getAttribute("href");
                 let links = [...document.querySelectorAll(".is-link")];
@@ -98,13 +93,10 @@ export const CustomLink = Link.extend({
               ) {
                 let links = [...document.querySelectorAll(".is-link")];
                 const uuid = event.target.previousSibling.getAttribute("data-uuid");
-                console.log(uuid);
-                console.log(links);
                 const [thisLink] = links.filter(
                   link =>
                     !!link.children[0] && link.children[0].dataset.uuid === uuid
                 );
-                console.log(thisLink);
                 if (!thisLink) return false;
                 thisLink.lastChild.setAttribute(
                   "data-tooltip",

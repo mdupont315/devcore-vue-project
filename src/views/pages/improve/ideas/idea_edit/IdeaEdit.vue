@@ -394,6 +394,13 @@ export default {
     async saveIdeaVersion() {
       this.isLoading = true;
       this.isSaving = true;
+      window.vm.$snotify.info(this.$t("Do not close window"), {
+				timeout: 5000,
+        showProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+      });
+
       try {
         //Sync files in server with files in content
         this.syncFiles();
@@ -441,6 +448,7 @@ export default {
       } catch (e) {
         console.log(e);
       } finally {
+				window.vm.$snotify.clear()
         this.ideaForm._fields.removeFileIds = [];
         this.isSaving = false;
         this.isLoading = false;
@@ -519,11 +527,10 @@ export default {
 
 
 <style lang="scss" scoped>
-
 .idea_edit_container {
   width: 100%;
   // max-height: 82vh;
-	height: 90%;
+  height: 90%;
   overflow: hidden;
   height: 100%;
   margin-top: 0px;

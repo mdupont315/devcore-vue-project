@@ -704,5 +704,7 @@
   "Select or Drag Image": "Valitse kuva tietokoneelta tai raahaa tähän.",
   "You can upload up to size": "Suurin kuvakoko on {size} mb. Tuetut formaatit: JPEG, PNG, GIF, SVG",
   "Select or Drag Attachment": "Valitse liite tietokoneelta tai raahaa tähän.",
-  "You can upload attachment up to size": "Suurin liitekoko on {size} mb."
+  "You can upload attachment up to size": "Suurin liitekoko on {size} mb.",
+  "Do not close window": "Tallentaa... Ethän sulje selaintasi ennen kuin sisältö on tallentunut."
+
 }

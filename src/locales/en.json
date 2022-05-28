@@ -674,5 +674,6 @@
   "Select or Drag Image": "Select images from files or drag your images here.",
   "You can upload image up to size": "You can upload image sizes up to {size} mb. Supported formats JPEG, PNG, GIF, SVG.",
   "Select or Drag Attachment": "Select attachments from files or drag your attachments here.",
-  "You can upload attachment up to size": "You can upload attachment sizes up to {size} mb."
+  "You can upload attachment up to size": "You can upload attachment sizes up to {size} mb.",
+  "Do not close window": "Saving... Please do not close or exit browser window, while content is saving."
 }
