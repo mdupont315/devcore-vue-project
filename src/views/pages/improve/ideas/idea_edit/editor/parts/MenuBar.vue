@@ -1,15 +1,26 @@
 <template>
-  <div>
-    <template v-for="(item, index) in items">
+  <div
+    id="idea_editor_header_togglables-container"
+    :class="'__header__bar__width-' + headerBarWidth"
+  >
+    <template v-for="(item, index) in getItems">
       <div
         class="divider"
-        v-if="item.type === 'divider'"
+        v-if="headerBarWidth > showAllWidth && item.type === 'divider'"
         :key="`divider${index}`"
       />
       <menu-list
         v-else-if="item.type === 'list'"
         :key="index + '-list'"
         :item="item"
+        :activeIcon="activeHeading"
+        class="idea_editor_header_item"
+      />
+      <menu-grid
+        v-else-if="item.type === 'grid'"
+        :key="index + '-grid'"
+				:item="item"
+        :allItems="items.filter((x) => x.type === 'item')"
         :activeIcon="activeHeading"
         class="idea_editor_header_item"
       />
@@ -21,15 +32,23 @@
         :editor="editor"
       /> -->
 
-      <menu-prompt
+      <!-- <menu-prompt
         v-else-if="item.type === 'prompt'"
         :key="index + '-item'"
         :item="item"
         class="idea_editor_header_item"
+      /> -->
+
+      <menu-item
+        v-else-if="headerBarWidth > showAllWidth && item.type === 'item'"
+        :key="index + '-item'"
+        :item="item"
+        class="idea_editor_header_item"
+        :class="'editor__header__item-' + index"
       />
 
       <menu-item
-        v-else
+        v-else-if="item.type === 'comment'"
         :key="index + '-item'"
         :item="item"
         class="idea_editor_header_item"
@@ -54,7 +73,7 @@
 <script>
 import MenuItem from "./MenuItem.vue";
 import MenuList from "./MenuList.vue";
-import MenuPrompt from "./MenuPrompt";
+import MenuGrid from "./MenuGrid.vue";
 import { TableModal, FileModal, EmbedModal } from "./modals";
 import { CommentIcon } from "@/assets";
 import { NodeSelection, TextSelection } from "prosemirror-state";
@@ -65,12 +84,30 @@ export default {
   components: {
     "menu-item": MenuItem,
     "menu-list": MenuList,
-    "menu-prompt": MenuPrompt,
+    "menu-grid": MenuGrid,
     "table-modal": TableModal,
     "file-modal": FileModal,
     "embed-modal": EmbedModal,
   },
+  mounted() {
+    this.$nextTick(() => {
+      window.addEventListener("resize", this.onResize);
+    });
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.onResize);
+  },
   methods: {
+    onResize() {
+      let width = 0;
+      const container = document.getElementById(
+        "idea_editor_header_togglables-container"
+      );
+      if (container) {
+        width = container.clientWidth;
+      }
+      this.headerBarWidth = width;
+    },
     extractTextFromSelection(state) {
       const selection = state.tr.selection;
       let ret = "";
@@ -164,10 +201,7 @@ export default {
             let newEditorState = this.editor.state;
             let newTr = newEditorState.tr;
             let newDoc = newEditorState.doc;
-            const [$from, $to] = [
-              newDoc.resolve(from),
-              newDoc.resolve(to),
-            ];
+            const [$from, $to] = [newDoc.resolve(from), newDoc.resolve(to)];
             const sel = new TextSelection($from, $to);
             dispatch(newTr.setSelection(sel));
           });
@@ -175,7 +209,6 @@ export default {
 
         setTimeout(() => {
           if (!data.url) return;
-          console.log("SET LINK!");
           this.editor.commands.setLink({
             href: data.url,
             target: "_blank",
@@ -265,6 +298,16 @@ export default {
     },
   },
   computed: {
+    getItems: {
+      get() {
+        const isLarge = this.headerBarWidth > this.showAllWidth;
+        if (isLarge) {
+          return this.items.filter((item) => item.showOnLarge);
+        } else {
+          return this.items.filter((item) => item.showOnSmall);
+        }
+      },
+    },
     getConfigs: {
       get() {
         if (!this.editor) return;
@@ -341,6 +384,7 @@ export default {
   },
   data() {
     return {
+      showAllWidth: 570,
       embedType: "",
       fileModalTexts: {
         primary: this.$t("Select or Drag Image"),
@@ -348,6 +392,7 @@ export default {
           size: MAX_FILE_SIZE,
         }),
       },
+      headerBarWidth: null,
       tablePromptOpen: false,
       filePromptOpen: false,
       embedPromptOpen: false,
@@ -357,6 +402,8 @@ export default {
           icon: "menu-line",
           title: "Menu",
           type: "list",
+          showOnSmall: true,
+          showOnLarge: true,
           iconType: "remix",
           listItems: [
             {
@@ -415,6 +462,9 @@ export default {
         {
           icon: "bold",
           iconType: "remix",
+          type: "item",
+          showOnSmall: false,
+          showOnLarge: true,
           title: "Bold",
           action: () => this.editor.chain().focus().toggleBold().run(),
           isActive: () => this.editor.isActive("bold"),
@@ -422,16 +472,24 @@ export default {
         {
           icon: "italic",
           iconType: "remix",
+          showOnSmall: false,
+          showOnLarge: true,
+          type: "item",
           title: "Italic",
           action: () => this.editor.chain().focus().toggleItalic().run(),
           isActive: () => this.editor.isActive("italic"),
         },
         {
           type: "divider",
+          showOnSmall: false,
+          showOnLarge: true,
         },
         {
           icon: "indent-decrease",
           iconType: "remix",
+          showOnSmall: false,
+          showOnLarge: true,
+          type: "item",
           title: "outdent",
           action: () => this.editor.chain().focus().outdent().run(),
           isActive: () => this.editor.isActive("outdent"),
@@ -439,6 +497,9 @@ export default {
         {
           icon: "indent-increase",
           iconType: "remix",
+          showOnSmall: false,
+          showOnLarge: true,
+          type: "item",
           title: "indent",
           action: () => {
             if (this.editor.isActive("comment")) return;
@@ -449,7 +510,10 @@ export default {
         {
           icon: "list-unordered",
           iconType: "remix",
-          title: "Bullet List",
+          showOnSmall: false,
+          showOnLarge: true,
+          type: "item",
+          title: "BulletList",
           action: () => {
             if (this.editor.isActive("comment")) return;
             return this.editor.chain().focus().toggleBulletList().run();
@@ -459,16 +523,24 @@ export default {
         {
           icon: "list-ordered",
           iconType: "remix",
-          title: "Ordered List",
+          showOnSmall: false,
+          showOnLarge: true,
+          type: "item",
+          title: "OrderedList",
           action: () => this.editor.chain().focus().toggleOrderedList().run(),
           isActive: () => this.editor.isActive("orderedList"),
         },
         {
           type: "divider",
+          showOnSmall: false,
+          showOnLarge: true,
         },
         {
           icon: "link",
           iconType: "remix",
+          type: "item",
+          showOnSmall: false,
+          showOnLarge: true,
           title: "link",
           action: (file) => {
             this.embedType = "link";
@@ -479,6 +551,9 @@ export default {
         {
           icon: "separator",
           iconType: "remix",
+          showOnSmall: false,
+          showOnLarge: true,
+          type: "item",
           title: "Horizontal Rule",
           action: () => this.editor.chain().focus().setHorizontalRule().run(),
         },
@@ -487,22 +562,22 @@ export default {
           icon: "vidicon-line",
           iconType: "remix",
           title: "video",
+          showOnSmall: false,
+          showOnLarge: true,
+          type: "item",
           action: (file) => {
             this.embedType = "video";
             this.embedPromptOpen = !this.embedPromptOpen;
           },
-
-          // this.editor.commands.setExternalVideo({
-          //   src: file.src,
-          //   width: file.width,
-          //   height: file.height,
-          // }),
         },
 
         {
           icon: "image-line",
           iconType: "remix",
+          showOnSmall: false,
+          showOnLarge: true,
           title: "Image",
+          type: "item",
           action: () => {
             this.setFilePromptOpen("preview");
           },
@@ -510,6 +585,9 @@ export default {
         {
           icon: "file-3-line",
           iconType: "remix",
+          showOnSmall: false,
+          showOnLarge: true,
+          type: "item",
           title: "Attachment",
           action: () => {
             this.setFilePromptOpen("nonpreview");
@@ -518,22 +596,34 @@ export default {
         {
           icon: "grid-line",
           iconType: "remix",
-          title: "table",
+          showOnSmall: false,
+          showOnLarge: true,
+          type: "item",
+          title: "grid",
           action: () => (this.tablePromptOpen = !this.tablePromptOpen),
-          // action: () =>
-          //   this.editor
-          //     .chain()
-          //     .focus()
-          //     .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-          //     .run(),
           isActive: () => this.editor.isActive("table"),
         },
         {
           type: "divider",
+          showOnSmall: false,
+          showOnLarge: true,
+        },
+        {
+          icon: "more-line",
+          iconType: "remix",
+          showOnSmall: true,
+          showOnLarge: false,
+          type: "grid",
+          title: "more-line",
+          action: () => console.log("ACTION"),
+          isActive: (item) => this.editor.isActive(item),
         },
         {
           icon: CommentIcon,
           iconType: "inline",
+          type: "comment",
+          showOnSmall: true,
+          showOnLarge: true,
           title: "comment",
           //  action: () => this.editor.commands.scrollToNextComment(),
 

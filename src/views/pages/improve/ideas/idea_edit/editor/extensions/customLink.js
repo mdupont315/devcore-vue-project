@@ -72,6 +72,7 @@ export const CustomLink = Link.extend({
         props: {
           handleDOMEvents: {
             mouseover(view, event) {
+              if (!event.target) return false;
               if (
                 event.target.localName === "a" ||
                 event.target.getAttribute("uuid")
@@ -84,6 +85,7 @@ export const CustomLink = Link.extend({
                     !!link.children[0] && link.children[0].dataset.uuid === uuid
                 );
                 if (!thisLink) return false;
+                if (!thisLink.firstChild) return false;
                 thisLink.firstChild.setAttribute("data-tooltip", href);
               }
 
@@ -92,12 +94,16 @@ export const CustomLink = Link.extend({
                 event.target.getAttribute("uuid")
               ) {
                 let links = [...document.querySelectorAll(".is-link")];
-                const uuid = event.target.previousSibling.getAttribute("data-uuid");
+                if (!event.target.previousSibling) return false;
+                const uuid = event.target.previousSibling.getAttribute(
+                  "data-uuid"
+                );
                 const [thisLink] = links.filter(
                   link =>
                     !!link.children[0] && link.children[0].dataset.uuid === uuid
                 );
                 if (!thisLink) return false;
+                if (!thisLink.lastChild) return false;
                 thisLink.lastChild.setAttribute(
                   "data-tooltip",
                   "Remove Hyperlink"
