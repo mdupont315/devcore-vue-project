@@ -57,9 +57,8 @@ import MenuList from "./MenuList.vue";
 import MenuPrompt from "./MenuPrompt";
 import { TableModal, FileModal, EmbedModal } from "./modals";
 import { CommentIcon } from "@/assets";
-import { NodeSelection } from "prosemirror-state";
+import { NodeSelection, TextSelection } from "prosemirror-state";
 import { MAX_FILE_SIZE } from "./modals/constants";
-import { TextSelection } from "prosemirror-state";
 import { v4 as uuidv4 } from "uuid";
 
 export default {
@@ -152,14 +151,34 @@ export default {
           state,
           view: { dispatch },
         } = this.editor;
+        let tr = state.tr;
+        if (!state.selection.empty) {
+          this.replaceSelectionTextWithText(data.text, state, dispatch);
+        } else {
+          this.editor.commands.focus();
+          const { from } = state.selection;
+          const to = from + 1 + data.text.length;
+          let insertTr = tr.insertText(data.text, from, from + 1);
+          dispatch(insertTr);
+          setTimeout(() => {
+            let newEditorState = this.editor.state;
+            let newTr = newEditorState.tr;
+            let newDoc = newEditorState.doc;
+            const [$from, $to] = [
+              newDoc.resolve(from),
+              newDoc.resolve(to),
+            ];
+            const sel = new TextSelection($from, $to);
+            dispatch(newTr.setSelection(sel));
+          });
+        }
 
-        this.replaceSelectionTextWithText(data.text, state, dispatch);
         setTimeout(() => {
           if (!data.url) return;
+          console.log("SET LINK!");
           this.editor.commands.setLink({
             href: data.url,
             target: "_blank",
-            text: data.text,
             uuid: uuidv4(),
           });
         }, 100);

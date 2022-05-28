@@ -177,11 +177,14 @@ export default {
                     return true;
                   });
                   const newNode = node.copy(Fragment.from(newNodeContent));
-									const [$from, $to] = [doc.resolve(nodeFrom), doc.resolve(nodeTo)];
-        					const sel = new TextSelection($from, $to);
-									const startPosition = Math.max(pos, sel.from);
-									const endPosition = Math.min(pos + node.nodeSize, sel.to);
-									dispatch(tr.replaceWith(startPosition, endPosition, newNode))
+                  const [$from, $to] = [
+                    doc.resolve(nodeFrom),
+                    doc.resolve(nodeTo),
+                  ];
+                  const sel = new TextSelection($from, $to);
+                  const startPosition = Math.max(pos, sel.from);
+                  const endPosition = Math.min(pos + node.nodeSize, sel.to);
+                  dispatch(tr.replaceWith(startPosition, endPosition, newNode));
                 }
               }
             }
@@ -622,6 +625,27 @@ export default {
       &:hover {
         background: #d0424d;
         color: #fff;
+        &[data-tooltip] {
+          position: relative;
+          &:after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 50%;
+            top: -6px;
+						white-space: nowrap;
+            transform: translateX(-50%) translateY(-100%);
+            background: rgba(0, 0, 0, 0.7);
+            text-align: center;
+            color: #fff;
+            padding: 4px 2px;
+            font-size: 12px;
+            min-width: 80px;
+            border-radius: 5px;
+            pointer-events: none;
+            padding: 5px;
+            font-family: "FuturaMedium";
+          }
+        }
       }
     }
     & > a {
@@ -629,17 +653,40 @@ export default {
       display: inline-flex;
       border-radius: 3px;
       place-items: center;
+      color: #4294d0;
       line-height: 5px;
       cursor: pointer;
       padding: 0 10px;
       margin-right: 10px;
       text-decoration: none;
       user-select: none;
+      &[data-tooltip] {
+        position: relative;
+        &:hover::after {
+          content: attr(data-tooltip);
+          position: absolute;
+          left: 50%;
+          top: -6px;
+					white-space: nowrap;
+          transform: translateX(-50%) translateY(-100%);
+          background: rgba(0, 0, 0, 0.7);
+          text-align: center;
+          color: #fff;
+          padding: 4px 2px;
+          font-size: 12px;
+          min-width: 80px;
+          border-radius: 5px;
+          pointer-events: none;
+          padding: 10px;
+          font-family: "FuturaMedium";
+        }
+      }
       &:hover {
         background: #4294d0;
         color: #fff;
       }
-      &::before {
+      &::before,
+      &:hover::before {
         padding-right: 5px;
         font-family: "Material Icons";
         font-size: 15px;
@@ -969,10 +1016,12 @@ export default {
   max-height: 100px;
 }
 
-[data-tooltip] {
+.table-control-button[data-tooltip],
+.delete-table-button[data-tooltip] {
   position: relative;
 }
-[data-tooltip]:hover::before {
+.table-control-button[data-tooltip]:hover::before,
+.delete-table-button[data-tooltip]:hover::before {
   content: "";
   position: absolute;
   top: -6px;
@@ -983,7 +1032,8 @@ export default {
   border-color: rgba(0, 0, 0, 0.7) transparent transparent transparent;
   z-index: 100;
 }
-[data-tooltip]:hover::after {
+.table-control-button[data-tooltip]:hover::after,
+.delete-table-button[data-tooltip]:hover::after {
   content: attr(data-tooltip);
   position: absolute;
   left: 50%;

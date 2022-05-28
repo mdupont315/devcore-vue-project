@@ -1,13 +1,13 @@
 import Link from "@tiptap/extension-link";
 import { mergeAttributes } from "@tiptap/core";
-import { Plugin, TextSelection } from "prosemirror-state";
-import { getMarkRange } from "tiptap-utils";
+import { Plugin } from "prosemirror-state";
 
 export const CustomLink = Link.extend({
   addOptions() {
     return {
       HTMLAttributes: {
         target: "_blank",
+        href: null
       },
       linkOnPaste: true,
       openOnClick: true,
@@ -54,19 +54,68 @@ export const CustomLink = Link.extend({
       { class: "is-link" },
       [
         "a",
-        mergeAttributes(this.options.HTMLAttributes, { uuid, href, target }),
+        mergeAttributes(this.options.HTMLAttributes, {
+          "data-uuid": uuid,
+          href,
+          target
+        }),
         0
       ],
-      ["button", { "data-uuid": uuid }]
-    ]
+      ["button", "Remove"]
+    ];
   },
   addProseMirrorPlugins() {
     const { options } = this;
     const { removeLink } = options;
+    const { uuid, href } = options;
+
+    console.log(options);
 
     const plugins = [
       new Plugin({
         props: {
+          handleDOMEvents: {
+            mouseover(view, event) {
+              if (
+                event.target.localName === "a" ||
+                event.target.getAttribute("uuid")
+              ) {
+                console.log(event.target);
+                const uuid = event.target.getAttribute("data-uuid");
+                const href = event.target.getAttribute("href");
+                let links = [...document.querySelectorAll(".is-link")];
+                const [thisLink] = links.filter(
+                  link =>
+                    !!link.children[0] && link.children[0].dataset.uuid === uuid
+                );
+                if (!thisLink) return false;
+                thisLink.firstChild.setAttribute("data-tooltip", href);
+              }
+
+              if (
+                event.target.localName === "button" ||
+                event.target.getAttribute("uuid")
+              ) {
+                let links = [...document.querySelectorAll(".is-link")];
+                const uuid = event.target.previousSibling.getAttribute("data-uuid");
+                console.log(uuid);
+                console.log(links);
+                const [thisLink] = links.filter(
+                  link =>
+                    !!link.children[0] && link.children[0].dataset.uuid === uuid
+                );
+                console.log(thisLink);
+                if (!thisLink) return false;
+                thisLink.lastChild.setAttribute(
+                  "data-tooltip",
+                  "Remove Hyperlink"
+                );
+                // thisLink.setAttribute("data-tooltip", uuid);
+              }
+
+              return false;
+            }
+          },
           handleClick(view, pos, event) {
             if (!event.target.dataset.uuid) return;
             const { uuid } = event.target.dataset;
