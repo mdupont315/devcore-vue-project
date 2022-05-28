@@ -26,6 +26,7 @@ import {
   ExternalVideo,
   Paragraph,
   TrailingNode,
+  CustomLink
 } from "./extensions";
 
 // const dedupeComments = editor => {
@@ -190,7 +191,8 @@ export default class ContentEditor {
     options,
     fileHandlers,
     saveContent,
-    commentHandlers
+    commentHandlers,
+    linkHandlers
   ) {
     this.editable = editable;
     this.content = value;
@@ -219,10 +221,8 @@ export default class ContentEditor {
       }),
       Text,
       // Draggable,
-      Link.configure({
-        HTMLAttributes: { target: "_blank" },
-        linkOnPaste: true,
-        openOnClick: true
+      CustomLink.configure({
+        removeLink: linkHandlers.removeLink
       }),
       TextStyle,
       Color,

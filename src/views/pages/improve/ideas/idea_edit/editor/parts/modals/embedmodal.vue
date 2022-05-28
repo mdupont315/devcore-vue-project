@@ -14,12 +14,12 @@
                 <b-col class="col-12" ref="insert_iframe-url">
                   <div class="form-label-group required form-group">
                     <b-form-input
-                      v-if="configs.text"
+                      v-if="configs.text !== null"
                       id="idea_edit_insert__url"
                       name="idea_edit_insert__url"
                       v-model="text"
-                      v-validate="'required'"
-                      :placeholder="configs.placeholder"
+											autocomplete="off"
+                      :placeholder="configs.inputPlaceholder"
                       type="text"
                     ></b-form-input>
                   </div>
@@ -28,8 +28,8 @@
                       id="idea_edit_insert__url"
                       name="idea_edit_insert__url"
                       v-model="url"
-                      v-validate="'required'"
-                      :placeholder="configs.placeholder"
+											autocomplete="off"
+                      :placeholder="configs.urlPlaceholder"
                       type="text"
                     ></b-form-input>
                   </div>
@@ -81,8 +81,8 @@ export default {
     save() {
       this.$emit("setEmbed", {
         type: this.type,
-				text: this.text,
-        url: this.url
+        text: this.text,
+        url: this.url,
       });
     },
     cancel() {
@@ -91,6 +91,14 @@ export default {
     },
   },
   watch: {
+    value: {
+      handler(newVal) {
+        if (!newVal) {
+          this.url = "https://";
+          this.text = "";
+        }
+      },
+    },
     configs: {
       deep: true,
       handler(newVal) {

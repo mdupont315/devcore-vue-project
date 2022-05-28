@@ -59,6 +59,8 @@ import { TableModal, FileModal, EmbedModal } from "./modals";
 import { CommentIcon } from "@/assets";
 import { NodeSelection } from "prosemirror-state";
 import { MAX_FILE_SIZE } from "./modals/constants";
+import { TextSelection } from "prosemirror-state";
+import { v4 as uuidv4 } from "uuid";
 
 export default {
   components: {
@@ -70,6 +72,54 @@ export default {
     "embed-modal": EmbedModal,
   },
   methods: {
+    extractTextFromSelection(state) {
+      const selection = state.tr.selection;
+      let ret = "";
+      state.doc.nodesBetween(selection.from, selection.to, (node, position) => {
+        // we only processing text, must be a selection
+        if (!node.isTextblock || selection.from === selection.to) return;
+        // grab the content
+        const substringFrom = Math.max(0, selection.from - position - 1);
+        const substringTo = Math.max(0, selection.to - position - 1);
+        ret = node.textContent.substring(substringFrom, substringTo);
+      });
+      return ret;
+    },
+    replaceSelectionTextWithText(replaceContent, state, dispatch) {
+      // grab the current transaction and selection
+      let tr = state.tr;
+      const selection = tr.selection;
+
+      // check we will actually need a to dispatch transaction
+      let shouldUpdate = false;
+
+      let startPosition = null;
+      let endPosition = null;
+      let newNode = null;
+
+      state.doc.nodesBetween(selection.from, selection.to, (node, position) => {
+        // we only processing text, must be a selection
+        if (!node.isTextblock || selection.from === selection.to) return;
+
+        // calculate the section to replace
+        startPosition = Math.max(position + 1, selection.from);
+        endPosition = Math.min(position + node.nodeSize, selection.to);
+
+        newNode = state.schema.text(replaceContent, node.marks);
+        // replace
+        tr = tr.replaceWith(startPosition, endPosition, newNode);
+        shouldUpdate = true;
+      });
+
+      if (dispatch && shouldUpdate) {
+        dispatch(tr.scrollIntoView());
+      }
+      return {
+        startPosition: startPosition,
+        endPosition: endPosition,
+        content: newNode,
+      };
+    },
     isYoutubeUrl(url) {
       return true;
     },
@@ -98,7 +148,21 @@ export default {
       }
 
       if (data.type === "link") {
-        this.editor.commands.setLink({ href: data.url, target: "_blank" });
+        const {
+          state,
+          view: { dispatch },
+        } = this.editor;
+
+        this.replaceSelectionTextWithText(data.text, state, dispatch);
+        setTimeout(() => {
+          if (!data.url) return;
+          this.editor.commands.setLink({
+            href: data.url,
+            target: "_blank",
+            text: data.text,
+            uuid: uuidv4(),
+          });
+        }, 100);
       }
 
       this.embedPromptOpen = false;
@@ -115,7 +179,6 @@ export default {
       //set selection to end of paragraph if inserting in the middle
 
       //   if (this.editor.isActive("table")) return;
-      console.log("selection ", this.editor.view.state.selection);
       let $anchor = this.editor.view.state.selection.$anchor;
 
       //  let pos = this.editor.view.state.selection;
@@ -126,10 +189,8 @@ export default {
       //   .setHighlight({ color: "#ffcc00" }).run();
 
       // if (this.editor && this.editor.isActive("comment")) {
-      console.log($anchor);
       if ($anchor && $anchor.nodeAfter) {
         const posAfter = new NodeSelection($anchor);
-        console.log({ posAfter });
         $anchor = posAfter.to;
       } else {
         $anchor = $anchor.pos;
@@ -171,6 +232,13 @@ export default {
       this.filePromptOpen = !this.filePromptOpen;
     },
   },
+  watch: {
+    anyModalOpen: {
+      handler(newVal) {
+        this.$emit("modalOpen", newVal);
+      },
+    },
+  },
   props: {
     editor: {
       type: Object,
@@ -187,16 +255,21 @@ export default {
           let configs = {
             url: "",
             title: this.$t("InsertLinkTitle"),
-            placeholder: "Https://",
-						text: ""
+            inputPlaceholder: this.$t("InsertLinkText"),
+            urlPlaceholder: "Https://",
+            text: "",
           };
 
           let marks = [];
+
+          if (!state.selection.isEmpty) {
+            configs.text = this.extractTextFromSelection(state);
+          }
+
           state.doc.nodesBetween(from, to, (node) => {
             marks = [...marks, ...node.marks];
           });
           const mark = marks.find((markItem) => markItem.type.name === "link");
-					console.log(mark)
           if (mark && mark.attrs && mark.attrs.href) {
             configs.url = mark.attrs.href;
           }
@@ -206,12 +279,20 @@ export default {
           let configs = {
             url: "",
             title: this.$t("InsertVideoTitle"),
-            placeholder: "Https://",
-						text: null
+            inputPlaceholder: this.$t("InsertLinkText"),
+            urlPlaceholder: "Https://",
+            text: null,
           };
           return configs;
         }
         return null;
+      },
+    },
+    anyModalOpen: {
+      get() {
+        return (
+          this.showTablePrompt || this.showImagePrompt || this.showEmbedPrompt
+        );
       },
     },
     showTablePrompt: {

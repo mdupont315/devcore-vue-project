@@ -99,19 +99,20 @@ export default {
 
 <style lang="scss">
 .file-component {
-	padding-top: 3px;
-	padding-bottom: 3px;
+  padding-top: 3px;
+  padding-bottom: 3px;
   .file-remove-button {
     font-family: "FuturaMedium";
     color: #d0424d;
     border: 1px solid lightgray;
     width: 60px;
     height: 20px;
-		outline: none;
+    outline: none;
     position: relative;
     border-radius: 3px;
     background: #fff;
     bottom: 2px;
+    cursor: pointer;
     &:hover {
       background: #d0424d;
       color: #fff;
@@ -135,6 +136,7 @@ export default {
   padding: 2px 10px;
   border-radius: 3px;
   padding: 0 10px;
+  cursor: pointer;
   background: #fff;
   > a {
     color: #4294d0;

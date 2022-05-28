@@ -2,7 +2,11 @@
   <div class="idea_editor_content" id="idea_editor_content">
     <div class="editor" v-if="editor">
       <div class="editor_header_border">
-        <menu-bar class="editor__header" :editor="editor" />
+        <menu-bar
+          class="editor__header"
+          :editor="editor"
+          @modalOpen="setIsModalView"
+        />
       </div>
       <editor-content
         class="editor__content"
@@ -23,7 +27,7 @@ import { EditorContent, BubbleMenu } from "@tiptap/vue-2";
 import { MenuBar } from "./parts";
 import ContentEditor from "./EditorLoader.js";
 import { TextSelection, NodeSelection } from "prosemirror-state";
-
+import { Fragment } from "prosemirror-model";
 /* eslint-disable */
 export default {
   components: {
@@ -80,16 +84,20 @@ export default {
 
   data() {
     return {
+      isModalView: false,
       provider: null,
       editor: null,
       status: "connecting",
     };
   },
   methods: {
+    setIsModalView(val) {
+      this.isModalView = val;
+    },
     handleKeyup(e) {
-      console.log(e);
       if (e && e.keyCode === 9) {
-        e.preventDefault();
+        if (this.editor.isActive("comment")) e.preventDefault();
+        if (this.isModalView) e.preventDefault();
       }
       return;
     },
@@ -142,6 +150,44 @@ export default {
       if (this.editor) this.editor.destroy();
       if (this.provider) this.editor.destroy();
 
+      const linkHandlers = {
+        removeLink: (markPos, uuid) => {
+          const {
+            state: { doc, tr, schema },
+            view: { dispatch },
+          } = this.editor;
+          doc.descendants((node, pos) => {
+            if (node.type.name == "paragraph") {
+              const [from, to] = [pos, pos + node.nodeSize];
+              const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
+              if (from <= markPos && to >= markPos) {
+                if (node.content && node.content.content) {
+                  const { content } = node.content;
+                  const newNodeContent = content.filter((innerNode, index) => {
+                    if (innerNode.marks && innerNode.marks[0]) {
+                      const [mark] = innerNode.marks;
+                      if (
+                        mark.attrs &&
+                        mark.attrs.uuid &&
+                        mark.attrs.uuid === uuid
+                      ) {
+                        return false;
+                      }
+                    }
+                    return true;
+                  });
+                  const newNode = node.copy(Fragment.from(newNodeContent));
+									const [$from, $to] = [doc.resolve(nodeFrom), doc.resolve(nodeTo)];
+        					const sel = new TextSelection($from, $to);
+									const startPosition = Math.max(pos, sel.from);
+									const endPosition = Math.min(pos + node.nodeSize, sel.to);
+									dispatch(tr.replaceWith(startPosition, endPosition, newNode))
+                }
+              }
+            }
+          });
+        },
+      };
       const fileHandlers = {
         addFile: async (file) => {
           this.$emit("fileAdded", file);
@@ -222,7 +268,6 @@ export default {
 
             for (const comment of comments) {
               const { from } = comment;
-              console.log(comment);
 
               replaceTr.setNodeMarkup(from, schema.nodes.paragraph, {
                 id: comment.comment.uuid,
@@ -252,7 +297,6 @@ export default {
         },
         transformComments: (node) => {
           const curNode = JSON.parse(node.attrs.comment);
-          console.log("current node: ", curNode);
           // console.log()
           if (
             !this.editor.view.state.selection.empty ||
@@ -267,32 +311,32 @@ export default {
             view: { dispatch },
           } = this.editor;
 
-//           const paragraphs = [];
-//           const comments = [];
-//           doc.descendants((node, pos) => {
-//             if (node.type.name !== "comment") return;
-//             const [from, to] = [pos, pos + node.nodeSize];
+          //           const paragraphs = [];
+          //           const comments = [];
+          //           doc.descendants((node, pos) => {
+          //             if (node.type.name !== "comment") return;
+          //             const [from, to] = [pos, pos + node.nodeSize];
 
-//             const [comment, content] = [
-//               JSON.parse(node.attrs.comment),
-//               node.content,
-//             ];
+          //             const [comment, content] = [
+          //               JSON.parse(node.attrs.comment),
+          //               node.content,
+          //             ];
 
-// console.log(this.editor.view.state.selection)
-// console.log(to)
-// console.log(from)
-//             if (
-//               from >= this.editor.view.state.selection &&
-//               to <= this.editor.view.state.selection
-//             ) {
-//               comments.push({ from, to, comment, content });
-//             }
-//           });
+          // console.log(this.editor.view.state.selection)
+          // console.log(to)
+          // console.log(from)
+          //             if (
+          //               from >= this.editor.view.state.selection &&
+          //               to <= this.editor.view.state.selection
+          //             ) {
+          //               comments.push({ from, to, comment, content });
+          //             }
+          //           });
 
-//           console.log({ comments });
+          //           console.log({ comments });
 
-//           console.log("selection ", this.editor.view.state.selection);
-//           comments.filter();
+          //           console.log("selection ", this.editor.view.state.selection);
+          //           comments.filter();
           this.editor
             .chain()
             .focus()
@@ -349,7 +393,8 @@ export default {
         },
         fileHandlers,
         saveContent,
-        commentHandlers
+        commentHandlers,
+        linkHandlers
       );
 
       this.editor = editorInstance.editor;
@@ -558,6 +603,59 @@ export default {
     margin-block-start: 4px !important;
     margin-block-end: 4px !important;
   }
+
+  p > span.is-link {
+    display: flex;
+    height: 20px;
+    & > button {
+      font-family: "FuturaMedium";
+      color: #d0424d;
+      border: 1px solid lightgray;
+      width: 60px;
+      height: 20px;
+      outline: none;
+      position: relative;
+      border-radius: 3px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      &:hover {
+        background: #d0424d;
+        color: #fff;
+      }
+    }
+    & > a {
+      border: 1px solid lightgray;
+      display: inline-flex;
+      border-radius: 3px;
+      place-items: center;
+      line-height: 5px;
+      cursor: pointer;
+      padding: 0 10px;
+      margin-right: 10px;
+      text-decoration: none;
+      user-select: none;
+      &:hover {
+        background: #4294d0;
+        color: #fff;
+      }
+      &::before {
+        padding-right: 5px;
+        font-family: "Material Icons";
+        font-size: 15px;
+        opacity: 0.8;
+        display: flex;
+        place-items: center;
+        content: "link";
+        height: 17px;
+        &:hover {
+          background: #4294d0;
+          color: #fff;
+        }
+      }
+    }
+  }
+
   p > a {
     cursor: pointer;
   }

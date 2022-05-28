@@ -9,5 +9,6 @@ export * from "./heading";
 export * from "./customLine";
 export * from './trailingNode'
 export * from './customParagraph'
+export * from './customLink'
 export { default as Draggable } from "./draggable";
 export * from './selectionDecorator'

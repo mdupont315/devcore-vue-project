@@ -26,9 +26,6 @@ export const SelectionDecorator = Extension.create({
         }
         const { selection, doc } = newState
 
-        console.log("___________________")
-        console.log(selection)
-
         // only do it when it's not empty
         if (selection.empty) {
           decorationSet = DecorationSet.empty
