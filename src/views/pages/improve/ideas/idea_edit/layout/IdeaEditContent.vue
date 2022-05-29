@@ -186,15 +186,19 @@ export default {
 
 .ideaContent-empty-spinner {
   text-align: center;
-  text-align: center;
   height: 90%;
   border-radius: 3px;
+  display: flex;
+  place-content: center;
+  align-items: center;
   background: #fff;
   width: 100%;
   & > span {
     width: 40px;
+    margin-bottom: 100px;
+    color: lightgray;
     height: 40px;
-    background: "#fff";
+    background: #fff;
   }
 }
 .idea-template-create-item {
