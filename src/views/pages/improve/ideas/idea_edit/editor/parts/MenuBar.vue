@@ -90,11 +90,13 @@ export default {
     "embed-modal": EmbedModal,
   },
   mounted() {
+		this.onResize();
     this.$nextTick(() => {
       window.addEventListener("resize", this.onResize);
     });
   },
   beforeDestroy() {
+    console.log("REMOVED)")
     window.removeEventListener("resize", this.onResize);
   },
   methods: {

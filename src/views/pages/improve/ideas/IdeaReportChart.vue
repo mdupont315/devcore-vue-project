@@ -3,9 +3,7 @@
     class="idea-report idea-report-chart report-chart d-flex flex-column"
     style="min-height: 250px; padding: 20px; background: #fff"
   >
-    <div
-      class="period-selector text-right p-2 px-4 flex-grow-0 position-relative"
-    >
+    <div class="period-selector text-right p-2 flex-grow-0 position-relative">
       <unit-selector
         v-model="filter.data.interval"
         :units="intervals"
@@ -13,8 +11,12 @@
         style="display: flex; justify-content: flex-start"
       />
       <div
-        class="text-right pr-4 float-right position-absolute"
-        style="top: 3px; right: 0"
+        class="
+          text-right
+          float-right
+          position-absolute
+          unit-selector-evaluations
+        "
       >
         <span
           v-if="idea.evaluationsCount > 0"
@@ -284,5 +286,19 @@ export default {
   .idea-report {
     height: 340px;
   }
+}
+@media screen and (min-width: 500px) {
+  .unit-selector-evaluations {
+    top: -21px;
+    right: 0;
+  }
+
+}
+@media screen and (min-width: 1600px) {
+  .unit-selector-evaluations {
+    top: 3px;
+    right: 0;
+  }
+
 }
 </style>
