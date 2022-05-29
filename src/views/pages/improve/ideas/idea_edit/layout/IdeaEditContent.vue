@@ -186,7 +186,11 @@ export default {
 
 .ideaContent-empty-spinner {
   text-align: center;
-  margin-top: 250px;
+  text-align: center;
+  height: 90%;
+  border-radius: 3px;
+  background: #fff;
+  width: 100%;
   & > span {
     width: 40px;
     height: 40px;
@@ -234,6 +238,7 @@ export default {
 }
 .idea_edit_content_container_content-header {
   display: flex;
+  background: #fff;
   justify-content: space-between;
   align-items: center;
 }
@@ -248,20 +253,9 @@ export default {
   margin: 20px 20px 10px 20px;
 }
 .idea_edit_content_container {
-  background: #fff;
   margin: 20px;
   border-radius: 3px;
   width: 75%;
   overflow: hidden;
-}
-@media screen and (max-height: 900px) {
-  .idea_edit_content_container {
-    margin-bottom: 20px;
-  }
-}
-@media screen and (min-height: 900px) {
-  .idea_edit_content_container {
-    margin-bottom: 0;
-  }
 }
 </style>

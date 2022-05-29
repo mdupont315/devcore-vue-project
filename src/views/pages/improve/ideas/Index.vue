@@ -4,7 +4,7 @@
       v-if="process.process && process.process.stages.length > 0"
       class="sub-top-bar shadow-sm d-flex flex-row"
     >
-      <div class="flex-grow-1">
+      <div style="flex-grow:5">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb text-capitalize bg-white">
             <li
@@ -51,7 +51,7 @@
           </ol>
         </nav>
       </div>
-      <div class="flex-grow-0">
+      <div class="flex-grow-1 flex-start-on-small" style="display: flex; justify-content: flex-end">
         <b-button
           :variant="isActive('new') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'ideas' }"
@@ -99,7 +99,7 @@
       class="has-top-bar"
       style="overflow: auto; overflow-x: hidden; height: calc(100% - 45px)"
     >
-		<!--  class="has-top-bar p-3" -->
+      <!--  class="has-top-bar p-3" -->
       <component
         :is="currentComponent"
         v-if="currentProcess && currentComponent && !getIsIdeaInEdit"
@@ -519,4 +519,3 @@ export default {
   }
 }
 
-</style>
