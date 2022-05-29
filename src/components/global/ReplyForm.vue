@@ -45,7 +45,7 @@
                 style="font-size: 30px; color: #4494d1"
                 v-if="!isLoading"
               ></i>
-              <b-spinner v-else style="color:lightgray"></b-spinner>
+              <b-spinner v-else style="color: lightgray"></b-spinner>
             </div>
           </div>
         </div>
@@ -199,7 +199,7 @@ export default {
   margin-right: 10px;
   background: #fff;
   &:active,
-	:focus,
+  :focus,
   :hover {
     background: #fff;
     resize: none;
@@ -209,6 +209,8 @@ export default {
 .feedback-form-footer-body {
   display: flex;
   margin: 10px;
+  flex-direction: row;
+  justify-content: center;
 }
 .ideaIssue_reply_feedback_feedback_reward.reward__active {
   background: #4294d0;
