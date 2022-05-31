@@ -46,11 +46,11 @@ export const CustomLink = Link.extend({
       href: {
         default: this.options.HTMLAttributes.href
       },
-      'data-uuid': {
-        default: null,
+      uuid: {
+        default: uuidv4(),
         parseHTML: el => {
           console.log(el);
-          return el.getAttribute("uuid") ?? uuidv4();
+          return el.getAttribute("uuid");
         },
         renderHTML: attrs => ({ uuid: attrs.uuid })
       },

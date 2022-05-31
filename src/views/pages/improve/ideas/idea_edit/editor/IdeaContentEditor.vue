@@ -164,6 +164,8 @@ export default {
                 if (node.content && node.content.content) {
                   const { content } = node.content;
 
+                  console.log(content);
+
                   const newNodeContent = content.filter((innerNode, index) => {
                     if (innerNode.marks.length > 0) {
                       console.log(innerNode.marks);
