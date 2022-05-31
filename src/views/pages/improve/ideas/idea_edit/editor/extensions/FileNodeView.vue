@@ -88,8 +88,21 @@ export default {
   beforeDestroy() {
     this.editor.commands.removeFile(this.fileEntity);
   },
+  watch: {
+    fileEntity: {
+      deep: true,
+      handler(newVal) {
+        if (newVal && newVal.src) {
+          if (this.isValidExternalUrl(newVal.src)) {
+            this.transformFilesIfPastedExternalUrls();
+          }
+        }
+      },
+    },
+  },
   methods: {
     async transformFilesIfPastedExternalUrls() {
+			console.log("transforming");
       if (
         !this.node.attrs.size &&
         this.node.attrs.src &&
@@ -99,7 +112,6 @@ export default {
           this.node.attrs.src
         );
 
-        console.log(externalToBase64);
 
         const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;
         const size = externalToBase64.length * (3 / 4) - mod;
