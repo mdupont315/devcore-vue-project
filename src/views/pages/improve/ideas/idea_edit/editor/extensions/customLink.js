@@ -1,17 +1,44 @@
 import Link from "@tiptap/extension-link";
 import { mergeAttributes } from "@tiptap/core";
 import { Plugin } from "prosemirror-state";
+import { v4 as uuidv4 } from "uuid";
 
 export const CustomLink = Link.extend({
   addOptions() {
     return {
       HTMLAttributes: {
         target: "_blank",
-        href: null
+        href: null,
+        uuid: null
       },
       linkOnPaste: true,
       openOnClick: true,
       removeLink: () => {}
+    };
+  },
+  addCommands() {
+    return {
+      setLink: attributes => ({ chain }) => {
+        console.log(attributes);
+        return chain()
+          .setMark(this.name, attributes)
+          .setMeta("preventAutolink", true)
+          .run();
+      },
+
+      toggleLink: attributes => ({ chain }) => {
+        return chain()
+          .toggleMark(this.name, attributes, { extendEmptyMarkRange: true })
+          .setMeta("preventAutolink", true)
+          .run();
+      },
+
+      unsetLink: () => ({ chain }) => {
+        return chain()
+          .unsetMark(this.name, { extendEmptyMarkRange: true })
+          .setMeta("preventAutolink", true)
+          .run();
+      }
     };
   },
   addAttributes() {
@@ -19,10 +46,11 @@ export const CustomLink = Link.extend({
       href: {
         default: this.options.HTMLAttributes.href
       },
-      uuid: {
+      'data-uuid': {
         default: null,
         parseHTML: el => {
-          return el.getAttribute("uuid");
+          console.log(el);
+          return el.getAttribute("uuid") ?? uuidv4();
         },
         renderHTML: attrs => ({ uuid: attrs.uuid })
       },
@@ -40,7 +68,7 @@ export const CustomLink = Link.extend({
         tag: 'a[href]:not([href *= "javascript:" i])',
         getAttrs: dom => {
           return {
-            uuid: dom.getAttribute("uuid")
+            "data-uuid": dom.getAttribute("uuid")
           };
         }
       }
@@ -48,9 +76,10 @@ export const CustomLink = Link.extend({
   },
   renderHTML({ mark, HTMLAttributes }) {
     const { uuid, href, target } = HTMLAttributes;
+    console.log(uuid);
     return [
       "span",
-      { class: "is-link" },
+      { class: "is-link", "data-uuid": uuid ?? uuidv4() },
       [
         "a",
         mergeAttributes(this.options.HTMLAttributes, {
@@ -78,11 +107,16 @@ export const CustomLink = Link.extend({
                 event.target.getAttribute("uuid")
               ) {
                 const uuid = event.target.getAttribute("data-uuid");
+                console.log(uuid);
+                console.log(event.target);
+
                 const href = event.target.getAttribute("href");
                 let links = [...document.querySelectorAll(".is-link")];
+                console.log(links);
                 const [thisLink] = links.filter(
                   link =>
-                    !!link.children[0] && link.children[0].dataset.uuid === uuid
+                    !!link.parentElement &&
+                    link.parentElement.dataset.uuid === uuid
                 );
                 if (!thisLink) return false;
                 if (!thisLink.firstChild) return false;
@@ -94,13 +128,14 @@ export const CustomLink = Link.extend({
                 event.target.getAttribute("uuid")
               ) {
                 let links = [...document.querySelectorAll(".is-link")];
-                if (!event.target.previousSibling) return false;
-                const uuid = event.target.previousSibling.getAttribute(
+                if (!event.target.parentElement) return false;
+                const uuid = event.target.parentElement.getAttribute(
                   "data-uuid"
                 );
                 const [thisLink] = links.filter(
                   link =>
-                    !!link.children[0] && link.children[0].dataset.uuid === uuid
+                    !!link.parentElement &&
+                    link.parentElement.dataset.uuid === uuid
                 );
                 if (!thisLink) return false;
                 if (!thisLink.lastChild) return false;
@@ -115,10 +150,31 @@ export const CustomLink = Link.extend({
             }
           },
           handleClick(view, pos, event) {
-            if (!event.target.dataset.uuid) return;
-            const { uuid } = event.target.dataset;
-            removeLink(pos, uuid);
-            return true;
+            console.log(event);
+            if (event.target.localName === "a") {
+              if (
+                !event.target.parentElement.dataset.uuid ||
+                !event.target.href
+              )
+                return;
+              if (event.button === 2) return;
+              window.open(event.target.href, "__blank");
+            }
+            if (event.target.localName === "button") {
+              if (!event.target.parentElement) return;
+              console.log("2");
+              if (
+                event.target.parentElement &&
+                event.target.parentElement.dataset.uuid
+              ) {
+                if (event.button === 2) return;
+                console.log("3");
+                const uuid = event.target.parentElement.dataset.uuid;
+                removeLink(pos, uuid);
+              }
+            }
+
+            return false;
             // //view.dispatch(tr.setSelection(new TextSelection($start, $end)));
             // The link mark's renderHTML renders an <a> element with a data-link attribute set
             // I register a new Plugin where I listen for the mouseover event

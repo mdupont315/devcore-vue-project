@@ -78,13 +78,61 @@ export default {
       return stringFileEntity;
     },
     getAttrs() {
+      console.log(this.fileEntity);
       return this.fileEntity;
     },
+  },
+  async mounted() {
+    await this.transformFilesIfPastedExternalUrls();
   },
   beforeDestroy() {
     this.editor.commands.removeFile(this.fileEntity);
   },
   methods: {
+    async transformFilesIfPastedExternalUrls() {
+      if (
+        !this.node.attrs.size &&
+        this.node.attrs.src &&
+        this.isValidExternalUrl(this.node.attrs.src)
+      ) {
+        const externalToBase64 = await this.getBase64FromUrl(
+          this.node.attrs.src
+        );
+
+        console.log(externalToBase64);
+
+        const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;
+        const size = externalToBase64.length * (3 / 4) - mod;
+
+        this.updateAttributes({
+          src: externalToBase64,
+          preview: true,
+          size,
+        });
+      }
+    },
+    isValidExternalUrl(url) {
+      const regexp =
+        /^(ftp|http|https|chrome|:\/\/|\.|@){2,}(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\S*:\w*@)*([a-zA-Z]|(\d{1,3}|\.){7}){1,}(\w|\.{2,}|\.[a-zA-Z]{2,3}|\/|\?|&|:\d|@|=|\/|\(.*\)|#|-|%)*$/gmu;
+      return regexp.test(url);
+    },
+    getHref(href) {
+      console.log(href);
+
+      return href;
+    },
+    async getBase64FromUrl(url) {
+      const data = await fetch(url);
+      const blob = await data.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+          const base64data = reader.result;
+          resolve(base64data);
+        };
+      });
+    },
     remove() {
       const { editor, getPos, node } = this;
 

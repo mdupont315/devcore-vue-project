@@ -12,13 +12,14 @@ import ExternalLayout from "./views/layouts/ExternalLayout";
 import AppComponent from "./App.vue";
 /* import wysiwyg from 'vue-wysiwyg';
  */
+import AsyncComputed from 'vue-async-computed'
 import 'remixicon/fonts/remixicon.css'
 import "@/lib/functions";
 
 import "./components/global";
 // import './assets/scss/app.scss'
 import VueDragscroll from "vue-dragscroll";
-
+Vue.use(AsyncComputed)
 
 // plugins
 import "@/plugins/validator";

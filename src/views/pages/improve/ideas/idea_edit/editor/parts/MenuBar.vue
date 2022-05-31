@@ -19,7 +19,7 @@
       <menu-grid
         v-else-if="item.type === 'grid'"
         :key="index + '-grid'"
-				:item="item"
+        :item="item"
         :allItems="items.filter((x) => x.type === 'item')"
         :activeIcon="activeHeading"
         class="idea_editor_header_item"
@@ -90,13 +90,13 @@ export default {
     "embed-modal": EmbedModal,
   },
   mounted() {
-		this.onResize();
+    this.onResize();
     this.$nextTick(() => {
       window.addEventListener("resize", this.onResize);
     });
   },
   beforeDestroy() {
-    console.log("REMOVED)")
+    console.log("REMOVED)");
     window.removeEventListener("resize", this.onResize);
   },
   methods: {
@@ -203,14 +203,18 @@ export default {
             let newEditorState = this.editor.state;
             let newTr = newEditorState.tr;
             let newDoc = newEditorState.doc;
+            console.log(from, to);
             const [$from, $to] = [newDoc.resolve(from), newDoc.resolve(to)];
+
             const sel = new TextSelection($from, $to);
             dispatch(newTr.setSelection(sel));
           });
         }
 
         setTimeout(() => {
+					console.log(uuidv4());
           if (!data.url) return;
+					console.log(uuidv4());
           this.editor.commands.setLink({
             href: data.url,
             target: "_blank",

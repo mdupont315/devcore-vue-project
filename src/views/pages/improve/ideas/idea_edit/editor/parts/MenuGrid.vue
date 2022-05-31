@@ -66,9 +66,6 @@ export default {
       listItem.action();
     },
     setSelectionOpen(val) {
-      console.log(this.selecting);
-      console.log(this.selectionOpen);
-      console.log(val);
       setTimeout(() => {}, 500);
       if (!val && !this.selecting) {
         this.selectionOpen = val;

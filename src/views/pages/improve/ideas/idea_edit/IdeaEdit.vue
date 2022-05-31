@@ -309,6 +309,7 @@ export default {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
 
+					console.log(node)
           if (fileInIdea) {
             if (node.attrs.preview) {
               node.attrs.src = fileInIdea.url;

@@ -5,9 +5,14 @@ const FILE_SIZE_LIMIT = 6000000;
 /**
  * function for image drag n drop(for tiptap)
  * @see https://gist.github.com/slava-vishnyakov/16076dff1a77ddaca93c4bccd4ec4521#gistcomment-3744392
- */
+
+*/
+
+
 
 const validateFileSize = (notify, file) => {
+  console.log(file);
+
   let valid = true;
   if (file.size > FILE_SIZE_LIMIT) {
     notify(file, FILE_SIZE_LIMIT);
@@ -56,6 +61,8 @@ const uploadFilePlugin = (addFile, notify) => {
 
         if (items.length === 0) return;
 
+        console.log(items);
+
         let pos = 1;
         if (
           view.state.tr &&
@@ -67,11 +74,15 @@ const uploadFilePlugin = (addFile, notify) => {
         const coordinates = { pos, inside: 0 };
 
         for (const item of items) {
+          console.log(item);
           // console.log(item.getAsString(data => console.log(data)));
           if (item.kind != "file") return;
+          console.log({ item });
           if (item.type.indexOf("image") === 0) {
             event.preventDefault();
             const preview = true;
+
+            console.log("IS IMAGE");
 
             const itemAsFile = item.getAsFile();
             const valid = validateFileSize(notify, itemAsFile);
@@ -89,6 +100,7 @@ const uploadFilePlugin = (addFile, notify) => {
           } else {
             const preview = false;
             const itemAsFile = item.getAsFile();
+            console.log(itemAsFile);
 
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {

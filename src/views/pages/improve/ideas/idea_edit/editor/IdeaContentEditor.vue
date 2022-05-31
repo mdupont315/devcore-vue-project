@@ -157,13 +157,17 @@ export default {
             view: { dispatch },
           } = this.editor;
           doc.descendants((node, pos) => {
-            if (node.type.name == "paragraph") {
+            if (node.type.name == "paragraph" || node.type.name == "heading") {
               const [from, to] = [pos, pos + node.nodeSize];
               const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
               if (from <= markPos && to >= markPos) {
                 if (node.content && node.content.content) {
                   const { content } = node.content;
+
                   const newNodeContent = content.filter((innerNode, index) => {
+                    if (innerNode.marks.length > 0) {
+                      console.log(innerNode.marks);
+                    }
                     if (innerNode.marks && innerNode.marks[0]) {
                       const [mark] = innerNode.marks;
                       if (
@@ -171,6 +175,7 @@ export default {
                         mark.attrs.uuid &&
                         mark.attrs.uuid === uuid
                       ) {
+                        console.log(mark.uuid);
                         return false;
                       }
                     }
@@ -184,6 +189,7 @@ export default {
                   const sel = new TextSelection($from, $to);
                   const startPosition = Math.max(pos, sel.from);
                   const endPosition = Math.min(pos + node.nodeSize, sel.to);
+                  console.log(newNode);
                   dispatch(tr.replaceWith(startPosition, endPosition, newNode));
                 }
               }
@@ -607,6 +613,9 @@ export default {
     margin-block-end: 4px !important;
   }
 
+  h1 > span.is-link,
+  h2 > span.is-link,
+  h3 > span.is-link,
   p > span.is-link {
     display: flex;
     height: 20px;
@@ -632,7 +641,7 @@ export default {
             position: absolute;
             left: 50%;
             top: -6px;
-						white-space: nowrap;
+            white-space: nowrap;
             transform: translateX(-50%) translateY(-100%);
             background: rgba(0, 0, 0, 0.7);
             text-align: center;
@@ -667,7 +676,7 @@ export default {
           position: absolute;
           left: 50%;
           top: -6px;
-					white-space: nowrap;
+          white-space: nowrap;
           transform: translateX(-50%) translateY(-100%);
           background: rgba(0, 0, 0, 0.7);
           text-align: center;

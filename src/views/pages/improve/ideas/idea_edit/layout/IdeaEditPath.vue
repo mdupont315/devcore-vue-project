@@ -253,6 +253,7 @@
                 :disabled="vErrors.any() || isLoading"
                 variant="primary"
                 size="lg"
+										:style="{'cursor': isLoading ? 'not-allowed' : 'pointer' }"
                 style="flex-grow: 1; width: 30%; border-radius: 3px"
                 :loading="false"
                 @click="updateStatus"
@@ -267,6 +268,7 @@
                 size="lg"
                 :loading="false"
                 style="flex-grow: 1; width: 30%; border-radius: 3px"
+								:style="{'cursor': isLoading ? 'not-allowed' : 'pointer' }"
                 :disabled="vErrors.any() || isLoading"
                 @click="updateStatus"
                 >{{ $t("Adopt") }}</loading-button
@@ -275,6 +277,7 @@
                 :disabled="vErrors.any() || isLoading"
                 :loading="false"
                 size="lg"
+										:style="{'cursor': isLoading ? 'not-allowed' : 'pointer' }"
                 block
                 style="flex-grow: 1; width: 30%; border-radius: 3px"
                 type="submit"
@@ -284,6 +287,7 @@
                 buttonVariant="outline-danger"
                 size="lg"
                 :isDisabled="isLoading"
+										:style="{'cursor': isLoading ? 'not-allowed' : 'pointer' }"
                 :btnClass="
                   isLoading
                     ? 'ideaEdit_path_remove_button-disabled'

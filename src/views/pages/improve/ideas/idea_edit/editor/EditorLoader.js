@@ -279,7 +279,7 @@ export default class ContentEditor {
           const __formatHTML = _formatHTML.replace(/ style(.*?)">/g, ">");
           const ___formatHTML = __formatHTML.replace(/<br>/g, " ");
 
-          console.log(html);
+         // console.log(html);
 
           // console.log(_stylesRemoved)
           return ___formatHTML;

@@ -111,16 +111,14 @@ export const File = Node.create({
           id: dom.getAttribute("id"),
           src: dom.getAttribute("src"),
           size: dom.getAttribute("size"),
-          title: dom.getAttribute("title"),
+          title: dom.getAttribute("title") ?? 'no-name',
           alt: dom.getAttribute("alt"),
           style: dom.getAttribute("style"),
           type: dom.getAttribute("type"),
           preview: dom.getAttribute("preview"),
-          uuid: dom.getAttribute("uuid"),
+          uuid: dom.getAttribute("uuid")
         };
-
-        console.log(obj);
-        return obj;
+        if (obj.src) return obj;
       }
     },
     {
@@ -132,13 +130,13 @@ export const File = Node.create({
           src: dom.getAttribute("src"),
           size: dom.getAttribute("size"),
           href: dom.getAttribute("href"),
-          title: dom.getAttribute("title"),
+          title: dom.getAttribute("title") ?? 'no-name',
           style: dom.getAttribute("style"),
           type: dom.getAttribute("type"),
           preview: dom.getAttribute("preview"),
-          uuid: dom.getAttribute("uuid"),
+          uuid: dom.getAttribute("uuid")
         };
-        return obj;
+        if (obj.href) return obj;
       }
     }
   ],
@@ -154,10 +152,17 @@ export const File = Node.create({
       uuid
     } = HTMLAttributes;
 
-    if (!preview) {
-      return ["a", { href, title, style, size, alt, uuid }, title];
+    console.log(HTMLAttributes)
+
+    if (href || src) {
+      if (!preview) {
+        return ["a", { href, title, style, size, alt, uuid }, title];
+      } else {
+        return ["img", { title, src, alt, style, size, uuid }];
+      }
     }
-    return ["img", { title, src, alt, style, size, uuid }];
+
+    return false;
   },
   addNodeView() {
     return VueNodeViewRenderer(FileNodeView);
@@ -185,7 +190,13 @@ export const File = Node.create({
             if (valid) {
               const uuid = uuidv4();
               addFile({ uuid, file: item });
-              renderFileInBase64ToCoordinates(item, view, coordinates, preview, uuid);
+              renderFileInBase64ToCoordinates(
+                item,
+                view,
+                coordinates,
+                preview,
+                uuid
+              );
             }
           });
         }
@@ -197,7 +208,13 @@ export const File = Node.create({
             if (valid) {
               const uuid = uuidv4();
               addFile({ uuid, file: item });
-              renderFileInBase64ToCoordinates(item, view, coordinates, preview, uuid);
+              renderFileInBase64ToCoordinates(
+                item,
+                view,
+                coordinates,
+                preview,
+                uuid
+              );
             }
           });
         }
