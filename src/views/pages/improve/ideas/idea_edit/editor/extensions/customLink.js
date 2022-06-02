@@ -155,20 +155,19 @@ export const CustomLink = Link.extend({
               if (
                 !event.target.parentElement.dataset.uuid ||
                 !event.target.href
-              )
+              ) {
                 return;
+              }
               if (event.button === 2) return;
               window.open(event.target.href, "__blank");
             }
             if (event.target.localName === "button") {
               if (!event.target.parentElement) return;
-              console.log("2");
               if (
                 event.target.parentElement &&
                 event.target.parentElement.dataset.uuid
               ) {
                 if (event.button === 2) return;
-                console.log("3");
                 const uuid = event.target.parentElement.dataset.uuid;
                 removeLink(pos, uuid);
               }

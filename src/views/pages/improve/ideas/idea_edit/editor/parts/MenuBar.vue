@@ -207,6 +207,8 @@ export default {
             const [$from, $to] = [newDoc.resolve(from), newDoc.resolve(to)];
 
             const sel = new TextSelection($from, $to);
+
+						console.log(sel)
             dispatch(newTr.setSelection(sel));
           });
         }

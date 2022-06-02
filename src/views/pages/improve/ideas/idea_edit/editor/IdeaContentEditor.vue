@@ -157,19 +157,15 @@ export default {
             view: { dispatch },
           } = this.editor;
           doc.descendants((node, pos) => {
-            if (node.type.name == "paragraph" || node.type.name == "heading") {
+            if (node.type.name == "paragraph" || node.type.name == "heading" || node.type.name == "comment") {
               const [from, to] = [pos, pos + node.nodeSize];
               const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
               if (from <= markPos && to >= markPos) {
                 if (node.content && node.content.content) {
                   const { content } = node.content;
 
-                  console.log(content);
-
                   const newNodeContent = content.filter((innerNode, index) => {
-                    if (innerNode.marks.length > 0) {
-                      console.log(innerNode.marks);
-                    }
+
                     if (innerNode.marks && innerNode.marks[0]) {
                       const [mark] = innerNode.marks;
                       if (
@@ -177,7 +173,6 @@ export default {
                         mark.attrs.uuid &&
                         mark.attrs.uuid === uuid
                       ) {
-                        console.log(mark.uuid);
                         return false;
                       }
                     }
@@ -571,10 +566,12 @@ export default {
     td {
       font-family: FuturaLight;
       color: #707070;
+			    overflow: hidden;
     }
 
     th {
       font-weight: bold;
+			    overflow: hidden;
       text-align: left;
       background-color: #4294d0;
       color: #fff;
@@ -618,15 +615,18 @@ export default {
   h1 > span.is-link,
   h2 > span.is-link,
   h3 > span.is-link,
-  p > span.is-link {
-    display: flex;
+  p > span.is-link,
+  div > span.is-link {
+    display: inline-flex;
+    padding-right: 5px;
     height: 20px;
+    white-space: nowrap;
     & > button {
+      height: 100%;
       font-family: "FuturaMedium";
       color: #d0424d;
       border: 1px solid lightgray;
       width: 60px;
-      height: 20px;
       outline: none;
       position: relative;
       border-radius: 3px;
@@ -660,14 +660,20 @@ export default {
       }
     }
     & > a {
-      border: 1px solid lightgray;
+      flex-direction: row;
+      max-width: fit-content;
       display: inline-flex;
+      width: 100%;
+      border: 1px solid lightgray;
       border-radius: 3px;
       place-items: center;
       color: #4294d0;
       line-height: 5px;
       cursor: pointer;
       padding: 0 10px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      // position: absolute;
       margin-right: 10px;
       text-decoration: none;
       user-select: none;
@@ -675,6 +681,7 @@ export default {
         position: relative;
         &:hover::after {
           content: attr(data-tooltip);
+          max-width: 200px;
           position: absolute;
           left: 50%;
           top: -6px;
