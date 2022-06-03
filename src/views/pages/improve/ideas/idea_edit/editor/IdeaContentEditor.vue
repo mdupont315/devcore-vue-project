@@ -287,6 +287,8 @@ export default {
         },
         transformComments: (node) => {
           const curNode = JSON.parse(node.attrs.comment);
+          const selection = this.editor.view.state.selection;
+
           // console.log()
           if (
             !this.editor.view.state.selection.empty ||
@@ -301,12 +303,22 @@ export default {
             view: { dispatch },
           } = this.editor;
 
-          this.editor
-            .chain()
-            .focus()
-            .selectParentNode(this.editor.view.state.selection)
-            .setComment(JSON.stringify(curNode))
-            .run();
+
+          if (selection && selection.$head && selection.$head.parent) {
+            const parent = selection.$head.parent;
+            if (
+              parent.attrs.id &&
+              curNode.uuid &&
+              parent.attrs.id === curNode.uuid
+            ) {
+              this.editor
+                .chain()
+                .focus()
+                .selectParentNode(selection)
+                .setComment(JSON.stringify(curNode))
+                .run();
+            }
+          }
         },
       };
 

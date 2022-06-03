@@ -363,7 +363,9 @@ export default {
     getParagraphNodesFromContent() {
       const { markup } = this.getIdeaContent;
       const paragraphNodes =
-        markup?.content.filter((node) => node.type === "paragraph") ?? [];
+        markup?.content.filter(
+          (node) => node.type === "paragraph" && node.attrs && node.attrs.id
+        ) ?? [];
 
       return paragraphNodes;
     },
@@ -372,7 +374,7 @@ export default {
       //sync files
       this.syncFiles();
       //sync comments
-      this.getCommentNodesFromContent();
+      this.getParagraphNodesFromContent();
       //remove ids
       // const paragraphNodesInContent = this.getParagraphNodesFromContent();
       // console.log(paragraphNodesInContent)
