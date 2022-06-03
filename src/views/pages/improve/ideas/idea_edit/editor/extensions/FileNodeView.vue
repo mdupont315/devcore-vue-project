@@ -21,7 +21,11 @@
 
       <div v-else style="display: flex">
         <div style="display: flex; place-items: center">
-          <div class="attachment-file-non-preview-container">
+          <div
+            class="attachment-file-non-preview-container"
+            v-b-tooltip.hover
+            :title="$t('Download file')"
+          >
             <a :href="getAttrs.href">
               <svg
                 width="17"
@@ -41,8 +45,10 @@
           </div>
           <button
             @click="remove"
+            v-b-tooltip.hover
+            :title="$t('Remove file')"
             class="file-remove-button"
-            style="margin-left: 8px"
+            style="margin-left: 8px; height: 100%"
           >
             {{ $t("Remove") }}
           </button>
@@ -102,7 +108,7 @@ export default {
   },
   methods: {
     async transformFilesIfPastedExternalUrls() {
-			console.log("transforming");
+      console.log("transforming");
       if (
         !this.node.attrs.size &&
         this.node.attrs.src &&
@@ -111,7 +117,6 @@ export default {
         const externalToBase64 = await this.getBase64FromUrl(
           this.node.attrs.src
         );
-
 
         const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;
         const size = externalToBase64.length * (3 / 4) - mod;
@@ -166,7 +171,6 @@ export default {
     color: #d0424d;
     border: 1px solid lightgray;
     width: 60px;
-    height: 20px;
     outline: none;
     position: relative;
     border-radius: 3px;
@@ -189,13 +193,16 @@ export default {
 .attachment-file-non-preview-container {
   bottom: 2px;
   font-family: "FuturaMedium";
+  height: 40px;
+  display: flex;
+  align-items: center;
   position: relative;
-  height: 20px;
   width: 100%;
   border: 1px solid lightgray;
   padding: 2px 10px;
   border-radius: 3px;
   padding: 0 10px;
+  user-select: none;
   cursor: pointer;
   background: #fff;
   > a {

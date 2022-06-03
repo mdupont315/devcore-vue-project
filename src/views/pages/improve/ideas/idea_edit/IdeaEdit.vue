@@ -356,7 +356,26 @@ export default {
       const commentNodes =
         markup?.content.filter((node) => node.type === "comment") ?? [];
 
+      console.log(commentNodes);
+
       return commentNodes;
+    },
+    getParagraphNodesFromContent() {
+      const { markup } = this.getIdeaContent;
+      const paragraphNodes =
+        markup?.content.filter((node) => node.type === "paragraph") ?? [];
+
+      return paragraphNodes;
+    },
+
+    syncContent() {
+      //sync files
+      this.syncFiles();
+      //sync comments
+      this.getCommentNodesFromContent();
+      //remove ids
+      // const paragraphNodesInContent = this.getParagraphNodesFromContent();
+      // console.log(paragraphNodesInContent)
     },
 
     syncFiles() {
@@ -395,7 +414,7 @@ export default {
       this.isLoading = true;
       this.isSaving = true;
       window.vm.$snotify.info(this.$t("Do not close window"), {
-				timeout: 5000,
+        timeout: 5000,
         showProgressBar: false,
         closeOnClick: false,
         pauseOnHover: true,
@@ -403,7 +422,8 @@ export default {
 
       try {
         //Sync files in server with files in content
-        this.syncFiles();
+
+        this.syncContent();
         //this.getCommentNodesFromContent();
 
         const ideaSave = await this.saveIdea();
@@ -440,7 +460,7 @@ export default {
           }
         }
 
-        if (this.ideaInEdit.editIdeaMode === "CREATE") {
+        if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "CREATE") {
           await this.navigateToPath();
           await this.closeIdeaEdit();
         }
@@ -448,7 +468,7 @@ export default {
       } catch (e) {
         console.log(e);
       } finally {
-				window.vm.$snotify.clear()
+        window.vm.$snotify.clear();
         this.ideaForm._fields.removeFileIds = [];
         this.isSaving = false;
         this.isLoading = false;

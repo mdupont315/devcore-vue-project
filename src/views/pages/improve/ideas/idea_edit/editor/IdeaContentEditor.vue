@@ -157,7 +157,11 @@ export default {
             view: { dispatch },
           } = this.editor;
           doc.descendants((node, pos) => {
-            if (node.type.name == "paragraph" || node.type.name == "heading" || node.type.name == "comment") {
+            if (
+              node.type.name == "paragraph" ||
+              node.type.name == "heading" ||
+              node.type.name == "comment"
+            ) {
               const [from, to] = [pos, pos + node.nodeSize];
               const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
               if (from <= markPos && to >= markPos) {
@@ -165,7 +169,6 @@ export default {
                   const { content } = node.content;
 
                   const newNodeContent = content.filter((innerNode, index) => {
-
                     if (innerNode.marks && innerNode.marks[0]) {
                       const [mark] = innerNode.marks;
                       if (
@@ -269,7 +272,6 @@ export default {
           ).filter(
             ([key, _comments]) => _comments.length > 1 && key === curNode.uuid
           )) {
-            //console.log(comments);
             comments.pop();
 
             for (const comment of comments) {
@@ -278,26 +280,8 @@ export default {
               replaceTr.setNodeMarkup(from, schema.nodes.paragraph, {
                 id: comment.comment.uuid,
               });
-
-              // const emptyComment = JSON.stringify({
-              //   comments: [],
-              //   ideaUuid: comment.comment.ideaUuid,
-              //   uuid: comment.comment.uuid,
-              // });
-              // replaceTr.setNodeMarkup(from, schema.nodes.comment, {
-              //   comment: emptyComment,
-              // });
-              // const [$start, $end] = [
-              //   doc.resolve(comment.from),
-              //   doc.resolve(comment.to),
-              // ];
-              // replaceTr = replaceTr.setSelection(
-              //   new TextSelection($start, $end)
-              // );
             }
           }
-          // this.editor.commands.clearNodes();
-          //	this.editor.commands.toggleHighlight({ color: "#ffcc00" });
 
           dispatch(replaceTr);
         },
@@ -317,72 +301,12 @@ export default {
             view: { dispatch },
           } = this.editor;
 
-          //           const paragraphs = [];
-          //           const comments = [];
-          //           doc.descendants((node, pos) => {
-          //             if (node.type.name !== "comment") return;
-          //             const [from, to] = [pos, pos + node.nodeSize];
-
-          //             const [comment, content] = [
-          //               JSON.parse(node.attrs.comment),
-          //               node.content,
-          //             ];
-
-          // console.log(this.editor.view.state.selection)
-          // console.log(to)
-          // console.log(from)
-          //             if (
-          //               from >= this.editor.view.state.selection &&
-          //               to <= this.editor.view.state.selection
-          //             ) {
-          //               comments.push({ from, to, comment, content });
-          //             }
-          //           });
-
-          //           console.log({ comments });
-
-          //           console.log("selection ", this.editor.view.state.selection);
-          //           comments.filter();
           this.editor
             .chain()
             .focus()
             .selectParentNode(this.editor.view.state.selection)
             .setComment(JSON.stringify(curNode))
             .run();
-
-          //this.editor.commands.setComment(JSON.stringify(curNode));
-
-          // this.editor.commands.setHighlight({ color: "#ffcc00" });
-          // console.log("is empty ", this.editor.view.state.selection.empty);
-          // const [$from, $to] = [
-          //   doc.resolve(paragraphs[0].from),
-          //   doc.resolve(paragraphs[0].to),
-          // ];
-          // const sel = new TextSelection($from, $to);
-          // console.log($from, $to)
-          // console.log(sel);
-          // dispatch(tr.setSelection(sel));
-          // //	const sel = new TextSelection($from, $to);
-          // setTimeout(() => {
-          //   this.editor.commands.setHighlight({ color: "#ffcc00" });
-          // });
-
-          //		this.editor.commands.toggleHighlight();
-
-          // const curComment = comments.filter(
-          //   (commentEntity) => commentEntity.comment.uuid === curNode.uuid
-          // );
-          //  console.log(curComment);
-          // console.log({comments})
-          //           this.editor.chain().focus().setComment(
-          //   JSON.stringify({
-          //     this.editor.commands.setComment(JSON.stringify(dataToInsert));,
-          //   })
-
-          //   console.log(curNode);
-          // console.log(comments);
-
-          //   this.editor.commands.setComment(JSON.stringify(curNode));
         },
       };
 
@@ -566,12 +490,12 @@ export default {
     td {
       font-family: FuturaLight;
       color: #707070;
-			    overflow: hidden;
+      overflow: hidden;
     }
 
     th {
       font-weight: bold;
-			    overflow: hidden;
+      overflow: hidden;
       text-align: left;
       background-color: #4294d0;
       color: #fff;
@@ -619,7 +543,8 @@ export default {
   div > span.is-link {
     display: inline-flex;
     padding-right: 5px;
-    height: 20px;
+    height: 40px;
+    user-select: none;
     white-space: nowrap;
     & > button {
       height: 100%;
@@ -630,6 +555,7 @@ export default {
       outline: none;
       position: relative;
       border-radius: 3px;
+      user-select: none;
       background: #fff;
       cursor: pointer;
       font-size: 12px;
@@ -675,6 +601,7 @@ export default {
       white-space: nowrap;
       // position: absolute;
       margin-right: 10px;
+      margin-left: 10px;
       text-decoration: none;
       user-select: none;
       &[data-tooltip] {

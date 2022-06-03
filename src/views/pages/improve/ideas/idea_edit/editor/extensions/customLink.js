@@ -89,7 +89,7 @@ export const CustomLink = Link.extend({
         }),
         0
       ],
-      ["button", "Remove"]
+      ["button", window.vm.$t("Remove")]
     ];
   },
   addProseMirrorPlugins() {
@@ -107,16 +107,12 @@ export const CustomLink = Link.extend({
                 event.target.getAttribute("uuid")
               ) {
                 const uuid = event.target.getAttribute("data-uuid");
-                console.log(uuid);
-                console.log(event.target);
-
                 const href = event.target.getAttribute("href");
                 let links = [...document.querySelectorAll(".is-link")];
-                console.log(links);
                 const [thisLink] = links.filter(
                   link =>
-                    !!link.parentElement &&
-                    link.parentElement.dataset.uuid === uuid
+                    !!link &&
+                    link.dataset.uuid === uuid
                 );
                 if (!thisLink) return false;
                 if (!thisLink.firstChild) return false;
@@ -125,23 +121,25 @@ export const CustomLink = Link.extend({
 
               if (
                 event.target.localName === "button" ||
-                event.target.getAttribute("uuid")
+                event.target.getAttribute("data-uuid")
               ) {
                 let links = [...document.querySelectorAll(".is-link")];
-                if (!event.target.parentElement) return false;
-                const uuid = event.target.parentElement.getAttribute(
+                if (!event.target) return false;
+                const uuid = event.target.getAttribute(
                   "data-uuid"
                 );
+
                 const [thisLink] = links.filter(
                   link =>
-                    !!link.parentElement &&
-                    link.parentElement.dataset.uuid === uuid
+                    !!link &&
+                    link.dataset.uuid === uuid
                 );
+
                 if (!thisLink) return false;
                 if (!thisLink.lastChild) return false;
                 thisLink.lastChild.setAttribute(
                   "data-tooltip",
-                  "Remove Hyperlink"
+                  window.vm.$t("RemoveHyperLink")
                 );
                 // thisLink.setAttribute("data-tooltip", uuid);
               }
