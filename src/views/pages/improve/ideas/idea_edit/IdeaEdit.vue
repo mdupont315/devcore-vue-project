@@ -360,21 +360,21 @@ export default {
 
       return commentNodes;
     },
-    getParagraphNodesFromContent() {
-      const { markup } = this.getIdeaContent;
-      const paragraphNodes =
-        markup?.content.filter(
-          (node) => node.type === "paragraph" && node.attrs && node.attrs.id
-        ) ?? [];
+    // getParagraphNodesFromContent() {
+    //   const { markup } = this.getIdeaContent;
+    //   const paragraphNodes =
+    //     markup?.content.filter(
+    //       (node) => node.type === "paragraph" && node.attrs && node.attrs.id
+    //     ) ?? [];
 
-      return paragraphNodes;
-    },
+    //   return paragraphNodes;
+    // },
 
     syncContent() {
       //sync files
       this.syncFiles();
       //sync comments
-      this.getParagraphNodesFromContent();
+     //this.getParagraphNodesFromContent();
       //remove ids
       // const paragraphNodesInContent = this.getParagraphNodesFromContent();
       // console.log(paragraphNodesInContent)

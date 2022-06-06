@@ -145,12 +145,12 @@
                               id="password"
                               ref="password"
                               v-model="form.password"
-                              v-validate="{
+                              :v-validate="{
                                 required: this.form.changePassword,
                                 min: 6,
                               }"
                               class="shadow-sm"
-                              :state="$validateState('password')"
+                              :state="$validateState('password', form)"
                               :disabled="form.busy"
                               :placeholder="$t('Password')"
                               type="password"
@@ -171,16 +171,15 @@
                             <b-form-input
                               id="passwordConfirmation"
                               v-model="form.passwordConfirmation"
-                              v-validate="{
-                                required: this.form.changePassword,
-                                min: 6,
-                                confirmed: $t('passwordConfirmationMatchPassword'),
-                              }"
+                              v-validate="'required|confirmed:password'"
                               class="shadow-sm"
-                              :state="$validateState('passwordConfirmation')"
+                              :state="
+                                $validateState('passwordConfirmation', form)
+                              "
                               :disabled="form.busy"
                               :placeholder="$t('Password confirm')"
                               type="password"
+                              ref="passwordConfirmation"
                               name="passwordConfirmation"
                             ></b-form-input>
                             <label for="passwordConfirmation">
@@ -250,7 +249,7 @@ export default {
       handler(route) {
         if (route.query.i) {
           this.intent = Math.random();
-					this.changePassword = true;
+          this.changePassword = true;
         }
       },
     },
