@@ -133,11 +133,6 @@ export default {
         /^(ftp|http|https|chrome|:\/\/|\.|@){2,}(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\S*:\w*@)*([a-zA-Z]|(\d{1,3}|\.){7}){1,}(\w|\.{2,}|\.[a-zA-Z]{2,3}|\/|\?|&|:\d|@|=|\/|\(.*\)|#|-|%)*$/gmu;
       return regexp.test(url);
     },
-    getHref(href) {
-      console.log(href);
-
-      return href;
-    },
     async getBase64FromUrl(url) {
       const data = await fetch(url);
       const blob = await data.blob();

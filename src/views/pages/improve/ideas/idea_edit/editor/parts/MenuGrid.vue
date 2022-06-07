@@ -8,6 +8,7 @@
       :class="{ 'menu-grid-is-active': selectionOpen || selecting }"
       ref="menuListButtonHeading"
     >
+
       <svg class="remix">
         <use :xlink:href="`${remixiconUrl}#ri-${item.icon}`" />
       </svg>
@@ -48,6 +49,10 @@ export default {
   props: {
     item: {
       type: Object,
+      required: true,
+    },
+    activeIcon: {
+      type: String,
       required: true,
     },
     allItems: {

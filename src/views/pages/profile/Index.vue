@@ -124,7 +124,8 @@
                     <div>
                       <b-form-checkbox
                         id="changePassword"
-                        v-model="form.changePassword"
+                        v-model="getFormChangePassword"
+												:disabled="user.mustChangePassword"
                         name="changePassword"
                         :value="true"
                         :unchecked-value="false"
@@ -171,7 +172,9 @@
                             <b-form-input
                               id="passwordConfirmation"
                               v-model="form.passwordConfirmation"
-                              v-validate="'required|confirmed:password'"
+                              v-validate="
+                                `required_if:${this.form.changePassword}|confirmed:password`
+                              "
                               class="shadow-sm"
                               :state="
                                 $validateState('passwordConfirmation', form)
@@ -243,13 +246,22 @@ export default {
     ...mapGetters({
       user: "auth/user",
     }),
+    getFormChangePassword: {
+      get() {
+        return this.form.changePassword;
+      },
+      set(val) {
+        this.form.changePassword = this.user.mustChangePassword ? false : val;
+      },
+    },
   },
   watch: {
     $route: {
+      immediate: true,
       handler(route) {
         if (route.query.i) {
           this.intent = Math.random();
-          this.changePassword = true;
+          this.form.changePassword = true;
         }
       },
     },

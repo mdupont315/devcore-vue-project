@@ -93,7 +93,6 @@ export default {
   watch: {
     value: {
       handler(newVal) {
-        console.log(newVal);
         if (!newVal) {
           this.hoverPosition = null;
           this.tableGridX = null;
@@ -200,7 +199,6 @@ export default {
       },
       set(value) {
         this.$emit("close", value);
-        console.log(value);
         if (!value) {
           this.tableGridY = null;
           this.tableGridX = null;

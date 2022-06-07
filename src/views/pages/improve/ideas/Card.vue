@@ -128,13 +128,13 @@
           <span v-if="idea.problemsCount > 0" class="font-15x ml-2">
             <b-badge variant="danger">{{ idea.problemsCount }}</b-badge>
           </span>
-          <span
+          <!-- <span
             v-if="idea.hasFile"
             class="text-gray font-15x ml-2"
             style="position: relative; top: 1px"
           >
             <i class="mdi mdi-folder-open-outline"></i>
-          </span>
+          </span> -->
         </div>
       </b-card-footer>
     </div>

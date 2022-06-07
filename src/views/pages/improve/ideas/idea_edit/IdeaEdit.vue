@@ -11,6 +11,7 @@
         @fileRemoved="removeFile"
         @selectedType="setContentType"
         @saveIdeaContent="saveIdeaVersion"
+        @editorLoaded="setEditorLoaded"
         @isDirty="setIsDirty"
         :isSaving="isSaving"
         v-model="getIdeaContent"
@@ -23,6 +24,8 @@
         :isLoading="isLoading"
         v-model="getIdeaPath"
         :ideaContentIsDirty="ideaContentIsDirty"
+        @isDirty="setIsDirty"
+        :editorLoaded="editorLoaded && isLoaded"
         :idea="getIdea"
       ></idea-edit-path>
     </div>
@@ -64,6 +67,7 @@ export default {
     defaultContentName: "Custom",
     selectedCategoryIndex: 2,
     ideaContentIsDirty: false,
+    editorLoaded: false,
     ideaForm: new GQLForm({
       id: undefined,
       processId: null,
@@ -226,7 +230,14 @@ export default {
     }
   },
   methods: {
+    setEditorLoaded() {
+      this.editorLoaded = true;
+    },
     setIsDirty() {
+      console.log("setIsDirty");
+      console.log(this);
+      console.log(this.ideaForm);
+      console.log(this.ideaContentCategories);
       this.ideaContentIsDirty = true;
     },
     removeFile(file) {
@@ -252,11 +263,14 @@ export default {
       });
     },
     formFieldMapper(mapTo, mapFrom) {
+      this.editorLoaded = false;
       Object.keys(mapTo.fields || {})
         .filter((key) => key in mapFrom)
         .forEach((key) => {
           mapTo[key] = mapFrom[key];
         });
+
+      this.editorLoaded = true;
     },
     async initializeData() {
       this.filter = {
@@ -374,7 +388,7 @@ export default {
       //sync files
       this.syncFiles();
       //sync comments
-     //this.getParagraphNodesFromContent();
+      //this.getParagraphNodesFromContent();
       //remove ids
       // const paragraphNodesInContent = this.getParagraphNodesFromContent();
       // console.log(paragraphNodesInContent)
@@ -474,6 +488,7 @@ export default {
         this.ideaForm._fields.removeFileIds = [];
         this.isSaving = false;
         this.isLoading = false;
+        this.ideaContentIsDirty = false;
       }
     },
     async navigateToPath() {

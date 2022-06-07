@@ -56,7 +56,6 @@ Vue.use(VeeValidate, {
 function getErrorMessage(vue, ref, form = null) {
   const userLanguage = store.getters["auth/user"]?.lang ?? "en";
 
-  console.log(vue.vFields)
   let errorMessage = "";
   if (vue.vFields[ref]) {
 
@@ -80,7 +79,6 @@ function getErrorMessage(vue, ref, form = null) {
       return errorMessage.replace(re, replaceText);
     }
 
-    console.log(errorMessage);
     return errorMessage;
   } else {
     return form && form.getError(ref) ? form.getError(ref).message : null;
@@ -92,9 +90,7 @@ Vue.use({
   install(Vue) {
     Vue.prototype.$validateState = function(ref, form = null) {
 
-      // console.log(ref, form)
       const message = getErrorMessage(this, ref, form);
-      console.log(message)
       const ret =
         message === null || message.message === null || message.message === "";
       return ret;

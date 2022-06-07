@@ -32,6 +32,8 @@ export const Comment = Node.create({
   parseHTML: () => [{ tag: "span[comment]" }],
 
   renderHTML({ HTMLAttributes }) {
+
+    console.log(HTMLAttributes)
     return [
       "span",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),

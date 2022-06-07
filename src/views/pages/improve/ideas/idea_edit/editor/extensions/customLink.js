@@ -13,13 +13,13 @@ export const CustomLink = Link.extend({
       },
       linkOnPaste: true,
       openOnClick: true,
-      removeLink: () => {}
+      removeLink: () => {},
+      validate: href => /^https?:\/\//.test(href)
     };
   },
   addCommands() {
     return {
       setLink: attributes => ({ chain }) => {
-        console.log(attributes);
         return chain()
           .setMark(this.name, attributes)
           .setMeta("preventAutolink", true)
@@ -71,12 +71,19 @@ export const CustomLink = Link.extend({
             "data-uuid": dom.getAttribute("uuid")
           };
         }
-      }
+      },
     ];
   },
   renderHTML({ mark, HTMLAttributes }) {
     const { uuid, href, target } = HTMLAttributes;
-    console.log(uuid);
+    const validate = /^https?:\/\//.test(href);
+
+    if (!href) return true;
+
+    if (!validate) {
+      return ["p", 0];
+    }
+
     return [
       "span",
       { class: "is-link", "data-uuid": uuid ?? uuidv4() },
@@ -102,17 +109,12 @@ export const CustomLink = Link.extend({
           handleDOMEvents: {
             mouseover(view, event) {
               if (!event.target) return false;
-              if (
-                event.target.localName === "a" ||
-                event.target.getAttribute("uuid")
-              ) {
+              if (event.target.getAttribute("uuid")) {
                 const uuid = event.target.getAttribute("data-uuid");
                 const href = event.target.getAttribute("href");
                 let links = [...document.querySelectorAll(".is-link")];
                 const [thisLink] = links.filter(
-                  link =>
-                    !!link &&
-                    link.dataset.uuid === uuid
+                  link => !!link && link.dataset.uuid === uuid
                 );
                 if (!thisLink) return false;
                 if (!thisLink.firstChild) return false;
@@ -125,14 +127,10 @@ export const CustomLink = Link.extend({
               ) {
                 let links = [...document.querySelectorAll(".is-link")];
                 if (!event.target) return false;
-                const uuid = event.target.getAttribute(
-                  "data-uuid"
-                );
+                const uuid = event.target.getAttribute("data-uuid");
 
                 const [thisLink] = links.filter(
-                  link =>
-                    !!link &&
-                    link.dataset.uuid === uuid
+                  link => !!link && link.dataset.uuid === uuid
                 );
 
                 if (!thisLink) return false;
@@ -144,21 +142,24 @@ export const CustomLink = Link.extend({
                 // thisLink.setAttribute("data-tooltip", uuid);
               }
 
-              return false;
+              return true;
             }
           },
           handleClick(view, pos, event) {
-            console.log(event);
-            if (event.target.localName === "a") {
+            if (event.button === 2) return;
+
+            if (
+              event.target.localName === "a" ||
+              event.target.localName === "strong"
+            ) {
               if (
-                !event.target.parentElement.dataset.uuid ||
-                !event.target.href
+                event.target.parentElement.dataset.uuid ||
+                event.target.parentElement.href
               ) {
-                return;
+                window.open(event.target.href, "__blank");
               }
-              if (event.button === 2) return;
-              window.open(event.target.href, "__blank");
             }
+
             if (event.target.localName === "button") {
               if (!event.target.parentElement) return;
               if (

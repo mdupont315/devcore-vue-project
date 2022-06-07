@@ -118,6 +118,7 @@ export default {
       type: Boolean,
       default: true,
     },
+
     selectedCategoryIndex: {
       type: Number,
       default: 0,
@@ -155,6 +156,8 @@ export default {
     setIsInitialized() {
       this.isEditable = true;
       this.isInitialized = true;
+
+			this.$emit("editorLoaded")
     },
     saveContent() {
       this.$emit("saveIdeaContent");

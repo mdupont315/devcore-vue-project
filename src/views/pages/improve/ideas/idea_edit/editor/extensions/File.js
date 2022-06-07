@@ -152,8 +152,6 @@ export const File = Node.create({
       uuid
     } = HTMLAttributes;
 
-    console.log(HTMLAttributes)
-
     if (href || src) {
       if (!preview) {
         return ["a", { href, title, style, size, alt, uuid }, title];

@@ -125,16 +125,9 @@ export default class IssueModel extends BaseModel {
 
     if (effect && effect.templates && effect.templates.length > 0) {
       effect.templates.forEach(template => {
-        console.log("reporters time value", this.timeValue);
-        console.log("effect template time", template.effectTime);
         const time = template.effectTime * 0.01;
         const mod = this.timeValue * 0.01;
-        console.log("template time", time);
-        console.log("multipllier", mod);
-        console.log("before", totalTime);
-        console.log("calc", time * mod)
         totalTime += time * mod;
-        console.log("after", totalTime);
       });
     }
     return totalTime;
@@ -153,7 +146,6 @@ export default class IssueModel extends BaseModel {
     const active = this.effect;
     if (active) {
       total -= active.effectValue;
-      console.log("initial total");
       if (active.templates && active.templates.length > 0) {
         active.templates.forEach(template => {
           const companyRoleId = template.companyRoleId;
@@ -167,9 +159,6 @@ export default class IssueModel extends BaseModel {
             r => r.roleId == companyRoleId
           );
 
-          console.log(hourlyByRole)
-          console.log(effectTime)
-          console.log("total after: ", total)
 
           if (hourlyByRole && hourlyByRole.hourlyAverage) {
             total -= hourlyByRole.hourlyAverage * effectTime;

@@ -33,7 +33,6 @@ const renderFileInBase64ToCoordinates = (
 
   if (!item) return;
 
-  console.log(coordinates);
   const reader = new FileReader();
   reader.onload = readerEvent => {
     const node = schema.nodes.file.create({
@@ -74,15 +73,10 @@ const uploadFilePlugin = (addFile, notify) => {
         const coordinates = { pos, inside: 0 };
 
         for (const item of items) {
-          console.log(item);
-          // console.log(item.getAsString(data => console.log(data)));
           if (item.kind != "file") return;
-          console.log({ item });
           if (item.type.indexOf("image") === 0) {
             event.preventDefault();
             const preview = true;
-
-            console.log("IS IMAGE");
 
             const itemAsFile = item.getAsFile();
             const valid = validateFileSize(notify, itemAsFile);
@@ -100,7 +94,6 @@ const uploadFilePlugin = (addFile, notify) => {
           } else {
             const preview = false;
             const itemAsFile = item.getAsFile();
-            console.log(itemAsFile);
 
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {
@@ -128,18 +121,11 @@ const uploadFilePlugin = (addFile, notify) => {
           }
 
           const data = Array.from(event.dataTransfer?.files ?? []);
-          console.log(data);
 
           const previewFiles = data.filter(file => /image/i.test(file.type));
           const nonPreviewFiles = data.filter(
             file => !/image/i.test(file.type)
           );
-
-          //  const docxFiles = data.filter(file => /vnd.openxmlformats-officedocument.wordprocessingml.document/i.test(file.type));
-
-          //  console.log(data)
-          //  console.log(docxFiles);
-          //  parseWordDocxFile(docxFiles)
 
           event.preventDefault();
           const coordinates = view.posAtCoords({

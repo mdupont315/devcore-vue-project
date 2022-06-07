@@ -253,7 +253,7 @@
                 :disabled="vErrors.any() || isLoading"
                 variant="primary"
                 size="lg"
-										:style="{'cursor': isLoading ? 'not-allowed' : 'pointer' }"
+                :style="{ cursor: isLoading ? 'not-allowed' : 'pointer' }"
                 style="flex-grow: 1; width: 30%; border-radius: 3px"
                 :loading="false"
                 @click="updateStatus"
@@ -268,7 +268,7 @@
                 size="lg"
                 :loading="false"
                 style="flex-grow: 1; width: 30%; border-radius: 3px"
-								:style="{'cursor': isLoading ? 'not-allowed' : 'pointer' }"
+                :style="{ cursor: isLoading ? 'not-allowed' : 'pointer' }"
                 :disabled="vErrors.any() || isLoading"
                 @click="updateStatus"
                 >{{ $t("Adopt") }}</loading-button
@@ -277,7 +277,7 @@
                 :disabled="vErrors.any() || isLoading"
                 :loading="false"
                 size="lg"
-										:style="{'cursor': isLoading ? 'not-allowed' : 'pointer' }"
+                :style="{ cursor: isLoading ? 'not-allowed' : 'pointer' }"
                 block
                 style="flex-grow: 1; width: 30%; border-radius: 3px"
                 type="submit"
@@ -287,7 +287,7 @@
                 buttonVariant="outline-danger"
                 size="lg"
                 :isDisabled="isLoading"
-										:style="{'cursor': isLoading ? 'not-allowed' : 'pointer' }"
+                :style="{ cursor: isLoading ? 'not-allowed' : 'pointer' }"
                 :btnClass="
                   isLoading
                     ? 'ideaEdit_path_remove_button-disabled'
@@ -341,6 +341,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    editorLoaded: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {
@@ -367,13 +371,6 @@ export default {
     getSelectableRoles: {
       get() {
         return this.allRoles;
-        // if (this.getParentRoles.length > 0) {
-        //   return this.allRoles.filter((role) =>
-        //     this.getParentRoles.includes(role.id)
-        //   );
-        // } else {
-        //   return this.allRoles;
-        // }
       },
     },
     mutateForm: {
@@ -381,6 +378,7 @@ export default {
         return this.value;
       },
       set(value) {
+        console.log(value);
         this.$emit("input", value);
       },
     },
@@ -422,15 +420,28 @@ export default {
 
   data: () => ({
     section: "ideas",
-    hasChanges: false,
     selectablePathRoles: [],
     roleIntent: null,
     toolIntent: null,
   }),
   mounted() {
     this.selectablePathRoles = this.getSelectableRoles;
+		console.log("this.mutateForm")
+		console.log(this.mutateForm)
     this.roleIntent = Math.random();
     this.toolIntent = Math.random();
+  },
+  watch: {
+    mutateForm: {
+      deep: true,
+      handler(newVal) {
+				console.log(newVal)
+        if (this.editorLoaded) {
+					console.log("EMITTING")
+          this.$emit("isDirty");
+        }
+      },
+    },
   },
   methods: {
     getSelectableProcessPathRoles() {

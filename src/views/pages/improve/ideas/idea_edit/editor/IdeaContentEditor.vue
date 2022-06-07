@@ -189,7 +189,6 @@ export default {
                   const sel = new TextSelection($from, $to);
                   const startPosition = Math.max(pos, sel.from);
                   const endPosition = Math.min(pos + node.nodeSize, sel.to);
-                  console.log(newNode);
                   dispatch(tr.replaceWith(startPosition, endPosition, newNode));
                 }
               }
@@ -289,7 +288,6 @@ export default {
           const curNode = JSON.parse(node.attrs.comment);
           const selection = this.editor.view.state.selection;
 
-          // console.log()
           if (
             !this.editor.view.state.selection.empty ||
             (!this.editor.isActive("paragraph") &&
@@ -510,9 +508,12 @@ export default {
       overflow: hidden;
       text-align: left;
       background-color: #4294d0;
-      color: #fff;
       font-size: 14px;
       font-family: FuturaMedium;
+			color: #fff;
+			& > p {
+				color: #fff
+			}
     }
 
     .selectedCell:after {
@@ -538,7 +539,7 @@ export default {
     }
   }
   p {
-    color: #707070 !important;
+    color: #707070;
     font-size: 14px !important;
     font-family: FuturaLight !important;
     font-weight: 400;

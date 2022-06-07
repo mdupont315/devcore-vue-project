@@ -96,7 +96,6 @@ export default {
     });
   },
   beforeDestroy() {
-    console.log("REMOVED)");
     window.removeEventListener("resize", this.onResize);
   },
   methods: {
@@ -168,16 +167,15 @@ export default {
       return match && match[7].length === 11 ? match[7] : false;
     },
     setVideo(dataUrl) {
-      let url = null;
+      let url = dataUrl;
       if (this.isYoutubeUrl(dataUrl)) {
         const embedParse = this.parseYoutubeUrl(dataUrl);
         url = `https://www.youtube.com/embed/${embedParse}`;
-
-        if (url) {
-          this.editor.commands.setExternalVideo({
-            src: url,
-          });
-        }
+      }
+      if (url) {
+        this.editor.commands.setExternalVideo({
+          src: url,
+        });
       }
     },
     setEmbed(data) {
@@ -203,20 +201,15 @@ export default {
             let newEditorState = this.editor.state;
             let newTr = newEditorState.tr;
             let newDoc = newEditorState.doc;
-            console.log(from, to);
             const [$from, $to] = [newDoc.resolve(from), newDoc.resolve(to)];
 
             const sel = new TextSelection($from, $to);
-
-						console.log(sel)
             dispatch(newTr.setSelection(sel));
           });
         }
 
         setTimeout(() => {
-					console.log(uuidv4());
           if (!data.url) return;
-					console.log(uuidv4());
           this.editor.commands.setLink({
             href: data.url,
             target: "_blank",
@@ -306,6 +299,15 @@ export default {
     },
   },
   computed: {
+    activeFont: {
+      get() {
+        let active = "paragraph";
+
+        let test = this.editor.isActive("heading", { level: 2 });
+
+        return test;
+      },
+    },
     getItems: {
       get() {
         const isLarge = this.headerBarWidth > this.showAllWidth;

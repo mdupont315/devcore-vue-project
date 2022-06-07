@@ -274,7 +274,6 @@ export default {
     getIsIdeaInEdit: {
       get() {
         if (this.ideaInEdit) {
-          console.log(this.ideaInEdit);
           const isEditingOrCreating = this.ideaInEdit.editIdeaMode;
           if (isEditingOrCreating === "EDIT") {
             return this.ideaInEdit;
@@ -316,8 +315,6 @@ export default {
       }
     });
     EventBus.$on("idea/currentTab", async (data) => {
-      console.log("data");
-      console.log(data);
       const tabName =
         data && data.form && data.form.tab ? data.form.tab : "new";
 
@@ -335,7 +332,6 @@ export default {
 
     //  EventBus.$on("idea/currentIdea", (data) => {
 
-    console.log(this.$router.currentRoute.query);
     if (
       this.$router.currentRoute.query &&
       Object.keys(this.$router.currentRoute.query).length > 0
@@ -381,7 +377,6 @@ export default {
       operationId = null,
       phaseId = null,
     }) {
-      console.log("@navigateToIdea");
       const processPath = this.processes.find((p) => p.id == processId);
       const stagePath =
         processPath && processPath.stages.length > 0

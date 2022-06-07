@@ -222,7 +222,7 @@ export default class ContentEditor {
       Text,
       // Draggable,
       CustomLink.configure({
-        removeLink: linkHandlers.removeLink
+        removeLink: linkHandlers.removeLink,
       }),
       TextStyle,
       Color,
@@ -267,20 +267,21 @@ export default class ContentEditor {
           const formatHTML = text.replace(/&nbsp;/g, " ");
 
           //Remove comments
-          const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
+         // const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
+       //  console.log(formatHTML)
           // console.log(_formatHTML)
-          return _formatHTML;
+          return formatHTML;
         },
         transformPastedHTML(html) {
           const formatHTML = html.replace(/&nbsp;/g, " ");
 
           //Remove comments
-          const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
-          const __formatHTML = _formatHTML.replace(/ style(.*?)">/g, ">");
+      //    const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
+          const __formatHTML = formatHTML.replace(/ style(.*?)">/g, ">");
           const ___formatHTML = __formatHTML.replace(/<br>/g, " ");
 
          // console.log(html);
-
+        // console.log(___formatHTML)
           // console.log(_stylesRemoved)
           return ___formatHTML;
         }
