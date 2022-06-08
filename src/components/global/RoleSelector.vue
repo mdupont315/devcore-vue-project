@@ -183,7 +183,6 @@ export default {
       }
     },
     change(value, event) {
-			console.log(value, event)
       this.dataValue = value;
       this.$emit("input", this.dataValue, event);
     },

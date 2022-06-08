@@ -7,7 +7,7 @@
       <div class="idea_edit_path_container-header-close"></div>
 
       <div
-        v-if="!ideaContentIsDirty"
+        v-if="cleanIdeaPath && !ideaContentIsDirty"
         class="ideaEdit_path_noEdit_content"
         @click="closeIdeaEdit"
       >
@@ -98,7 +98,6 @@
                       $validateState('stage_id', mutateForm) === false,
                     'is-valid': $validateState('stage_id', mutateForm) === true,
                   }"
-                  @input="changeStage"
                 ></v-select>
                 <label for="stage">{{ $t("Stage") }}</label>
                 <b-form-invalid-feedback>{{
@@ -153,7 +152,6 @@
                   :placeholder="$t('Phase')"
                   :reduce="(phase) => phase.id"
                   :options="phases"
-                  @input="changePhase"
                   :class="{
                     'is-invalid': $validateState('phase', mutateForm) === false,
                     'is-valid': $validateState('phase', mutateForm) === true,
@@ -319,6 +317,23 @@
 	<script>
 import { mapGetters } from "vuex";
 import IdeaReportChart from "../../IdeaReportChart.vue";
+import { isEqual, differenceWith, toPairs, xor } from "lodash";
+
+const emptyIdea = ({
+  title = "",
+  stageId = null,
+  operationId = null,
+  phaseId = null,
+  description = null,
+}) => {
+  return {
+    title,
+    stageId,
+    operationId,
+    phaseId,
+    description,
+  };
+};
 
 export default {
   components: {
@@ -345,8 +360,52 @@ export default {
       type: Boolean,
       default: false,
     },
+    isSaving: {
+      type: Boolean,
+      default: false,
+    },
   },
 
+  watch: {
+    mutateForm: {
+      deep: true,
+      handler() {
+        if (this.editorLoaded) {
+          const initialIdea = {
+            title: this.idea.title,
+            stageId: this.idea.stageId,
+            operationId: this.idea.operationId,
+            phaseId: this.idea.phaseId,
+            description: this.idea.description ?? "",
+          };
+
+          const currentIdeaForm = {
+            title: this.value.title,
+            stageId: this.value.stageId,
+            operationId: this.value.operationId,
+            phaseId: this.value.phaseId,
+            description: this.value.description ?? "",
+          };
+          const cleanPath = this.objectsAreEqual(
+            emptyIdea(initialIdea),
+            emptyIdea(currentIdeaForm)
+          );
+
+          const cleanRoles = this.listsAreEqual(
+            this.idea.companyRoleIds,
+            this.value.companyRoleIds
+          );
+
+          const cleanTools = this.listsAreEqual(
+            this.idea.companyToolIds,
+            this.value.companyToolIds
+          );
+
+          this.cleanIdeaPath = cleanPath && cleanRoles && cleanTools;
+        }
+      },
+    },
+  },
   computed: {
     ...mapGetters({
       currentProcess: "process/current",
@@ -354,18 +413,15 @@ export default {
       allRoles: "companyRole/all",
     }),
 
-    processPath: {
+    contentAndPathClean: {
       get() {
-        return this.currentProcess("ideas");
+        return this.cleanIdeaPath;
       },
     },
 
-    getParentRoles: {
+    processPath: {
       get() {
-        const parentRoles =
-          this.idea.parent?.companyRoles.map((role) => role.id) ??
-          this.selectablePathRoles;
-        return parentRoles;
+        return this.currentProcess("ideas");
       },
     },
     getSelectableRoles: {
@@ -378,7 +434,6 @@ export default {
         return this.value;
       },
       set(value) {
-        console.log(value);
         this.$emit("input", value);
       },
     },
@@ -423,27 +478,22 @@ export default {
     selectablePathRoles: [],
     roleIntent: null,
     toolIntent: null,
+    cleanIdeaPath: true,
   }),
   mounted() {
     this.selectablePathRoles = this.getSelectableRoles;
-		console.log("this.mutateForm")
-		console.log(this.mutateForm)
     this.roleIntent = Math.random();
     this.toolIntent = Math.random();
   },
-  watch: {
-    mutateForm: {
-      deep: true,
-      handler(newVal) {
-				console.log(newVal)
-        if (this.editorLoaded) {
-					console.log("EMITTING")
-          this.$emit("isDirty");
-        }
-      },
-    },
-  },
+
   methods: {
+    listsAreEqual(a, b) {
+      return a.length === b.length && xor(a, b).length === 0;
+    },
+    objectsAreEqual(a, b) {
+      const changes = differenceWith(toPairs(a), toPairs(b), isEqual);
+      return changes.length === 0;
+    },
     getSelectableProcessPathRoles() {
       if (this.processPath.phase) {
         return this.processPath.phase.companyRoles.map((x) => x.id);
@@ -468,56 +518,12 @@ export default {
     async deleteItem() {
       this.$emit("deleteIdea");
     },
-    // setSelectableRoles(path) {
-    //   if (!path || !path.stageId) return;
-
-    //   const stage = this.process.process.stages.find(
-    //     (x) => x.id === path.stageId
-    //   );
-    //   if (path.stageId) {
-    //     this.selectablePathRoles = stage.companyRoles;
-    //   }
-    //   if (path.operationId) {
-    //     const operation = stage.operations.find(
-    //       (x) => x.id === path.operationId
-    //     );
-    //     this.selectablePathRoles = operation.companyRoles;
-    //   }
-
-    //   if (path.phaseId) {
-    //     const operation = stage.operations.find(
-    //       (x) => x.id === path.operationId
-    //     );
-    //     const phase = operation.phases.find((x) => x.id === path.phaseId);
-    //     this.selectablePathRoles = phase.companyRoles;
-    //   }
-
-    //   this.roleIntent = Math.random();
-    // },
     changeStage() {
       this.mutateForm.operationId = null;
       this.mutateForm.phaseId = null;
-      if (this.value.stageId) {
-        //   this.setSelectableRoles({ stageId: this.value.stageId });
-      }
     },
     changeOperation() {
       this.mutateForm.phaseId = null;
-      if (this.value.operationId) {
-        // this.setSelectableRoles({
-        //   operationId: this.value.operationId,
-        //   stageId: this.value.stageId,
-        // });
-      }
-    },
-    changePhase() {
-      if (this.value.phaseId) {
-        // this.setSelectableRoles({
-        //   phaseId: this.value.phaseId,
-        //   operationId: this.value.operationId,
-        //   stageId: this.value.stageId,
-        // });
-      }
     },
     closeIdeaEdit() {
       this.$emit("close");

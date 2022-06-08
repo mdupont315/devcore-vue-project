@@ -12,7 +12,7 @@
         @selectedType="setContentType"
         @saveIdeaContent="saveIdeaVersion"
         @editorLoaded="setEditorLoaded"
-        @isDirty="setIsDirty"
+        @isDirty="setIsContentDirty"
         :isSaving="isSaving"
         v-model="getIdeaContent"
       ></idea-edit-content>
@@ -24,7 +24,6 @@
         :isLoading="isLoading"
         v-model="getIdeaPath"
         :ideaContentIsDirty="ideaContentIsDirty"
-        @isDirty="setIsDirty"
         :editorLoaded="editorLoaded && isLoaded"
         :idea="getIdea"
       ></idea-edit-path>
@@ -233,11 +232,7 @@ export default {
     setEditorLoaded() {
       this.editorLoaded = true;
     },
-    setIsDirty() {
-      console.log("setIsDirty");
-      console.log(this);
-      console.log(this.ideaForm);
-      console.log(this.ideaContentCategories);
+    setIsContentDirty() {
       this.ideaContentIsDirty = true;
     },
     removeFile(file) {
@@ -369,8 +364,6 @@ export default {
       const { markup } = this.getIdeaContent;
       const commentNodes =
         markup?.content.filter((node) => node.type === "comment") ?? [];
-
-      console.log(commentNodes);
 
       return commentNodes;
     },
