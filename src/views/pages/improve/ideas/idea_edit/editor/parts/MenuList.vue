@@ -6,7 +6,7 @@
       ref="btnMenuListPopover"
       tabindex="0"
       :class="{ 'is-active': selectionOpen }"
-      style="width: 100%; height: 100%; margin: 0;margin-left:10px"
+      style="width: 100%; height: 100%; margin: 0; margin-left: 10px"
     >
       <div class="menu-list-active-text" @click="setActive(activeIcon)">
         <div
@@ -18,8 +18,9 @@
           @mouseenter="isHovering = true"
           @mouseleave="isHovering = false"
         >
-				<span style="padding-left:5px">
-          {{ getActiveText(activeIcon) }}</span>
+          <span style="padding-left: 5px">
+            {{ getActiveText(activeIcon) }}</span
+          >
           <i
             class="ri-arrow-down-s-fill"
             style="font-size: 14px"
@@ -50,7 +51,7 @@
           :key="index"
           @click="invokeListItemAction(listItem, index)"
           class="menu-list-item"
-          :class="{ 'is-active': activeHeadingIndex == index }"
+          :class="{ 'is-active': listItem.icon === activeIcon }"
           :style="{
             color: getHeadingColor(listItem),
           }"
@@ -82,10 +83,13 @@ export default {
       required: true,
     },
   },
+
   methods: {
     setActive(active) {
-      const thisItem = this.item.listItems.find((x) => x.icon === active);
-      thisItem.action();
+      if (active !== this.activeIcon) {
+        const thisItem = this.item.listItems.find((x) => x.icon === active);
+        thisItem.action();
+      }
     },
     getActiveText(active) {
       let ret = "P";
@@ -103,8 +107,10 @@ export default {
       return ret;
     },
     invokeListItemAction(listItem, index) {
-      this.setActiveHeadingIndex(index);
-      listItem.action();
+      if (listItem.icon !== this.activeIcon) {
+        this.setActiveHeadingIndex(index);
+        listItem.action();
+      }
     },
     setActiveHeadingIndex(index) {
       if (this.activeHeadingIndex !== index) {

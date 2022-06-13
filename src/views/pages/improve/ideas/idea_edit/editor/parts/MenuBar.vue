@@ -296,6 +296,13 @@ export default {
         this.$emit("modalOpen", newVal);
       },
     },
+    activeFont: {
+      handler(newVal) {
+        if (newVal !== this.activeHeading) {
+          this.activeHeading = newVal;
+        }
+      },
+    },
   },
   props: {
     editor: {
@@ -308,9 +315,16 @@ export default {
       get() {
         let active = "paragraph";
 
-        let test = this.editor.isActive("heading", { level: 2 });
-
-        return test;
+        if (this.editor.isActive("heading", { level: 1 })) {
+          active = "h-1";
+        } else if (this.editor.isActive("heading", { level: 2 })) {
+          active = "h-2";
+        } else if (this.editor.isActive("heading", { level: 3 })) {
+          active = "h-3";
+        } else {
+          active = "paragraph";
+        }
+        return active;
       },
     },
     getItems: {
