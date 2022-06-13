@@ -14,17 +14,17 @@ const getElementWithAttributes = (name, attrs) => {
   return el;
 };
 
-const stopAndPreventEvent = (e) => {
-  if (!e) return false
+const stopAndPreventEvent = e => {
+  if (!e) return false;
 
-  e.preventDefault()
-  e.stopPropagation()
+  e.preventDefault();
+  e.stopPropagation();
 
-  return true
-}
-
+  return true;
+};
 
 const focusTable = (editor, getPos) => {
+  // updateColumns(nodeViewNode, colgroup, table, this.cellMinWidth);
   const currentTablePos = getPos();
 
   const { state } = editor;
@@ -102,7 +102,10 @@ const getRowControlButtons = (editor, getPos) => {
 
     // btn.addEventListener("click", () => el.action(editor));
     // btn.addEventListener("click", () => el.action(editor, getPos));
-    btn.addEventListener("click", (e) => stopAndPreventEvent(e) && el.action(editor, getPos));
+    btn.addEventListener(
+      "click",
+      e => stopAndPreventEvent(e) && el.action(editor, getPos)
+    );
 
     btn.setAttribute("data-tooltip", el.name);
 
@@ -130,7 +133,10 @@ const getDeleteTableButton = (editor, getPos) => {
   });
 
   // el.addEventListener("click", () => action(editor, getPos));
-  el.addEventListener("click", (e) => stopAndPreventEvent(e) && action(editor, getPos));
+  el.addEventListener(
+    "click",
+    e => stopAndPreventEvent(e) && action(editor, getPos)
+  );
   el.innerText = text;
 
   el.setAttribute("data-tooltip", name);
@@ -180,7 +186,11 @@ const getColControlButtons = (editor, getPos) => {
 
     // btn.addEventListener("click", () => el.action(editor));
     // btn.addEventListener("click", () => el.action(editor, getPos));
-    btn.addEventListener("click", (e) => stopAndPreventEvent(e) && el.action(editor, getPos));
+
+    btn.addEventListener(
+      "click",
+      e => stopAndPreventEvent(e) && el.action(editor, getPos)
+    );
 
     btn.setAttribute("data-tooltip", el.name);
 
@@ -255,7 +265,7 @@ export const CustomTable = Table.extend({
       resizable: true,
       handleWidth: 5,
       cellMinWidth: 25,
-      lastColumnResizable: false,
+      lastColumnResizable: true,
       allowTableNodeSelection: false
     };
   },
@@ -286,6 +296,8 @@ export const CustomTable = Table.extend({
 
   addNodeView() {
     return ({ editor, node: nodeViewNode, getPos }) => {
+
+      console.log(this.options)
       let tempNode = nodeViewNode;
 
       const cellMinWidth = 40;
@@ -363,8 +375,8 @@ export const CustomTable = Table.extend({
   },
 
   addProseMirrorPlugins() {
-    const isResizable = this.options.resizable && this.editor.isEditable;
-
+    //const isResizable = this.options.resizable && this.editor.isEditable;
+    const isResizable = this.options.resizable;
     const plugins = [
       tableEditing({
         allowTableNodeSelection: this.options.allowTableNodeSelection

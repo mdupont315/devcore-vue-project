@@ -1,25 +1,59 @@
-import Link from "@tiptap/extension-link";
-import { mergeAttributes } from "@tiptap/core";
-import { Plugin } from "prosemirror-state";
-import { v4 as uuidv4 } from "uuid";
+// import Link from "@tiptap/extension-link";
+// import { mergeAttributes } from "@tiptap/core";
+// import { Plugin } from "prosemirror-state";
+//
+// import { find, registerCustomProtocol } from "linkifyjs";
 
-export const CustomLink = Link.extend({
+import { Mark, markPasteRule, mergeAttributes } from '@tiptap/core'
+import { find, registerCustomProtocol } from 'linkifyjs'
+import { v4 as uuidv4 } from "uuid";
+import { autolink } from './helpers/autolink'
+import { clickHandler } from './helpers/clickHandler'
+import { pasteHandler } from './helpers/pasteHandler'
+
+export const CustomLink = Mark.create({
+  name: 'link',
+
+  priority: 1000,
+
+  keepOnSplit: false,
+
+  onCreate() {
+    this.options.protocols.forEach(registerCustomProtocol)
+  },
+
+  inclusive() {
+    return this.options.autolink
+  },
   addOptions() {
     return {
+      // HTMLAttributes: {
+      //   target: "_blank",
+      //   href: null,
+      //   uuid: null
+      // },
+      // linkOnPaste: true,
+      // openOnClick: true,
+      // removeLink: () => {},
+      // validate: href => /^https?:\/\//.test(href),
+
+      openOnClick: true,
+      linkOnPaste: true,
+      autolink: true,
+      protocols: [],
       HTMLAttributes: {
         target: "_blank",
-        href: null,
+        rel: "noopener noreferrer nofollow",
+        class: null,
         uuid: null
       },
-      linkOnPaste: true,
-      openOnClick: true,
-      removeLink: () => {},
       validate: href => /^https?:\/\//.test(href)
     };
   },
   addCommands() {
     return {
       setLink: attributes => ({ chain }) => {
+        console.log(attributes);
         return chain()
           .setMark(this.name, attributes)
           .setMeta("preventAutolink", true)
@@ -71,14 +105,17 @@ export const CustomLink = Link.extend({
             "data-uuid": dom.getAttribute("uuid")
           };
         }
-      },
+      }
     ];
   },
   renderHTML({ mark, HTMLAttributes }) {
+    console.log(mark, HTMLAttributes);
     const { uuid, href, target } = HTMLAttributes;
     const validate = /^https?:\/\//.test(href);
 
     if (!href) return true;
+
+    console.log(uuid)
 
     if (!validate) {
       return ["p", 0];
@@ -86,104 +123,115 @@ export const CustomLink = Link.extend({
 
     return [
       "span",
-      { class: "is-link", "data-uuid": uuid ?? uuidv4() },
+      { class: "is-link" },
       [
         "a",
         mergeAttributes(this.options.HTMLAttributes, {
-          "data-uuid": uuid,
           href,
-          target
+          target,
+          "data-tooltip": href
         }),
         0
       ],
-      ["button", window.vm.$t("Remove")]
+      [
+        "button",
+        { "data-tooltip": window.vm.$t("RemoveHyperLink"), "data-uuid": uuid },
+        window.vm.$t("Remove")
+      ]
     ];
   },
+  addPasteRules() {
+    return [
+      markPasteRule({
+        find: text => find(text)
+          .filter(link => {
+            if (this.options.validate) {
+              return this.options.validate(link.value)
+            }
+
+            return true
+          })
+          .filter(link => link.isLink)
+          .map(link => ({
+            text: link.value,
+            index: link.start,
+            data: link,
+          })),
+        type: this.type,
+        getAttributes: match => ({
+          href: match.data?.href,
+        }),
+      }),
+    ]
+  },
   addProseMirrorPlugins() {
+    const plugins = []
     const { options } = this;
     const { removeLink } = options;
 
-    const plugins = [
-      new Plugin({
-        props: {
-          handleDOMEvents: {
-            mouseover(view, event) {
-              if (!event.target) return false;
-              if (event.target.getAttribute("uuid")) {
-                const uuid = event.target.getAttribute("data-uuid");
-                const href = event.target.getAttribute("href");
-                let links = [...document.querySelectorAll(".is-link")];
-                const [thisLink] = links.filter(
-                  link => !!link && link.dataset.uuid === uuid
-                );
-                if (!thisLink) return false;
-                if (!thisLink.firstChild) return false;
-                thisLink.firstChild.setAttribute("data-tooltip", href);
-              }
+    if (this.options.autolink) {
+      plugins.push(autolink({
+        type: this.type,
+        validate: this.options.validate,
+      }))
+    }
 
-              if (
-                event.target.localName === "button" ||
-                event.target.getAttribute("data-uuid")
-              ) {
-                let links = [...document.querySelectorAll(".is-link")];
-                if (!event.target) return false;
-                const uuid = event.target.getAttribute("data-uuid");
+    if (this.options.openOnClick) {
+      plugins.push(clickHandler({
+        type: this.type,
+        remove: removeLink
+      }))
+    }
 
-                const [thisLink] = links.filter(
-                  link => !!link && link.dataset.uuid === uuid
-                );
+    if (this.options.linkOnPaste) {
+      plugins.push(pasteHandler({
+        editor: this.editor,
+        type: this.type,
+      }))
+    }
 
-                if (!thisLink) return false;
-                if (!thisLink.lastChild) return false;
-                thisLink.lastChild.setAttribute(
-                  "data-tooltip",
-                  window.vm.$t("RemoveHyperLink")
-                );
-                // thisLink.setAttribute("data-tooltip", uuid);
-              }
+    return plugins
+  },
+  // addProseMirrorPlugins() {
+  //   const { options } = this;
+  //   const { removeLink } = options;
 
-              return true;
-            }
-          },
-          handleClick(view, pos, event) {
-            if (event.button === 2) return;
+  //   const plugins = [
+  //     new Plugin({
+  //       props: {
+  //         handleClick(view, pos, event) {
+  //           console.log(event);
+  //           if (event.button === 2) return false;
 
-            if (
-              event.target.localName === "a" ||
-              event.target.localName === "strong"
-            ) {
-              if (
-                event.target.parentElement.dataset.uuid ||
-                event.target.parentElement.href
-              ) {
-                window.open(event.target.href, "__blank");
-              }
-            }
+  //           if (
+  //             event.target.localName === "a" ||
+  //             (event.target.localName === "strong" &&
+  //               event.target.parentElement.localName === "a")
+  //           ) {
+  //             if (event.target.dataset.uuid || event.target.href) {
+  //               window.open(event.target.href, "__blank");
+  //             }
+  //           }
 
-            if (event.target.localName === "button") {
-              if (!event.target.parentElement) return;
-              if (
-                event.target.parentElement &&
-                event.target.parentElement.dataset.uuid
-              ) {
-                if (event.button === 2) return;
-                const uuid = event.target.parentElement.dataset.uuid;
-                removeLink(pos, uuid);
-              }
-            }
+  //           if (event.target.localName === "button") {
+  //             if (!event.target.parentElement) return true;
 
-            return false;
-            // //view.dispatch(tr.setSelection(new TextSelection($start, $end)));
-            // The link mark's renderHTML renders an <a> element with a data-link attribute set
-            // I register a new Plugin where I listen for the mouseover event
-            // In the event handler, I check that event.target is an <a> element with my data-link attribute, and then display a tooltip for it (using Tippy.js)
-            // For the edit button in the tooltip (see below), I can retrieve the ProseMirror node for the element using pos = view.posAtDOM(event.target) and then node = view.state.doc.nodeAt(pos)
-            // return true;
-          }
-        }
-      })
-    ];
+  //             if (
+  //               event.target.previousSibling &&
+  //               event.target.previousSibling.dataset.uuid
+  //             ) {
+  //               if (event.button === 2) return true;
+  //               const uuid = event.target.previousSibling.dataset.uuid;
+  //               removeLink(pos, uuid);
+  //             }
+  //           }
 
-    return plugins;
-  }
+  //           return true;
+  //         }
+  //       }
+  //     })
+  //   ];
+
+  //   return plugins;
+  // }
 });

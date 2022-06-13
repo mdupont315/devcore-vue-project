@@ -67,11 +67,6 @@ export default {
     }),
   },
   watch: {
-    "value.markup": {
-      handler(newVal) {
-        //Todo scroll to content
-      },
-    },
     isEditable: {
       handler(newVal) {
         this.editor.setEditable(newVal);
@@ -96,8 +91,8 @@ export default {
     },
     handleKeyup(e) {
       if (e && e.keyCode === 9) {
-        if (this.editor.isActive("comment")) e.preventDefault();
-        if (this.isModalView) e.preventDefault();
+        if (this.editor && this.editor.isActive("comment")) e.preventDefault();
+        //  if (this.isModalView) e.preventDefault();
       }
       return;
     },
@@ -301,7 +296,6 @@ export default {
             view: { dispatch },
           } = this.editor;
 
-
           if (selection && selection.$head && selection.$head.parent) {
             const parent = selection.$head.parent;
             if (
@@ -392,6 +386,9 @@ export default {
   background-color: #fff;
   border-radius: 0.75rem;
   min-height: 100%;
+  & > .editor__content {
+    overflow-x: hidden;
+  }
 
   &__header {
     display: flex;
@@ -510,10 +507,10 @@ export default {
       background-color: #4294d0;
       font-size: 14px;
       font-family: FuturaMedium;
-			color: #fff;
-			& > p {
-				color: #fff
-			}
+      color: #fff;
+      & > p {
+        color: #fff;
+      }
     }
 
     .selectedCell:after {
@@ -530,6 +527,7 @@ export default {
 
     .column-resize-handle {
       position: absolute;
+			z-index: 2;
       right: -2px;
       top: 0;
       bottom: -2px;
@@ -559,6 +557,7 @@ export default {
     height: 40px;
     user-select: none;
     white-space: nowrap;
+    max-width: 40vw;
     & > button {
       height: 100%;
       font-family: "FuturaMedium";
@@ -673,15 +672,20 @@ export default {
   }
   h2 {
     color: #242526 !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
     font-family: FuturaMedium !important;
     font-weight: 400;
   }
   h3 {
     color: #4294d0 !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
     font-family: FuturaMedium !important;
     font-weight: 400;
+  }
+  h1,
+  h2,
+  h3 {
+    margin-top: 21px;
   }
 
   p > span {
@@ -699,13 +703,13 @@ export default {
   }
   h2 > span {
     color: #242526 !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
     font-family: FuturaMedium !important;
     font-weight: 400;
   }
   h3 > span {
     color: #4294d0 !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
     font-family: FuturaMedium !important;
     font-weight: 400;
   }

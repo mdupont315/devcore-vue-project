@@ -208,13 +208,18 @@ export default {
           });
         }
 
+        console.log();
+
         setTimeout(() => {
           if (!data.url) return;
+
+          // if (this.editor.isActive("paragraph")) {
           this.editor.commands.setLink({
             href: data.url,
             target: "_blank",
             uuid: uuidv4(),
           });
+          // }
         }, 100);
       }
 

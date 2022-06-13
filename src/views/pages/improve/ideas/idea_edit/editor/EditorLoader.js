@@ -11,6 +11,9 @@ import TextStyle from "@tiptap/extension-text-style";
 import History from "@tiptap/extension-history";
 import FontFamily from "@tiptap/extension-font-family";
 import ListItem from "@tiptap/extension-list-item";
+import Typography from "@tiptap/extension-typography";
+import Italic from "@tiptap/extension-italic";
+import Bold from "@tiptap/extension-bold";
 
 import { Color } from "@tiptap/extension-color";
 import {
@@ -44,7 +47,9 @@ export default class ContentEditor {
       StarterKit.configure({
         history: false,
         paragraph: false,
-        listItem: false
+        listItem: false,
+        italic: false,
+        bold: false
         // hardBreak: false
       }),
       Paragraph,
@@ -56,6 +61,30 @@ export default class ContentEditor {
       //     };
       //   }
       // }),
+      Italic.extend({
+        addInputRules(){
+          return []
+        },
+        addPasteRules(){
+          return []
+        }
+      }),
+      Bold.extend({
+        addInputRules(){
+          return []
+        },
+        addPasteRules(){
+          return []
+        }
+      }),
+      Typography.configure({
+        oneHalf: false,
+        oneQuarter: false,
+        threeQuarters: false,
+        laquo: false,
+        raquo: false,
+        plusMinus: false
+      }),
       ListItem,
       History.configure({ depth: 10 }),
       FontFamily.configure({
@@ -64,7 +93,7 @@ export default class ContentEditor {
       Text,
       // Draggable,
       CustomLink.configure({
-        removeLink: linkHandlers.removeLink,
+        removeLink: linkHandlers.removeLink
       }),
       TextStyle,
       Color,
@@ -109,8 +138,8 @@ export default class ContentEditor {
           const formatHTML = text.replace(/&nbsp;/g, " ");
 
           //Remove comments
-         // const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
-       //  console.log(formatHTML)
+          // const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
+          //  console.log(formatHTML)
           // console.log(_formatHTML)
           return formatHTML;
         },
@@ -118,12 +147,12 @@ export default class ContentEditor {
           const formatHTML = html.replace(/&nbsp;/g, " ");
 
           //Remove comments
-      //    const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
+          //    const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
           const __formatHTML = formatHTML.replace(/ style(.*?)">/g, ">");
           const ___formatHTML = __formatHTML.replace(/<br>/g, " ");
 
-         // console.log(html);
-        // console.log(___formatHTML)
+          // console.log(html);
+          // console.log(___formatHTML)
           // console.log(_stylesRemoved)
           return ___formatHTML;
         }
