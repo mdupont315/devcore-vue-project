@@ -62,19 +62,19 @@ export default class ContentEditor {
       //   }
       // }),
       Italic.extend({
-        addInputRules(){
-          return []
+        addInputRules() {
+          return [];
         },
-        addPasteRules(){
-          return []
+        addPasteRules() {
+          return [];
         }
       }),
       Bold.extend({
-        addInputRules(){
-          return []
+        addInputRules() {
+          return [];
         },
-        addPasteRules(){
-          return []
+        addPasteRules() {
+          return [];
         }
       }),
       Typography.configure({
@@ -100,7 +100,11 @@ export default class ContentEditor {
       Indent,
       Highlight,
       ExternalVideo,
-      Underline,
+      Underline.extend({
+        addKeyboardShortcuts() {
+          return {};
+        }
+      }),
       TableRow,
       TableHeader,
       TableCell,

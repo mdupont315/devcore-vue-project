@@ -239,6 +239,7 @@ export const File = Node.create({
   addProseMirrorPlugins() {
     const { addFile } = this.options;
     const { notify } = this.options;
+    console.log(this.editor)
     return [uploadFilePlugin(addFile, notify)];
   }
 });

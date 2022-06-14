@@ -8,8 +8,6 @@ const FILE_SIZE_LIMIT = 6000000;
 
 */
 
-
-
 const validateFileSize = (notify, file) => {
   console.log(file);
 
@@ -29,15 +27,34 @@ const renderFileInBase64ToCoordinates = (
   preview,
   uuid
 ) => {
+  if (!item) return;
+
+  let fileTitle = item.name;
   const { schema } = view.state;
 
-  if (!item) return;
+  //let docFileNames = [];
+  if (view && view.state && view.state.doc) {
+    const { doc } = view.state;
+    const { content } = doc.content;
+    const sameNameFiles = content.filter(
+      node =>
+        node.type && node.type.name === "file" && node.attrs.title === item.name
+    );
+
+    if (sameNameFiles.length > 0) {
+      const splitFileName = item.name.split(".").pop()
+      fileTitle = item.name.replace(`.${splitFileName}`, `(${sameNameFiles.length + 1})`) + `.${splitFileName}`
+    }
+
+    console.log(sameNameFiles);
+    //  docFiles.forEach(node => docFileNames.push(node.attrs.title));
+  }
 
   const reader = new FileReader();
   reader.onload = readerEvent => {
     const node = schema.nodes.file.create({
       src: readerEvent.target?.result,
-      title: item.name,
+      title: fileTitle,
       size: item.size,
       type: item.type,
       pos: coordinates.pos,
@@ -59,8 +76,6 @@ const uploadFilePlugin = (addFile, notify) => {
           .items;
 
         if (items.length === 0) return;
-
-        console.log(items);
 
         let pos = 1;
         if (

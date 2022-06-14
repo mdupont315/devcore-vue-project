@@ -84,7 +84,7 @@ export default {
       return stringFileEntity;
     },
     getAttrs() {
-      console.log(this.fileEntity);
+      console.log(this.fileEntity.title);
       return this.fileEntity;
     },
   },

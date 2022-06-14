@@ -407,6 +407,15 @@ export default {
       // dont remove files that actually exist in content
       const allFilesInContentIds = allFilesInContent.map((x) => x.id);
 
+      const contentFileUuids = this.files.map((x) => x.uuid);
+
+      this.files = this.files.filter((file) => {
+        if (file.uuid && contentFileUuids.includes(file.uuid)) {
+          return true;
+        }
+        return false;
+      });
+
       this.ideaForm._fields.removeFileIds =
         this.ideaForm._fields.removeFileIds.filter((uri) => {
           if (allFilesInContentIds.includes(uri)) return false;
