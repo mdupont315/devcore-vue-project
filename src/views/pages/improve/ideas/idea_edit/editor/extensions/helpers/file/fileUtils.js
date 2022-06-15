@@ -28,7 +28,11 @@ const addCounterToFileName = (name, counter) => {
 };
 
 const getSimilarNamesFromContent = (fileNodes, name) => {
-  const extension = name => name.split(".").pop();
+  const extension = name =>
+    name
+      .split(".")
+      .pop()
+      .toUpperCase();
   return fileNodes.filter(node => {
     return (
       extension(node.attrs.title) === extension(name) &&

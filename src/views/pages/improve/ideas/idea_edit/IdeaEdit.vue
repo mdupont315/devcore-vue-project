@@ -237,6 +237,9 @@ export default {
     },
     removeFile(file) {
       if (this.isSaving) return;
+      if (file.uuid) {
+        this.files = this.files.filter((_file) => _file.uuid !== file.uuid);
+      }
       if (file.src && file.id) {
         this.filesChanged = true;
         this.ideaForm._fields.removeFileIds.push(file.id);
@@ -427,6 +430,8 @@ export default {
       } else {
         this.ideaForm._fields.removeFile = false;
       }
+
+      console.log(this.ideaForm._fields.removeFileIds);
     },
     async saveIdeaVersion() {
       this.isLoading = true;

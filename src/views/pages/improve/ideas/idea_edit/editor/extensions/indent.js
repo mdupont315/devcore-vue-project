@@ -179,7 +179,6 @@ const indent = () => ({ editor }) => {
   return false;
 };
 const outdent = outdentOnlyAtHead => ({ editor }) => {
-  console.log(outdentOnlyAtHead);
   if (
     !(
       isList(editor.state.doc.type.name, editor.extensionManager.extensions) ||

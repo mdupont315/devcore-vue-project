@@ -158,4 +158,4 @@ const uploadFilePlugin = (addFile, notify) => {
   });
 };
 
-export { renderFileInBase64ToCoordinates, uploadFilePlugin, validateFileSize };
+export { renderFileInBase64ToCoordinates, uploadFilePlugin };
