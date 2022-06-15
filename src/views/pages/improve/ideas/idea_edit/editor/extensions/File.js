@@ -2,9 +2,10 @@ import { Node, nodeInputRule } from "@tiptap/core";
 
 import {
   uploadFilePlugin,
-  renderFileInBase64ToCoordinates,
-  validateFileSize
+  renderFileInBase64ToCoordinates
 } from "./uploadFile";
+import { fileWithUniqueName, validateFileSize } from "./helpers/file/fileUtils";
+
 import FileNodeView from "./FileNodeView.vue";
 import { VueNodeViewRenderer } from "@tiptap/vue-2";
 import { v4 as uuidv4 } from "uuid";
@@ -180,16 +181,16 @@ export const File = Node.create({
         const previewFiles = files.filter(file => /image/i.test(file.type));
         const nonPreviewFiles = files.filter(file => !/image/i.test(file.type));
 
-        console.log(files);
         if (previewFiles.length > 0) {
           previewFiles.forEach(async item => {
             const preview = true;
             const valid = validateFileSize(notify, item);
             if (valid) {
+              const transformedFile = await fileWithUniqueName(view, item);
               const uuid = uuidv4();
-              addFile({ uuid, file: item });
+              addFile({ uuid, file: transformedFile });
               renderFileInBase64ToCoordinates(
-                item,
+                transformedFile,
                 view,
                 coordinates,
                 preview,
@@ -204,10 +205,11 @@ export const File = Node.create({
             const preview = false;
             const valid = validateFileSize(notify, item);
             if (valid) {
+              const transformedFile = await fileWithUniqueName(view, item);
               const uuid = uuidv4();
-              addFile({ uuid, file: item });
+              addFile({ uuid, file: transformedFile });
               renderFileInBase64ToCoordinates(
-                item,
+                transformedFile,
                 view,
                 coordinates,
                 preview,
@@ -239,7 +241,6 @@ export const File = Node.create({
   addProseMirrorPlugins() {
     const { addFile } = this.options;
     const { notify } = this.options;
-    console.log(this.editor)
     return [uploadFilePlugin(addFile, notify)];
   }
 });

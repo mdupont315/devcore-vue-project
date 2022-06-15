@@ -84,7 +84,6 @@ export default {
       return stringFileEntity;
     },
     getAttrs() {
-      console.log(this.fileEntity.title);
       return this.fileEntity;
     },
   },
@@ -108,7 +107,6 @@ export default {
   },
   methods: {
     async transformFilesIfPastedExternalUrls() {
-      console.log("transforming");
       if (
         !this.node.attrs.size &&
         this.node.attrs.src &&

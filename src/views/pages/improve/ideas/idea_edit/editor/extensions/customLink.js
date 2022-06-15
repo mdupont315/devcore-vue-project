@@ -7,9 +7,9 @@
 import { Mark, markPasteRule, mergeAttributes } from '@tiptap/core'
 import { find, registerCustomProtocol } from 'linkifyjs'
 import { v4 as uuidv4 } from "uuid";
-import { autolink } from './helpers/autolink'
-import { clickHandler } from './helpers/clickHandler'
-import { pasteHandler } from './helpers/pasteHandler'
+import { autolink } from './helpers/link/autolink'
+import { clickHandler } from './helpers/link/clickHandler'
+import { pasteHandler } from './helpers/link/pasteHandler'
 
 export const CustomLink = Mark.create({
   name: 'link',
@@ -192,46 +192,4 @@ export const CustomLink = Mark.create({
 
     return plugins
   },
-  // addProseMirrorPlugins() {
-  //   const { options } = this;
-  //   const { removeLink } = options;
-
-  //   const plugins = [
-  //     new Plugin({
-  //       props: {
-  //         handleClick(view, pos, event) {
-  //           console.log(event);
-  //           if (event.button === 2) return false;
-
-  //           if (
-  //             event.target.localName === "a" ||
-  //             (event.target.localName === "strong" &&
-  //               event.target.parentElement.localName === "a")
-  //           ) {
-  //             if (event.target.dataset.uuid || event.target.href) {
-  //               window.open(event.target.href, "__blank");
-  //             }
-  //           }
-
-  //           if (event.target.localName === "button") {
-  //             if (!event.target.parentElement) return true;
-
-  //             if (
-  //               event.target.previousSibling &&
-  //               event.target.previousSibling.dataset.uuid
-  //             ) {
-  //               if (event.button === 2) return true;
-  //               const uuid = event.target.previousSibling.dataset.uuid;
-  //               removeLink(pos, uuid);
-  //             }
-  //           }
-
-  //           return true;
-  //         }
-  //       }
-  //     })
-  //   ];
-
-  //   return plugins;
-  // }
 });

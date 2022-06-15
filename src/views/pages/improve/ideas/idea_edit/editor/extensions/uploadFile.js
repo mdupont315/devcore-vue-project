@@ -1,24 +1,7 @@
 import { Plugin } from "prosemirror-state";
 import { v4 as uuidv4 } from "uuid";
+import { fileWithUniqueName, validateFileSize } from "./helpers/file/fileUtils";
 
-const FILE_SIZE_LIMIT = 6000000;
-/**
- * function for image drag n drop(for tiptap)
- * @see https://gist.github.com/slava-vishnyakov/16076dff1a77ddaca93c4bccd4ec4521#gistcomment-3744392
-
-*/
-
-const validateFileSize = (notify, file) => {
-  console.log(file);
-
-  let valid = true;
-  if (file.size > FILE_SIZE_LIMIT) {
-    notify(file, FILE_SIZE_LIMIT);
-    console.log("ERROR, File size too big!");
-    valid = false;
-  }
-  return valid;
-};
 
 const renderFileInBase64ToCoordinates = (
   item,
@@ -29,32 +12,13 @@ const renderFileInBase64ToCoordinates = (
 ) => {
   if (!item) return;
 
-  let fileTitle = item.name;
   const { schema } = view.state;
-
-  //let docFileNames = [];
-  if (view && view.state && view.state.doc) {
-    const { doc } = view.state;
-    const { content } = doc.content;
-    const sameNameFiles = content.filter(
-      node =>
-        node.type && node.type.name === "file" && node.attrs.title === item.name
-    );
-
-    if (sameNameFiles.length > 0) {
-      const splitFileName = item.name.split(".").pop()
-      fileTitle = item.name.replace(`.${splitFileName}`, `(${sameNameFiles.length + 1})`) + `.${splitFileName}`
-    }
-
-    console.log(sameNameFiles);
-    //  docFiles.forEach(node => docFileNames.push(node.attrs.title));
-  }
 
   const reader = new FileReader();
   reader.onload = readerEvent => {
     const node = schema.nodes.file.create({
       src: readerEvent.target?.result,
-      title: fileTitle,
+      title: item.name,
       size: item.size,
       type: item.type,
       pos: coordinates.pos,
@@ -71,7 +35,7 @@ const renderFileInBase64ToCoordinates = (
 const uploadFilePlugin = (addFile, notify) => {
   return new Plugin({
     props: {
-      handlePaste(view, event, slice) {
+      handlePaste: async (view, event, slice) => {
         const items = (event.clipboardData || event.originalEvent.clipboardData)
           .items;
 
@@ -94,12 +58,13 @@ const uploadFilePlugin = (addFile, notify) => {
             const preview = true;
 
             const itemAsFile = item.getAsFile();
+            const transformedFile = await fileWithUniqueName(view, itemAsFile);
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {
               const uuid = uuidv4();
-              addFile({ uuid, file: itemAsFile });
+              addFile({ uuid, file: transformedFile });
               renderFileInBase64ToCoordinates(
-                itemAsFile,
+                transformedFile,
                 view,
                 coordinates,
                 preview,
@@ -109,13 +74,13 @@ const uploadFilePlugin = (addFile, notify) => {
           } else {
             const preview = false;
             const itemAsFile = item.getAsFile();
-
+            const transformedFile = await fileWithUniqueName(view, itemAsFile);
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {
               const uuid = uuidv4();
-              addFile({ uuid, file: itemAsFile });
+              addFile({ uuid, file: transformedFile });
               renderFileInBase64ToCoordinates(
-                itemAsFile,
+                transformedFile,
                 view,
                 coordinates,
                 preview,
@@ -154,9 +119,10 @@ const uploadFilePlugin = (addFile, notify) => {
               const valid = validateFileSize(notify, item);
               if (valid) {
                 const uuid = uuidv4();
-                addFile({ uuid, file: item });
+                const transformedFile = await fileWithUniqueName(view, item);
+                addFile({ uuid, file: transformedFile });
                 renderFileInBase64ToCoordinates(
-                  item,
+                  transformedFile,
                   view,
                   coordinates,
                   preview,
@@ -172,9 +138,10 @@ const uploadFilePlugin = (addFile, notify) => {
               const valid = validateFileSize(notify, item);
               if (valid) {
                 const uuid = uuidv4();
-                addFile({ uuid, file: item });
+                const transformedFile = await fileWithUniqueName(view, item);
+                addFile({ uuid, file: transformedFile });
                 renderFileInBase64ToCoordinates(
-                  item,
+                  transformedFile,
                   view,
                   coordinates,
                   preview,
