@@ -370,7 +370,7 @@ export default {
     mutateForm: {
       deep: true,
       handler() {
-        if (this.editorLoaded) {
+        if (this.editorLoaded && this.idea.id) {
           const initialIdea = {
             title: this.idea.title,
             stageId: this.idea.stageId,

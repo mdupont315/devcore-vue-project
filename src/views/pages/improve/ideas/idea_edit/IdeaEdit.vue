@@ -225,8 +225,16 @@ export default {
   },
   mounted() {
     if (this.getIdea && this.getIdea.id) {
-      this.ideaForm._fields.companyRoleIds = this.getIdea.companyRoleIds;
-			this.ideaForm._fields.companyToolIds = this.getIdea.companyToolIds
+      const companyRoleIds =
+        this.getIdea && this.getIdea.companyRoleIds
+          ? this.getIdea.companyRoleIds
+          : [];
+      const companyToolIds =
+        this.getIdea && this.getIdea.companyToolIds
+          ? this.getIdea.companyToolIds
+          : [];
+      this.ideaForm._fields.companyRoleIds = companyRoleIds;
+      this.ideaForm._fields.companyToolIds = companyToolIds;
     }
   },
   methods: {
