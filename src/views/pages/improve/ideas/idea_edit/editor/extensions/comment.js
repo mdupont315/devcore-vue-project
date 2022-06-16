@@ -32,8 +32,7 @@ export const Comment = Node.create({
   parseHTML: () => [{ tag: "span[comment]" }],
 
   renderHTML({ HTMLAttributes }) {
-
-    console.log(HTMLAttributes)
+    console.log(HTMLAttributes);
     return [
       "span",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
@@ -89,6 +88,8 @@ export const Comment = Node.create({
           focusNextCommentNode = isSelectionInsideCommentNode;
         }
 
+        if (commentNodes.length === 0) return;
+
         if (!coordsOfCommentToFocus && commentNodes.length) {
           coordsOfCommentToFocus = commentNodes[0];
         }
@@ -100,14 +101,14 @@ export const Comment = Node.create({
 
         dispatch(tr.setSelection(sel).scrollIntoView());
 
-        console.log(sel)
+        console.log(sel);
 
         setTimeout(() => {
           const selCommentStart = new TextSelection($from);
 
           dispatch(tr.setSelection(selCommentStart));
         }, 100);
-      },
+      }
     };
   },
 
