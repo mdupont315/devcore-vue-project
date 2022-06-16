@@ -4,26 +4,26 @@
 //
 // import { find, registerCustomProtocol } from "linkifyjs";
 
-import { Mark, markPasteRule, mergeAttributes } from '@tiptap/core'
-import { find, registerCustomProtocol } from 'linkifyjs'
+import { Mark, markPasteRule, mergeAttributes } from "@tiptap/core";
+import { find, registerCustomProtocol } from "linkifyjs";
 import { v4 as uuidv4 } from "uuid";
-import { autolink } from './helpers/link/autolink'
-import { clickHandler } from './helpers/link/clickHandler'
-import { pasteHandler } from './helpers/link/pasteHandler'
+import { autolink } from "./helpers/link/autolink";
+import { clickHandler } from "./helpers/link/clickHandler";
+import { pasteHandler } from "./helpers/link/pasteHandler";
 
 export const CustomLink = Mark.create({
-  name: 'link',
+  name: "link",
 
   priority: 1000,
 
   keepOnSplit: false,
 
   onCreate() {
-    this.options.protocols.forEach(registerCustomProtocol)
+    this.options.protocols.forEach(registerCustomProtocol);
   },
 
   inclusive() {
-    return this.options.autolink
+    return this.options.autolink;
   },
   addOptions() {
     return {
@@ -81,7 +81,7 @@ export const CustomLink = Mark.create({
         default: this.options.HTMLAttributes.href
       },
       uuid: {
-        default: uuidv4(),
+        default: null,
         parseHTML: el => {
           console.log(el);
           return el.getAttribute("uuid");
@@ -109,16 +109,21 @@ export const CustomLink = Mark.create({
     ];
   },
   renderHTML({ mark, HTMLAttributes }) {
-    console.log(mark, HTMLAttributes);
     const { uuid, href, target } = HTMLAttributes;
     const validate = /^https?:\/\//.test(href);
 
     if (!href) return true;
 
-    console.log(uuid)
-
     if (!validate) {
       return ["p", 0];
+    }
+
+    if (!uuid) {
+      return [
+        "a",
+        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+        0
+      ];
     }
 
     return [
@@ -143,53 +148,60 @@ export const CustomLink = Mark.create({
   addPasteRules() {
     return [
       markPasteRule({
-        find: text => find(text)
-          .filter(link => {
-            if (this.options.validate) {
-              return this.options.validate(link.value)
-            }
+        find: text =>
+          find(text)
+            .filter(link => {
+              if (this.options.validate) {
+                return this.options.validate(link.value);
+              }
 
-            return true
-          })
-          .filter(link => link.isLink)
-          .map(link => ({
-            text: link.value,
-            index: link.start,
-            data: link,
-          })),
+              return true;
+            })
+            .filter(link => link.isLink)
+            .map(link => ({
+              text: link.value,
+              index: link.start,
+              data: link
+            })),
         type: this.type,
         getAttributes: match => ({
-          href: match.data?.href,
-        }),
-      }),
-    ]
+          href: match.data?.href
+        })
+      })
+    ];
   },
   addProseMirrorPlugins() {
-    const plugins = []
+    const plugins = [];
     const { options } = this;
     const { removeLink } = options;
 
     if (this.options.autolink) {
-      plugins.push(autolink({
-        type: this.type,
-        validate: this.options.validate,
-      }))
+      plugins.push(
+        autolink({
+          type: this.type,
+          validate: this.options.validate
+        })
+      );
     }
 
     if (this.options.openOnClick) {
-      plugins.push(clickHandler({
-        type: this.type,
-        remove: removeLink
-      }))
+      plugins.push(
+        clickHandler({
+          type: this.type,
+          remove: removeLink
+        })
+      );
     }
 
     if (this.options.linkOnPaste) {
-      plugins.push(pasteHandler({
-        editor: this.editor,
-        type: this.type,
-      }))
+      plugins.push(
+        pasteHandler({
+          editor: this.editor,
+          type: this.type
+        })
+      );
     }
 
-    return plugins
-  },
+    return plugins;
+  }
 });

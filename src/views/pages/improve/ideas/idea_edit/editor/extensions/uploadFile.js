@@ -2,7 +2,6 @@ import { Plugin } from "prosemirror-state";
 import { v4 as uuidv4 } from "uuid";
 import { fileWithUniqueName, validateFileSize } from "./helpers/file/fileUtils";
 
-
 const renderFileInBase64ToCoordinates = (
   item,
   view,
@@ -35,7 +34,7 @@ const renderFileInBase64ToCoordinates = (
 const uploadFilePlugin = (addFile, notify) => {
   return new Plugin({
     props: {
-      handlePaste: async (view, event, slice) => {
+      handlePaste: (view, event, slice) => {
         const items = (event.clipboardData || event.originalEvent.clipboardData)
           .items;
 
@@ -58,7 +57,8 @@ const uploadFilePlugin = (addFile, notify) => {
             const preview = true;
 
             const itemAsFile = item.getAsFile();
-            const transformedFile = await fileWithUniqueName(view, itemAsFile);
+            const transformedFile = fileWithUniqueName(view, itemAsFile);
+           // const transformedFile = itemAsFile;
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {
               const uuid = uuidv4();
@@ -74,7 +74,8 @@ const uploadFilePlugin = (addFile, notify) => {
           } else {
             const preview = false;
             const itemAsFile = item.getAsFile();
-            const transformedFile = await fileWithUniqueName(view, itemAsFile);
+          //  const transformedFile = itemAsFile;
+            const transformedFile = fileWithUniqueName(view, itemAsFile);
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {
               const uuid = uuidv4();
@@ -119,7 +120,7 @@ const uploadFilePlugin = (addFile, notify) => {
               const valid = validateFileSize(notify, item);
               if (valid) {
                 const uuid = uuidv4();
-                const transformedFile = await fileWithUniqueName(view, item);
+                const transformedFile = fileWithUniqueName(view, item);
                 addFile({ uuid, file: transformedFile });
                 renderFileInBase64ToCoordinates(
                   transformedFile,
@@ -138,7 +139,7 @@ const uploadFilePlugin = (addFile, notify) => {
               const valid = validateFileSize(notify, item);
               if (valid) {
                 const uuid = uuidv4();
-                const transformedFile = await fileWithUniqueName(view, item);
+                const transformedFile = fileWithUniqueName(view, item);
                 addFile({ uuid, file: transformedFile });
                 renderFileInBase64ToCoordinates(
                   transformedFile,

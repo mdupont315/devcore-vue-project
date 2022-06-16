@@ -49,7 +49,9 @@ export default class ContentEditor {
         paragraph: false,
         listItem: false,
         italic: false,
-        bold: false
+        bold: false,
+        code: false,
+        codeBlock: false
         // hardBreak: false
       }),
       Paragraph,
@@ -154,10 +156,7 @@ export default class ContentEditor {
           //    const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
           const __formatHTML = formatHTML.replace(/ style(.*?)">/g, ">");
           const ___formatHTML = __formatHTML.replace(/<br>/g, " ");
-
-          // console.log(html);
-          // console.log(___formatHTML)
-          // console.log(_stylesRemoved)
+          console.log(___formatHTML)
           return ___formatHTML;
         }
       },
@@ -186,30 +185,6 @@ export default class ContentEditor {
 
           if (!this.dedupedCommentNodes) {
             this.dedupedCommentNodes = true;
-
-            // console.log(editor.isActive("paragraph"));
-
-            // console.log(editor.state.selection);
-            //   const $cursor = editor.state.selection.$cursor;
-
-            // console.log(editor)
-            // console.log("cursor position:", $cursor.pos);
-            // case delete from paragraph 1
-            // insert node between
-            // case backspace from comment
-            //  const hadComment = editor.state.selection.$head.parent
-            //    console.log($cursor)
-            // if (editor && editor.isActive("comment")) {
-            //   setTimeout(() => {
-            //     this.editor.commands.transformComments(this.node);
-            //   }, 300);
-            // }
-            // if (editor.isActive("comment")) {
-            //   setTimeout(() =>
-            //     // setTimeout(() => debouncedDedupeCommentNodes(editor))
-            // //    setTimeout(() => debounceCommentNodes(editor))
-            //   );
-            // }
           }
 
           this.dedupedCommentNodes = false;
@@ -218,18 +193,7 @@ export default class ContentEditor {
 
           this.options.onUpdate(json);
         });
-      },
-      onTransaction: ({ editor }) => {
-        // //  setTimeout(() => {
-        //     const $cursor = editor.state.selection.$cursor;
-        //     console.log("on transaction position:", $cursor);
-        // //  }, 300);
       }
-
-      // onFocus: ({ editor }) => {
-      //   const json = editor.getJSON();
-      //   this.options.onUpdate(json);
-      // }
     });
   }
 

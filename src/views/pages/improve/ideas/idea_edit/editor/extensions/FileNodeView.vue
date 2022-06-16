@@ -61,6 +61,7 @@
 <script>
 import { NodeViewWrapper, nodeViewProps, NodeViewContent } from "@tiptap/vue-2";
 import { FolderIcon } from "@/assets";
+import { getUniqueFileName } from "./helpers/file/fileUtils";
 
 export default {
   components: {
@@ -87,6 +88,9 @@ export default {
       return this.fileEntity;
     },
   },
+  async created() {
+    console.log(this.fileEntity);
+  },
   async mounted() {
     await this.transformFilesIfPastedExternalUrls();
   },
@@ -95,9 +99,11 @@ export default {
   },
   watch: {
     fileEntity: {
+      immediate: true,
       deep: true,
       handler(newVal) {
         if (newVal && newVal.src) {
+          console.log(newVal);
           if (this.isValidExternalUrl(newVal.src)) {
             this.transformFilesIfPastedExternalUrls();
           }
@@ -107,6 +113,7 @@ export default {
   },
   methods: {
     async transformFilesIfPastedExternalUrls() {
+      console.log("transform");
       if (
         !this.node.attrs.size &&
         this.node.attrs.src &&
