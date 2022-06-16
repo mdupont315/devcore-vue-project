@@ -7,7 +7,7 @@
       <div class="idea_edit_path_container-header-close"></div>
 
       <div
-        v-if="cleanIdeaPath && !ideaContentIsDirty"
+        v-if="(cleanIdeaPath && !ideaContentIsDirty) || !idea.id"
         class="ideaEdit_path_noEdit_content"
         @click="closeIdeaEdit"
       >

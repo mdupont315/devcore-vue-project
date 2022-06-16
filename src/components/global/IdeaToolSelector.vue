@@ -138,12 +138,12 @@ export default {
   }),
   computed: {
     ...mapGetters({
-      allTools: "companyTools/all",
+      allTools: "companyTool/all",
     }),
     tools: {
       get() {
         return (this.items || this.allTools).sort((a, b) =>
-          a.firstName > b.firstName ? 1 : -1
+          a.name > b.name ? 1 : -1
         );
       },
     },
@@ -166,9 +166,7 @@ export default {
       } else {
         this.dataValue = [];
       }
-    } else {
-
-		}
+    }
 
     this.ready = true;
     this.intent = Math.random();

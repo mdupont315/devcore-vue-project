@@ -77,7 +77,7 @@ export default {
       removeFile: false,
       removeFileIds: [],
       companyRoleIds: [],
-      companyToolIds: null,
+      companyToolIds: [],
       description: null,
       title: null,
       type: null,
@@ -226,6 +226,7 @@ export default {
   mounted() {
     if (this.getIdea && this.getIdea.id) {
       this.ideaForm._fields.companyRoleIds = this.getIdea.companyRoleIds;
+			this.ideaForm._fields.companyToolIds = this.getIdea.companyToolIds
     }
   },
   methods: {
