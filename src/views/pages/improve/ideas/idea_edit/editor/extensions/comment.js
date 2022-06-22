@@ -32,7 +32,6 @@ export const Comment = Node.create({
   parseHTML: () => [{ tag: "span[comment]" }],
 
   renderHTML({ HTMLAttributes }) {
-    console.log(HTMLAttributes);
     return [
       "span",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
@@ -101,8 +100,6 @@ export const Comment = Node.create({
 
         dispatch(tr.setSelection(sel).scrollIntoView());
 
-        console.log(sel);
-
         setTimeout(() => {
           const selCommentStart = new TextSelection($from);
 
@@ -115,99 +112,203 @@ export const Comment = Node.create({
   addKeyboardShortcuts: () => {
     return {
       Backspace: ({ editor }) => {
-        editor.commands.first(({ commands }) => [
-          // () => commands.undoInputRule(),
-          () => commands.deleteSelection(),
-          () => commands.joinBackward(),
-          () => commands.selectNodeBackward()
-        ]);
-        //   console.log("creaíng!");
-        //  // editor.commands.clearNodes();
+        if (editor && editor.isActive("comment")) {
+          console.log(editor.view.state.selection);
 
-        //   // Backspace: ({ editor }) => {
-        //   const {
-        //     state: {
-        //       doc,
-        //       selection: { from: selFrom, to: selTo },
-        //       schema,
-        //       tr
-        //     },
-        //     view: { dispatch }
-        //   } = editor;
 
-        //   let [commentNode, nodeBeforeCommentNode, lastNode] = new Array(3).fill(
-        //     null
-        //   );
+          editor.commands.first(({ commands }) => [
+            () => commands.deleteSelection(),
+            () => commands.joinBackward(),
+            () => commands.deleteCharBefore()
+          ]);
 
-        //   doc.descendants((node, pos) => {
-        //     if (!node.isBlock || commentNode) return;
-
-        //     if (node.type.name === "comment") {
-        //       const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
-
-        //       const isNodeActiveCommentNode =
-        //         nodeFrom <= selFrom && selTo <= nodeTo;
-
-        //       if (isNodeActiveCommentNode) {
-        //         commentNode = { node, from: pos, to: pos + node.nodeSize };
-        //         nodeBeforeCommentNode = lastNode;
-        //       }
-        //     } else {
-        //       lastNode = {
-        //         node,
-        //         from: pos,
-        //         to: pos + node.nodeSize,
-        //         isEmpty: !node.textContent.length
-        //       };
-        //     }
-        //   });
-
-        //   if (
-        //     commentNode &&
-        //     nodeBeforeCommentNode &&
-        //     selFrom === commentNode.from + 1 &&
-        //     selTo === commentNode.from + 1
-        //   ) {
-        //     const beforeContent = nodeBeforeCommentNode.node.content;
-        //     const commentContent = commentNode.node.content;
-
-        //     const combinedContent = beforeContent.append(commentContent);
-
-        //     const newCommentWithCombinedContent = schema.nodes.comment.create(
-        //       commentNode.node.attrs,
-        //       combinedContent
-        //     );
-
-        //     let replaceTr = tr.replaceRangeWith(
-        //       nodeBeforeCommentNode.from,
-        //       commentNode.to - 2,
-        //       newCommentWithCombinedContent
-        //     );
-
-        //     console.log(replaceTr);
-        //     dispatch(replaceTr);
-
-        //     setTimeout(() => {
-        //       if (nodeBeforeCommentNode.isEmpty) {
-        //         const focusPos = editor.state.doc.resolve(
-        //           nodeBeforeCommentNode.from
-        //         );
-
-        //         const newSel = new TextSelection(focusPos);
-
-        //         editor.view.dispatch(editor.state.tr.setSelection(newSel));
-        //       }
-        //     }, 100);
-        //   } else {
-        //     const resolvedPos = doc.resolve(selFrom);
-
-        //     const newSel = new TextSelection(resolvedPos);
-
-        //     dispatch(tr.setSelection(newSel));
-        //   }
+          return true;
+        }
+        return false;
       }
     };
   },
+  // addKeyboardShortcuts: () => {
+  //   return {
+  //     Backspace: ({ editor }) => {
+  //       const {
+  //         state: {
+  //           doc,
+  //           selection: { from: selFrom, to: selTo },
+  //           schema,
+  //           tr
+  //         },
+  //         view: { dispatch }
+  //       } = editor;
+
+  //       let [commentNode, nodeBeforeCommentNode, lastNode] = new Array(3).fill(
+  //         null
+  //       );
+
+  //       doc.descendants((node, pos) => {
+  //         if (!node.isBlock || commentNode) return;
+
+  //         if (node.type.name === "comment") {
+  //           const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
+
+  //           const isNodeActiveCommentNode =
+  //             nodeFrom <= selFrom && selTo <= nodeTo;
+
+  //           if (isNodeActiveCommentNode) {
+  //             commentNode = { node, from: pos, to: pos + node.nodeSize };
+  //             nodeBeforeCommentNode = lastNode;
+  //           }
+  //         } else {
+  //           lastNode = {
+  //             node,
+  //             from: pos,
+  //             to: pos + node.nodeSize,
+  //             isEmpty: !node.textContent.length
+  //           };
+  //         }
+  //       });
+
+  //       if (
+  //         commentNode &&
+  //         nodeBeforeCommentNode &&
+  //         selFrom === commentNode.from + 1 &&
+  //         selTo === commentNode.from + 1
+  //       ) {
+  //         const beforeContent = nodeBeforeCommentNode.node.content;
+  //         const commentContent = commentNode.node.content;
+
+  //         const combinedContent = beforeContent.append(commentContent);
+
+  //         const newCommentWithCombinedContent = schema.nodes.comment.create(
+  //           commentNode.node.attrs,
+  //           combinedContent
+  //         );
+
+  //         let replaceTr = tr.replaceRangeWith(
+  //           nodeBeforeCommentNode.from,
+  //           commentNode.to - 2,
+  //           newCommentWithCombinedContent
+  //         );
+
+  //         dispatch(replaceTr);
+
+  //         setTimeout(() => {
+  //           if (nodeBeforeCommentNode.isEmpty) {
+  //             const focusPos = editor.state.doc.resolve(
+  //               nodeBeforeCommentNode.from
+  //             );
+
+  //             const newSel = new TextSelection(focusPos);
+
+  //             editor.view.dispatch(editor.state.tr.setSelection(newSel));
+  //           }
+  //         }, 100);
+  //       } else {
+  //         const resolvedPos = doc.resolve(selFrom);
+
+  //         const newSel = new TextSelection(resolvedPos);
+
+  //         dispatch(tr.setSelection(newSel));
+  //       }
+
+  //       //   if (editor && editor.isActive("comment")) {
+  //       //   //  editor.commands.clearNodes();
+  //       //     editor.commands.first(({ commands }) => [
+  //       //  //     () => commands.undoInputRule(),
+  //       //       () => commands.deleteSelection(),
+  //       //       () => commands.joinBackward(),
+  //       //       () => commands.selectNodeBackward()
+  //       //     ]);
+  //       //   }
+  //       return false;
+
+  //       //   console.log("creaíng!");
+  //       //  // editor.commands.clearNodes();
+
+  //       //   // Backspace: ({ editor }) => {
+  //       //   const {
+  //       //     state: {
+  //       //       doc,
+  //       //       selection: { from: selFrom, to: selTo },
+  //       //       schema,
+  //       //       tr
+  //       //     },
+  //       //     view: { dispatch }
+  //       //   } = editor;
+
+  //       //   let [commentNode, nodeBeforeCommentNode, lastNode] = new Array(3).fill(
+  //       //     null
+  //       //   );
+
+  //       //   doc.descendants((node, pos) => {
+  //       //     if (!node.isBlock || commentNode) return;
+
+  //       //     if (node.type.name === "comment") {
+  //       //       const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
+
+  //       //       const isNodeActiveCommentNode =
+  //       //         nodeFrom <= selFrom && selTo <= nodeTo;
+
+  //       //       if (isNodeActiveCommentNode) {
+  //       //         commentNode = { node, from: pos, to: pos + node.nodeSize };
+  //       //         nodeBeforeCommentNode = lastNode;
+  //       //       }
+  //       //     } else {
+  //       //       lastNode = {
+  //       //         node,
+  //       //         from: pos,
+  //       //         to: pos + node.nodeSize,
+  //       //         isEmpty: !node.textContent.length
+  //       //       };
+  //       //     }
+  //       //   });
+
+  //       //   if (
+  //       //     commentNode &&
+  //       //     nodeBeforeCommentNode &&
+  //       //     selFrom === commentNode.from + 1 &&
+  //       //     selTo === commentNode.from + 1
+  //       //   ) {
+  //       //     const beforeContent = nodeBeforeCommentNode.node.content;
+  //       //     const commentContent = commentNode.node.content;
+
+  //       //     const combinedContent = beforeContent.append(commentContent);
+
+  //       //     const newCommentWithCombinedContent = schema.nodes.comment.create(
+  //       //       commentNode.node.attrs,
+  //       //       combinedContent
+  //       //     );
+
+  //       //     let replaceTr = tr.replaceRangeWith(
+  //       //       nodeBeforeCommentNode.from,
+  //       //       commentNode.to - 2,
+  //       //       newCommentWithCombinedContent
+  //       //     );
+
+  //       //     console.log(replaceTr);
+  //       //     dispatch(replaceTr);
+
+  //       //     setTimeout(() => {
+  //       //       if (nodeBeforeCommentNode.isEmpty) {
+  //       //         const focusPos = editor.state.doc.resolve(
+  //       //           nodeBeforeCommentNode.from
+  //       //         );
+
+  //       //         const newSel = new TextSelection(focusPos);
+
+  //       //         editor.view.dispatch(editor.state.tr.setSelection(newSel));
+  //       //       }
+  //       //     }, 100);
+  //       //   } else {
+  //       //     const resolvedPos = doc.resolve(selFrom);
+
+  //       //     const newSel = new TextSelection(resolvedPos);
+
+  //       //     dispatch(tr.setSelection(newSel));
+  //       //   }
+  //     }
+  //   };
+  // },
 
   addNodeView: () => VueNodeViewRenderer(CommentNodeView)
 });

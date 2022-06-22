@@ -1,7 +1,6 @@
 import { Editor } from "@tiptap/vue-2";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
-import Underline from "@tiptap/extension-underline";
 import Gapcursor from "@tiptap/extension-gapcursor";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
@@ -26,7 +25,8 @@ import {
   ExternalVideo,
   Paragraph,
   TrailingNode,
-  CustomLink
+  CustomLink,
+  CustomUnderLine
 } from "./extensions";
 
 export default class ContentEditor {
@@ -46,6 +46,7 @@ export default class ContentEditor {
     this.extensions = [
       StarterKit.configure({
         history: false,
+        heading: false,
         paragraph: false,
         listItem: false,
         italic: false,
@@ -102,11 +103,7 @@ export default class ContentEditor {
       Indent,
       Highlight,
       ExternalVideo,
-      Underline.extend({
-        addKeyboardShortcuts() {
-          return {};
-        }
-      }),
+      CustomUnderLine,
       TableRow,
       TableHeader,
       TableCell,
@@ -160,6 +157,10 @@ export default class ContentEditor {
         }
       },
 
+      // onTransaction: ({ editor, transaction }) => {
+      //   console.log(transaction);
+      // },
+
       onUpdate: ({ editor }) => {
         setTimeout(() => {
           editor.state.doc.descendants((node, pos, parent) => {
@@ -182,11 +183,11 @@ export default class ContentEditor {
             return false;
           });
 
-          if (!this.dedupedCommentNodes) {
-            this.dedupedCommentNodes = true;
-          }
+          // if (!this.dedupedCommentNodes) {
+          //   this.dedupedCommentNodes = true;
+          // }
 
-          this.dedupedCommentNodes = false;
+          // this.dedupedCommentNodes = false;
 
           const json = editor.getJSON();
 

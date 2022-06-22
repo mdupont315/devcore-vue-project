@@ -26,6 +26,7 @@ export function trailingNode(options) {
       const endPosition = content.size;
 
       if (!shouldInsertNodeAtEnd) return
+      console.log(endPosition)
 
       return tr.insert(endPosition, type.create());
     },

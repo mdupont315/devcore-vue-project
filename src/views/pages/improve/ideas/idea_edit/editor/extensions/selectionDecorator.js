@@ -1,81 +1,81 @@
-import { Extension } from '@tiptap/core'
-import { Plugin, PluginKey } from "prosemirror-state";
-import { Decoration, DecorationSet } from 'prosemirror-view'
+// import { Extension } from '@tiptap/core'
+// import { Plugin, PluginKey } from "prosemirror-state";
+// import { Decoration, DecorationSet } from 'prosemirror-view'
 
-let decorationSet
+// let decorationSet
 
-export const SelectionDecorator = Extension.create({
-  name: 'selectionDecorator',
+// export const SelectionDecorator = Extension.create({
+//   name: 'selectionDecorator',
 
-  addProseMirrorPlugins() {
-    const { editor: { view: { dispatch }} } = this
+//   addProseMirrorPlugins() {
+//     const { editor: { view: { dispatch }} } = this
 
-    let alreadyFocused = false
+//     let alreadyFocused = false
 
-    const paragraphSelectorPlugin = new Plugin({
-      key: new PluginKey('paragraphSelectorPlugin'),
-      props: {
-        decorations(state) {
-          return this.getState(state)
-        },
-      },
-      appendTransaction: (tr, state, newState) => {
-        if (alreadyFocused) {
-          alreadyFocused = false
-          return
-        }
-        const { selection, doc } = newState
+//     const paragraphSelectorPlugin = new Plugin({
+//       key: new PluginKey('paragraphSelectorPlugin'),
+//       props: {
+//         decorations(state) {
+//           return this.getState(state)
+//         },
+//       },
+//       appendTransaction: (tr, state, newState) => {
+//         if (alreadyFocused) {
+//           alreadyFocused = false
+//           return
+//         }
+//         const { selection, doc } = newState
 
-        // only do it when it's not empty
-        if (selection.empty) {
-          decorationSet = DecorationSet.empty
-          return decorationSet
-        }
+//         // only do it when it's not empty
+//         if (selection.empty) {
+//           decorationSet = DecorationSet.empty
+//           return decorationSet
+//         }
 
-        const { from: selectionFrom, to: selectionTo } = selection;
+//         const { from: selectionFrom, to: selectionTo } = selection;
 
-        let nodeWithPos = {
-          node: null,
-          from: 0,
-          to: 0
-        };
+//         let nodeWithPos = {
+//           node: null,
+//           from: 0,
+//           to: 0
+//         };
 
-        doc.descendants((node, pos, parent) => {
-          if (!node.isBlock || nodeWithPos.node) return false;
+//         doc.descendants((node, pos, parent) => {
+//           if (!node.isBlock || nodeWithPos.node) return false;
 
-          const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
+//           const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
 
-          const nodeContainsSelection = nodeFrom <= selectionFrom && selectionFrom <= nodeTo
+//           const nodeContainsSelection = nodeFrom <= selectionFrom && selectionFrom <= nodeTo
 
-          if (nodeContainsSelection) nodeWithPos = { node, from: nodeFrom, to: nodeTo }
-        });
+//           if (nodeContainsSelection) nodeWithPos = { node, from: nodeFrom, to: nodeTo }
+//         });
 
-        if (!nodeWithPos.node) {
-          decorationSet = DecorationSet.empty
-          return decorationSet
-        }
+//         if (!nodeWithPos.node) {
+//           decorationSet = DecorationSet.empty
+//           return decorationSet
+//         }
 
-        const selectionDecoration = Decoration.inline(nodeWithPos.from, nodeWithPos.to, {
-          class: `selection-decoration`,
-          nodeName: 'span',
-        })
+//         const selectionDecoration = Decoration.inline(nodeWithPos.from, nodeWithPos.to, {
+//           class: `selection-decoration`,
+//           nodeName: 'span',
+//         })
 
-        decorationSet = DecorationSet.create(doc, [selectionDecoration])
-        // dispatch(state.tr.setSelection(selection))
-        if (!alreadyFocused) {
-          alreadyFocused = true
-        }
-      },
-      state: {
-        init: (config, state) => {
-          decorationSet = DecorationSet.create(state.doc, [])
+//         decorationSet = DecorationSet.create(doc, [selectionDecoration])
+//         // dispatch(state.tr.setSelection(selection))
+//         if (!alreadyFocused) {
+//           alreadyFocused = true
+//         }
+//       },
+//       state: {
+//         init: (config, state) => {
+//           decorationSet = DecorationSet.create(state.doc, [])
 
-          return decorationSet
-        },
-        apply: () => decorationSet,
-      },
-    })
+//           return decorationSet
+//         },
+//         apply: () => decorationSet,
+//       },
+//     })
 
-    return [paragraphSelectorPlugin]
-  }
-})
+//     return [paragraphSelectorPlugin]
+//   }
+// })

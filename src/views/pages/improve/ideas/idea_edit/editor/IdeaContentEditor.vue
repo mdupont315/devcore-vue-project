@@ -26,7 +26,7 @@ import { mapGetters } from "vuex";
 import { EditorContent, BubbleMenu } from "@tiptap/vue-2";
 import { MenuBar } from "./parts";
 import ContentEditor from "./EditorLoader.js";
-import { TextSelection, NodeSelection } from "prosemirror-state";
+import { TextSelection } from "prosemirror-state";
 import { Fragment } from "prosemirror-model";
 /* eslint-disable */
 export default {
@@ -277,12 +277,11 @@ export default {
             }
           }
 
-          dispatch(replaceTr);
+          setTimeout(() => {
+            dispatch(replaceTr);
+          });
         },
         transformComments: (node) => {
-          const curNode = JSON.parse(node.attrs.comment);
-          const selection = this.editor.view.state.selection;
-
           if (
             !this.editor.view.state.selection.empty ||
             (!this.editor.isActive("paragraph") &&
@@ -290,27 +289,27 @@ export default {
           ) {
             return;
           }
+          setTimeout(() => {
+            const curNode = JSON.parse(node.attrs.comment);
+            const selection = this.editor.view.state.selection;
 
-          const {
-            state: { doc, tr, schema },
-            view: { dispatch },
-          } = this.editor;
+            if (selection && selection.$head && selection.$head.parent) {
+              const parent = selection.$head.parent;
+              if (
+                parent.attrs.id &&
+                curNode.uuid &&
+                parent.attrs.id === curNode.uuid
+              ) {
+                this.editor
+                  .chain()
+                  .selectParentNode(selection)
+                  .setComment(JSON.stringify(curNode))
+                  .run();
 
-          if (selection && selection.$head && selection.$head.parent) {
-            const parent = selection.$head.parent;
-            if (
-              parent.attrs.id &&
-              curNode.uuid &&
-              parent.attrs.id === curNode.uuid
-            ) {
-              this.editor
-                .chain()
-                .focus()
-                .selectParentNode(selection)
-                .setComment(JSON.stringify(curNode))
-                .run();
+                this.editor.commands.focus(selection.to);
+              }
             }
-          }
+          }, 100);
         },
       };
 
@@ -527,7 +526,7 @@ export default {
 
     .column-resize-handle {
       position: absolute;
-			z-index: 2;
+      z-index: 2;
       right: -2px;
       top: 0;
       bottom: -2px;
@@ -613,7 +612,6 @@ export default {
       white-space: nowrap;
       // position: absolute;
       margin-right: 10px;
-      margin-left: 10px;
       text-decoration: none;
       user-select: none;
       &[data-tooltip] {
@@ -746,6 +744,7 @@ export default {
   font-weight: 400;
   letter-spacing: 1px;
 }
+
 .ProseMirror {
   > * + * {
     margin-top: 0.5em;

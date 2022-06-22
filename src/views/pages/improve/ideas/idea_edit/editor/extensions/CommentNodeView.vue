@@ -115,9 +115,13 @@ export default {
     }
   },
   beforeDestroy() {
-    if (this.editor && (this.editor.isActive("paragraph") || this.editor.isActive("comment"))) {
+    const { node } = this;
+    if (
+      this.editor &&
+      (this.editor.isActive("paragraph") || this.editor.isActive("comment"))
+    ) {
       setTimeout(() => {
-        this.editor.commands.transformComments(this.node);
+        this.editor.commands.transformComments(node);
       }, 100);
     }
   },
@@ -221,7 +225,7 @@ export default {
     .comment {
       color: #fff;
       display: flex;
-			padding-top:2px;
+      padding-top: 2px;
       // animation-name: opacityanimation;
       //   animation-duration: 1s;
 

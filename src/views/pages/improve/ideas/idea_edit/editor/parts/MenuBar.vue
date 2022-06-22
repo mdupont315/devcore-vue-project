@@ -509,6 +509,16 @@ export default {
           isActive: () => this.editor.isActive("italic"),
         },
         {
+          icon: "underline",
+          iconType: "remix",
+          showOnSmall: false,
+          showOnLarge: true,
+          type: "item",
+          title: "Underline",
+          action: () => this.editor.chain().focus().toggleUnderline().run(),
+          isActive: () => this.editor.isActive("underline"),
+        },
+        {
           type: "divider",
           showOnSmall: false,
           showOnLarge: true,
