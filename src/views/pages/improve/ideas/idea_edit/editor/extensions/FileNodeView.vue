@@ -201,6 +201,12 @@ export default {
   cursor: pointer;
   background: #fff;
   > a {
+		&:not([href]) {
+			color: lightgray;
+			> svg > path {
+				fill: lightgray
+			}
+		}
     color: #4294d0;
     > svg > path {
       fill: #4294d0;

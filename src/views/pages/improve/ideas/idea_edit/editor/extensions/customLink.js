@@ -40,7 +40,7 @@ export const CustomLink = Mark.create({
       openOnClick: true,
       linkOnPaste: true,
       autolink: true,
-      protocols: ['www', 'mailto'],
+      protocols: ['www'],
       HTMLAttributes: {
         target: "_blank",
         rel: "noopener noreferrer nofollow",

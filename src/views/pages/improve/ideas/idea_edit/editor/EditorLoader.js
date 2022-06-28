@@ -137,7 +137,7 @@ export default class ContentEditor {
 
   getEditorInstance() {
     return new Editor({
-      editable: this.editable,
+      //editable: this.editable,
       content: this.content,
       extensions: this.extensions,
       editorProps: {

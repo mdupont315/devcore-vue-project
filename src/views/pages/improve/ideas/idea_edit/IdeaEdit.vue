@@ -451,7 +451,7 @@ export default {
       }
     },
 
-    async saveIdeaVersion({ reloadContent = true }) {
+    async saveIdeaVersion() {
       this.isLoading = true;
       this.isSaving = true;
       window.vm.$snotify.info(this.$t("Do not close window"), {
