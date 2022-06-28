@@ -21,11 +21,20 @@
 
       <div v-else style="display: flex">
         <div style="display: flex; place-items: center">
+          <b-tooltip
+            :disabled="!!getAttrs.href === false"
+            ref="tooltip"
+            :target="`attachment-file-non-preview-container-${getAttrs.title}`"
+          >
+            {{ $t("Download file") }}
+          </b-tooltip>
           <div
             class="attachment-file-non-preview-container"
-            v-b-tooltip.hover
-            :title="$t('Download file')"
+						:id="`attachment-file-non-preview-container-${getAttrs.title}`"
+            :class="!!getAttrs.href === true ? 'is_uploaded_file' : 'is_not_uploaded_file'"
           >
+            <!--          v-b-tooltip.hover
+            :title="$t('Download file')" -->
             <a :href="getAttrs.href">
               <svg
                 width="17"
@@ -39,6 +48,7 @@
                   fill="#4294D0"
                 />
               </svg>
+
 
               <span style="margin-left: 10px">{{ getAttrs.title }}</span></a
             >
@@ -61,7 +71,6 @@
 <script>
 import { NodeViewWrapper, nodeViewProps, NodeViewContent } from "@tiptap/vue-2";
 import { FolderIcon } from "@/assets";
-import { getUniqueFileName } from "./helpers/file/fileUtils";
 
 export default {
   components: {
@@ -76,6 +85,7 @@ export default {
   data() {
     return {
       FolderIcon,
+			disableTooltip: false
     };
   },
 
@@ -201,12 +211,12 @@ export default {
   cursor: pointer;
   background: #fff;
   > a {
-		&:not([href]) {
-			color: lightgray;
-			> svg > path {
-				fill: lightgray
-			}
-		}
+    &:not([href]) {
+      color: lightgray;
+      > svg > path {
+        fill: lightgray;
+      }
+    }
     color: #4294d0;
     > svg > path {
       fill: #4294d0;
@@ -214,6 +224,15 @@ export default {
   }
 }
 
+.attachment-file-non-preview-container.is_not_uploaded_file:hover {
+  background: #fff;
+  > a {
+    color: lightgray;
+    > svg > path {
+      fill: lightgray;
+    }
+  }
+}
 .attachment-file-non-preview-container:hover {
   background: #4294d0;
   > a {
