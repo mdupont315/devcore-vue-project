@@ -1,4 +1,3 @@
-import { forEach } from "lodash";
 import { FILE_SIZE_LIMIT } from "./constants";
 
 // const addCounterToFileName = (name, counter) => {

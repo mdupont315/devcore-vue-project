@@ -118,15 +118,7 @@ export default {
     async saveFeedback() {
       this.isLoading = true;
       this.feedbackForm.value = this.rewardablePoints[this.rewardActiveIndex];
-      //TODO: send comment reply here
-      // const ideaIssueReplyForm = new GQLForm({
-      //   authorId: this.item.author.id,
-      //   typeAuthorId: input.typeAuthorId,
-      //   ideaIssueId: this.item.id,
-      //   value: input.value,
-      //   description: input.description,
-      //   status,
-      // });
+
       const ideaIssueReplyForm = {
         ...this.feedbackForm,
         authorId: this.user.id,
@@ -150,11 +142,8 @@ export default {
 
       const ideaIssueCloseForm = new GQLForm({
         id: this.editingIdea.editIdeaId,
-        improvementId: this.comment.id,
+        improvementIds: [this.comment.id],
       });
-
-      //TODO: Unset this comment,
-      //TODO:  remove from editor, save content
 
       await this.$store.dispatch(
         "idea/closeImprovementFeedback",

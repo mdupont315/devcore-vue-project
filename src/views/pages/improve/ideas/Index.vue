@@ -4,7 +4,7 @@
       v-if="process.process && process.process.stages.length > 0"
       class="sub-top-bar shadow-sm d-flex flex-row"
     >
-      <div style="flex-grow:5">
+      <div style="flex-grow: 5">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb text-capitalize bg-white">
             <li
@@ -51,7 +51,10 @@
           </ol>
         </nav>
       </div>
-      <div class="flex-grow-1 flex-start-on-small" style="display: flex; justify-content: flex-end">
+      <div
+        class="flex-grow-1 flex-start-on-small"
+        style="display: flex; justify-content: flex-end"
+      >
         <b-button
           :variant="isActive('new') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'ideas' }"
@@ -314,23 +317,32 @@ export default {
         });
       }
     });
-    EventBus.$on("idea/currentTab", async (data) => {
-      const tabName =
-        data && data.form && data.form.tab ? data.form.tab : "new";
+    // EventBus.$on("idea/currentTab", async (data) => {
+    //   const tabName =
+    //     data && data.form && data.form.tab ? data.form.tab : "new";
 
-      if (this.getIsIdeaInEdit) {
-        await this.closeIdeaEdit();
-      }
+    //   if (this.getIsIdeaInEdit) {
+    //     await this.closeIdeaEdit();
+    //   }
 
-      const ref = `ideas_innerView_${tabName}`;
-      if (this.$refs[ref] && this.$refs[ref].$el) {
-        this.$nextTick(() => {
-          this.$refs[ref].$el.click();
-        });
-      }
-    });
+		// 	console.log(this.$router.params)
 
-    //  EventBus.$on("idea/currentIdea", (data) => {
+    //   if (this.$router.params && this.$router.params.type !== "New") {
+    //     const ref = `ideas_innerView_${tabName}`;
+    //     //console.log(data);
+    //     //console.log(tabName);
+    //     if (this.$refs[ref] && this.$refs[ref].$el) {
+    //       //  this.updatePathParams({ type: null });
+    //       //   this.$router.push({ params: { type: "" } });
+    //       this.updatePathParams(this.$router, { type: "New" });
+    //       this.$nextTick(() => {
+    //         this.$refs[ref].$el.click();
+    //         // this.setComponent("New");
+    //         //  this.currentComponent = import("./New.vue");
+    //       });
+    //     }
+    //   }
+    // });
 
     if (
       this.$router.currentRoute.query &&
@@ -338,10 +350,23 @@ export default {
     ) {
       await this.goToIdeaByQuery();
     }
-    //  });
-    // }
   },
   methods: {
+    // updatePathParams($router, newParams) {
+    //   // Retrieve current params
+    //   const currentParams = $router.currentRoute.params;
+
+    //   // Create new params object
+    //   const mergedParams = { ...currentParams, ...newParams };
+
+    //   // console.log(currentParams);
+    //   // console.log(newParams);
+
+    //   // When router is not supplied path or name,
+    //   // it simply tries to update current route with new params or query
+    //   // Almost everything is optional.
+    //   $router.push({ params: mergedParams });
+    // },
     async goToIdeaByQuery() {
       // Navigated through link
       if (this.$router.currentRoute.query) {
@@ -495,6 +520,8 @@ export default {
                 : "New") +
               ".vue"
           );
+      } else {
+        this.currentComponent = () => import(`./${component}.vue`);
       }
     },
   },
@@ -513,4 +540,3 @@ export default {
     max-height: 100vh;
   }
 }
-

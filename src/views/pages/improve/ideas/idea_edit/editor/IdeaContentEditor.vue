@@ -224,7 +224,7 @@ export default {
 
         setTimeout(() => {
           this.$emit("contentScrollPosition", scrollToSelection);
-          this.$emit("saveContent");
+          this.$emit("saveContent", { reloadContent: false });
         }, 200);
       };
 

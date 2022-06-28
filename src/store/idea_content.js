@@ -39,7 +39,7 @@ const actions = {
   },
 
   async update(context, form) {
-    console.log(form)
+    console.log(context)
     let ret = null;
     try {
       const result = await form.mutate({

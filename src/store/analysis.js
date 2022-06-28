@@ -1,7 +1,7 @@
 const initialState = () => {
   return {
     activeTab: "general",
-    analysisReady: true,
+    analysisReady: false,
     selectedTabView: "savings",
     chartTimespan: [
       "Q3 2017",

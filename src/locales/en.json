@@ -225,6 +225,9 @@
     "ideaIssueReplyCreate": "Reply submitted succesfully!",
     "ideaIssueReplyCreateFail": "Submitting reply failed!",
 
+    "ideaContentCreate": "Idea content saved succesfully!",
+    "ideaContentCreateFail": "Saving idea content failed!",
+
     "issueCloseFeedback": "Issue closed for feedback succesfully!",
     "issueCloseFeedbackFail": "Closing issue feedback failed!",
     "ideaCloseFeedback": "Idea closed for feedback succesfully!",

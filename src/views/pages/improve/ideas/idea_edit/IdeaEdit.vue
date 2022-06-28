@@ -2,7 +2,6 @@
   <div class="idea_edit-wrapper">
     <div class="idea_edit_container">
       <idea-edit-content
-        :user="user"
         :idea="getIdea"
         :ideaContentCategories="ideaContentCategories"
         :isLoading="isLoading"
@@ -61,7 +60,6 @@ export default {
     filter: null,
     isSaving: false,
     isLoaded: false,
-    ideaPathChanged: false,
     filesChanged: false,
     defaultContentName: "Custom",
     selectedCategoryIndex: 2,
@@ -156,16 +154,6 @@ export default {
     isLoading: false,
     files: [],
   }),
-  props: {
-    idea: {
-      type: Object,
-      required: false,
-    },
-    user: {
-      type: Object,
-      required: false,
-    },
-  },
   computed: {
     ...mapGetters({
       ideaContents: "ideaContent/all",
@@ -193,10 +181,6 @@ export default {
     getIdeaPath: {
       get() {
         return this.ideaForm;
-      },
-      set(value) {
-        //TODO: SAVE ONLY CONTENT IF FILES OR PATH NOT CHANGED
-        this.ideaPathChanged = true;
       },
     },
     getIdeaContent: {
@@ -379,24 +363,13 @@ export default {
 
       return commentNodes;
     },
-    // getParagraphNodesFromContent() {
-    //   const { markup } = this.getIdeaContent;
-    //   const paragraphNodes =
-    //     markup?.content.filter(
-    //       (node) => node.type === "paragraph" && node.attrs && node.attrs.id
-    //     ) ?? [];
 
-    //   return paragraphNodes;
-    // },
-
-    syncContent() {
+    async syncContent() {
       //sync files
       this.syncFiles();
+
       //sync comments
-      //this.getParagraphNodesFromContent();
-      //remove ids
-      // const paragraphNodesInContent = this.getParagraphNodesFromContent();
-      // console.log(paragraphNodesInContent)
+      await this.syncComments();
     },
 
     syncFiles() {
@@ -439,10 +412,46 @@ export default {
       } else {
         this.ideaForm._fields.removeFile = false;
       }
-
-      console.log(this.ideaForm._fields.removeFileIds);
     },
-    async saveIdeaVersion() {
+    async syncComments() {
+      const contentCommentIds = [];
+      const commentNodes = this.getCommentNodesFromContent();
+
+      if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
+        const editIdea = await this.$store.dispatch("idea/findById", {
+          id: this.getIdea.id,
+          force: true,
+        });
+
+        const allNotRepliedCommentIds = [
+          ...editIdea.improvements.filter(
+            (improvement) => !improvement.replied
+          ),
+          ...editIdea.problems.filter((problem) => !problem.replied),
+        ].map((comment) => comment.id);
+
+        commentNodes.forEach((node) => {
+          const parsedComment = JSON.parse(node.attrs.comment);
+          parsedComment.comments.forEach((comment) =>
+            contentCommentIds.push(comment.id)
+          );
+        });
+
+        const markRepliedToCommentIds = allNotRepliedCommentIds.filter(
+          (id) => contentCommentIds.indexOf(id) < 0
+        );
+
+        await this.$store.dispatch(
+          "idea/closeImprovementFeedback",
+          new GQLForm({
+            id: this.getIdea.id,
+            improvementIds: markRepliedToCommentIds,
+          })
+        );
+      }
+    },
+
+    async saveIdeaVersion({ reloadContent = true }) {
       this.isLoading = true;
       this.isSaving = true;
       window.vm.$snotify.info(this.$t("Do not close window"), {
@@ -455,11 +464,11 @@ export default {
       try {
         //Sync files in server with files in content
 
-        this.syncContent();
-        //this.getCommentNodesFromContent();
+        await this.syncContent();
 
-        const ideaSave = await this.saveIdea();
-        //reset removeFileIds
+        let ideaSave = this.getIdea;
+
+        ideaSave = await this.saveIdea();
 
         if (ideaSave && ideaSave.id) {
           let ideaContent = null;
@@ -486,9 +495,15 @@ export default {
               `ideaContent/create`,
               contentForm
             );
+
+            //   if (reloadContent) {
             const mapTo = contentForm;
             const mapFrom = Object.assign(ideaContent, {});
             this.formFieldMapper(mapTo, mapFrom);
+            //    }
+            // const mapTo = contentForm;
+            // const mapFrom = Object.assign(ideaContent, {});
+            // this.formFieldMapper(mapTo, mapFrom);
           }
         }
 

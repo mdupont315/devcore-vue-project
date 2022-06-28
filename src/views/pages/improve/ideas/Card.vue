@@ -5,7 +5,7 @@
     class="mb-3 idea-card"
     :class="showDetail ? 'idea-card-expanded' : 'idea-card-shrunk'"
   >
-	<layer v-if="showPopOverFeedback" @closed="togglePopOverFeedback" />
+    <layer v-if="showPopOverFeedback" @closed="togglePopOverFeedback" />
     <div class="idea_card_container" v-if="!showDetail">
       <b-card-header class="bg-white border-0">
         <div style="line-height: 1em">
@@ -142,8 +142,6 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-//import IdeaDetail from "./Detail";
-import IdeaEdit from "./idea_edit/IdeaEdit.vue";
 import feedbackForm from "../../../../components/global/FeedbackForm.vue";
 import GQLForm from "@/lib/gqlform";
 
@@ -151,8 +149,6 @@ import GQLForm from "@/lib/gqlform";
 export default {
   components: {
     "idea-feedback": feedbackForm,
-    // "idea-detail": IdeaDetail,
-    "idea-edit": IdeaEdit,
   },
   props: {
     idea: {
@@ -233,11 +229,18 @@ export default {
 
   methods: {
     async openIdeaEdit(idea) {
+
+      // this.$router.push({
+      //   params: {
+      //     ideaId: idea.id,
+      //   },
+      // });
+
       await this.$store.dispatch("idea/setIdeaInEdit", {
         editIdeaMeta: {
           editStartedAt: new Date().getTime(),
         },
-				editIdeaMode: "EDIT",
+        editIdeaMode: "EDIT",
         editIdeaId: idea.id,
       });
       this.$emit("openIdea", idea);

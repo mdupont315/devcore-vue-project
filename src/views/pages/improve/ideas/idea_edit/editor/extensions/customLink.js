@@ -40,20 +40,19 @@ export const CustomLink = Mark.create({
       openOnClick: true,
       linkOnPaste: true,
       autolink: true,
-      protocols: [],
+      protocols: ['www', 'mailto'],
       HTMLAttributes: {
         target: "_blank",
         rel: "noopener noreferrer nofollow",
         class: null,
         uuid: null
       },
-      validate: href => /^https?:\/\//.test(href)
+      validate: undefined
     };
   },
   addCommands() {
     return {
       setLink: attributes => ({ chain }) => {
-        console.log(attributes);
         return chain()
           .setMark(this.name, attributes)
           .setMeta("preventAutolink", true)

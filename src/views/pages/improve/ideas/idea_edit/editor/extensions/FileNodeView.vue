@@ -88,9 +88,6 @@ export default {
       return this.fileEntity;
     },
   },
-  async created() {
-    console.log(this.fileEntity);
-  },
   async mounted() {
     await this.transformFilesIfPastedExternalUrls();
   },
@@ -103,7 +100,6 @@ export default {
       deep: true,
       handler(newVal) {
         if (newVal && newVal.src) {
-          console.log(newVal);
           if (this.isValidExternalUrl(newVal.src)) {
             this.transformFilesIfPastedExternalUrls();
           }
@@ -113,7 +109,6 @@ export default {
   },
   methods: {
     async transformFilesIfPastedExternalUrls() {
-      console.log("transform");
       if (
         !this.node.attrs.size &&
         this.node.attrs.src &&

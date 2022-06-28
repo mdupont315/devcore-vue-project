@@ -146,7 +146,6 @@ export default {
     },
     selectedItems: {
       get() {
-        console.log(this.tools);
         return this.tools
           .filter((r) => this.dataValue.includes(r.id))
           .sort((a, b) => (a.name > b.name ? 1 : -1));
@@ -155,20 +154,11 @@ export default {
   },
   async mounted() {
 
-    console.log(this.value);
     if (this.value && this.value.length > 0) {
-      // const allRoleIds = this.value;
-      // console.log(this.value)
-      // console.log(this.value)
-      console.log(this.value);
       const tools = this.value.filter(
         (o) => this.tools.find((u) => u.id === o) != null
       );
-      console.log(tools);
       this.dataValue = tools;
-
-      // console.log("this.dataValue")
-      // console.log(this.dataValue)
     } else {
       this.dataValue = [];
     }

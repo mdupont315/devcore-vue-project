@@ -97,10 +97,6 @@ export default {
       type: Object,
       required: false,
     },
-    user: {
-      type: Object,
-      required: false,
-    },
     value: {
       type: Object,
       required: false,
@@ -159,8 +155,9 @@ export default {
 
 			this.$emit("editorLoaded")
     },
-    saveContent() {
-      this.$emit("saveIdeaContent");
+    saveContent(reloadContent) {
+			console.log(reloadContent)
+      this.$emit("saveIdeaContent", reloadContent);
     },
     setFile(file) {
       this.$emit("fileAdded", file);

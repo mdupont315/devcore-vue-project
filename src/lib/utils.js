@@ -97,10 +97,6 @@ export function showMessageFromResponse(response) {
   if (window.vm.$t(translationKey) == translationKey) {
     return;
   }
-
-
-
-  console.log(translationKey)
   if (response.statusCode > 300) {
     window.vm.$snotify.error(window.vm.$t(`${translationKey}Fail`));
   } else {

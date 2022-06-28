@@ -88,7 +88,15 @@ export default class ContentEditor {
         raquo: false,
         plusMinus: false
       }),
-      ListItem,
+      ListItem.configure({
+        addKeyboardShortcuts() {
+          return {
+            Enter: () => this.editor.commands.splitListItem(this.name),
+            Tab: () => this.editor.commands.sinkListItem(this.name),
+            "Shift-Tab": () => this.editor.commands.liftListItem(this.name)
+          };
+        }
+      }),
       History.configure({ depth: 10 }),
       FontFamily.configure({
         types: ["textStyle"]
@@ -96,7 +104,8 @@ export default class ContentEditor {
       Text,
       // Draggable,
       CustomLink.configure({
-        removeLink: linkHandlers.removeLink
+        removeLink: linkHandlers.removeLink,
+        protocols: ["www", "mailto"]
       }),
       TextStyle,
       Color,

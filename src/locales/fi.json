@@ -225,6 +225,9 @@
     "ideaIssueReplyCreate": "Palaute annettu onnistuneesti!",
     "ideaIssueReplyCreateFail": "Palautteen anto epäonnistui!",
 
+    "ideaContentCreate": "Idea sisältö tallennettu onnistuneesti!",
+    "ideaContentCreateFail": "Idea sisällön tallennus epäonnistui!",
+
     "issueCloseFeedback": "Palaute suljettiin ongelmalle onnistuneest!",
     "issueCloseFeedbackFail": "Palautteen sulkeminen epäonnistui!",
     "ideaCloseFeedback": "Palaute suljettiin idealle onnistuneesti!",

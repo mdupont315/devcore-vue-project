@@ -70,6 +70,7 @@ export const Indent = Extension.create({
         return false;
       },
       outdent: (backspace = false) => ({ tr, state, dispatch, editor }) => {
+        console.log("outdenting", backspace)
         const { selection } = state;
         if (this.editor.isActive("comment") || selection.node) {
           return this.editor
@@ -77,22 +78,26 @@ export const Indent = Extension.create({
             .focus()
             .run();
         }
-        console.log("backspace", backspace);
-        console.log("selection", selection.$anchor.parentOffset);
-        console.log("fromto", selection.from !== selection.to);
 
-        if (backspace && selection.$anchor.parentOffset === 0) {
-          console.log("OUTDENTING!")
-          return false
-        }
-        if (
-          backspace &&
-          (selection.$anchor.parentOffset > 0 ||
-            selection.from !== selection.to)
-        ) {
-          console.log("backspace", backspace);
-          console.log(selection.from !== selection.to);
-          return false;
+        if (backspace) {
+          // console.log(backspace);
+          // console.log(selection.$anchor.parentOffset);
+          // console.log(selection.from);
+          // console.log(selection.to);
+          console.log(selection)
+          if (selection.$anchor.parentOffset === 0) {
+            if (selection.from === selection.to) {
+              editor.commands.outdent(false)
+              return false;
+            }
+            return false;
+          }
+          if (
+            selection.$anchor.parentOffset > 0 ||
+            selection.from !== selection.to
+          ) {
+            return false;
+          }
         }
 
         tr = tr.setSelection(selection);
