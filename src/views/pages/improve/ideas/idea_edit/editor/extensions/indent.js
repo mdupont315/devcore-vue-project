@@ -80,11 +80,6 @@ export const Indent = Extension.create({
         }
 
         if (backspace) {
-          // console.log(backspace);
-          // console.log(selection.$anchor.parentOffset);
-          // console.log(selection.from);
-          // console.log(selection.to);
-          console.log(selection)
           if (selection.$anchor.parentOffset === 0) {
             if (selection.from === selection.to) {
               editor.commands.outdent(false)

@@ -441,33 +441,36 @@ export default {
           (id) => contentCommentIds.indexOf(id) < 0
         );
 
-        await this.$store.dispatch(
-          "idea/closeImprovementFeedback",
-          new GQLForm({
-            id: this.getIdea.id,
-            improvementIds: markRepliedToCommentIds,
-          })
-        );
+        if (markRepliedToCommentIds.length > 0) {
+          await this.$store.dispatch(
+            "idea/closeImprovementFeedback",
+            new GQLForm({
+              id: this.getIdea.id,
+              improvementIds: markRepliedToCommentIds,
+            })
+          );
+        }
       }
     },
 
-    async saveIdeaVersion() {
-      this.isLoading = true;
-      this.isSaving = true;
-      window.vm.$snotify.info(this.$t("Do not close window"), {
-        timeout: 5000,
-        showProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-      });
+    async saveIdeaVersion(reloadContent = true) {
+      if (reloadContent) {
+        window.vm.$snotify.info(this.$t("Do not close window"), {
+          timeout: 5000,
+          showProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+        });
+        this.isLoading = true;
+        this.isSaving = true;
+      }
 
       try {
         //Sync files in server with files in content
 
-        await this.syncContent();
-
         let ideaSave = this.getIdea;
 
+        await this.syncContent();
         ideaSave = await this.saveIdea();
 
         if (ideaSave && ideaSave.id) {
@@ -475,6 +478,8 @@ export default {
 
           const contentForm =
             this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+          console.log(contentForm);
+
           let markup = contentForm.markup;
 
           if (ideaSave.files.length > 0) {
@@ -488,19 +493,21 @@ export default {
           if (contentForm.id) {
             ideaContent = await this.$store.dispatch(
               `ideaContent/update`,
-              contentForm
+              contentForm,
+              { reload: reloadContent }
             );
           } else {
             ideaContent = await this.$store.dispatch(
               `ideaContent/create`,
-              contentForm
+              contentForm,
+              { reload: reloadContent }
             );
 
-            //   if (reloadContent) {
-            const mapTo = contentForm;
-            const mapFrom = Object.assign(ideaContent, {});
-            this.formFieldMapper(mapTo, mapFrom);
-            //    }
+            if (reloadContent) {
+              const mapTo = contentForm;
+              const mapFrom = Object.assign(ideaContent, {});
+              this.formFieldMapper(mapTo, mapFrom);
+            }
             // const mapTo = contentForm;
             // const mapFrom = Object.assign(ideaContent, {});
             // this.formFieldMapper(mapTo, mapFrom);

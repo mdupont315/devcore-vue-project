@@ -65,6 +65,7 @@
         </b-popover>
       </div>
     </div>
+
     <idea-content-editor
       v-if="!isLoading"
       :isEditable="isEditable"

@@ -166,9 +166,14 @@ export default class ContentEditor {
         }
       },
 
-      // onTransaction: ({ editor, transaction }) => {
-      //   console.log(transaction);
-      // },
+      onTransaction: ({ editor, transaction }) => {
+
+        const isCommenting = transaction.getMeta('saveComment')
+
+        if (isCommenting) {
+          console.log(transaction)
+        }
+      },
 
       onUpdate: ({ editor }) => {
         setTimeout(() => {

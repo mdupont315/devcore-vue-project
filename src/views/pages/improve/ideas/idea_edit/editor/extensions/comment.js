@@ -1,6 +1,7 @@
 import { Node, VueNodeViewRenderer, mergeAttributes } from "@tiptap/vue-2";
 import { TextSelection } from "prosemirror-state";
 import CommentNodeView from "./CommentNodeView.vue";
+import { paragraphTransformer } from "./helpers/comment/transformEmpty";
 
 export const Comment = Node.create({
   name: "comment",
@@ -112,8 +113,9 @@ export const Comment = Node.create({
   addKeyboardShortcuts: () => {
     return {
       Backspace: ({ editor }) => {
-        if (editor && editor.isActive("comment")) {
 
+        if (editor && editor.isActive("comment")) {
+          console.log("COMMENT!")
           editor.commands.first(({ commands }) => [
             () => commands.deleteSelection(),
             () => commands.joinBackward(),
@@ -125,6 +127,17 @@ export const Comment = Node.create({
         return false;
       }
     };
+  },
+  addProseMirrorPlugins() {
+    const plugins = [];
+    const {
+      editor: {
+        view: { dispatch }
+      }
+    } = this;
+
+    plugins.push(paragraphTransformer(dispatch));
+    return plugins;
   },
   // addKeyboardShortcuts: () => {
   //   return {

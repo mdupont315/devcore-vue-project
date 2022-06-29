@@ -140,6 +140,7 @@ export default {
     async saveEmptyFeedback() {
       this.isLoading = true;
 
+	console.log("CLOSING!")
       const ideaIssueCloseForm = new GQLForm({
         id: this.editingIdea.editIdeaId,
         improvementIds: [this.comment.id],

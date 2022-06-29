@@ -116,12 +116,15 @@ export default {
   },
   beforeDestroy() {
     const { node } = this;
+
     if (
       this.editor &&
       (this.editor.isActive("paragraph") || this.editor.isActive("comment"))
     ) {
       setTimeout(() => {
-        this.editor.commands.transformComments(node);
+        if (!this.editor.isDestroyed) {
+          this.editor.commands.transformComments(node);
+        }
       }, 100);
     }
   },
@@ -150,8 +153,9 @@ export default {
       const to = from + node.nodeSize;
 
       if (this.editor) {
-        this.editor.commands.focus("start");
-        this.editor.commands.saveReply(to);
+        // this.editor.commands.focus();
+        // this.editor.commands.saveReply(to);
+        this.editor.chain().setMeta("saveComment", true).saveReply(to).run();
       }
     },
     closeOverlay() {
