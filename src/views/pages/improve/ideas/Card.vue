@@ -5,6 +5,7 @@
     class="mb-3 idea-card"
     :class="showDetail ? 'idea-card-expanded' : 'idea-card-shrunk'"
   >
+    <layer v-if="showPopOverFeedback" @closed="togglePopOverFeedback" />
     <div class="idea_card_container" v-if="!showDetail">
       <b-card-header class="bg-white border-0">
         <div style="line-height: 1em">
@@ -105,11 +106,11 @@
             @close="closeIdeaForFeedback"
             :openState="showPopOverFeedback"
           >
-            <small
+            <!-- <small
               class="d-block text-gray"
               style="line-height: 1em; align-self: center"
               >{{ $t("Feedback") }}</small
-            >
+            > -->
           </idea-feedback>
 
           <span v-if="idea.evaluationsCount > 0" class="font-15x ml-2">
@@ -127,13 +128,13 @@
           <span v-if="idea.problemsCount > 0" class="font-15x ml-2">
             <b-badge variant="danger">{{ idea.problemsCount }}</b-badge>
           </span>
-          <span
+          <!-- <span
             v-if="idea.hasFile"
             class="text-gray font-15x ml-2"
             style="position: relative; top: 1px"
           >
             <i class="mdi mdi-folder-open-outline"></i>
-          </span>
+          </span> -->
         </div>
       </b-card-footer>
     </div>
@@ -141,8 +142,6 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-//import IdeaDetail from "./Detail";
-import IdeaEdit from "./idea_edit/IdeaEdit.vue";
 import feedbackForm from "../../../../components/global/FeedbackForm.vue";
 import GQLForm from "@/lib/gqlform";
 
@@ -150,8 +149,6 @@ import GQLForm from "@/lib/gqlform";
 export default {
   components: {
     "idea-feedback": feedbackForm,
-    // "idea-detail": IdeaDetail,
-    "idea-edit": IdeaEdit,
   },
   props: {
     idea: {
@@ -161,20 +158,20 @@ export default {
   data: () => ({
     showPopOverFeedback: false,
   }),
-  // mounted() {
-  //   const route = this.$router.currentRoute;
-  //   if (route.query) {
-  //     if (route.query.uuid) {
-  //       if (this.idea.uuid == route.query.uuid) {
-  //         this.$nextTick(() => {
-  //           setTimeout(() => {
-  //             this.toggleIdea();
-  //           }, 1000);
-  //         });
-  //       }
-  //     }
-  //   }
-  // },
+  mounted() {
+    const route = this.$router.currentRoute;
+    if (route.query) {
+      if (route.query.uuid) {
+        if (this.idea.uuid == route.query.uuid) {
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.toggleIdea();
+            }, 1000);
+          });
+        }
+      }
+    }
+  },
   computed: {
     ...mapGetters({
       allProcess: "process/all",
@@ -232,11 +229,18 @@ export default {
 
   methods: {
     async openIdeaEdit(idea) {
+
+      // this.$router.push({
+      //   params: {
+      //     ideaId: idea.id,
+      //   },
+      // });
+
       await this.$store.dispatch("idea/setIdeaInEdit", {
         editIdeaMeta: {
           editStartedAt: new Date().getTime(),
         },
-				editIdeaMode: "EDIT",
+        editIdeaMode: "EDIT",
         editIdeaId: idea.id,
       });
       this.$emit("openIdea", idea);

@@ -3,7 +3,7 @@
     <node-view-content class="content-dom" />
 
     <section class="content-dom-video">
-      <div style="display: flex" v-if="videoEntity">
+      <div style="display: flex; flex-direction: column" v-if="videoEntity">
         <iframe
           :src="`${this.node.attrs.src}?rel=0`"
           :title="this.node.attrs.title"
@@ -81,18 +81,20 @@ export default {
     border: 1px solid lightgray;
     width: 60px;
     height: 20px;
-    right: -15px;
     position: relative;
     border-radius: 3px;
     background: #fff;
-    transform: translate(-2px, -10px);
+		margin-top:10px;
+		&:hover {
+			background: #d0424d;
+			color: #fff;
+		}
   }
   .video-remove-icon {
     cursor: pointer;
     width: 20px;
     height: 20px;
     position: absolute;
-    transform: translate(-8px, -8px);
   }
 }
 </style>

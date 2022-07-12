@@ -1,28 +1,29 @@
 import { Plugin } from "prosemirror-state";
+import { v4 as uuidv4 } from "uuid";
+import { fileWithUniqueName, validateFileSize } from "./helpers/file/fileUtils";
 
-/**
- * function for image drag n drop(for tiptap)
- * @see https://gist.github.com/slava-vishnyakov/16076dff1a77ddaca93c4bccd4ec4521#gistcomment-3744392
- */
-
-const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
-  const { schema } = view.state;
-  console.log("item", item);
-
+const renderFileInBase64ToCoordinates = (
+  item,
+  view,
+  coordinates,
+  preview,
+  uuid
+) => {
   if (!item) return;
-  if (item.size > 1000000) {
-    console.log("ERROR, File size too big!");
-    return;
-  }
+
+  const { schema } = view.state;
+
   const reader = new FileReader();
   reader.onload = readerEvent => {
     const node = schema.nodes.file.create({
       src: readerEvent.target?.result,
       title: item.name,
+      size: item.size,
       type: item.type,
+      pos: coordinates.pos,
+      uuid,
       preview
     });
-    console.log(node);
 
     const transaction = view.state.tr.insert(coordinates.pos, node);
     view.dispatch(transaction);
@@ -30,10 +31,10 @@ const renderFileInBase64ToCoordinates = (item, view, coordinates, preview) => {
   reader.readAsDataURL(item);
 };
 
-const uploadFilePlugin = addFile => {
+const uploadFilePlugin = (addFile, notify) => {
   return new Plugin({
     props: {
-      handlePaste(view, event, slice) {
+      handlePaste: (view, event, slice) => {
         const items = (event.clipboardData || event.originalEvent.clipboardData)
           .items;
 
@@ -49,37 +50,44 @@ const uploadFilePlugin = addFile => {
         }
         const coordinates = { pos, inside: 0 };
 
-        console.log("ADD FILE ", addFile)
-
-        console.log(this);
         for (const item of items) {
-          console.log("item", item);
-          console.log(item.kind);
           if (item.kind != "file") return;
           if (item.type.indexOf("image") === 0) {
-            console.log("ITEM IS IMAGE ! ");
             event.preventDefault();
             const preview = true;
 
             const itemAsFile = item.getAsFile();
-
-            addFile(itemAsFile);
-            renderFileInBase64ToCoordinates(
-              itemAsFile,
-              view,
-              coordinates,
-              preview
-            );
+            const transformedFile = fileWithUniqueName(view, itemAsFile);
+           // const transformedFile = itemAsFile;
+            const valid = validateFileSize(notify, itemAsFile);
+            if (valid) {
+              const uuid = uuidv4();
+              addFile({ uuid, file: transformedFile });
+              renderFileInBase64ToCoordinates(
+                transformedFile,
+                view,
+                coordinates,
+                preview,
+                uuid
+              );
+            }
           } else {
             const preview = false;
             const itemAsFile = item.getAsFile();
-            addFile(itemAsFile);
-            renderFileInBase64ToCoordinates(
-              itemAsFile,
-              view,
-              coordinates,
-              preview
-            );
+          //  const transformedFile = itemAsFile;
+            const transformedFile = fileWithUniqueName(view, itemAsFile);
+            const valid = validateFileSize(notify, itemAsFile);
+            if (valid) {
+              const uuid = uuidv4();
+              addFile({ uuid, file: transformedFile });
+              renderFileInBase64ToCoordinates(
+                transformedFile,
+                view,
+                coordinates,
+                preview,
+                uuid
+              );
+            }
           }
         }
         return false;
@@ -93,17 +101,12 @@ const uploadFilePlugin = addFile => {
             return false;
           }
 
-          console.log(event.dataTransfer);
-
-          console.log("ADD FILE ", addFile)
           const data = Array.from(event.dataTransfer?.files ?? []);
+
           const previewFiles = data.filter(file => /image/i.test(file.type));
           const nonPreviewFiles = data.filter(
             file => !/image/i.test(file.type)
           );
-
-          console.log("data", data);
-          console.log("nonPreviewFiles", nonPreviewFiles);
 
           event.preventDefault();
           const coordinates = view.posAtCoords({
@@ -112,20 +115,40 @@ const uploadFilePlugin = addFile => {
           });
 
           if (previewFiles.length > 0) {
-            console.log(previewFiles);
             previewFiles.forEach(async item => {
               const preview = true;
-              addFile(item);
-              renderFileInBase64ToCoordinates(item, view, coordinates, preview);
+              const valid = validateFileSize(notify, item);
+              if (valid) {
+                const uuid = uuidv4();
+                const transformedFile = fileWithUniqueName(view, item);
+                addFile({ uuid, file: transformedFile });
+                renderFileInBase64ToCoordinates(
+                  transformedFile,
+                  view,
+                  coordinates,
+                  preview,
+                  uuid
+                );
+              }
             });
           }
 
           if (nonPreviewFiles.length > 0) {
-            console.log(data);
             nonPreviewFiles.forEach(async item => {
               const preview = false;
-              addFile(item);
-              renderFileInBase64ToCoordinates(item, view, coordinates, preview);
+              const valid = validateFileSize(notify, item);
+              if (valid) {
+                const uuid = uuidv4();
+                const transformedFile = fileWithUniqueName(view, item);
+                addFile({ uuid, file: transformedFile });
+                renderFileInBase64ToCoordinates(
+                  transformedFile,
+                  view,
+                  coordinates,
+                  preview,
+                  uuid
+                );
+              }
             });
           }
 

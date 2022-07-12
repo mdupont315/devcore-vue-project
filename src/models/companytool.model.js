@@ -2,11 +2,20 @@ import BaseModel from "./base.model";
 import CompanyModel from "./company.model";
 import CompanyToolPrice from "./companytoolprice.model";
 import CompanyToolModuleModel from "./companytoolmodule.model";
-
+import {
+  imageResolver
+} from "../lib/utils";
 export default class CompanyToolModel extends BaseModel {
     modules = [];
 
     _showDetails = false;
+
+    getAvatarUrl(size = '0x0') {
+      if (this.avatarUrl) {
+          return imageResolver(this.avatarUrl, size);
+      }
+      return null;
+  }
 
     deserialize(input) {
         if (input.company) {

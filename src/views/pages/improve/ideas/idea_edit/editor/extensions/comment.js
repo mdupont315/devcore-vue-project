@@ -1,11 +1,7 @@
-import {
-  getMarkRange,
-  Node,
-  VueNodeViewRenderer,
-  mergeAttributes
-} from "@tiptap/vue-2";
-import { Plugin, TextSelection } from "prosemirror-state";
+import { Node, VueNodeViewRenderer, mergeAttributes } from "@tiptap/vue-2";
+import { TextSelection } from "prosemirror-state";
 import CommentNodeView from "./CommentNodeView.vue";
+import { paragraphTransformer } from "./helpers/comment/transformEmpty";
 
 export const Comment = Node.create({
   name: "comment",
@@ -18,7 +14,9 @@ export const Comment = Node.create({
     return {
       HTMLAttributes: {},
       isCommentModeOn: () => false,
-      saveContent: () => {}
+      saveContent: () => {},
+      dedupeComments: () => {},
+      transformComments: () => {}
     };
   },
 
@@ -32,9 +30,7 @@ export const Comment = Node.create({
     };
   },
 
-  parseHTML() {
-    return [{ tag: "span[comment]" }];
-  },
+  parseHTML: () => [{ tag: "span[comment]" }],
 
   renderHTML({ HTMLAttributes }) {
     return [
@@ -45,47 +41,285 @@ export const Comment = Node.create({
   },
 
   addCommands() {
-    const { saveContent } = this.options;
+    const { saveContent, dedupeComments, transformComments } = this.options;
+
     return {
       setComment: comment => ({ commands }) =>
         commands.setNode(this.name, { comment }),
 
-      saveReply: () => () => saveContent()
+      saveReply: ideaUUID => ({ commands }) => saveContent(ideaUUID),
+      dedupeComments: node => ({ commands }) => dedupeComments(node),
+      transformComments: node => ({ commands }) => transformComments(node),
+
+      scrollToNextComment: () => ({ commands }) => {
+        const editor = this.editor;
+
+        const {
+          state: { doc, tr, selection },
+          view: { dispatch }
+        } = editor;
+
+        const { from: selectionFrom, to: selectionTo } = selection;
+
+        const commentNodes = [];
+
+        doc.descendants((node, pos) => {
+          if (node.type.name !== "comment") return;
+
+          const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
+
+          commentNodes.push({ nodeFrom, nodeTo });
+        });
+
+        let focusNextCommentNode = false;
+        let coordsOfCommentToFocus = null;
+
+        for (const commentNode of commentNodes) {
+          const { nodeFrom, nodeTo } = commentNode;
+
+          if (focusNextCommentNode) {
+            coordsOfCommentToFocus = commentNode;
+            break;
+          }
+
+          const isSelectionInsideCommentNode =
+            nodeFrom <= selectionFrom && selectionTo <= nodeTo + 1;
+
+          focusNextCommentNode = isSelectionInsideCommentNode;
+        }
+
+        if (commentNodes.length === 0) return;
+
+        if (!coordsOfCommentToFocus && commentNodes.length) {
+          coordsOfCommentToFocus = commentNodes[0];
+        }
+
+        const { nodeFrom, nodeTo } = coordsOfCommentToFocus;
+
+        const [$from, $to] = [doc.resolve(nodeFrom + 1), doc.resolve(nodeTo)];
+        const sel = new TextSelection($from, $to);
+
+        dispatch(tr.setSelection(sel).scrollIntoView());
+
+        setTimeout(() => {
+          const selCommentStart = new TextSelection($from);
+
+          dispatch(tr.setSelection(selCommentStart));
+        }, 100);
+      }
     };
   },
 
-  addProseMirrorPlugins() {
-    const { options } = this;
+  addKeyboardShortcuts: () => {
+    return {
+      Backspace: ({ editor }) => {
 
-    const plugins = [
-      new Plugin({
-        props: {
-          handleClick(view, pos) {
-            if (!options.isCommentModeOn()) return false;
+        if (editor && editor.isActive("comment")) {
+          console.log("COMMENT!")
+          editor.commands.first(({ commands }) => [
+            () => commands.deleteSelection(),
+            () => commands.joinBackward(),
+            () => commands.deleteCharBefore()
+          ]);
 
-            const { schema, doc, tr } = view.state;
-
-            const range = getMarkRange(doc.resolve(pos), schema.marks.comment);
-
-            if (!range) return false;
-
-            const [$start, $end] = [
-              doc.resolve(range.from),
-              doc.resolve(range.to)
-            ];
-
-            view.dispatch(tr.setSelection(new TextSelection($start, $end)));
-
-            return true;
-          }
+          return true;
         }
-      })
-    ];
+        return false;
+      }
+    };
+  },
+  addProseMirrorPlugins() {
+    const plugins = [];
+    const {
+      editor: {
+        view: { dispatch }
+      }
+    } = this;
 
+    plugins.push(paragraphTransformer(dispatch));
     return plugins;
   },
+  // addKeyboardShortcuts: () => {
+  //   return {
+  //     Backspace: ({ editor }) => {
+  //       const {
+  //         state: {
+  //           doc,
+  //           selection: { from: selFrom, to: selTo },
+  //           schema,
+  //           tr
+  //         },
+  //         view: { dispatch }
+  //       } = editor;
 
-  addNodeView() {
-    return VueNodeViewRenderer(CommentNodeView);
-  }
+  //       let [commentNode, nodeBeforeCommentNode, lastNode] = new Array(3).fill(
+  //         null
+  //       );
+
+  //       doc.descendants((node, pos) => {
+  //         if (!node.isBlock || commentNode) return;
+
+  //         if (node.type.name === "comment") {
+  //           const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
+
+  //           const isNodeActiveCommentNode =
+  //             nodeFrom <= selFrom && selTo <= nodeTo;
+
+  //           if (isNodeActiveCommentNode) {
+  //             commentNode = { node, from: pos, to: pos + node.nodeSize };
+  //             nodeBeforeCommentNode = lastNode;
+  //           }
+  //         } else {
+  //           lastNode = {
+  //             node,
+  //             from: pos,
+  //             to: pos + node.nodeSize,
+  //             isEmpty: !node.textContent.length
+  //           };
+  //         }
+  //       });
+
+  //       if (
+  //         commentNode &&
+  //         nodeBeforeCommentNode &&
+  //         selFrom === commentNode.from + 1 &&
+  //         selTo === commentNode.from + 1
+  //       ) {
+  //         const beforeContent = nodeBeforeCommentNode.node.content;
+  //         const commentContent = commentNode.node.content;
+
+  //         const combinedContent = beforeContent.append(commentContent);
+
+  //         const newCommentWithCombinedContent = schema.nodes.comment.create(
+  //           commentNode.node.attrs,
+  //           combinedContent
+  //         );
+
+  //         let replaceTr = tr.replaceRangeWith(
+  //           nodeBeforeCommentNode.from,
+  //           commentNode.to - 2,
+  //           newCommentWithCombinedContent
+  //         );
+
+  //         dispatch(replaceTr);
+
+  //         setTimeout(() => {
+  //           if (nodeBeforeCommentNode.isEmpty) {
+  //             const focusPos = editor.state.doc.resolve(
+  //               nodeBeforeCommentNode.from
+  //             );
+
+  //             const newSel = new TextSelection(focusPos);
+
+  //             editor.view.dispatch(editor.state.tr.setSelection(newSel));
+  //           }
+  //         }, 100);
+  //       } else {
+  //         const resolvedPos = doc.resolve(selFrom);
+
+  //         const newSel = new TextSelection(resolvedPos);
+
+  //         dispatch(tr.setSelection(newSel));
+  //       }
+
+  //       //   if (editor && editor.isActive("comment")) {
+  //       //   //  editor.commands.clearNodes();
+  //       //     editor.commands.first(({ commands }) => [
+  //       //  //     () => commands.undoInputRule(),
+  //       //       () => commands.deleteSelection(),
+  //       //       () => commands.joinBackward(),
+  //       //       () => commands.selectNodeBackward()
+  //       //     ]);
+  //       //   }
+  //       return false;
+
+  //       //   console.log("creaíng!");
+  //       //  // editor.commands.clearNodes();
+
+  //       //   // Backspace: ({ editor }) => {
+  //       //   const {
+  //       //     state: {
+  //       //       doc,
+  //       //       selection: { from: selFrom, to: selTo },
+  //       //       schema,
+  //       //       tr
+  //       //     },
+  //       //     view: { dispatch }
+  //       //   } = editor;
+
+  //       //   let [commentNode, nodeBeforeCommentNode, lastNode] = new Array(3).fill(
+  //       //     null
+  //       //   );
+
+  //       //   doc.descendants((node, pos) => {
+  //       //     if (!node.isBlock || commentNode) return;
+
+  //       //     if (node.type.name === "comment") {
+  //       //       const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
+
+  //       //       const isNodeActiveCommentNode =
+  //       //         nodeFrom <= selFrom && selTo <= nodeTo;
+
+  //       //       if (isNodeActiveCommentNode) {
+  //       //         commentNode = { node, from: pos, to: pos + node.nodeSize };
+  //       //         nodeBeforeCommentNode = lastNode;
+  //       //       }
+  //       //     } else {
+  //       //       lastNode = {
+  //       //         node,
+  //       //         from: pos,
+  //       //         to: pos + node.nodeSize,
+  //       //         isEmpty: !node.textContent.length
+  //       //       };
+  //       //     }
+  //       //   });
+
+  //       //   if (
+  //       //     commentNode &&
+  //       //     nodeBeforeCommentNode &&
+  //       //     selFrom === commentNode.from + 1 &&
+  //       //     selTo === commentNode.from + 1
+  //       //   ) {
+  //       //     const beforeContent = nodeBeforeCommentNode.node.content;
+  //       //     const commentContent = commentNode.node.content;
+
+  //       //     const combinedContent = beforeContent.append(commentContent);
+
+  //       //     const newCommentWithCombinedContent = schema.nodes.comment.create(
+  //       //       commentNode.node.attrs,
+  //       //       combinedContent
+  //       //     );
+
+  //       //     let replaceTr = tr.replaceRangeWith(
+  //       //       nodeBeforeCommentNode.from,
+  //       //       commentNode.to - 2,
+  //       //       newCommentWithCombinedContent
+  //       //     );
+
+  //       //     console.log(replaceTr);
+  //       //     dispatch(replaceTr);
+
+  //       //     setTimeout(() => {
+  //       //       if (nodeBeforeCommentNode.isEmpty) {
+  //       //         const focusPos = editor.state.doc.resolve(
+  //       //           nodeBeforeCommentNode.from
+  //       //         );
+
+  //       //         const newSel = new TextSelection(focusPos);
+
+  //       //         editor.view.dispatch(editor.state.tr.setSelection(newSel));
+  //       //       }
+  //       //     }, 100);
+  //       //   } else {
+  //       //     const resolvedPos = doc.resolve(selFrom);
+
+  //       //     const newSel = new TextSelection(resolvedPos);
+
+  //       //     dispatch(tr.setSelection(newSel));
+  //       //   }
+  //     }
+  //   };
+  // },
+
+  addNodeView: () => VueNodeViewRenderer(CommentNodeView)
 });

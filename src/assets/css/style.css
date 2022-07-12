@@ -38898,7 +38898,7 @@
 
   .super-select .input-wrapper .field,.super-select .input-wrapper .field:focus {
     border: 1px solid rgba(60,60,60,.26);
-    background: #f6f8f9!important;
+    background: #fff !important;
     font-size: 16px;
     height: 38px;
     padding: .375rem .75rem;
@@ -39049,7 +39049,7 @@
     flex-grow: 0;
     background: #4294d0;
     color: #fff;
-    padding: 5px;
+			padding: 5px 10px 5px 10px;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -40262,7 +40262,7 @@
     text-align: center;
     right: 0;
     z-index: 1;
-    width: calc(100vw - 250px);
+    width: calc(100% - 250px);
     border-bottom: 1px solid rgba(60,60,60,.26);
   }
 

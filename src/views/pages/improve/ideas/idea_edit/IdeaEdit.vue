@@ -2,7 +2,6 @@
   <div class="idea_edit-wrapper">
     <div class="idea_edit_container">
       <idea-edit-content
-        :user="user"
         :idea="getIdea"
         :ideaContentCategories="ideaContentCategories"
         :isLoading="isLoading"
@@ -11,6 +10,8 @@
         @fileRemoved="removeFile"
         @selectedType="setContentType"
         @saveIdeaContent="saveIdeaVersion"
+        @editorLoaded="setEditorLoaded"
+        @isDirty="setIsContentDirty"
         :isSaving="isSaving"
         v-model="getIdeaContent"
       ></idea-edit-content>
@@ -21,8 +22,9 @@
         @updateStatus="updateIdeaVersionStatus"
         :isLoading="isLoading"
         v-model="getIdeaPath"
+        :ideaContentIsDirty="ideaContentIsDirty"
+        :editorLoaded="editorLoaded && isLoaded"
         :idea="getIdea"
-        v-if="isLoaded"
       ></idea-edit-path>
     </div>
   </div>
@@ -58,10 +60,11 @@ export default {
     filter: null,
     isSaving: false,
     isLoaded: false,
-    ideaPathChanged: false,
     filesChanged: false,
     defaultContentName: "Custom",
     selectedCategoryIndex: 2,
+    ideaContentIsDirty: false,
+    editorLoaded: false,
     ideaForm: new GQLForm({
       id: undefined,
       processId: null,
@@ -71,8 +74,8 @@ export default {
       file: [],
       removeFile: false,
       removeFileIds: [],
-      companyRoleIds: null,
-      companyToolId: null,
+      companyRoleIds: [],
+      companyToolIds: [],
       description: null,
       title: null,
       type: null,
@@ -90,7 +93,17 @@ export default {
         name: "Cheatsheet",
         contentForm: new GQLForm({
           id: undefined,
-          markup: null,
+          markup: JSON.stringify({
+            type: "doc",
+            content: [
+              {
+                attrs: {
+                  indent: 0,
+                },
+                type: "paragraph",
+              },
+            ],
+          }),
           ideaId: null,
           version: 1,
           contentType: null,
@@ -100,7 +113,17 @@ export default {
         name: "Learn",
         contentForm: new GQLForm({
           id: undefined,
-          markup: null,
+          markup: JSON.stringify({
+            type: "doc",
+            content: [
+              {
+                attrs: {
+                  indent: 0,
+                },
+                type: "paragraph",
+              },
+            ],
+          }),
           ideaId: null,
           version: 1,
           contentType: null,
@@ -110,7 +133,17 @@ export default {
         name: "Custom",
         contentForm: new GQLForm({
           id: undefined,
-          markup: null,
+          markup: JSON.stringify({
+            type: "doc",
+            content: [
+              {
+                attrs: {
+                  indent: 0,
+                },
+                type: "paragraph",
+              },
+            ],
+          }),
           ideaId: null,
           version: 1,
           contentType: null,
@@ -121,16 +154,6 @@ export default {
     isLoading: false,
     files: [],
   }),
-  props: {
-    idea: {
-      type: Object,
-      required: false,
-    },
-    user: {
-      type: Object,
-      required: false,
-    },
-  },
   computed: {
     ...mapGetters({
       ideaContents: "ideaContent/all",
@@ -159,10 +182,6 @@ export default {
       get() {
         return this.ideaForm;
       },
-      set(value) {
-        //TODO: SAVE ONLY CONTENT IF FILES OR PATH NOT CHANGED
-        this.ideaPathChanged = true;
-      },
     },
     getIdeaContent: {
       get() {
@@ -182,10 +201,38 @@ export default {
     },
   },
   async beforeDestroy() {
-    await this.closeIdeaEdit();
+    //  await this.closeIdeaEdit();
+
+    if (this.ideaInEdit) {
+      await this.$store.dispatch("idea/setIdeaInEdit", null);
+    }
+  },
+  mounted() {
+    if (this.getIdea && this.getIdea.id) {
+      const companyRoleIds =
+        this.getIdea && this.getIdea.companyRoleIds
+          ? this.getIdea.companyRoleIds
+          : [];
+      const companyToolIds =
+        this.getIdea && this.getIdea.companyToolIds
+          ? this.getIdea.companyToolIds
+          : [];
+      this.ideaForm._fields.companyRoleIds = companyRoleIds;
+      this.ideaForm._fields.companyToolIds = companyToolIds;
+    }
   },
   methods: {
+    setEditorLoaded() {
+      this.editorLoaded = true;
+    },
+    setIsContentDirty() {
+      this.ideaContentIsDirty = true;
+    },
     removeFile(file) {
+      if (this.isSaving) return;
+      if (file.uuid) {
+        this.files = this.files.filter((_file) => _file.uuid !== file.uuid);
+      }
       if (file.src && file.id) {
         this.filesChanged = true;
         this.ideaForm._fields.removeFileIds.push(file.id);
@@ -207,11 +254,14 @@ export default {
       });
     },
     formFieldMapper(mapTo, mapFrom) {
+      this.editorLoaded = false;
       Object.keys(mapTo.fields || {})
         .filter((key) => key in mapFrom)
         .forEach((key) => {
           mapTo[key] = mapFrom[key];
         });
+
+      this.editorLoaded = true;
     },
     async initializeData() {
       this.filter = {
@@ -234,7 +284,7 @@ export default {
       );
     },
     async initializeForms() {
-      if (this.ideaInEdit.editIdeaMode === "EDIT") {
+      if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
         this.ideaFormFieldMapper();
         this.ideaContentFormFieldMapper();
       }
@@ -282,8 +332,10 @@ export default {
     },
 
     async saveIdea() {
-      console.log(this.files);
-      this.ideaForm.fields.file = this.files.filter((x) => x.size && !x.uri);
+      this.ideaForm._fields.file = this.files
+        .map((fileEntity) => fileEntity.file)
+        .filter((x) => x.size && !x.uri);
+
       let ideaSave = null;
       this.ideaForm.processId = this.processPath.process.id;
       if (this.ideaForm.id) {
@@ -312,43 +364,122 @@ export default {
       return commentNodes;
     },
 
+    async syncContent() {
+      //sync files
+      this.syncFiles();
+
+      //sync comments
+      await this.syncComments();
+    },
+
     syncFiles() {
       const fileNodesInContent = this.getImageNodesFromContent();
-      console.log(fileNodesInContent);
+      const allFilesInContent = fileNodesInContent.map((x) => x.attrs);
+      const savedFiles = this.getIdea.files.map((file) => file.uri);
+
+      if (allFilesInContent.length > 0) {
+        savedFiles.forEach((uri) => {
+          const contentFileIds = allFilesInContent.map((x) => x.id);
+          if (
+            !contentFileIds.includes(uri) &&
+            !this.ideaForm._fields.removeFileIds.includes(uri)
+          ) {
+            this.ideaForm._fields.removeFileIds.push(uri);
+          }
+        });
+      }
+
+      // dont remove files that actually exist in content
+      const allFilesInContentIds = allFilesInContent.map((x) => x.id);
+
+      const contentFileUuids = this.files.map((x) => x.uuid);
+
+      this.files = this.files.filter((file) => {
+        if (file.uuid && contentFileUuids.includes(file.uuid)) {
+          return true;
+        }
+        return false;
+      });
+
+      this.ideaForm._fields.removeFileIds =
+        this.ideaForm._fields.removeFileIds.filter((uri) => {
+          if (allFilesInContentIds.includes(uri)) return false;
+          return true;
+        });
+
       if (fileNodesInContent.length === 0) {
         this.ideaForm._fields.removeFile = true;
       } else {
         this.ideaForm._fields.removeFile = false;
       }
-      //   this.ideaForm.removeFileIds = [];
-
-      //   const uploadedFilesInContent = fileNodesInContent.filter(
-      //     (node) => node.attrs.id
-      //   );
-
-      //   const uploadedFiles = uploadedFilesInContent.map((node) => node.attrs.id);
-
-      //   const removeFiles = this.files.filter(
-      //     (file) => !uploadedFiles.includes(file.uri)
-      //   );
-      //  // this.ideaForm.removeFileIds = removeFiles.map((file) => file.id) ?? [];
     },
-    async saveIdeaVersion() {
-      this.isLoading = true;
-      this.isSaving = true;
+    async syncComments() {
+      const contentCommentIds = [];
+      const commentNodes = this.getCommentNodesFromContent();
+
+      if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
+        const editIdea = await this.$store.dispatch("idea/findById", {
+          id: this.getIdea.id,
+          force: true,
+        });
+
+        const allNotRepliedCommentIds = [
+          ...editIdea.improvements.filter(
+            (improvement) => !improvement.replied
+          ),
+          ...editIdea.problems.filter((problem) => !problem.replied),
+        ].map((comment) => comment.id);
+
+        commentNodes.forEach((node) => {
+          const parsedComment = JSON.parse(node.attrs.comment);
+          parsedComment.comments.forEach((comment) =>
+            contentCommentIds.push(comment.id)
+          );
+        });
+
+        const markRepliedToCommentIds = allNotRepliedCommentIds.filter(
+          (id) => contentCommentIds.indexOf(id) < 0
+        );
+
+        if (markRepliedToCommentIds.length > 0) {
+          await this.$store.dispatch(
+            "idea/closeImprovementFeedback",
+            new GQLForm({
+              id: this.getIdea.id,
+              improvementIds: markRepliedToCommentIds,
+            })
+          );
+        }
+      }
+    },
+
+    async saveIdeaVersion(reloadContent = true) {
+      if (reloadContent) {
+        window.vm.$snotify.info(this.$t("Do not close window"), {
+          timeout: 5000,
+          showProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+        });
+        this.isLoading = true;
+        this.isSaving = true;
+      }
+
       try {
         //Sync files in server with files in content
-        this.syncFiles();
-        this.getCommentNodesFromContent();
 
-        const ideaSave = await this.saveIdea();
-        //reset removeFileIds
+        let ideaSave = this.getIdea;
+
+        await this.syncContent();
+        ideaSave = await this.saveIdea();
 
         if (ideaSave && ideaSave.id) {
           let ideaContent = null;
 
           const contentForm =
             this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+          console.log(contentForm);
+
           let markup = contentForm.markup;
 
           if (ideaSave.files.length > 0) {
@@ -362,28 +493,40 @@ export default {
           if (contentForm.id) {
             ideaContent = await this.$store.dispatch(
               `ideaContent/update`,
-              contentForm
+              contentForm,
+              { reload: reloadContent }
             );
           } else {
             ideaContent = await this.$store.dispatch(
               `ideaContent/create`,
-              contentForm
+              contentForm,
+              { reload: reloadContent }
             );
-            const mapTo = contentForm;
-            const mapFrom = Object.assign(ideaContent, {});
-            this.formFieldMapper(mapTo, mapFrom);
+
+            if (reloadContent) {
+              const mapTo = contentForm;
+              const mapFrom = Object.assign(ideaContent, {});
+              this.formFieldMapper(mapTo, mapFrom);
+            }
+            // const mapTo = contentForm;
+            // const mapFrom = Object.assign(ideaContent, {});
+            // this.formFieldMapper(mapTo, mapFrom);
           }
+        }
+
+        if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "CREATE") {
+          await this.navigateToPath();
+          await this.closeIdeaEdit();
         }
         return ideaSave;
       } catch (e) {
         console.log(e);
       } finally {
+        window.vm.$snotify.clear();
+        this.ideaForm._fields.removeFileIds = [];
         this.isSaving = false;
         this.isLoading = false;
-        if (this.ideaInEdit.editIdeaMode === "CREATE") {
-          await this.navigateToPath();
-          await this.closeIdeaEdit();
-        }
+        this.ideaContentIsDirty = false;
       }
     },
     async navigateToPath() {
@@ -405,16 +548,24 @@ export default {
       });
     },
     async updateIdeaVersionStatus() {
-      const editForm = new GQLForm({
-        id: this.getIdea.id,
-        status: this.getIdea.status === "NEW" ? "TESTING" : "ADOPTED",
-      });
-      await this.$store.dispatch(`idea/changeStatus`, editForm);
-      this.$store.dispatch(`idea/findByProcess`, {
-        id: this.getIdea.processId,
-        force: true,
-      });
-      await this.closeIdeaEdit();
+      this.isLoading = true;
+
+      try {
+        const editForm = new GQLForm({
+          id: this.getIdea.id,
+          status: this.getIdea.status === "NEW" ? "TESTING" : "ADOPTED",
+        });
+        await this.$store.dispatch(`idea/changeStatus`, editForm);
+        this.$store.dispatch(`idea/findByProcess`, {
+          id: this.getIdea.processId,
+          force: true,
+        });
+      } catch (e) {
+        console.log(e);
+      } finally {
+        this.isLoading = false;
+        await this.closeIdeaEdit();
+      }
     },
     async deleteIdeaVersion() {
       const editForm = new GQLForm({
@@ -433,6 +584,16 @@ export default {
     },
     async closeIdeaEdit() {
       this.$emit("close");
+
+      if (
+        this.$router.currentRoute.query &&
+        this.$router.currentRoute.query.id
+      ) {
+        const query = {};
+
+        this.$router.replace({ query });
+      }
+
       await this.$store.dispatch("idea/setIdeaInEdit", null);
     },
   },
@@ -443,17 +604,19 @@ export default {
 <style lang="scss" scoped>
 .idea_edit_container {
   width: 100%;
-  max-height: 82vh;
+  // max-height: 82vh;
+  height: 90%;
   overflow: hidden;
   height: 100%;
   margin-top: 0px;
-  min-height: 82vh;
+  // min-height: 82vh;
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
 }
 
 .idea_edit-wrapper {
-  margin: 20px 20px 0 20px;
+  //margin: 20px 10px 0 10px;
+  height: 100%;
 }
 </style>

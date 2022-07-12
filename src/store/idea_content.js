@@ -22,7 +22,7 @@ const getters = {
 };
 
 const actions = {
-  async create(context, form) {
+  async create(context, form, reload) {
     let ret = null;
     try {
       form.busy = true;
@@ -38,8 +38,7 @@ const actions = {
     return ret;
   },
 
-  async update(context, form) {
-    console.log(form)
+  async update(context, form, reload) {
     let ret = null;
     try {
       const result = await form.mutate({
@@ -48,8 +47,10 @@ const actions = {
           id: form.id
         }
       });
-      ret = new IdeaContent().deserialize(result.data.ideaContentUpdate);
-      context.commit("SET_ITEM", ret);
+      //if (reload) {
+        ret = new IdeaContent().deserialize(result.data.ideaContentUpdate);
+        context.commit("SET_ITEM", ret);
+    //  }
     } catch (e) {
       console.log(e);
     } finally {

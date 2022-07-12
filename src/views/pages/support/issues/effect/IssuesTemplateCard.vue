@@ -171,7 +171,6 @@ export default {
 .issueTemplate-card__totals-action {
   /* padding: 20px 0 10px 0; */
   display: flex;
-  width: 100px;
   height: 30px;
   letter-spacing: 1px;
   justify-content: space-between;

@@ -38,15 +38,15 @@ export default {
 
 <style lang="scss" scoped>
 .menubar-file-input-field-container {
-  width: 50px;
-  height: 50px;
+  width: 35px;
+  height: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .menubar-file-input-field {
-  width: 50px;
+  width: 35px;
   text-align: center;
   cursor: pointer;
   width: 100%;

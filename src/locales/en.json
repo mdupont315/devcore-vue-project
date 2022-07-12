@@ -31,6 +31,7 @@
     }
   },
   "responses": {
+    "invalidData": "The given data was invalid!",
     "milestoneCreate": "Milestone created succesfully!",
     "milestoneUpdateOrDeleteMany": "Milestones updated succesfully!",
     "projectCreate": "Project created succesfully!",
@@ -224,6 +225,9 @@
     "ideaIssueReplyCreate": "Reply submitted succesfully!",
     "ideaIssueReplyCreateFail": "Submitting reply failed!",
 
+    "ideaContentCreate": "Idea content saved succesfully!",
+    "ideaContentCreateFail": "Saving idea content failed!",
+
     "issueCloseFeedback": "Issue closed for feedback succesfully!",
     "issueCloseFeedbackFail": "Closing issue feedback failed!",
     "ideaCloseFeedback": "Idea closed for feedback succesfully!",
@@ -236,6 +240,7 @@
     "Unauthenticated": "Unauthenticated"
   },
 
+  "You can not remove your own account": "You can not remove your own account",
   "Privacy Policy": "Privacy Policy",
   "EULA": "EULA",
   "Idea feedback": "Idea feedback",
@@ -244,6 +249,7 @@
   "Issue Evaluation Restriction Info": "Selected roles are restricted to evaluate issue loss amounts in mobile report issue feature.",
   "Issue Template Restriction": "Issue Effect Restriction",
   "Issue Template Restriction Info": "Selected roles are restricted to set issue template in mobile report issue feature.",
+  "Unsaved Idea Data": "You have unsaved data. Closing edit will discard pending changes",
   "Project Advanced": "Advanced settings",
   "Milestone reward": "Reward",
   "Engage": "Engage",
@@ -369,6 +375,7 @@
   "Please provide your username, we'll send you an email with instructions to change your password.": "Please provide your username, we'll send you an email with instructions to change your password.",
   "Add": "Add",
   "roles": "roles",
+  "Roles": "Roles",
   "We will send a new password to": "We will send a new password to",
   "Price models": "Price models",
   "Product categories": "Product categories",
@@ -514,7 +521,18 @@
   "Edit": "Edit",
   "Remove": "Remove",
   "Files": "Files",
+  "Remove file": "Remove file",
   "Add new": "Add new",
+  "ADDROW": "Add row",
+  "REMOVEROW": "Remove row",
+  "ADDCOL": "Add column",
+  "REMOVECOL": "Remove column",
+  "REMOVETABLE": "Remove table",
+  "REMOVE": "Remove",
+  "RemoveHyperLink": "Remove hyperlink",
+  "InsertLinkTitle": "Insert hyperlink",
+  "InsertLinkText": "Insert hyperlink text",
+  "InsertVideoTitle": "Insert www-address",
   "Value": "Value",
   "Archived": "Archived",
   "Archived ideas": "Archived instructions",
@@ -653,5 +671,15 @@
   "View all": "View all",
   "Back To Process": "Back",
   "Super Admininstrator Panel": "Super Admininstrator Panel",
-  "Page Under Construction": "{page} will be available soon!"
+  "Page Under Construction": "{page} will be available soon!",
+  "File size too big": "Tiedosto {file} ({size}) on liian suuri. Suurin sallittu koko on {limit}.",
+  "The given data was invalid.": "The given data was invalid.",
+  "Table": "Table",
+  "Insert": "Insert",
+  "AddNewTable": "Add new table",
+  "Select or Drag Image": "Select images from files or drag your images here.",
+  "You can upload image up to size": "You can upload image sizes up to {size} mb. Supported formats JPEG, PNG, GIF, SVG.",
+  "Select or Drag Attachment": "Select attachments from files or drag your attachments here.",
+  "You can upload attachment up to size": "You can upload attachment sizes up to {size} mb.",
+  "Do not close window": "Saving... Please do not close or exit browser window, while content is saving."
 }

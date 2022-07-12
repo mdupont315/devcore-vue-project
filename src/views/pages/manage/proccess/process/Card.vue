@@ -171,13 +171,13 @@ export default {
     ...mapGetters({
       companyRoles: "companyRole/all",
     }),
-    selectedRoles: {
-      get() {
-        return this.companyRoles
-          .filter((r) => this.editForm.companyRoles.includes(r.id))
-          .sort((a, b) => (a.name > b.name ? 1 : -1));
-      },
-    },
+    // selectedRoles: {
+    //   get() {
+    //     return this.companyRoles
+    //       .filter((r) => this.editForm.companyRoles.includes(r.id))
+    //       .sort((a, b) => (a.name > b.name ? 1 : -1));
+    //   },
+    // },
     operations: {
       get() {
         return [...this.item.operations].sort((a, b) => {

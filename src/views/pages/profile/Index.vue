@@ -124,7 +124,8 @@
                     <div>
                       <b-form-checkbox
                         id="changePassword"
-                        v-model="form.changePassword"
+                        v-model="getFormChangePassword"
+												:disabled="user.mustChangePassword"
                         name="changePassword"
                         :value="true"
                         :unchecked-value="false"
@@ -145,12 +146,12 @@
                               id="password"
                               ref="password"
                               v-model="form.password"
-                              v-validate="{
+                              :v-validate="{
                                 required: this.form.changePassword,
                                 min: 6,
                               }"
                               class="shadow-sm"
-                              :state="$validateState('password')"
+                              :state="$validateState('password', form)"
                               :disabled="form.busy"
                               :placeholder="$t('Password')"
                               type="password"
@@ -171,16 +172,17 @@
                             <b-form-input
                               id="passwordConfirmation"
                               v-model="form.passwordConfirmation"
-                              v-validate="{
-                                required: this.form.changePassword,
-                                min: 6,
-                                confirmed: $t('passwordConfirmationMatchPassword'),
-                              }"
+                              v-validate="
+                                `required_if:${this.form.changePassword}|confirmed:password`
+                              "
                               class="shadow-sm"
-                              :state="$validateState('passwordConfirmation')"
+                              :state="
+                                $validateState('passwordConfirmation', form)
+                              "
                               :disabled="form.busy"
                               :placeholder="$t('Password confirm')"
                               type="password"
+                              ref="passwordConfirmation"
                               name="passwordConfirmation"
                             ></b-form-input>
                             <label for="passwordConfirmation">
@@ -244,13 +246,22 @@ export default {
     ...mapGetters({
       user: "auth/user",
     }),
+    getFormChangePassword: {
+      get() {
+        return this.form.changePassword;
+      },
+      set(val) {
+        this.form.changePassword = this.user.mustChangePassword ? false : val;
+      },
+    },
   },
   watch: {
     $route: {
+      immediate: true,
       handler(route) {
         if (route.query.i) {
           this.intent = Math.random();
-					this.changePassword = true;
+          this.form.changePassword = true;
         }
       },
     },

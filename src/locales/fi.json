@@ -225,6 +225,9 @@
     "ideaIssueReplyCreate": "Palaute annettu onnistuneesti!",
     "ideaIssueReplyCreateFail": "Palautteen anto epäonnistui!",
 
+    "ideaContentCreate": "Idea sisältö tallennettu onnistuneesti!",
+    "ideaContentCreateFail": "Idea sisällön tallennus epäonnistui!",
+
     "issueCloseFeedback": "Palaute suljettiin ongelmalle onnistuneest!",
     "issueCloseFeedbackFail": "Palautteen sulkeminen epäonnistui!",
     "ideaCloseFeedback": "Palaute suljettiin idealle onnistuneesti!",
@@ -236,6 +239,7 @@
 
     "Unauthenticated": "Sessio vanhentunut. Ole hyvä ja päivitä sivu"
   },
+  "You can not remove your own account": "Et voi poistaa omaa tiliäsi",
   "Privacy Policy": "Tietosuojakäytäntö",
   "EULA": "EULA",
   "Idea feedback": "Palaute",
@@ -243,7 +247,7 @@
   "Issue Evaluation Restriction Info": "Valitut roolit eivät pysty asettamaan hukan määrää mobiilissa jaa ongelma ominaisuudesta.",
   "Issue Template Restriction": "Ongelman vaikutuksen rajoitus",
   "Issue Template Restriction Info": "Valitut roolit eivät pysty asettamaan ongelman vaikutusta mobiilissa jaa ongelma ominaisuudesta.",
-
+  "Unsaved Idea Data": "Sinulla on tallentamattomia muutoksia. Muutokset hylätään jos poistut.",
   "Project Advanced": "Lisäasetukset",
   "Milestone reward text": "Palkinto/Kannustus tähän",
   "Engage": "Sitouta",
@@ -277,6 +281,16 @@
   "ideas": "ideat",
   "budget": "budjetti",
   "type": "tyyppi",
+  "ADDROW": "Lisää rivi",
+  "REMOVEROW": "Poista rivi",
+  "ADDCOL": "Lisää sarake",
+  "REMOVECOL": "Poista sarake",
+  "REMOVETABLE": "Poista taulukko",
+  "REMOVE": "Poista",
+  "RemoveHyperLink": "Poista linkki",
+  "InsertLinkTitle": "Aseta hyperlinkki",
+  "InsertVideoTitle": "Aseta www sivujen osoite",
+  "InsertLinkText": "Aseta hyperlinkin teksti",
   "NoRolesSelected": "Aseta",
   "AdvancedForm-switch-info": "Lisäasetukset",
   "inUse": "ovat käytössä",
@@ -571,7 +585,7 @@
   "seconds.count": "0 sekunttia | 1 sekuntti | {count} sekunttia",
   "hours.count": "0 tuntia | 1 tunti | {count} tuntia",
   "days.count": "0 päivää | 1 päivä | {count} päivää",
-  "h.count":  "{count}t",
+  "h.count": "{count}t",
   "module.count": "0 moduulia | 1 moduuli | {count} moduulia",
   "evaluation.count": "0 arviointia | 1 arviointi | {count} arviointia",
   "time.ago": "{count} sitten",
@@ -588,6 +602,7 @@
   "Remove": "Poista",
   "Checked": "Käsitelty",
   "Files": "Tiedostot",
+  "Remove file": "Poista tiedosto",
   "Add new": "Lisää uusi",
   "Value": "Arvo",
   "Archived": "Arkistoidut",
@@ -686,5 +701,15 @@
   "Idea Template": "Idea pohja",
   "View all": "Katso kaikki",
   "Super Admininstrator Panel": "Super-järjestelmänvalvojan paneeli",
-  "Page Under Construction": "{page} välilehti on kehityksen alla ja saatavilla pian!"
+  "Page Under Construction": "{page} välilehti on kehityksen alla ja saatavilla pian!",
+  "File size too big": "{file} ({size}) is too big. Size limit for files is {limit}.",
+  "The given data was invalid.": "Annetut tiedot eivät kelpaa",
+  "Table": "Taulukko",
+  "Insert": "Aseta",
+  "AddNewTable": "Lisää uusi taulukko",
+  "Select or Drag Image": "Valitse kuva tietokoneelta tai raahaa tähän.",
+  "You can upload up to size": "Suurin kuvakoko on {size} mb. Tuetut formaatit: JPEG, PNG, GIF, SVG",
+  "Select or Drag Attachment": "Valitse liite tietokoneelta tai raahaa tähän.",
+  "You can upload attachment up to size": "Suurin liitekoko on {size} mb.",
+  "Do not close window": "Tallentaa... Ethän sulje selaintasi ennen kuin sisältö on tallentunut."
 }

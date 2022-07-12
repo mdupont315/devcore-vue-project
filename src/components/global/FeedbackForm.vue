@@ -1,5 +1,6 @@
 <template>
   <div style="height:100%">
+
     <div class="feedback__container" v-if="$can('core/ideaIssueReply/manage')">
       <b-popover
         ref="popover"
@@ -267,6 +268,8 @@ export default {
   margin: 0 20px;
   font-size: 12px;
   color: #777;
+	max-height: 100px;
+    overflow: scroll;
 }
 
 .feedback-form-header-body-author-name-time {
@@ -285,6 +288,8 @@ export default {
 }
 .feedback-form-footer-body {
   display: flex;
+    justify-content: space-around;
+
 }
 .feedbackIcon {
   border-radius: 50%;

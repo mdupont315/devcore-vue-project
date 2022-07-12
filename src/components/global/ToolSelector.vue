@@ -6,7 +6,7 @@
     v-model="dataValue"
     :v-bind="$props"
     ref="selector"
-    :placeholder="placeHolderText"
+    :placeholder="$t('tools')"
     v-if="ready"
     :state="state"
     :outside-close="!showPopOver"

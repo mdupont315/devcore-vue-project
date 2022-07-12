@@ -1,5 +1,5 @@
 <template>
-  <b-button v-bind="$attrs" @click="click">
+  <b-button v-bind="$attrs" @click="click" :variant="buttonVariant">
     <b-spinner v-if="loading" small></b-spinner> <slot />
   </b-button>
 </template>
@@ -11,7 +11,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
+    buttonVariant: {
+      required: false,
+      default: () => "outline-primary",
+    },
   },
   methods:{
     click(event){

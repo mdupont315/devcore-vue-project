@@ -2,7 +2,9 @@
   <div class="idea_edit_content_container">
     <div class="idea_edit_content_container_content-header">
       <div class="idea_edit_content_container_content-header-title">
-        {{ idea.title ? idea.title : $t("action.create", { name: $t("idea") }) }}
+        {{
+          idea.title ? idea.title : $t("action.create", { name: $t("idea") })
+        }}
       </div>
       <div class="idea_edit_content_container_content-header-button">
         <b-button
@@ -63,6 +65,7 @@
         </b-popover>
       </div>
     </div>
+
     <idea-content-editor
       v-if="!isLoading"
       :isEditable="isEditable"
@@ -72,7 +75,9 @@
       @fileAdded="setFile"
       @fileRemoved="removeFile"
       @saveContent="saveContent"
-      @initialized="isEditable = true"
+      @initialized="setIsInitialized"
+      @contentScrollPosition="setContentScrollPosition"
+      :scrollToSelection="contentScrollPosition"
       :contentType="contentType"
     />
     <div v-else class="ideaContent-empty-spinner">
@@ -93,10 +98,6 @@ export default {
       type: Object,
       required: false,
     },
-    user: {
-      type: Object,
-      required: false,
-    },
     value: {
       type: Object,
       required: false,
@@ -114,6 +115,7 @@ export default {
       type: Boolean,
       default: true,
     },
+
     selectedCategoryIndex: {
       type: Number,
       default: 0,
@@ -129,8 +131,10 @@ export default {
         };
       },
       set(value) {
-        console.log(value);
         this.$emit("input", value);
+        if (this.isInitialized && this.isEditable) {
+          this.$emit("isDirty");
+        }
       },
     },
   },
@@ -138,11 +142,23 @@ export default {
     contentType: "Custom",
     selectingType: false,
     isEditable: false,
+    isInitialized: false,
     newType: "",
+    contentScrollPosition: null,
   }),
   methods: {
-    saveContent() {
-      this.$emit("saveIdeaContent");
+    setContentScrollPosition(val) {
+      this.contentScrollPosition = val;
+    },
+    setIsInitialized() {
+      this.isEditable = true;
+      this.isInitialized = true;
+
+			this.$emit("editorLoaded")
+    },
+    saveContent(reloadContent) {
+			console.log(reloadContent)
+      this.$emit("saveIdeaContent", reloadContent);
     },
     setFile(file) {
       this.$emit("fileAdded", file);
@@ -171,11 +187,19 @@ export default {
 
 .ideaContent-empty-spinner {
   text-align: center;
-  margin-top: 250px;
+  height: 100%;
+  border-radius: 3px;
+  display: flex;
+  place-content: center;
+  align-items: center;
+  background: #fff;
+  width: 100%;
   & > span {
     width: 40px;
+    margin-bottom: 100px;
+    color: lightgray;
     height: 40px;
-    background: "#fff";
+    background: #fff;
   }
 }
 .idea-template-create-item {
@@ -219,6 +243,7 @@ export default {
 }
 .idea_edit_content_container_content-header {
   display: flex;
+  background: #fff;
   justify-content: space-between;
   align-items: center;
 }
@@ -226,14 +251,14 @@ export default {
 .idea_edit_content_container_content-header-title {
   height: 60px;
   padding: 20px;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .idea_edit_content_container_content-header-button {
   margin: 20px 20px 10px 20px;
 }
 .idea_edit_content_container {
-  background: #fff;
+  margin: 20px;
   border-radius: 3px;
   width: 75%;
   overflow: hidden;

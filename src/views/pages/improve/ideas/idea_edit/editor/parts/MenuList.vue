@@ -6,11 +6,27 @@
       ref="btnMenuListPopover"
       tabindex="0"
       :class="{ 'is-active': selectionOpen }"
-      style="width: 100%; height: 100%; margin: 0"
+      style="width: 100%; height: 100%; margin: 0; margin-left: 10px"
     >
       <div class="menu-list-active-text" @click="setActive(activeIcon)">
-        <div class="menu-list-active-text-icon">
-          {{ getActiveText(activeIcon) }}
+        <div
+          class="menu-list-active-text-icon"
+          :style="{
+            background: isHovering ? '#4294d0' : '#fff',
+            color: isHovering ? '#fff' : '#000',
+          }"
+          @mouseenter="isHovering = true"
+          @mouseleave="isHovering = false"
+        >
+          <span style="padding-left: 5px">
+            {{ getActiveText(activeIcon) }}</span
+          >
+          <i
+            class="ri-arrow-down-s-fill"
+            style="font-size: 14px"
+            v-if="isHovering"
+          ></i>
+          <i class="ri-arrow-up-s-fill" style="font-size: 14px" v-else></i>
         </div>
       </div>
       <!-- <svg class="remix">
@@ -24,13 +40,18 @@
       :target="() => $refs.btnMenuListPopover"
       placement="bottom"
     >
-      <b-card no-body style="align-items: center; width: 150px">
+      <b-card
+        no-body
+        style="align-items: center; width: 150px"
+        @mouseenter="isHovering = true"
+        @mouseleave="isHovering = false"
+      >
         <div
           v-for="(listItem, index) in item.listItems"
           :key="index"
           @click="invokeListItemAction(listItem, index)"
           class="menu-list-item"
-          :class="{ 'is-active': activeHeadingIndex == index }"
+          :class="{ 'is-active': listItem.icon === activeIcon }"
           :style="{
             color: getHeadingColor(listItem),
           }"
@@ -62,10 +83,13 @@ export default {
       required: true,
     },
   },
+
   methods: {
     setActive(active) {
-      const thisItem = this.item.listItems.find((x) => x.icon === active);
-      thisItem.action();
+      if (active !== this.activeIcon) {
+        const thisItem = this.item.listItems.find((x) => x.icon === active);
+        thisItem.action();
+      }
     },
     getActiveText(active) {
       let ret = "P";
@@ -83,8 +107,10 @@ export default {
       return ret;
     },
     invokeListItemAction(listItem, index) {
-      this.setActiveHeadingIndex(index);
-      listItem.action();
+      if (listItem.icon !== this.activeIcon) {
+        this.setActiveHeadingIndex(index);
+        listItem.action();
+      }
     },
     setActiveHeadingIndex(index) {
       if (this.activeHeadingIndex !== index) {
@@ -130,6 +156,7 @@ export default {
 
   data() {
     return {
+      isHovering: false,
       selectionOpen: false,
       activeHeadingIndex: null,
       remixiconUrl,
@@ -151,6 +178,7 @@ export default {
 }
 .menu-list-active-text-icon {
   width: 25px;
+  font-size: 15px;
   height: 25px;
   display: flex;
   align-items: center;
@@ -161,7 +189,7 @@ export default {
   &.is-active,
   &:hover {
     color: #fff;
-    background-color: #0d0d0d;
+    background-color: #4294d0;
   }
 }
 .menu-list-item.is-active {

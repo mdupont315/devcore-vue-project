@@ -11,6 +11,8 @@ export const COMPANY_TOOL_FRAGMENT = gql`
     toolId
     createdAt
     updatedAt
+    avatar,
+    avatarUrl
     __typename
   }
 `;
@@ -23,6 +25,8 @@ export const COMPANY_TOOL_FULL_FRAGMENT = gql`
     type
     modulesCount
     toolId
+    avatar
+    avatarUrl
     createdAt
     updatedAt
     modules {

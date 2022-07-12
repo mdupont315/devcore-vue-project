@@ -144,7 +144,7 @@ const actions = {
       mutation: IDEA.closeImprovementFeedback,
       variables: {
         id: form.id,
-        improvementId: form.improvementId
+        improvementIds: form.improvementIds
       }
     });
     const idea = new Idea().deserialize(

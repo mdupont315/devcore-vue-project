@@ -24,14 +24,14 @@
             </b-col>
             <b-col cols="12">
               <div class="form-group">
-                <company-role-selector
+                <!-- <company-role-selector
                   v-model="form.companyRoles"
                   :show-field="true"
                   name="companyRoles"
                   style="z-index:1;position:relative"
                   :state="$validateState('companyRoles', form)"
                   :show-add-btn="$can('core/companyRole/create')"
-                ></company-role-selector>
+                ></company-role-selector> -->
                 <b-form-invalid-feedback>{{ $displayError('companyRoles', form) }}</b-form-invalid-feedback>
               </div>
             </b-col>
@@ -67,7 +67,7 @@ export default {
       // id: undefined,
       processId: null,
       title: null,
-      companyRoles: []
+     companyRoles: []
     })
   }),
   mounted() {
@@ -77,6 +77,7 @@ export default {
   },
   methods: {
     async initForm() {
+			console.log(this.input)
       Object.keys(this.input || {})
         .filter(key => key in this.form)
         .forEach(key => (this.form[key] = this.input[key]));

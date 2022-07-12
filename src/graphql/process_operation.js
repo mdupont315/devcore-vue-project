@@ -19,11 +19,11 @@ export const PROCESS_OPERATION_FRAGMENT = gql `
           ideas
           toolIdeas
       }
-      companyRoles{
-          id,
-          name,
-          avatarUrl
-      },
+    #  companyRoles{
+   #       id,
+  #        name,
+   #       avatarUrl
+   #   },
       phases{
           ...processPhaseFullFields,
       }
@@ -40,7 +40,7 @@ export const PROCESS_OPERATION_FRAGMENT = gql `
 export const PROCESS_OPERATION_FULL_FRAGMENT = gql `
     fragment processOperationFullFields on ProcessOperation{
         ...processOperationFields,
-      
+
     }
     ${PROCESS_OPERATION_FRAGMENT}
 `;

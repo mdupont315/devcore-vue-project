@@ -4,8 +4,11 @@ import {
   uploadFilePlugin,
   renderFileInBase64ToCoordinates
 } from "./uploadFile";
+import { fileWithUniqueName, validateFileSize } from "./helpers/file/fileUtils";
+
 import FileNodeView from "./FileNodeView.vue";
 import { VueNodeViewRenderer } from "@tiptap/vue-2";
+import { v4 as uuidv4 } from "uuid";
 
 const IMAGE_INPUT_REGEX = /!\[(.+|:?)\]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
 
@@ -17,7 +20,8 @@ export const File = Node.create({
       inline: false,
       HTMLAttributes: {},
       addFile: () => {},
-      removeFile: () => {}
+      removeFile: () => {},
+      notify: () => {}
     };
   },
 
@@ -36,14 +40,14 @@ export const File = Node.create({
       size: {
         default: null,
         parseHTML: el => {
-          return el.getAttribute("title");
+          return el.getAttribute("size");
         },
         renderHTML: attrs => ({ size: attrs.size })
       },
       href: {
         default: null,
         parseHTML: el => {
-          return el.getAttribute("title");
+          return el.getAttribute("href");
         },
         renderHTML: attrs => ({ href: attrs.href })
       },
@@ -88,12 +92,17 @@ export const File = Node.create({
           return el.getAttribute("src");
         },
         renderHTML: attrs => ({ src: attrs.src })
+      },
+      uuid: {
+        default: null,
+        parseHTML: el => {
+          return el.getAttribute("uuid");
+        },
+        renderHTML: attrs => ({ uuid: attrs.uuid })
       }
     };
   },
-  // parseHTML() {
-  //   return [{ tag: "span[file]" }];
-  // },
+
   parseHTML: () => [
     {
       tag: "img[src]",
@@ -102,13 +111,15 @@ export const File = Node.create({
         const obj = {
           id: dom.getAttribute("id"),
           src: dom.getAttribute("src"),
-          title: dom.getAttribute("title"),
+          size: dom.getAttribute("size"),
+          title: dom.getAttribute("title") ?? 'no-name',
           alt: dom.getAttribute("alt"),
           style: dom.getAttribute("style"),
           type: dom.getAttribute("type"),
-          preview: dom.getAttribute("preview")
+          preview: dom.getAttribute("preview"),
+          uuid: dom.getAttribute("uuid")
         };
-        return obj;
+        if (obj.src) return obj;
       }
     },
     {
@@ -118,34 +129,48 @@ export const File = Node.create({
         const obj = {
           id: dom.getAttribute("id"),
           src: dom.getAttribute("src"),
+          size: dom.getAttribute("size"),
           href: dom.getAttribute("href"),
-          title: dom.getAttribute("title"),
+          title: dom.getAttribute("title") ?? 'no-name',
           style: dom.getAttribute("style"),
           type: dom.getAttribute("type"),
-          preview: dom.getAttribute("preview")
+          preview: dom.getAttribute("preview"),
+          uuid: dom.getAttribute("uuid")
         };
-        return obj;
+        if (obj.href) return obj;
       }
     }
   ],
   renderHTML: ({ HTMLAttributes }) => {
-    const { href, title, src, alt, style, preview } = HTMLAttributes;
+    const {
+      href,
+      title,
+      src,
+      alt,
+      style,
+      preview,
+      size,
+      uuid
+    } = HTMLAttributes;
 
-    if (!preview) {
-      return ["a", { href, title, style }, title];
+    if (href || src) {
+      if (!preview) {
+        return ["a", { href, title, style, size, alt, uuid }, title];
+      } else {
+        return ["img", { title, src, alt, style, size, uuid }];
+      }
     }
-    return ["img", { title, src, alt, style }];
+
+    return false;
   },
   addNodeView() {
     return VueNodeViewRenderer(FileNodeView);
   },
 
   addCommands() {
-    console.log(this.options);
-    const { addFile } = this.options;
+    const { addFile, notify } = this.options;
     return {
       setImage: attrs => ({ view, tr }) => {
-        console.log("SETTING IMAGE ");
         let pos = 1;
         if (tr && tr.curSelection && tr.curSelection.$head) {
           pos = tr.curSelection.$head.pos;
@@ -154,18 +179,43 @@ export const File = Node.create({
         const input = attrs ? attrs : [];
         const files = Array.from(input);
         const previewFiles = files.filter(file => /image/i.test(file.type));
+        const nonPreviewFiles = files.filter(file => !/image/i.test(file.type));
 
         if (previewFiles.length > 0) {
           previewFiles.forEach(async item => {
             const preview = true;
-            addFile(item);
-            renderFileInBase64ToCoordinates(item, view, coordinates, preview);
+            const valid = validateFileSize(notify, item);
+            if (valid) {
+              const transformedFile = await fileWithUniqueName(view, item);
+              const uuid = uuidv4();
+              addFile({ uuid, file: transformedFile });
+              renderFileInBase64ToCoordinates(
+                transformedFile,
+                view,
+                coordinates,
+                preview,
+                uuid
+              );
+            }
           });
-        } else {
-          files.forEach(async item => {
+        }
+
+        if (nonPreviewFiles.length > 0) {
+          nonPreviewFiles.forEach(async item => {
             const preview = false;
-            addFile(item);
-            renderFileInBase64ToCoordinates(item, view, coordinates, preview);
+            const valid = validateFileSize(notify, item);
+            if (valid) {
+              const transformedFile = await fileWithUniqueName(view, item);
+              const uuid = uuidv4();
+              addFile({ uuid, file: transformedFile });
+              renderFileInBase64ToCoordinates(
+                transformedFile,
+                view,
+                coordinates,
+                preview,
+                uuid
+              );
+            }
           });
         }
       },
@@ -190,6 +240,7 @@ export const File = Node.create({
   },
   addProseMirrorPlugins() {
     const { addFile } = this.options;
-    return [uploadFilePlugin(addFile)];
+    const { notify } = this.options;
+    return [uploadFilePlugin(addFile, notify)];
   }
 });

@@ -1,5 +1,9 @@
 <template>
-  <node-view-wrapper as="div" class="comment-component">
+  <node-view-wrapper
+    as="div"
+    class="comment-component"
+    :class="`comment-container-${ideaUUID}`"
+  >
     <inner-overlay
       v-if="isReplying"
       @click="closeOverlay()"
@@ -8,7 +12,7 @@
 
     <node-view-content class="content-dom" />
 
-    <section v-if="comments.length" class="comment-details">
+    <section v-if="comments.length > 0" class="comment-details">
       <template class="comment" v-for="(comment, i) in comments">
         <article v-if="!isCommentReplied(comment)" :key="i" class="comment">
           <span :class="`idea_comment_${comment.type}`">
@@ -43,7 +47,7 @@
 
             <span
               v-b-tooltip="{ placement: 'top', boundary: 'viewport' }"
-              :title="$t('reply')"
+              :title="$t('Leave a reply')"
               :class="`comment_replyIcon-${comment.id}`"
               :ref="`comment_replyIcon-${comment.id}`"
             >
@@ -100,38 +104,63 @@ export default {
       CommentIcon,
       FolderIcon,
       isReplying: null,
+      activeCommentIndex: null,
     };
+  },
+  created() {
+    if (this.editor && this.editor.isActive("comment")) {
+      setTimeout(() => {
+        this.editor.commands.dedupeComments(this.node);
+      });
+    }
+  },
+  beforeDestroy() {
+    const { node } = this;
+
+    if (
+      this.editor &&
+      (this.editor.isActive("paragraph") || this.editor.isActive("comment"))
+    ) {
+      setTimeout(() => {
+        if (!this.editor.isDestroyed) {
+          this.editor.commands.transformComments(node);
+        }
+      }, 100);
+    }
   },
 
   methods: {
-    openReplyForm(comment) {
-      console.log(this);
-      console.log("OPEN FORM!");
-
+    openReplyForm(comment, index) {
+      this.activeCommentIndex = index;
       this.isReplying = comment.id;
     },
     savedReply(id) {
       this.isReplying = null;
 
       const data = {
+        uuid: this.commentEntity.uuid,
+        ideaUuid: this.commentEntity.ideaUuid,
         comments: this.commentEntity.comments.filter((x) => x.id !== id),
       };
-      this.updateAttributes({ comment: JSON.stringify(data) });
+
+      this.updateAttributes({
+        comment: JSON.stringify(data),
+      });
+
+      const { getPos, node } = this;
+
+      const from = getPos();
+      const to = from + node.nodeSize;
 
       if (this.editor) {
-        this.editor.commands.saveReply();
+        // this.editor.commands.focus();
+        // this.editor.commands.saveReply(to);
+        this.editor.chain().setMeta("saveComment", true).saveReply(to).run();
       }
     },
     closeOverlay() {
+      this.activeCommentIndex = null;
       this.isReplying = null;
-    },
-
-    getReplyIconRef(id) {
-      return `comment_replyIcon-${id}`;
-    },
-
-    getCommentRef(comment) {
-      return `comment_replyIcon-${comment.id}`;
     },
     openUrl(link) {
       window.open(link, "__blank");
@@ -149,6 +178,10 @@ export default {
     comments() {
       return this.commentEntity?.comments || [];
     },
+    ideaUUID() {
+      //TODO: ideauuid gets overwritten when reply and updateattributes doesnt set it
+      return this.commentEntity?.uuid || "";
+    },
   },
 };
 </script>
@@ -160,7 +193,6 @@ export default {
   }
   .content-dom {
     border-radius: 4px;
-    padding: 4px;
     color: #707070 !important;
     font-size: 14px !important;
     font-family: FuturaLight !important;
@@ -168,7 +200,7 @@ export default {
 
   .comment-details {
     border-radius: 8px;
-    padding: 8px;
+    padding: 8px 8px 8px 0;
 
     .idea_comment_IMPROVEMENT {
       background: #d0e4f3;
@@ -184,37 +216,34 @@ export default {
       margin: 2px 0;
     }
 
+    // @keyframes opacityanimation {
+    //   from {
+    //     opacity: 0;
+    //   }
+    //   to {
+    //     opacity: 1;
+    //   }
+    // }
+
     .comment {
       color: #fff;
       display: flex;
+      padding-top: 2px;
+      // animation-name: opacityanimation;
+      //   animation-duration: 1s;
 
       .file {
-        margin-left: 10px;
+        margin-right: 8px;
         a {
           cursor: pointer;
           pointer-events: all;
           text-decoration: underline;
-
-          // &:hover {
-          //   &::after {
-          //     content: attr(data-title);
-          //     margin: 0 4px;
-          //     z-index: 1;
-          //     position: absolute;
-          //     background: white;
-          //     border-radius: 8px;
-          //     padding: 4px;
-          //     box-shadow: 0 0 5px rgba(gray, 0.5);
-          //     text-decoration: underline;
-          //   }
-          // }
         }
       }
 
       .comment-icon {
         transform: translate(0px, 2px);
         cursor: pointer;
-        margin-left: 1em;
         height: 16px;
 
         &:hover {

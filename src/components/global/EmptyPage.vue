@@ -1,5 +1,5 @@
 <template>
-  <div class="empty-page" style="height: 100%; max-height: 93.7vh">
+  <div class="empty-page" style="height: 100%; max-height: 94.8vh">
     <slot name="icon">
       <div class="h3 text-center">
         <i :class="`mdi ${getIcon} text-white`" style="font-size: 100px"></i>

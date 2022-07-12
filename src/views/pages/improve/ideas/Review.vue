@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div class="idea_review_container">
     <b-row v-if="currentProcessSection">
       <b-col>
-        <h3 class="h4 text-white text-uppercase" style="padding-top: 15px">
+        <h3 class="h4 text-white text-uppercase">
           {{ $t("In testing") }}
           <span class="text-gray-lighter">{{ testingIdeas.length }}</span>
         </h3>
@@ -20,7 +20,7 @@
         </div>
       </b-col>
       <b-col>
-        <h3 class="h4 text-white text-uppercase" style="padding-top: 15px">
+        <h3 class="h4 text-white text-uppercase">
           {{ $t("Evaluated ideas") }}
           <span class="text-gray-lighter">{{ evaluatedIdeas.length }}</span>
         </h3>
@@ -143,3 +143,10 @@ export default {
   },
 };
 </script>
+
+<style scoped lang="scss">
+.idea_review_container {
+  // height: 100%;
+	margin: 20px;
+}
+</style>

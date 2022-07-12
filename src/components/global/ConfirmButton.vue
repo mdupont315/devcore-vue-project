@@ -8,8 +8,11 @@
     ></div>
     <b-button
       ref="button"
+      v-if="!customButton"
       class="confirm-buttom-general"
       v-bind="$attrs"
+      :variant="buttonVariant"
+      :disabled="isDisabled"
       block
       :class="btnClass"
       :style="btnStyle"
@@ -17,25 +20,42 @@
     >
       <slot name="default" />
     </b-button>
+    <div
+      v-else
+      ref="button"
+      class="confirm-buttom-custom"
+      v-bind="$attrs"
+      :class="btnClass"
+      :style="btnStyle"
+      @click="toggleConfirm"
+    >
+      <slot></slot>
+    </div>
     <b-popover
       :target="() => $refs.button"
       :show.sync="showConfirmMessage"
       :placement="confirmPlacement"
       :boundary="confirmBoundary"
-			:custom-class="popoverCustomClass"
+      :custom-class="popoverCustomClass"
     >
       <slot name="confirm">
         <b-card no-body style="width: 200px" class="text-center light">
           <b-card-header>
-            <strong class="h6 text-bold">{{ confirmTitle }}</strong>
+            <strong class="h6 text-bold" style="font-size: 14px">{{
+              confirmTitle
+            }}</strong>
           </b-card-header>
           <b-card-body>
-            <p class="m-0">{{ confirmMessage }}</p>
+            <p class="m-0" style="font-size: 14px">{{ confirmMessage }}</p>
           </b-card-body>
           <b-card-footer>
-            <b-button :class="confirmClass" block @click="confirm">{{
-              confirmText
-            }}</b-button>
+            <b-button
+              :class="confirmClass"
+              style="font-size: 14px"
+              block
+              @click="confirm"
+              >{{ confirmText }}</b-button
+            >
             <b-button
               variant="link"
               class="text-dark"
@@ -43,7 +63,7 @@
               block
               @click="cancel"
             >
-              <small>{{ cancelText }}</small>
+              <small style="font-size: 14px">{{ cancelText }}</small>
             </b-button>
           </b-card-footer>
         </b-card>
@@ -103,6 +123,18 @@ export default {
       required: false,
       default: () => true,
     },
+    customButton: {
+      required: false,
+      default: () => false,
+    },
+    buttonVariant: {
+      required: false,
+      default: () => "outline-primary",
+    },
+    isDisabled: {
+      required: false,
+      default: () => false,
+    },
     confirmClass: {
       required: false,
       default: () => "btn-danger",
@@ -148,5 +180,17 @@ export default {
 .confirm-buttom-general:active {
   -webkit-box-shadow: none;
   box-shadow: none;
+}
+
+.confirm-buttom-custom {
+  font-size: 24px;
+  color: lightgray;
+  margin-left: 30px;
+  cursor: pointer;
+}
+
+.ideaEdit_path_remove_button-disabled:hover {
+	cursor:not-allowed;
+	background: #fff
 }
 </style>

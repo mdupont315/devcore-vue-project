@@ -71,11 +71,11 @@ export const PROJECT_FULL_FRAGMENT = gql `
         users{
             id
         }
-        tools{
-          id,
-          toolId,
-          stageId
-        }
+      #  tools{
+      #    id,
+       #   toolId,
+      #    stageId
+     #   }
         ideas{
             id,
             ideaId,

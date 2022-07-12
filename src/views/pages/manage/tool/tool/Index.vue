@@ -48,6 +48,14 @@
               property="name"
               :static-value="row.item.name"
             >
+						 <span>
+                <img
+                  :src="row.item.getAvatarUrl('50x50')"
+                  class="border rounded-circle"
+                  height="25px"
+                />
+                {{ row.item.name }}
+              </span>
               <template v-if="isRowEditing(row)" slot="editing">
                 <suggestions
                   v-model="updateForm.name"

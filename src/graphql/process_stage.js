@@ -12,16 +12,16 @@ export const PROCESS_STAGE_FRAGMENT = gql `
       title,
       dOrder,
       processId,
-      companyRoles{
-          id,
-          name,
-          avatarUrl
-      },
-      companyRolesWithChild{
-          id,
-          name,
-          avatarUrl,
-      },
+     # companyRoles{
+     #     id,
+     #     name,
+     #     avatarUrl
+     # },
+    #  // companyRolesWithChild{
+    #  //     id,
+    #  //     name,
+    #  //     avatarUrl,
+   #   // },
       stats{
           operations
           phases
@@ -42,7 +42,7 @@ export const PROCESS_STAGE_FRAGMENT = gql `
 export const PROCESS_STAGE_FULL_FRAGMENT = gql `
     fragment processStageFullFields on ProcessStage{
         ...processStageFields,
-        
+
       operations{
           ...processOperationFullFields
       }

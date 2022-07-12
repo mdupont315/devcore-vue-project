@@ -78,11 +78,20 @@ export function showGraphqlErrorFromResponse(networkError) {
 }
 
 export function showMessageFromResponse(response) {
+
+  if (response.statusCode == 400) {
+    window.vm.$snotify.error(window.vm.$t(response.message));
+    return;
+  }
+
   if (response.statusCode == 401) {
     window.vm.$snotify.error(window.vm.$t(response.message));
     return;
   }
-  if (!response.data) return;
+  if (response.statusCode === 500) {
+    window.vm.$snotify.error(window.vm.$t(response.message));
+    return
+  }
 
   const translationKey = `responses.${Object.keys(response.data)[0]}`;
   if (window.vm.$t(translationKey) == translationKey) {
@@ -93,6 +102,8 @@ export function showMessageFromResponse(response) {
   } else {
     window.vm.$snotify.success(window.vm.$t(`${translationKey}`));
   }
+
+
 }
 
 export function processGraphQLErrors(graphQLErrors) {

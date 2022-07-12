@@ -1,10 +1,11 @@
 <template>
   <super-select
     :items="roles"
-    class="image-selector role-selector"
+    class="image-selector display-selector"
     selector-class="columns columns-3"
     v-model="dataValue"
     :v-bind="$props"
+		style="z-index:0"
     ref="selector"
     :placeholder="placeholder ? placeholder : $t('companyRoles')"
     v-if="ready"
@@ -14,7 +15,7 @@
     :filter-fn="filter"
     @input="change"
     :show-add-btn="showAddBtn"
-    :max-display-items="6"
+    :max-display-items="5"
     @close="close"
     :key="intent"
   >
@@ -182,7 +183,6 @@ export default {
       }
     },
     change(value, event) {
-			console.log(value, event)
       this.dataValue = value;
       this.$emit("input", this.dataValue, event);
     },

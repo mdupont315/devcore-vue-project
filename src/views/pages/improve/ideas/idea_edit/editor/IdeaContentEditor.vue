@@ -1,17 +1,18 @@
 <template>
-  <div
-    class="idea_editor_content"
-    @click="focusEditor()"
-    id="idea_editor_content"
-  >
+  <div class="idea_editor_content" id="idea_editor_content">
     <div class="editor" v-if="editor">
       <div class="editor_header_border">
-        <menu-bar class="editor__header" :editor="editor" />
+        <menu-bar
+          class="editor__header"
+          :editor="editor"
+          @modalOpen="setIsModalView"
+        />
       </div>
       <editor-content
         class="editor__content"
         id="editor__content"
         :editor="editor"
+        style="min-height: 70vh"
         ref="editor_content"
       />
 
@@ -24,8 +25,10 @@
 import { mapGetters } from "vuex";
 import { EditorContent, BubbleMenu } from "@tiptap/vue-2";
 import { MenuBar } from "./parts";
-import { TextSelection } from "prosemirror-state";
 import ContentEditor from "./EditorLoader.js";
+import { TextSelection } from "prosemirror-state";
+import { Fragment } from "prosemirror-model";
+import debounce from "lodash/debounce";
 
 /* eslint-disable */
 export default {
@@ -55,6 +58,10 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    scrollToSelection: {
+      type: Number,
+      default: () => null,
+    },
   },
   computed: {
     ...mapGetters({
@@ -62,74 +69,110 @@ export default {
     }),
   },
   watch: {
+    scrollToSelection: {
+      handler(newVal) {
+        if (newVal) {
+          this.focusEditor();
+        }
+      },
+    },
     isEditable: {
       handler(newVal) {
         this.editor.setEditable(newVal);
-        if (newVal) this.focusEditor();
+        console.log(newVal);
+        if (newVal) {
+          this.focusEditor();
+        }
       },
     },
   },
 
   data() {
     return {
+      isModalView: false,
       provider: null,
       editor: null,
       status: "connecting",
+      windowTop: 0,
+      handleDebouncedScroll: null,
     };
   },
   methods: {
-    focusEditor() {
-      this.editor?.commands.focus();
+    onScroll(e) {
+      this.windowTop = e.srcElement.scrollTop;
     },
-    transformProcessedCommentNodesToParagraph() {
-      const comments = [];
+    setIsModalView(val) {
+      this.isModalView = val;
+    },
+    handleKeyup(e) {
+      if (e && e.keyCode === 9) {
+        if (this.editor && this.editor.isActive("comment")) e.preventDefault();
+        //  if (this.isModalView) e.preventDefault();
+      }
+      return;
+    },
+    focusEditor() {
+      if (this.scrollToSelection) {
+        this.editor.commands.setNodeSelection(this.scrollToSelection);
+        this.editor.commands.scrollIntoView();
 
-      const {
-        state: { doc, tr, schema },
-        view: { dispatch },
-      } = this.editor;
-
-      doc.descendants((node, pos) => {
-        if (node.type.name !== "comment") return;
-
-        comments.push({
-          from: pos,
-          to: pos + node.nodeSize,
-          comment: JSON.parse(node.attrs.comment),
-          shouldDelete: false,
-        });
-      });
-
-      for (const comment of comments) {
-        const { from, to, comment: commentData } = comment;
-
-        const shouldRemoveComment = !commentData.comments.length;
-
-        if (!shouldRemoveComment) continue;
-
-        const textContent = doc.textBetween(from, to);
-
-        const paragraphContent = schema.text(textContent || " ");
-
-        const newParagraphWithContent = schema.nodes.paragraph.create(
-          {},
-          paragraphContent
-        );
-
-        const replaceTransaction = tr.replaceRangeWith(
-          from,
-          to,
-          newParagraphWithContent
-        );
-
-
-        dispatch(replaceTransaction);
+        this.$emit("contentScrollPosition", null);
+      } else {
+        this.editor?.commands.focus();
       }
     },
 
     initEditor() {
+      console.log("*** Editor Initialized ***");
       if (this.editor) this.editor.destroy();
       if (this.provider) this.editor.destroy();
+
+      const linkHandlers = {
+        removeLink: (markPos, uuid) => {
+          const {
+            state: { doc, tr },
+            view: { dispatch },
+          } = this.editor;
+          doc.descendants((node, pos) => {
+            if (
+              node.type.name == "paragraph" ||
+              node.type.name == "heading" ||
+              node.type.name == "comment"
+            ) {
+              const [from, to] = [pos, pos + node.nodeSize];
+              const [nodeFrom, nodeTo] = [pos, pos + node.nodeSize];
+              if (from <= markPos && to >= markPos) {
+                if (node.content && node.content.content) {
+                  const { content } = node.content;
+
+                  const newNodeContent = content.filter((innerNode, index) => {
+                    if (innerNode.marks && innerNode.marks[0]) {
+                      const [mark] = innerNode.marks;
+                      if (
+                        mark.attrs &&
+                        mark.attrs.uuid &&
+                        mark.attrs.uuid === uuid
+                      ) {
+                        return false;
+                      }
+                    }
+                    return true;
+                  });
+                  const newNode = node.copy(Fragment.from(newNodeContent));
+                  const [$from, $to] = [
+                    doc.resolve(nodeFrom),
+                    doc.resolve(nodeTo),
+                  ];
+                  const sel = new TextSelection($from, $to);
+                  const startPosition = Math.max(pos, sel.from);
+                  const endPosition = Math.min(pos + node.nodeSize, sel.to);
+                  dispatch(tr.replaceWith(startPosition, endPosition, newNode));
+                }
+              }
+            }
+          });
+        },
+      };
 
       const fileHandlers = {
         addFile: async (file) => {
@@ -138,14 +181,118 @@ export default {
         removeFile: (file) => {
           this.$emit("fileRemoved", file);
         },
+        notify: (file, limit) => {
+          const formatSize = (bytes, decimalPoint) => {
+            if (bytes == 0) return "0 Bytes";
+            var k = 1000,
+              dm = decimalPoint || 2,
+              sizes = ["Bytes", "KB", "MB", "GB"],
+              i = Math.floor(Math.log(bytes) / Math.log(k));
+            return (
+              parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
+            );
+          };
+
+          const message = this.$t("File size too big", {
+            file: file.name,
+            size: formatSize(file.size, 2),
+            limit: formatSize(limit),
+          });
+          window.vm.$snotify.error(window.vm.$t(message));
+        },
       };
 
-      const saveContent = async (content) => {
-        console.log("transforming");
-        this.transformProcessedCommentNodesToParagraph();
+      const commentHandlers = {
+        dedupeComments: async (node) => {
+          if (!this.editor.isActive("comment")) return;
+          const curNode = JSON.parse(node.attrs.comment);
+          const {
+            state: { doc, tr, schema },
+            view: { dispatch },
+          } = this.editor;
+          const comments = [];
+          doc.descendants((node, pos) => {
+            if (node.type.name !== "comment") return;
+            const [from, to] = [pos, pos + node.nodeSize];
 
+            const [comment, content] = [
+              JSON.parse(node.attrs.comment),
+              node.content,
+            ];
+
+            comments.push({ from, to, comment, content });
+          });
+
+          const currentComments = comments;
+          const mapOfUuidAndComments = {};
+
+          for (const comment of currentComments) {
+            const uuid = comment.comment.uuid;
+
+            if (mapOfUuidAndComments[uuid])
+              mapOfUuidAndComments[uuid].push(comment);
+            else mapOfUuidAndComments[uuid] = [comment];
+          }
+
+          let replaceTr = tr;
+          for (const [, comments] of Object.entries(
+            mapOfUuidAndComments
+          ).filter(
+            ([key, _comments]) => _comments.length > 1 && key === curNode.uuid
+          )) {
+            comments.pop();
+
+            for (const comment of comments) {
+              const { from } = comment;
+
+              replaceTr.setNodeMarkup(from, schema.nodes.paragraph, {
+                id: comment.comment.uuid,
+              });
+            }
+          }
+
+          setTimeout(() => {
+            dispatch(replaceTr);
+          });
+        },
+        transformComments: (node) => {
+          if (this.editor.isDestroyed) return;
+
+          if (
+            !this.editor.view.state.selection.empty ||
+            (!this.editor.isActive("paragraph") &&
+              this.editor.isActive("comment"))
+          ) {
+            return;
+          }
+          setTimeout(() => {
+            const curNode = JSON.parse(node.attrs.comment);
+            const selection = this.editor.view.state.selection;
+
+            if (selection && selection.$head && selection.$head.parent) {
+              const parent = selection.$head.parent;
+              if (
+                parent.attrs.id &&
+                curNode.uuid &&
+                parent.attrs.id === curNode.uuid
+              ) {
+                this.editor
+                  .chain()
+                  .selectParentNode(selection)
+                  .setComment(JSON.stringify(curNode))
+                  .run();
+
+                this.editor.commands.focus(selection.to);
+              }
+            }
+          }, 100);
+        },
+      };
+
+      const saveContent = async (scrollToSelection, reload = false) => {
+        this.$emit("saveContent", reload);
         setTimeout(() => {
-          this.$emit("saveContent");
+          this.$emit("contentScrollPosition", scrollToSelection);
         }, 200);
       };
 
@@ -153,27 +300,47 @@ export default {
         this.isEditable,
         this.value.markup,
         {
-          onUpdate: (content) =>
+          onUpdate: (content) => {
             this.$emit("input", {
               contentType: this.value.contentType,
               markup: content,
-            }),
+            });
+          },
         },
         fileHandlers,
-        saveContent
+        saveContent,
+        commentHandlers,
+        linkHandlers
       );
 
       this.editor = editorInstance.editor;
       this.$emit("initialized");
+      if (this.scrollToSelection) {
+        setTimeout(() => {
+          this.editor.commands.setNodeSelection(this.scrollToSelection);
+          this.editor.commands.scrollIntoView();
+          this.$emit("contentScrollPosition", null);
+        });
+      }
+    },
+    addParagraphAtEnd() {
+      if (!this.editor) throw new Error("editor not defined");
+
+      this.editor.commands.focus("end");
+      this.editor.commands.insertContent("<p> </p>");
     },
   },
 
   mounted() {
+    document.addEventListener("keydown", this.handleKeyup);
+    this.handleDebouncedScroll = debounce(this.onScroll, 100);
+    window.addEventListener("scroll", this.handleDebouncedScroll, true);
     this.initEditor();
   },
   beforeDestroy() {
     this.editor.destroy();
-    // this.provider.destroy();
+    document.removeEventListener("keydown", this.handleKeyup);
+    window.removeEventListener("scroll", this.handleDebouncedScroll, true);
   },
 };
 </script>
@@ -182,6 +349,10 @@ export default {
 <style lang="scss" >
 /* Setup */
 
+.editor__header {
+  border-top: 1px solid lightgray;
+}
+
 .editor_header_border {
   border-bottom: 1px solid lightgray;
 }
@@ -189,6 +360,7 @@ export default {
 .idea_editor_content {
   background: #fff;
   flex-grow: 1;
+  padding-bottom: 2rem;
   border-radius: 3px;
   max-height: calc(100% - 60px);
   height: 100%;
@@ -201,6 +373,9 @@ export default {
   background-color: #fff;
   border-radius: 0.75rem;
   min-height: 100%;
+  & > .editor__content {
+    overflow-x: hidden;
+  }
 
   &__header {
     display: flex;
@@ -281,6 +456,9 @@ export default {
 /* Table */
 .ProseMirror {
   height: 100%;
+  & > :first-child {
+    margin-top: 0;
+  }
   table {
     border-collapse: collapse;
     table-layout: fixed;
@@ -309,15 +487,20 @@ export default {
     td {
       font-family: FuturaLight;
       color: #707070;
+      overflow: hidden;
     }
 
     th {
       font-weight: bold;
+      overflow: hidden;
       text-align: left;
       background-color: #4294d0;
-      color: #fff;
       font-size: 14px;
       font-family: FuturaMedium;
+      color: #fff;
+      & > p {
+        color: #fff;
+      }
     }
 
     .selectedCell:after {
@@ -334,6 +517,7 @@ export default {
 
     .column-resize-handle {
       position: absolute;
+      z-index: 2;
       right: -2px;
       top: 0;
       bottom: -2px;
@@ -343,28 +527,165 @@ export default {
     }
   }
   p {
-    color: #707070 !important;
+    color: #707070;
     font-size: 14px !important;
     font-family: FuturaLight !important;
     font-weight: 400;
+    margin-bottom: 4px !important;
+    margin-top: 4px !important;
+    margin-block-start: 4px !important;
+    margin-block-end: 4px !important;
+  }
+
+  p > span.is-link:hover {
+    & > a {
+      background: #4294d0;
+      color: #fff !important;
+      & > span {
+        background: #4294d0;
+        color: #fff !important;
+      }
+    }
+  }
+
+  h1 > span.is-link,
+  h2 > span.is-link,
+  h3 > span.is-link,
+  p > span.is-link,
+  div > span.is-link {
+    display: inline-flex;
+    padding-right: 5px;
+    height: 40px;
+    user-select: none;
+    white-space: nowrap;
+    max-width: 40vw;
+    & > button {
+      height: 100%;
+      font-family: "FuturaMedium";
+      color: #d0424d;
+      border: 1px solid lightgray;
+      width: 60px;
+      outline: none;
+      position: relative;
+      border-radius: 3px;
+      user-select: none;
+      background: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      &:hover {
+        background: #d0424d;
+        color: #fff;
+        &[data-tooltip] {
+          position: relative;
+          &:after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 50%;
+            top: -6px;
+            white-space: nowrap;
+            transform: translateX(-50%) translateY(-100%);
+            background: rgba(0, 0, 0, 0.7);
+            text-align: center;
+            color: #fff;
+            padding: 4px 2px;
+            font-size: 12px;
+            min-width: 80px;
+            border-radius: 5px;
+            pointer-events: none;
+            padding: 5px;
+            font-family: "FuturaMedium";
+          }
+        }
+      }
+    }
+    & > a {
+      flex-direction: row;
+      max-width: fit-content;
+      display: inline-flex;
+      width: 100%;
+      border: 1px solid lightgray;
+      border-radius: 3px;
+      place-items: center;
+      color: #4294d0;
+      line-height: 5px;
+      cursor: pointer;
+      padding: 0 10px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      // position: absolute;
+      margin-right: 10px;
+      text-decoration: none;
+      user-select: none;
+      &[data-tooltip] {
+        position: relative;
+        &:hover::after {
+          content: attr(data-tooltip);
+          max-width: 200px;
+          position: absolute;
+          left: 50%;
+          top: -6px;
+          white-space: nowrap;
+          transform: translateX(-50%) translateY(-100%);
+          background: rgba(0, 0, 0, 0.7);
+          text-align: center;
+          color: #fff;
+          padding: 4px 2px;
+          font-size: 12px;
+          min-width: 80px;
+          border-radius: 5px;
+          pointer-events: none;
+          padding: 10px;
+          font-family: "FuturaMedium";
+        }
+      }
+      &:hover {
+        background: #4294d0;
+        color: #fff !important;
+      }
+      &::before,
+      &:hover::before {
+        padding-right: 5px;
+        font-family: "Material Icons";
+        font-size: 15px;
+        opacity: 0.8;
+        display: flex;
+        place-items: center;
+        content: "link";
+        height: 17px;
+        &:hover {
+          background: #4294d0;
+          color: #fff;
+        }
+      }
+    }
+  }
+
+  p > a {
+    cursor: pointer;
   }
   h1 {
     color: #242526 !important;
     font-size: 18px !important;
     font-family: FuturaBold !important;
     font-weight: 400;
+    margin-bottom: 0.5em;
   }
   h2 {
     color: #242526 !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
     font-family: FuturaMedium !important;
     font-weight: 400;
   }
   h3 {
     color: #4294d0 !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
     font-family: FuturaMedium !important;
     font-weight: 400;
+  }
+  h1,
+  h2,
+  h3 {
+    margin-top: 21px;
   }
 
   p > span {
@@ -382,13 +703,13 @@ export default {
   }
   h2 > span {
     color: #242526 !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
     font-family: FuturaMedium !important;
     font-weight: 400;
   }
   h3 > span {
     color: #4294d0 !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
     font-family: FuturaMedium !important;
     font-weight: 400;
   }
@@ -425,9 +746,10 @@ export default {
   font-weight: 400;
   letter-spacing: 1px;
 }
+
 .ProseMirror {
   > * + * {
-    margin-top: 0.75em;
+    margin-top: 0.5em;
   }
 
   ul,
@@ -565,7 +887,7 @@ export default {
       display: flex;
       align-items: center;
 
-      .row-control-button-container {
+      .col-control-button-container {
         display: flex;
         flex-direction: column;
         gap: 1em;
@@ -592,12 +914,25 @@ export default {
     width: 90%;
 
     .delete-table-button {
-      background-color: transparent;
-      color: red;
-      border: 1px solid gray;
+      // background-color: transparent;
+      // color: red;
+      // border: 1px solid gray;
+      font-family: "FuturaMedium";
+      color: #d0424d;
+      border: 1px solid lightgray;
+      width: 60px;
+      height: 20px;
+      position: relative;
+      border-radius: 3px;
+      background: #fff;
+      bottom: 2px;
+      &:hover {
+        background: #d0424d;
+        color: #fff;
+      }
     }
 
-    .col-control-button-container {
+    .row-control-button-container {
       display: flex;
       flex-direction: row;
       gap: 1em;
@@ -644,10 +979,12 @@ export default {
   max-height: 100px;
 }
 
-[data-tooltip] {
+.table-control-button[data-tooltip],
+.delete-table-button[data-tooltip] {
   position: relative;
 }
-[data-tooltip]:hover::before {
+.table-control-button[data-tooltip]:hover::before,
+.delete-table-button[data-tooltip]:hover::before {
   content: "";
   position: absolute;
   top: -6px;
@@ -658,7 +995,8 @@ export default {
   border-color: rgba(0, 0, 0, 0.7) transparent transparent transparent;
   z-index: 100;
 }
-[data-tooltip]:hover::after {
+.table-control-button[data-tooltip]:hover::after,
+.delete-table-button[data-tooltip]:hover::after {
   content: attr(data-tooltip);
   position: absolute;
   left: 50%;

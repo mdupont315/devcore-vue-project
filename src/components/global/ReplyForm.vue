@@ -45,7 +45,7 @@
                 style="font-size: 30px; color: #4494d1"
                 v-if="!isLoading"
               ></i>
-              <b-spinner v-else></b-spinner>
+              <b-spinner v-else style="color: lightgray"></b-spinner>
             </div>
           </div>
         </div>
@@ -118,15 +118,7 @@ export default {
     async saveFeedback() {
       this.isLoading = true;
       this.feedbackForm.value = this.rewardablePoints[this.rewardActiveIndex];
-      //TODO: send comment reply here
-      // const ideaIssueReplyForm = new GQLForm({
-      //   authorId: this.item.author.id,
-      //   typeAuthorId: input.typeAuthorId,
-      //   ideaIssueId: this.item.id,
-      //   value: input.value,
-      //   description: input.description,
-      //   status,
-      // });
+
       const ideaIssueReplyForm = {
         ...this.feedbackForm,
         authorId: this.user.id,
@@ -148,13 +140,11 @@ export default {
     async saveEmptyFeedback() {
       this.isLoading = true;
 
+	console.log("CLOSING!")
       const ideaIssueCloseForm = new GQLForm({
         id: this.editingIdea.editIdeaId,
-        improvementId: this.comment.id,
+        improvementIds: [this.comment.id],
       });
-
-      //TODO: Unset this comment,
-      //TODO:  remove from editor, save content
 
       await this.$store.dispatch(
         "idea/closeImprovementFeedback",
@@ -196,11 +186,21 @@ export default {
   border: none;
   width: 100%;
   height: 100%;
-	margin-right: 10px;
+  margin-right: 10px;
+  background: #fff;
+  &:active,
+  :focus,
+  :hover {
+    background: #fff;
+    resize: none;
+    box-shadow: none !important;
+  }
 }
 .feedback-form-footer-body {
   display: flex;
   margin: 10px;
+  flex-direction: row;
+  justify-content: center;
 }
 .ideaIssue_reply_feedback_feedback_reward.reward__active {
   background: #4294d0;

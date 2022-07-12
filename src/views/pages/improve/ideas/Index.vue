@@ -4,7 +4,7 @@
       v-if="process.process && process.process.stages.length > 0"
       class="sub-top-bar shadow-sm d-flex flex-row"
     >
-      <div class="flex-grow-1">
+      <div style="flex-grow: 5">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb text-capitalize bg-white">
             <li
@@ -51,7 +51,10 @@
           </ol>
         </nav>
       </div>
-      <div class="flex-grow-0">
+      <div
+        class="flex-grow-1 flex-start-on-small"
+        style="display: flex; justify-content: flex-end"
+      >
         <b-button
           :variant="isActive('new') ? 'outline-primary' : 'transparent'"
           :to="{ name: 'ideas' }"
@@ -96,9 +99,10 @@
     <div
       v-if="process.process && process.process.stages.length > 0"
       id="main-content"
-      class="has-top-bar p-3"
-      style="overflow: auto; overflow-x: hidden; height: calc(100vh - 105px)"
+      class="has-top-bar"
+      style="overflow: auto; overflow-x: hidden; height: calc(100% - 45px)"
     >
+      <!--  class="has-top-bar p-3" -->
       <component
         :is="currentComponent"
         v-if="currentProcess && currentComponent && !getIsIdeaInEdit"
@@ -273,7 +277,6 @@ export default {
     getIsIdeaInEdit: {
       get() {
         if (this.ideaInEdit) {
-					console.log(this.ideaInEdit);
           const isEditingOrCreating = this.ideaInEdit.editIdeaMode;
           if (isEditingOrCreating === "EDIT") {
             return this.ideaInEdit;
@@ -288,8 +291,6 @@ export default {
     },
   },
   async mounted() {
-
-
     if (this.user.can("core/company/manage")) {
       await this.$router.replace("/manage/companies");
     }
@@ -316,61 +317,85 @@ export default {
         });
       }
     });
-    EventBus.$on("idea/currentTab", async (data) => {
-      console.log("data");
-      console.log(data);
-      const tabName =
-        data && data.form && data.form.tab ? data.form.tab : "New";
-      await this.closeIdeaEdit();
-      const ref = `ideas_innerView_${tabName}`;
-      if (this.$refs[ref] && this.$refs[ref].$el) {
-        this.$nextTick(() => {
-          this.$refs[ref].$el.click();
-        });
-      }
-    });
+    // EventBus.$on("idea/currentTab", async (data) => {
+    //   const tabName =
+    //     data && data.form && data.form.tab ? data.form.tab : "new";
 
-    // EventBus.$on("idea/currentIdea", (data) => {
-    //   if (data.form) {
-    //     // this.currentComponent = (data) => import("./idea_edit/IdeaEdit.vue")
-    //   } else {
-    //  //   this.loadComponent();
+    //   if (this.getIsIdeaInEdit) {
+    //     await this.closeIdeaEdit();
+    //   }
+
+		// 	console.log(this.$router.params)
+
+    //   if (this.$router.params && this.$router.params.type !== "New") {
+    //     const ref = `ideas_innerView_${tabName}`;
+    //     //console.log(data);
+    //     //console.log(tabName);
+    //     if (this.$refs[ref] && this.$refs[ref].$el) {
+    //       //  this.updatePathParams({ type: null });
+    //       //   this.$router.push({ params: { type: "" } });
+    //       this.updatePathParams(this.$router, { type: "New" });
+    //       this.$nextTick(() => {
+    //         this.$refs[ref].$el.click();
+    //         // this.setComponent("New");
+    //         //  this.currentComponent = import("./New.vue");
+    //       });
+    //     }
     //   }
     // });
 
-    // if (
-    //   this.$router.currentRoute.query &&
-    //   Object.keys(this.$router.currentRoute.query).length > 0
-    // ) {
-    //   await this.goToIdeaByQuery();
-    // }
+    if (
+      this.$router.currentRoute.query &&
+      Object.keys(this.$router.currentRoute.query).length > 0
+    ) {
+      await this.goToIdeaByQuery();
+    }
   },
   methods: {
-    // async goToIdeaByQuery() {
-    //   // Navigated through link
-    //   if (this.$router.currentRoute.query) {
-    //     const query = {
-    //       processId: this.$router.currentRoute.query.processId ?? null,
-    //       stageId: this.$router.currentRoute.query.stageId ?? null,
-    //       operationId: this.$router.currentRoute.query.operationId ?? null,
-    //       phaseId: this.$router.currentRoute.query.phaseId ?? null,
-    //       ideaId: this.$router.currentRoute.query.ideaId ?? null,
-    //     };
-    //     await this.navigateToIdea(query);
-    //     const editIdea = await this.$store.dispatch("idea/findById", {
-    //       id: query.ideaId,
-    //       force: true,
-    //     });
-    //     await this.$store.dispatch("idea/setIdeaInEdit", {
-    //       editIdeaMeta: {
-    //         editStartedAt: new Date().getTime(),
-    //       },
-    //       editIdea,
-		// 					editIdeaMode: "EDIT",
-    //     editIdeaId: idea.id,
-    //     });
-    //   }
+    // updatePathParams($router, newParams) {
+    //   // Retrieve current params
+    //   const currentParams = $router.currentRoute.params;
+
+    //   // Create new params object
+    //   const mergedParams = { ...currentParams, ...newParams };
+
+    //   // console.log(currentParams);
+    //   // console.log(newParams);
+
+    //   // When router is not supplied path or name,
+    //   // it simply tries to update current route with new params or query
+    //   // Almost everything is optional.
+    //   $router.push({ params: mergedParams });
     // },
+    async goToIdeaByQuery() {
+      // Navigated through link
+      if (this.$router.currentRoute.query) {
+        const query = {
+          processId: this.$router.currentRoute.query.processId ?? null,
+          stageId: this.$router.currentRoute.query.stageId ?? null,
+          operationId: this.$router.currentRoute.query.operationId ?? null,
+          phaseId: this.$router.currentRoute.query.phaseId ?? null,
+          ideaId: this.$router.currentRoute.query.id ?? null,
+        };
+        if (!query.processId || !query.ideaId) return;
+        await this.navigateToIdea(query);
+
+        const editIdea = await this.$store.dispatch("idea/findById", {
+          id: query.ideaId,
+          force: true,
+        });
+
+        if (!editIdea || !editIdea.id) return;
+        await this.$store.dispatch("idea/setIdeaInEdit", {
+          editIdeaMeta: {
+            editStartedAt: new Date().getTime(),
+          },
+          editIdea,
+          editIdeaMode: "EDIT",
+          editIdeaId: editIdea.id,
+        });
+      }
+    },
     async navigateToIdea({
       processId = null,
       stageId = null,
@@ -481,14 +506,11 @@ export default {
     },
 
     async setComponent(component) {
-      console.log("SET !!");
       await this.closeIdeaEdit();
       await this.loadComponent(component);
     },
 
     async loadComponent(component) {
-      console.log("SET COMPONENT!");
-      console.log(component);
       if (!component) {
         this.currentComponent = () =>
           import(
@@ -498,6 +520,8 @@ export default {
                 : "New") +
               ".vue"
           );
+      } else {
+        this.currentComponent = () => import(`./${component}.vue`);
       }
     },
   },
@@ -505,3 +529,14 @@ export default {
 </script>
 
 
+<style lang="scss">
+@media screen and (max-height: 1286px) and (min-height: 700px) {
+  #main-content {
+    max-height: 85vh;
+  }
+}
+@media screen and (min-height: 1286px) {
+  #main-content {
+    max-height: 100vh;
+  }
+}

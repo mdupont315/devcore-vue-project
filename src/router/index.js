@@ -131,31 +131,6 @@ const routes = [
               /* webpackChunkName: "manage" */ "@/views/pages/improve/ideas/CentralBar"
             )
         },
-        // children: [
-        //   {
-        //     path: "edit/:ideaId?",
-        //     name: "edit-idea",
-        //     component: () =>
-        //       import(
-        //         /* webpackChunkName: "improve" */ "@/views/pages/improve/ideas/idea_edit/Index"
-        //       ),
-        //       meta: {
-        //         middleware: [auth],
-        //         title: "Ideas",
-        //         permissions: "improve/idea/manage",
-        //         layout: "default-layout",
-        //         titleButton: () =>
-        //           import(
-        //             /* webpackChunkName: "improve" */ "@/views/pages/improve/ideas/TitleButton"
-        //           ),
-        //         // topRight: () => import(/* webpackChunkName: "improve" */'@/views/pages/manage/proccess/SearchBar'),
-        //         topCentral: () =>
-        //           import(
-        //             /* webpackChunkName: "manage" */ "@/views/pages/improve/ideas/CentralBar"
-        //           )
-        //       },
-        //   }
-        // ]
       },
       // {
       //   path: "tool-ideas/:type?",

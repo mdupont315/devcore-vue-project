@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-bottom: 100px" id="newIdeas__container">
+  <div style="padding: 20px 0" id="newIdeas__container">
     <b-row v-if="currentProcessSection" class="newIdeas__container">
       <b-col cols="12">
         <div class="h4 text-white text-uppercase clearfix newIdeas-idea-count">
