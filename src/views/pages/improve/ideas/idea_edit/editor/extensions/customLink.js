@@ -6,7 +6,6 @@
 
 import { Mark, markPasteRule, mergeAttributes } from "@tiptap/core";
 import { find, registerCustomProtocol } from "linkifyjs";
-import { v4 as uuidv4 } from "uuid";
 import { autolink } from "./helpers/link/autolink";
 import { clickHandler } from "./helpers/link/clickHandler";
 import { pasteHandler } from "./helpers/link/pasteHandler";
@@ -27,16 +26,6 @@ export const CustomLink = Mark.create({
   },
   addOptions() {
     return {
-      // HTMLAttributes: {
-      //   target: "_blank",
-      //   href: null,
-      //   uuid: null
-      // },
-      // linkOnPaste: true,
-      // openOnClick: true,
-      // removeLink: () => {},
-      // validate: href => /^https?:\/\//.test(href),
-
       openOnClick: true,
       linkOnPaste: true,
       autolink: true,
@@ -107,7 +96,7 @@ export const CustomLink = Mark.create({
       }
     ];
   },
-  renderHTML({ mark, HTMLAttributes }) {
+  renderHTML({ HTMLAttributes }) {
     const { uuid, href, target } = HTMLAttributes;
     const validate = /^https?:\/\//.test(href);
 

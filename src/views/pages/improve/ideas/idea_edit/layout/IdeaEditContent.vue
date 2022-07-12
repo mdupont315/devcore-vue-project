@@ -187,7 +187,7 @@ export default {
 
 .ideaContent-empty-spinner {
   text-align: center;
-  height: 90%;
+  height: 100%;
   border-radius: 3px;
   display: flex;
   place-content: center;

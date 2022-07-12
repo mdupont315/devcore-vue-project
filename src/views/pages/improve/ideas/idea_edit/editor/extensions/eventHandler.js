@@ -8,6 +8,7 @@ export const EventHandler = Extension.create({
     return [
       new Plugin({
         key: new PluginKey("eventHandler"),
+
         // props: {
         //   handleClick(view, pos, event) {
         //     console.log("Clicked editor!")

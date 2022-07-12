@@ -11,7 +11,7 @@
           <img
             :src="getAttrs.src"
             :alt="getAttrs.title"
-            style="width: 50%; height: 50%"
+            style="width: 30%; height: 30%"
           />
         </div>
         <button @click="remove" class="file-remove-button">

@@ -246,7 +246,6 @@ export function updateColumns(
     nextDOM.parentNode.removeChild(nextDOM);
     nextDOM = after;
   }
-
   if (fixedWidth) {
     table.style.width = `${totalWidth}px`;
     table.style.minWidth = "";
@@ -282,10 +281,6 @@ export const CustomTable = Table.extend({
 
   resizable: true,
 
-  parseHTML() {
-    return [{ tag: "table" }];
-  },
-
   renderHTML({ HTMLAttributes }) {
     return [
       "table",
@@ -293,12 +288,46 @@ export const CustomTable = Table.extend({
       ["tbody", 0]
     ];
   },
+  parseHTML() {
+    return [
+      {
+        tag: "table",
+        getAttrs: dom => {
+          return {
+            "data-table-width": dom.getAttribute("data-table-width"),
+            "data-table-cols": dom.getAttribute("data-table-cols")
+          };
+        }
+      }
+    ];
+  },
+  addAttributes() {
+    return {
+      "data-table-width": {
+        parseHTML: element => element.getAttribute("data-table-width"),
+        renderHTML: attrs => ({ "data-table-width": attrs["data-table-width"] })
+      },
+      "data-table-cols": {
+        parseHTML: element => element.getAttribute("data-table-cols"),
+        renderHTML: attrs => ({ "data-table-cols": attrs["data-table-cols"] })
+      }
+    };
+  },
 
   addNodeView() {
     return ({ editor, node: nodeViewNode, getPos }) => {
-
-      console.log(this.options)
       let tempNode = nodeViewNode;
+
+      const setCols =
+        this.editor.extensionStorage.table?.cols ??
+        tempNode.attrs["data-table-cols"];
+
+      tempNode.attrs["data-table-width"] = setCols
+        ? Math.round(editor.view.dom.clientWidth)
+        : null;
+
+      tempNode.attrs["data-table-cols"] = setCols ?? null;
+
 
       const cellMinWidth = 40;
 

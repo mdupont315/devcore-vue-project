@@ -27,8 +27,9 @@ import { EditorContent, BubbleMenu } from "@tiptap/vue-2";
 import { MenuBar } from "./parts";
 import ContentEditor from "./EditorLoader.js";
 import { TextSelection } from "prosemirror-state";
-import { transformProcessedCommentNodesToParagraph } from './editorUtils'
 import { Fragment } from "prosemirror-model";
+import debounce from "lodash/debounce";
+
 /* eslint-disable */
 export default {
   components: {
@@ -92,9 +93,14 @@ export default {
       provider: null,
       editor: null,
       status: "connecting",
+      windowTop: 0,
+      handleDebouncedScroll: null,
     };
   },
   methods: {
+    onScroll(e) {
+      this.windowTop = e.srcElement.scrollTop;
+    },
     setIsModalView(val) {
       this.isModalView = val;
     },
@@ -106,7 +112,6 @@ export default {
       return;
     },
     focusEditor() {
-      console.log("focusing", this.scrollToSelection);
       if (this.scrollToSelection) {
         this.editor.commands.setNodeSelection(this.scrollToSelection);
         this.editor.commands.scrollIntoView();
@@ -116,57 +121,16 @@ export default {
         this.editor?.commands.focus();
       }
     },
-    // transformProcessedCommentNodesToParagraph() {
-    //   const comments = [];
-
-    //   const {
-    //     state: { doc, tr, schema },
-    //     view: { dispatch },
-    //   } = this.editor;
-
-    //   doc.descendants((node, pos) => {
-    //     if (node.type.name !== "comment") return;
-
-    //     comments.push({
-    //       from: pos,
-    //       to: pos + node.nodeSize,
-    //       comment: JSON.parse(node.attrs.comment),
-    //       shouldDelete: false,
-    //       content: node.content,
-    //     });
-    //   });
-
-    //   for (const comment of comments) {
-    //     const { from, to, comment: commentData } = comment;
-
-    //     const shouldRemoveComment = !commentData.comments.length;
-
-    //     if (!shouldRemoveComment) continue;
-
-    //     const newParagraphWithContent = schema.nodes.paragraph.create(
-    //       {},
-    //       comment.content
-    //     );
-
-    //     const replaceTransaction = tr.replaceRangeWith(
-    //       from,
-    //       to,
-    //       newParagraphWithContent
-    //     );
-
-    //     dispatch(replaceTransaction);
-    //   }
-    // },
 
     initEditor() {
-      console.log("INITIALZ");
+      console.log("*** Editor Initialized ***");
       if (this.editor) this.editor.destroy();
       if (this.provider) this.editor.destroy();
 
       const linkHandlers = {
         removeLink: (markPos, uuid) => {
           const {
-            state: { doc, tr, schema },
+            state: { doc, tr },
             view: { dispatch },
           } = this.editor;
           doc.descendants((node, pos) => {
@@ -209,6 +173,7 @@ export default {
           });
         },
       };
+
       const fileHandlers = {
         addFile: async (file) => {
           this.$emit("fileAdded", file);
@@ -235,14 +200,6 @@ export default {
           });
           window.vm.$snotify.error(window.vm.$t(message));
         },
-      };
-
-      const saveContent = async (scrollToSelection, reload = false) => {
-        //transformProcessedCommentNodesToParagraph(this.editor);
-        this.$emit("saveContent", reload);
-        setTimeout(() => {
-          this.$emit("contentScrollPosition", scrollToSelection);
-        }, 200);
       };
 
       const commentHandlers = {
@@ -299,8 +256,7 @@ export default {
           });
         },
         transformComments: (node) => {
-
-					if (this.editor.isDestroyed) return;
+          if (this.editor.isDestroyed) return;
 
           if (
             !this.editor.view.state.selection.empty ||
@@ -333,6 +289,13 @@ export default {
         },
       };
 
+      const saveContent = async (scrollToSelection, reload = false) => {
+        this.$emit("saveContent", reload);
+        setTimeout(() => {
+          this.$emit("contentScrollPosition", scrollToSelection);
+        }, 200);
+      };
+
       const editorInstance = new ContentEditor(
         this.isEditable,
         this.value.markup,
@@ -356,7 +319,6 @@ export default {
         setTimeout(() => {
           this.editor.commands.setNodeSelection(this.scrollToSelection);
           this.editor.commands.scrollIntoView();
-          //  this.editor.commands.focus(this.scrollToSelection);
           this.$emit("contentScrollPosition", null);
         });
       }
@@ -371,11 +333,14 @@ export default {
 
   mounted() {
     document.addEventListener("keydown", this.handleKeyup);
+    this.handleDebouncedScroll = debounce(this.onScroll, 100);
+    window.addEventListener("scroll", this.handleDebouncedScroll, true);
     this.initEditor();
   },
   beforeDestroy() {
     this.editor.destroy();
     document.removeEventListener("keydown", this.handleKeyup);
+    window.removeEventListener("scroll", this.handleDebouncedScroll, true);
   },
 };
 </script>
@@ -395,6 +360,7 @@ export default {
 .idea_editor_content {
   background: #fff;
   flex-grow: 1;
+  padding-bottom: 2rem;
   border-radius: 3px;
   max-height: calc(100% - 60px);
   height: 100%;
@@ -490,6 +456,9 @@ export default {
 /* Table */
 .ProseMirror {
   height: 100%;
+  & > :first-child {
+    margin-top: 0;
+  }
   table {
     border-collapse: collapse;
     table-layout: fixed;
@@ -566,6 +535,17 @@ export default {
     margin-top: 4px !important;
     margin-block-start: 4px !important;
     margin-block-end: 4px !important;
+  }
+
+  p > span.is-link:hover {
+    & > a {
+      background: #4294d0;
+      color: #fff !important;
+      & > span {
+        background: #4294d0;
+        color: #fff !important;
+      }
+    }
   }
 
   h1 > span.is-link,
@@ -660,7 +640,7 @@ export default {
       }
       &:hover {
         background: #4294d0;
-        color: #fff;
+        color: #fff !important;
       }
       &::before,
       &:hover::before {

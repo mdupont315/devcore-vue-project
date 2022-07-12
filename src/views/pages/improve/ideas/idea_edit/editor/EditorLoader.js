@@ -26,7 +26,8 @@ import {
   Paragraph,
   TrailingNode,
   CustomLink,
-  CustomUnderLine
+  CustomUnderLine,
+  FocusNode
 } from "./extensions";
 
 export default class ContentEditor {
@@ -37,12 +38,14 @@ export default class ContentEditor {
     fileHandlers,
     saveContent,
     commentHandlers,
-    linkHandlers
+    linkHandlers,
+    tableHandlers
   ) {
     this.editable = editable;
     this.content = value;
     this.options = options;
     this.fileHandlers = fileHandlers;
+    this.tableHandlers = tableHandlers;
     this.extensions = [
       StarterKit.configure({
         history: false,
@@ -121,6 +124,7 @@ export default class ContentEditor {
       CustomTable,
       EventHandler,
       TrailingNode,
+      FocusNode,
       File.configure({
         addFile: fileHandlers.addFile,
         removeFile: fileHandlers.removeFile,
@@ -167,11 +171,9 @@ export default class ContentEditor {
       },
 
       onTransaction: ({ editor, transaction }) => {
-
-        const isCommenting = transaction.getMeta('saveComment')
-
+        const isCommenting = transaction.getMeta("saveComment");
         if (isCommenting) {
-          console.log(transaction)
+          console.log(transaction);
         }
       },
 

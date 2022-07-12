@@ -258,9 +258,17 @@ export default {
       //   $anchor = $anchor.head;
       // }
 
+      // console.log(this.editor.extensionStorage.table)
+
+      this.editor.extensionStorage.table = {
+        rows: setRows,
+        cols: setCols,
+      };
+
       this.editor
         .chain()
         .focus($anchor)
+        .setMeta("createTableCols", setCols)
         .insertTable({ rows: setRows, cols: setCols, withHeaderRow: true })
         .run();
 
