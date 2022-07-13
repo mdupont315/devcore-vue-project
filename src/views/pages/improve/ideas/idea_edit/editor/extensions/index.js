@@ -3,11 +3,11 @@ export * from "./table";
 export * from "./indent";
 export * from "./customStyle";
 export * from "./eventHandler";
-export { default as ExternalVideo } from "./externalVideo";
-export * from "./file";
+export { default as ExternalVideo } from "./ExternalVideo";
+export * from "./File";
 export * from "./heading";
 export * from "./customLine";
-export * from './trailingNode'
+export * from './TrailingNode'
 export * from './customParagraph'
 export * from './customLink'
 export * from './focus'

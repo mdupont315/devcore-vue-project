@@ -54,9 +54,13 @@ export default {
       type: Boolean,
       default: () => false,
     },
-    isSaving: {
+    isInitialized: {
       type: Boolean,
       default: () => false,
+    },
+    contentWindowTop: {
+      type: Number,
+      default: () => null,
     },
     scrollToSelection: {
       type: Number,
@@ -71,15 +75,21 @@ export default {
   watch: {
     scrollToSelection: {
       handler(newVal) {
+        console.log(newVal);
         if (newVal) {
           this.focusEditor();
         }
       },
     },
+    windowTop: {
+      handler(newVal) {
+        console.log(newVal);
+        this.$emit("contentWindowTop", newVal);
+      },
+    },
     isEditable: {
       handler(newVal) {
         this.editor.setEditable(newVal);
-        console.log(newVal);
         if (newVal) {
           this.focusEditor();
         }
@@ -112,14 +122,15 @@ export default {
       return;
     },
     focusEditor() {
-      if (this.scrollToSelection) {
-        this.editor.commands.setNodeSelection(this.scrollToSelection);
-        this.editor.commands.scrollIntoView();
+      this.editor?.commands.focus();
+      // if (this.scrollToSelection) {
+      //   // this.editor.commands.setNodeSelection(this.scrollToSelection);
+      //   // this.editor.commands.scrollIntoView();
 
-        this.$emit("contentScrollPosition", null);
-      } else {
-        this.editor?.commands.focus();
-      }
+      //   this.$emit("contentScrollPosition", null);
+      // } else {
+
+      // }
     },
 
     initEditor() {
@@ -289,11 +300,8 @@ export default {
         },
       };
 
-      const saveContent = async (scrollToSelection, reload = false) => {
+      const saveContent = async (pos, reload = false) => {
         this.$emit("saveContent", reload);
-        setTimeout(() => {
-          this.$emit("contentScrollPosition", scrollToSelection);
-        }, 200);
       };
 
       const editorInstance = new ContentEditor(
@@ -315,12 +323,14 @@ export default {
 
       this.editor = editorInstance.editor;
       this.$emit("initialized");
-      if (this.scrollToSelection) {
+      if (this.contentWindowTop) {
         setTimeout(() => {
-          this.editor.commands.setNodeSelection(this.scrollToSelection);
-          this.editor.commands.scrollIntoView();
-          this.$emit("contentScrollPosition", null);
-        });
+          const refs = this.$refs["editor_content"];
+          if (refs && refs.$el) {
+            const container = this.$el.querySelector("#editor__content");
+            container.scrollTop = this.contentWindowTop;
+          }
+        }, 500);
       }
     },
     addParagraphAtEnd() {
@@ -348,6 +358,11 @@ export default {
 
 <style lang="scss" >
 /* Setup */
+
+#idea-edit-editor-container {
+  overflow: hidden;
+  overflow-y: scroll;
+}
 
 .editor__header {
   border-top: 1px solid lightgray;

@@ -166,7 +166,12 @@ export default class ContentEditor {
           //    const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
           const __formatHTML = formatHTML.replace(/ style(.*?)">/g, ">");
           const ___formatHTML = __formatHTML.replace(/<br>/g, " ");
-          return ___formatHTML;
+          const ____formatHTML = ___formatHTML.replace(/\<head[^>]*\>([^]*)\<\/head/g, '');
+          const _____formatHTML = ____formatHTML.replace(/\<script[^>]*\>([^]*)\<\/script/g, '');
+
+          console.log(_____formatHTML)
+
+          return _____formatHTML;
         }
       },
 

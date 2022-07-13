@@ -68,16 +68,15 @@
 
     <idea-content-editor
       v-if="!isLoading"
-      :isEditable="isEditable"
+      :isEditable="isEditable && isInitialized"
       v-model="getIdeaContent"
       :idea="idea"
-      :isSaving="isSaving"
       @fileAdded="setFile"
       @fileRemoved="removeFile"
       @saveContent="saveContent"
       @initialized="setIsInitialized"
-      @contentScrollPosition="setContentScrollPosition"
-      :scrollToSelection="contentScrollPosition"
+			@contentWindowTop="setContentWindowTop"
+			:contentWindowTop="contentWindowTop"
       :contentType="contentType"
     />
     <div v-else class="ideaContent-empty-spinner">
@@ -113,7 +112,7 @@ export default {
     },
     isSaving: {
       type: Boolean,
-      default: true,
+      default: false,
     },
 
     selectedCategoryIndex: {
@@ -144,12 +143,13 @@ export default {
     isEditable: false,
     isInitialized: false,
     newType: "",
-    contentScrollPosition: null,
+		contentWindowTop: null
   }),
   methods: {
-    setContentScrollPosition(val) {
-      this.contentScrollPosition = val;
-    },
+		setContentWindowTop(scrollTop){
+			this.contentWindowTop = scrollTop
+		},
+
     setIsInitialized() {
       this.isEditable = true;
       this.isInitialized = true;

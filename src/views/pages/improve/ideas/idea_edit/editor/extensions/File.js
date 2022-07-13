@@ -99,6 +99,13 @@ export const File = Node.create({
           return el.getAttribute("uuid");
         },
         renderHTML: attrs => ({ uuid: attrs.uuid })
+      },
+      height: {
+        default: null,
+        parseHTML: el => {
+          return el.getAttribute("height");
+        },
+        renderHTML: attrs => ({ uuid: attrs.height })
       }
     };
   },
@@ -117,7 +124,8 @@ export const File = Node.create({
           style: dom.getAttribute("style"),
           type: dom.getAttribute("type"),
           preview: dom.getAttribute("preview"),
-          uuid: dom.getAttribute("uuid")
+          uuid: dom.getAttribute("uuid"),
+          height: dom.getAttribute("height"),
         };
         if (obj.src) return obj;
       }

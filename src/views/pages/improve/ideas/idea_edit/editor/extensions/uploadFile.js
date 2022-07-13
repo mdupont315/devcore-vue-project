@@ -15,6 +15,7 @@ const renderFileInBase64ToCoordinates = (
 
   const reader = new FileReader();
   reader.onload = readerEvent => {
+    console.log(item)
     const node = schema.nodes.file.create({
       src: readerEvent.target?.result,
       title: item.name,
@@ -63,6 +64,7 @@ const uploadFilePlugin = (addFile, notify) => {
             if (valid) {
               const uuid = uuidv4();
               addFile({ uuid, file: transformedFile });
+              console.log(transformedFile)
               renderFileInBase64ToCoordinates(
                 transformedFile,
                 view,
