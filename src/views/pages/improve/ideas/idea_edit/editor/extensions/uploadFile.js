@@ -1,6 +1,9 @@
 import { Plugin } from "prosemirror-state";
 import { v4 as uuidv4 } from "uuid";
-import { fileWithUniqueName, validateFileSize } from "./helpers/file/fileUtils";
+import {
+  fileWithUniqueName,
+  validateFileSize,
+} from "./helpers/file/fileUtils";
 
 const renderFileInBase64ToCoordinates = (
   item,
@@ -14,8 +17,8 @@ const renderFileInBase64ToCoordinates = (
   const { schema } = view.state;
 
   const reader = new FileReader();
+
   reader.onload = readerEvent => {
-    console.log(item)
     const node = schema.nodes.file.create({
       src: readerEvent.target?.result,
       title: item.name,
@@ -59,12 +62,13 @@ const uploadFilePlugin = (addFile, notify) => {
 
             const itemAsFile = item.getAsFile();
             const transformedFile = fileWithUniqueName(view, itemAsFile);
-           // const transformedFile = itemAsFile;
+            // const transformedFile = itemAsFile;
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {
               const uuid = uuidv4();
-              addFile({ uuid, file: transformedFile });
-              console.log(transformedFile)
+
+             // addFile({ uuid, file: transformedFile });
+            //  console.log(transformedFile);
               renderFileInBase64ToCoordinates(
                 transformedFile,
                 view,
@@ -72,11 +76,41 @@ const uploadFilePlugin = (addFile, notify) => {
                 preview,
                 uuid
               );
+
+              // console.log("file: ", transformedFile);
+
+              // const toBase64 = getBase64FromFile(transformedFile);
+              //     //TODO: resizedFile is malformed and cant be loaded by ui
+              //     // Handle resize here instead of in file component
+              //     // or move addFile function to vue component
+
+              // toBase64.then(base64String => {
+              //   console.log("base64", base64String);
+              //   const { name, type } = transformedFile;
+              //   console.log("attrs", name, type);
+              //   base64Resize(base64String, 600, (str) => {
+              //     const resizedFile = base64ToFile(str, {
+              //       name,
+              //       type
+              //     });
+              //     console.log("resizedFile: ", resizedFile);
+
+              //     addFile({ uuid, file: resizedFile });
+
+              //     renderFileInBase64ToCoordinates(
+              //       resizedFile,
+              //       view,
+              //       coordinates,
+              //       preview,
+              //       uuid
+              //     );
+              //   });
+              // });
             }
           } else {
             const preview = false;
             const itemAsFile = item.getAsFile();
-          //  const transformedFile = itemAsFile;
+            //  const transformedFile = itemAsFile;
             const transformedFile = fileWithUniqueName(view, itemAsFile);
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {
@@ -123,7 +157,7 @@ const uploadFilePlugin = (addFile, notify) => {
               if (valid) {
                 const uuid = uuidv4();
                 const transformedFile = fileWithUniqueName(view, item);
-                addFile({ uuid, file: transformedFile });
+              //  addFile({ uuid, file: transformedFile });
                 renderFileInBase64ToCoordinates(
                   transformedFile,
                   view,

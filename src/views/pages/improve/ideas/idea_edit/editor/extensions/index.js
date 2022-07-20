@@ -12,5 +12,6 @@ export * from './customParagraph'
 export * from './customLink'
 export * from './focus'
 export * from './customUnderLine'
+export * from './position'
 export { default as Draggable } from "./draggable";
 export * from './plugins/selectionDecorator'

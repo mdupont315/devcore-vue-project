@@ -9,10 +9,14 @@
       >
         <div style="margin-right: 5px; margin-bottom: 10px">
           <img
+            :ref="`${getAttrs.uuid}`"
             :src="getAttrs.src"
             :alt="getAttrs.title"
-            style="width: 30%; height: 30%"
+            @load="loadedImg"
+            style="max-height: 65vh; max-width: 50%"
+            :style="{ width: imgWidth, height: imgHeight }"
           />
+          <!--             style="width: 30%; height: 30%" -->
         </div>
         <button @click="remove" class="file-remove-button">
           {{ $t("Remove") }}
@@ -30,11 +34,13 @@
           </b-tooltip>
           <div
             class="attachment-file-non-preview-container"
-						:id="`attachment-file-non-preview-container-${getAttrs.title}`"
-            :class="!!getAttrs.href === true ? 'is_uploaded_file' : 'is_not_uploaded_file'"
+            :id="`attachment-file-non-preview-container-${getAttrs.title}`"
+            :class="
+              !!getAttrs.href === true
+                ? 'is_uploaded_file'
+                : 'is_not_uploaded_file'
+            "
           >
-            <!--          v-b-tooltip.hover
-            :title="$t('Download file')" -->
             <a :href="getAttrs.href">
               <svg
                 width="17"
@@ -48,7 +54,6 @@
                   fill="#4294D0"
                 />
               </svg>
-
 
               <span style="margin-left: 10px">{{ getAttrs.title }}</span></a
             >
@@ -71,6 +76,14 @@
 <script>
 import { NodeViewWrapper, nodeViewProps, NodeViewContent } from "@tiptap/vue-2";
 import { FolderIcon } from "@/assets";
+import { PREVIEW_MAX_WIDTH_OF_VIEWPORT } from "./helpers/file/constants";
+import { v4 as uuidv4 } from "uuid";
+import {
+  base64Resize,
+  isValidExternalUrl,
+  getBase64FromUrl,
+  base64MimeType,
+} from "./helpers/file/fileUtils";
 
 export default {
   components: {
@@ -85,7 +98,10 @@ export default {
   data() {
     return {
       FolderIcon,
-			disableTooltip: false
+      disableTooltip: false,
+      resizedImages: [],
+      imgWidth: "50%",
+      imgHeight: "auto",
     };
   },
 
@@ -99,62 +115,127 @@ export default {
     },
   },
   async mounted() {
-		console.log("mounted")
-    await this.transformFilesIfPastedExternalUrls();
+    console.log("MOUNTED");
+    //TODO: Gifs are resized even if the node view is updated
+    // Causes gifs to reload on UI
+		// exclude https://homestead etc urls from isValidExternalUrl Regex
+
+    console.log(this.node.attrs);
+
+    if (
+      !this.node.attrs.href &&
+      this.node.attrs.src &&
+      isValidExternalUrl(this.node.attrs.src)
+    ) {
+      await this.transformFilesIfPastedExternalUrls();
+    }
   },
   beforeDestroy() {
     this.editor.commands.removeFile(this.fileEntity);
   },
-  watch: {
-    fileEntity: {
-      immediate: true,
-      deep: true,
-      handler(newVal) {
-        if (newVal && newVal.src) {
-          if (this.isValidExternalUrl(newVal.src)) {
-            this.transformFilesIfPastedExternalUrls();
-          }
-        }
-      },
-    },
-  },
   methods: {
+    async addBase64AsFile(dataUrl, type) {
+      const toFile = await fetch(dataUrl);
+      const blob = await toFile.blob();
+
+      const file = new File([blob], this.node.attrs.title, {
+        type: type,
+      });
+
+      this.extension.options.addFile({
+        uuid: this.node.attrs.uuid ?? uuidv4(),
+        file: file,
+      });
+    },
+    async loadedImg(e) {
+      console.log(e);
+      const dataUrl = this.getAttrs.src;
+      const type = this.node.attrs.type ?? base64MimeType(dataUrl);
+
+      if (this.resizedImages.includes(this.node.attrs.uuid)) {
+        return;
+      }
+
+      console.log(isValidExternalUrl(dataUrl));
+
+      const mod = dataUrl.slice(-2) === "==" ? 2 : 1;
+      const size = dataUrl.length * (3 / 4) - mod;
+
+      const callback = async (dataUrl) => {
+        this.updateAttributes({
+          src: dataUrl,
+          preview: true,
+          size,
+          type,
+        });
+
+        await this.addBase64AsFile(dataUrl, type);
+      };
+      await this.handleResizedImage(dataUrl, type, callback);
+      this.resizedImages.push(this.node.attrs.uuid);
+      const { clientHeight: domHeight } = this.editor.view.dom.parentElement;
+      const { clientHeight } = e.path[0];
+      const allowedMaxHeight = domHeight * 0.9;
+
+      if (clientHeight > allowedMaxHeight) {
+        this.imgWidth = "auto";
+        this.imgHeight = "80vh";
+      }
+    },
+
+    async handleResizedImage(dataUrl, type, callback) {
+      const scaleWidthUntilPX =
+        this.$el.clientWidth * PREVIEW_MAX_WIDTH_OF_VIEWPORT;
+      base64Resize(dataUrl, scaleWidthUntilPX, type, callback);
+    },
     async transformFilesIfPastedExternalUrls() {
-      if (
-        !this.node.attrs.size &&
-        this.node.attrs.src &&
-        this.isValidExternalUrl(this.node.attrs.src)
-      ) {
-        const externalToBase64 = await this.getBase64FromUrl(
-          this.node.attrs.src
-        );
+      console.log("ATTRIBUTES!");
+      console.log(this.node.attrs);
+      if (!this.node.attrs.size) {
+        if (!this.node.attrs.src) return;
+        let externalToBase64 = "";
+        console.log("IS INSIDE!");
+        try {
+          externalToBase64 = await getBase64FromUrl(this.node.attrs.src);
+        } catch (e) {
+          console.log(e);
+          this.extension.options.notify("Copying content prohibited", {
+            site: this.node.attrs.src,
+          });
+          this.deleteNode();
+          return;
+        }
+        const type = this.node.attrs.type ?? base64MimeType(externalToBase64);
 
         const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;
         const size = externalToBase64.length * (3 / 4) - mod;
 
-        this.updateAttributes({
-          src: externalToBase64,
-          preview: true,
-          size,
-        });
-      }
-    },
-    isValidExternalUrl(url) {
-      const regexp =
-        /^(ftp|http|https|chrome|:\/\/|\.|@){2,}(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\S*:\w*@)*([a-zA-Z]|(\d{1,3}|\.){7}){1,}(\w|\.{2,}|\.[a-zA-Z]{2,3}|\/|\?|&|:\d|@|=|\/|\(.*\)|#|-|%)*$/gmu;
-      return regexp.test(url);
-    },
-    async getBase64FromUrl(url) {
-      const data = await fetch(url);
-      const blob = await data.blob();
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = () => {
-          const base64data = reader.result;
-          resolve(base64data);
+        const isGif = type === "image/gif";
+
+        if (isGif) {
+          this.updateAttributes({
+            src: externalToBase64,
+            type,
+            preview: true,
+            size,
+          });
+          this.resizedImages.push(this.node.attrs.uuid);
+          return await this.addBase64AsFile(externalToBase64, type);
+        }
+
+        const callback = async (dataUrl) => {
+          this.updateAttributes({
+            src: dataUrl,
+            type,
+            preview: true,
+            size,
+          });
+          await this.addBase64AsFile(dataUrl, type);
         };
-      });
+        this.resizedImages.push(this.node.attrs.uuid);
+
+        return await this.handleResizedImage(externalToBase64, type, callback);
+      }
     },
     remove() {
       const { editor, getPos, node } = this;

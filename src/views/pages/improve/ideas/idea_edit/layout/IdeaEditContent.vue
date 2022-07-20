@@ -67,8 +67,10 @@
     </div>
 
     <idea-content-editor
-      v-if="!isLoading"
+      v-show="!isLoading"
       :isEditable="isEditable && isInitialized"
+			:isRefreshing="isSaving && isLoading"
+			:isInitialized="isInitialized"
       v-model="getIdeaContent"
       :idea="idea"
       @fileAdded="setFile"
@@ -79,7 +81,7 @@
 			:contentWindowTop="contentWindowTop"
       :contentType="contentType"
     />
-    <div v-else class="ideaContent-empty-spinner">
+    <div v-show="isLoading" class="ideaContent-empty-spinner">
       <b-spinner />
     </div>
   </div>

@@ -1,33 +1,9 @@
-import { FILE_SIZE_LIMIT } from "./constants";
-
-// const addCounterToFileName = (name, counter) => {
-//   const splitFileName = name.split(".").pop();
-//   let fileName = name.replace(`.${splitFileName}`, "");
-//   const chars = [...fileName];
-//   let index = 0;
-//   console.log(counter);
-//   if (counter > 0) {
-//     let copyNumber = 0;
-//     for (var i = chars.length; i > 0; i--) {
-//       if (chars[i] === "(") {
-//         index = i;
-//         break;
-//       } else {
-//         index = chars.length;
-//       }
-//     }
-//     let parseCopyNumber = chars.slice(index, chars.length);
-//     fileName = chars.slice(0, index).join("");
-//     copyNumber = parseInt(parseCopyNumber.join("").replace(/\D/g, ""));
-//     console.log(copyNumber);
-//     if (Number.isNaN(copyNumber)) {
-//       return `${fileName}(1).${splitFileName}`;
-//     }
-//     return `${fileName}(${copyNumber + 1}).${splitFileName}`;
-//   } else {
-//     return `${fileName}(1).${splitFileName}`;
-//   }
-// };
+import {
+  FILE_SIZE_LIMIT,
+  VALID_EXTERNAL_URL_REGEX,
+  VALID_BASE64URL_REGEX,
+  SUPPORTED_PREVIEW_IMAGE_TYPES
+} from "./constants";
 
 const addCounterToFileName = (name, counter) => {
   const fileName = getFileName(name);
@@ -51,28 +27,6 @@ const getSimilarNamesFromContent = (fileNodes, name) => {
     );
   });
 };
-
-// const findUniqueName = (items, name) => {
-//   return new Promise(resolve => {
-//     let counter = 0;
-//     const isUnique = (items, name) => {
-//       return items.filter(node => node.attrs.title === name).length === 0;
-//     };
-
-//     const recurse = (items, name) => {
-//       if (isUnique(items, name)) {
-//         return resolve(name);
-//       } else {
-//         let newName = name;
-//         newName = addCounterToFileName(name, counter);
-//         counter += 1;
-//         recurse(items, newName);
-//       }
-//     };
-
-//     return recurse(items, name);
-//   });
-// };
 
 const findUniqueName = (items, name) => {
   let fileNames = items.length > 0 ? items.map(node => node.attrs.title) : [];
@@ -113,14 +67,131 @@ const fileWithUniqueName = (view, originalFile) => {
   });
 };
 
+const formatFileSize = (bytes, decimalPoint) => {
+  if (bytes == 0) return "0 Bytes";
+  const k = 1000;
+  const dm = decimalPoint || 2;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+};
+
 const validateFileSize = (notify, file) => {
   let valid = true;
+
   if (file.size > FILE_SIZE_LIMIT) {
-    notify(file, FILE_SIZE_LIMIT);
+    const data = {
+      file: file.name,
+      size: formatFileSize(file.size, 2),
+      limit: formatFileSize(FILE_SIZE_LIMIT)
+    };
+    notify("File size too big", data);
     console.log("ERROR, File size too big!");
     valid = false;
   }
   return valid;
 };
 
-export { fileWithUniqueName, validateFileSize, getUniqueFileName };
+const base64Resize = (sourceBase64, toWidth, _type, callback) => {
+  let type = _type;
+
+  console.log("resizing: ", type);
+
+  if (!SUPPORTED_PREVIEW_IMAGE_TYPES.includes(type)) {
+
+    console.log("not supported type")
+    return;
+  }
+
+  const img = document.createElement("img");
+  img.setAttribute("src", sourceBase64);
+
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    const scale = toWidth / img.width;
+
+    canvas.width = img.width * scale;
+    canvas.height = img.height * scale;
+
+    const ctx = canvas.getContext("2d");
+    const maxW = img.width * scale;
+    const maxH = img.height * scale;
+
+    const iw = img.width;
+    const ih = img.height;
+    const scl = Math.min(maxW / iw, maxH / ih);
+    const iwScaled = iw * scl;
+    const ihScaled = ih * scl;
+    canvas.width = iwScaled;
+    canvas.height = ihScaled;
+    ctx.drawImage(img, 0, 0, iwScaled, ihScaled);
+    const newBase64 = canvas.toDataURL(type, scl);
+
+    callback(newBase64);
+  };
+};
+
+const isValidExternalUrl = url => {
+  return VALID_EXTERNAL_URL_REGEX.test(url);
+};
+
+const isBase64 = url => {
+  return VALID_BASE64URL_REGEX.test(url);
+};
+
+const getBase64FromUrl = async url => {
+  const data = await fetch(url);
+  const blob = await data.blob();
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = () => {
+      const base64data = reader.result;
+      resolve(base64data);
+    };
+  });
+};
+
+const base64MimeType = base64String => {
+  var result = null;
+
+  if (typeof base64String !== "string") {
+    return result;
+  }
+
+  var mime = base64String.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
+
+  if (mime && mime.length) {
+    result = mime[1];
+  }
+
+  return result;
+};
+
+const base64ToFile = (base64String, properties) => {
+  const { name, type } = properties;
+  const file = new File([new Blob([base64String])], name, { type });
+  return file;
+};
+
+const getBase64FromFile = file => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+};
+
+export {
+  fileWithUniqueName,
+  validateFileSize,
+  getUniqueFileName,
+  base64Resize,
+  isValidExternalUrl,
+  getBase64FromUrl,
+  isBase64,
+  getBase64FromFile,
+  base64MimeType,
+  base64ToFile
+};

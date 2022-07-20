@@ -27,7 +27,8 @@ import {
   TrailingNode,
   CustomLink,
   CustomUnderLine,
-  FocusNode
+  FocusNode,
+  Position
 } from "./extensions";
 
 export default class ContentEditor {
@@ -56,17 +57,9 @@ export default class ContentEditor {
         bold: false,
         code: false,
         codeBlock: false
-        // hardBreak: false
       }),
+      Position,
       Paragraph,
-      // HardBreak.extend({
-      //   addKeyboardShortcuts() {
-      //     return {
-      //       "Mod-Enter": () => this.editor.commands.addNewLine(),
-      //       "Shift-Enter": () => this.editor.commands.addNewLine()
-      //     };
-      //   }
-      // }),
       Italic.extend({
         addInputRules() {
           return [];
@@ -166,19 +159,10 @@ export default class ContentEditor {
           //    const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
           const __formatHTML = formatHTML.replace(/ style(.*?)">/g, ">");
           const ___formatHTML = __formatHTML.replace(/<br>/g, " ");
-          const ____formatHTML = ___formatHTML.replace(/\<head[^>]*\>([^]*)\<\/head/g, '');
-          const _____formatHTML = ____formatHTML.replace(/\<script[^>]*\>([^]*)\<\/script/g, '');
+          //  const ____formatHTML = ___formatHTML.replace(/\<head[^>]*\>([^]*)\<\/head/g, '');
+          //  const _____formatHTML = ____formatHTML.replace(/\<script[^>]*\>([^]*)\<\/script>/g, '');
 
-          console.log(_____formatHTML)
-
-          return _____formatHTML;
-        }
-      },
-
-      onTransaction: ({ editor, transaction }) => {
-        const isCommenting = transaction.getMeta("saveComment");
-        if (isCommenting) {
-          console.log(transaction);
+          return ___formatHTML;
         }
       },
 

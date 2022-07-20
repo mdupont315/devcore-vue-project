@@ -54,15 +54,15 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    isRefreshing: {
+      type: Boolean,
+      default: () => false,
+    },
     isInitialized: {
       type: Boolean,
       default: () => false,
     },
     contentWindowTop: {
-      type: Number,
-      default: () => null,
-    },
-    scrollToSelection: {
       type: Number,
       default: () => null,
     },
@@ -73,17 +73,26 @@ export default {
     }),
   },
   watch: {
-    scrollToSelection: {
+    value: {
       handler(newVal) {
-        console.log(newVal);
-        if (newVal) {
-          this.focusEditor();
+        if (this.editor) {
+          if (this.editor.isEmpty) {
+            this.editor.commands.setContent(newVal.markup);
+          }
+        }
+      },
+    },
+    isRefreshing: {
+      handler(refreshing) {
+        if (this.editor) {
+          if (!refreshing) {
+            this.editor.commands.setContent(this.value.markup);
+          }
         }
       },
     },
     windowTop: {
       handler(newVal) {
-        console.log(newVal);
         this.$emit("contentWindowTop", newVal);
       },
     },
@@ -110,6 +119,10 @@ export default {
   methods: {
     onScroll(e) {
       this.windowTop = e.srcElement.scrollTop;
+
+      if (this.editor) {
+        this.editor.storage.scrollPosition = this.windowTop ?? 0;
+      }
     },
     setIsModalView(val) {
       this.isModalView = val;
@@ -123,14 +136,6 @@ export default {
     },
     focusEditor() {
       this.editor?.commands.focus();
-      // if (this.scrollToSelection) {
-      //   // this.editor.commands.setNodeSelection(this.scrollToSelection);
-      //   // this.editor.commands.scrollIntoView();
-
-      //   this.$emit("contentScrollPosition", null);
-      // } else {
-
-      // }
     },
 
     initEditor() {
@@ -192,22 +197,9 @@ export default {
         removeFile: (file) => {
           this.$emit("fileRemoved", file);
         },
-        notify: (file, limit) => {
-          const formatSize = (bytes, decimalPoint) => {
-            if (bytes == 0) return "0 Bytes";
-            var k = 1000,
-              dm = decimalPoint || 2,
-              sizes = ["Bytes", "KB", "MB", "GB"],
-              i = Math.floor(Math.log(bytes) / Math.log(k));
-            return (
-              parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
-            );
-          };
-
-          const message = this.$t("File size too big", {
-            file: file.name,
-            size: formatSize(file.size, 2),
-            limit: formatSize(limit),
+        notify: (translationKey, data) => {
+          const message = this.$t(translationKey, {
+            ...data,
           });
           window.vm.$snotify.error(window.vm.$t(message));
         },

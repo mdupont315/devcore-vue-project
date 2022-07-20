@@ -478,7 +478,6 @@ export default {
 
           const contentForm =
             this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
-          console.log(contentForm);
 
           let markup = contentForm.markup;
 
