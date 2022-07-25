@@ -13,7 +13,6 @@ import ListItem from "@tiptap/extension-list-item";
 import Typography from "@tiptap/extension-typography";
 import Italic from "@tiptap/extension-italic";
 import Bold from "@tiptap/extension-bold";
-
 import { Color } from "@tiptap/extension-color";
 import {
   Indent,
@@ -153,16 +152,57 @@ export default class ContentEditor {
           return formatHTML;
         },
         transformPastedHTML(html) {
-          const formatHTML = html.replace(/&nbsp;/g, " ");
+          const formatHTML = html
+            .replace(/&nbsp;/g, "")
+            .replace(/ comment(.*?)">/g, ">");
 
           //Remove comments
-          //    const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
-          const __formatHTML = formatHTML.replace(/ style(.*?)">/g, ">");
-          const ___formatHTML = __formatHTML.replace(/<br>/g, " ");
+          const formatHTML1 = formatHTML.replace(/<\/?style(.*?)">/g, "");
+          const formatHTML2 = formatHTML1.replace(/<br>/g, " ");
+         // const formatHTML3 = formatHTML2.replace(/<\/?p[^>]*>/g, "");
+          // const formatHTMLX = formatHTML3.replace(
+          //   /(<p[^>]*>)[^>]*(<img)/g,
+          //   "img"
+          // );
+        // const formatHTML4 = formatHTML2.replace(/<\/?span[^>]*>/g, "");
+
+          // // console.log(formatHTML1);
+          // const parser = new DOMParser();
+          // const temp_node = parser.parseFromString(formatHTML2, "text/html")
+          //   .body;
+          //   const imgs = temp_node.getElementsByTagName('img')
+          //   const paragraphs = temp_node.getElementsByTagName('p')
+          // console.log({imgs});
+          // console.log({paragraphs});
+          // console.log(temp_node.childNodes);
+
+
+
+          // TODO: Test if images can be stripped out from <p><span></span></span_></p>
+
           //  const ____formatHTML = ___formatHTML.replace(/\<head[^>]*\>([^]*)\<\/head/g, '');
           //  const _____formatHTML = ____formatHTML.replace(/\<script[^>]*\>([^]*)\<\/script>/g, '');
 
-          return ___formatHTML;
+          // const ast = parse(____formatHTML);
+          // let res = ""
+
+          // walk(ast, {
+          //   enter: (node) => {
+          //     console.log(node)
+          //     if (node.type === SyntaxKind.Tag && node.name === 'title' && Array.isArray(node.body)) {
+          //       const text = node.body[0];
+          //       if (text.type !== SyntaxKind.Text) {
+          //         return;
+          //       }
+          //       const div = document.createElement('div');
+          //       div.innerHTML = `The title of the input is <strong>${text.value}</strong>`;
+          //       res = div;
+          //     }
+          //   },
+          // });
+          // console.log(res)
+
+          return formatHTML2;
         }
       },
 

@@ -2,7 +2,7 @@ import {
   FILE_SIZE_LIMIT,
   VALID_EXTERNAL_URL_REGEX,
   VALID_BASE64URL_REGEX,
-  SUPPORTED_PREVIEW_IMAGE_TYPES
+  SUPPORTED_PREVIEW_RESIZE_IMAGE_TYPES
 } from "./constants";
 
 const addCounterToFileName = (name, counter) => {
@@ -95,11 +95,8 @@ const validateFileSize = (notify, file) => {
 const base64Resize = (sourceBase64, toWidth, _type, callback) => {
   let type = _type;
 
-  console.log("resizing: ", type);
-
-  if (!SUPPORTED_PREVIEW_IMAGE_TYPES.includes(type)) {
-
-    console.log("not supported type")
+  if (!SUPPORTED_PREVIEW_RESIZE_IMAGE_TYPES.includes(type)) {
+    callback(sourceBase64);
     return;
   }
 
@@ -129,6 +126,9 @@ const base64Resize = (sourceBase64, toWidth, _type, callback) => {
 
     callback(newBase64);
   };
+  img.onerror = function() {
+    console.log('Could not resize image');
+};
 };
 
 const isValidExternalUrl = url => {

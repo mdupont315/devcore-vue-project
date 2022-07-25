@@ -36,6 +36,7 @@ import IdeaEditPath from "./layout/IdeaEditPath.vue";
 import GQLForm from "@/lib/gqlform";
 import { mapGetters } from "vuex";
 import { Idea } from "@/models";
+import { VALID_EXTERNAL_URL_REGEX } from './editor/extensions/helpers/file/constants'
 
 export default {
   components: {
@@ -332,6 +333,7 @@ export default {
     },
 
     async saveIdea() {
+			console.log(this.files)
       this.ideaForm._fields.file = this.files
         .map((fileEntity) => fileEntity.file)
         .filter((x) => x.size && !x.uri);

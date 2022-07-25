@@ -71,7 +71,6 @@ export const CustomLink = Mark.create({
       uuid: {
         default: null,
         parseHTML: el => {
-          console.log(el);
           return el.getAttribute("uuid");
         },
         renderHTML: attrs => ({ uuid: attrs.uuid })

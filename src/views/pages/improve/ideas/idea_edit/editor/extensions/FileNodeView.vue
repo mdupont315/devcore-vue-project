@@ -115,18 +115,11 @@ export default {
     },
   },
   async mounted() {
-    console.log("MOUNTED");
-    //TODO: Gifs are resized even if the node view is updated
-    // Causes gifs to reload on UI
-		// exclude https://homestead etc urls from isValidExternalUrl Regex
+		console.log(this.node.attrs)
+    const isStagedFile =
+      !this.node.attrs.href && this.node.attrs.src && !this.node.attrs.id;
 
-    console.log(this.node.attrs);
-
-    if (
-      !this.node.attrs.href &&
-      this.node.attrs.src &&
-      isValidExternalUrl(this.node.attrs.src)
-    ) {
+    if (isStagedFile && isValidExternalUrl(this.node.attrs.src)) {
       await this.transformFilesIfPastedExternalUrls();
     }
   },
@@ -148,15 +141,17 @@ export default {
       });
     },
     async loadedImg(e) {
-      console.log(e);
+
+      const isStagedFile =
+        !this.node.attrs.href && this.node.attrs.src && !this.node.attrs.id;
+      if (!isStagedFile) return;
+
       const dataUrl = this.getAttrs.src;
       const type = this.node.attrs.type ?? base64MimeType(dataUrl);
 
       if (this.resizedImages.includes(this.node.attrs.uuid)) {
         return;
       }
-
-      console.log(isValidExternalUrl(dataUrl));
 
       const mod = dataUrl.slice(-2) === "==" ? 2 : 1;
       const size = dataUrl.length * (3 / 4) - mod;
@@ -189,12 +184,9 @@ export default {
       base64Resize(dataUrl, scaleWidthUntilPX, type, callback);
     },
     async transformFilesIfPastedExternalUrls() {
-      console.log("ATTRIBUTES!");
-      console.log(this.node.attrs);
       if (!this.node.attrs.size) {
         if (!this.node.attrs.src) return;
         let externalToBase64 = "";
-        console.log("IS INSIDE!");
         try {
           externalToBase64 = await getBase64FromUrl(this.node.attrs.src);
         } catch (e) {

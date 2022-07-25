@@ -15,6 +15,7 @@ const IMAGE_INPUT_REGEX = /!\[(.+|:?)\]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
 export const File = Node.create({
   name: "file",
 
+
   addOptions() {
     return {
       inline: false,
