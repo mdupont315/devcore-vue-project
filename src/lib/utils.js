@@ -43,8 +43,7 @@ export function blockUi() {
 }
 
 export function checkIsMobile() {
-  if (window.matchMedia("(min-width: 768px)").matches) {
-  } else {
+  if (!window.matchMedia("(min-width: 768px)").matches) {
     window.location = `${process.env.VUE_APP_MOBILE_URL}`;
   }
 }
