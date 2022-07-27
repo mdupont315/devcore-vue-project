@@ -164,7 +164,7 @@ export default class ContentEditor {
           //   /(<p[^>]*>)[^>]*(<img)/g,
           //   "img"
           // );
-        // const formatHTML4 = formatHTML2.replace(/<\/?span[^>]*>/g, "");
+        const formatHTML4 = formatHTML2.replace(/<\/?span[^>]*>/g, "");
 
           // // console.log(formatHTML1);
           // const parser = new DOMParser();
@@ -202,7 +202,7 @@ export default class ContentEditor {
           // });
           // console.log(res)
 
-          return formatHTML2;
+          return formatHTML4;
         }
       },
 

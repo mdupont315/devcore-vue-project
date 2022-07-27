@@ -36,7 +36,6 @@ import IdeaEditPath from "./layout/IdeaEditPath.vue";
 import GQLForm from "@/lib/gqlform";
 import { mapGetters } from "vuex";
 import { Idea } from "@/models";
-import { VALID_EXTERNAL_URL_REGEX } from './editor/extensions/helpers/file/constants'
 
 export default {
   components: {

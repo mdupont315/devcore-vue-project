@@ -6,15 +6,20 @@
           class="editor__header"
           :editor="editor"
           @modalOpen="setIsModalView"
+          :isEditable="isEditable"
         />
       </div>
       <editor-content
+        v-show="!isRefreshing"
         class="editor__content"
         id="editor__content"
         :editor="editor"
         style="min-height: 70vh"
         ref="editor_content"
       />
+      <div v-show="isRefreshing" class="ideaContent-empty-spinner">
+        <b-spinner />
+      </div>
 
       <div class="editor__footer"></div>
     </div>
@@ -349,6 +354,25 @@ export default {
 
 
 <style lang="scss" >
+
+.ideaContent-empty-spinner {
+  text-align: center;
+  height: 100vh;
+  border-radius: 3px;
+  display: flex;
+  place-content: center;
+  align-items: center;
+  background: #fff;
+  width: 100%;
+  & > span {
+    width: 40px;
+    margin-bottom: 100px;
+    color: lightgray;
+    height: 40px;
+    background: #fff;
+  }
+}
+
 /* Setup */
 
 #idea-edit-editor-container {
@@ -400,6 +424,9 @@ export default {
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+		& > #idea-edit-editor-container {
+			padding: 5px;
+		}
   }
 
   &__footer {

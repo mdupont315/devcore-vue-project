@@ -82,7 +82,7 @@ import {
   base64Resize,
   isValidExternalUrl,
   getBase64FromUrl,
-  base64MimeType,
+  base64MimeType
 } from "./helpers/file/fileUtils";
 
 export default {
@@ -115,12 +115,13 @@ export default {
     },
   },
   async mounted() {
-		console.log(this.node.attrs)
-    const isStagedFile =
+    const isStagedPreviewFile =
       !this.node.attrs.href && this.node.attrs.src && !this.node.attrs.id;
 
-    if (isStagedFile && isValidExternalUrl(this.node.attrs.src)) {
-      await this.transformFilesIfPastedExternalUrls();
+    if (isStagedPreviewFile) {
+      if (isValidExternalUrl(this.node.attrs.src)) {
+        await this.transformFilesIfPastedExternalUrls();
+      }
     }
   },
   beforeDestroy() {
@@ -140,8 +141,7 @@ export default {
         file: file,
       });
     },
-    async loadedImg(e) {
-
+    async resizeImage() {
       const isStagedFile =
         !this.node.attrs.href && this.node.attrs.src && !this.node.attrs.id;
       if (!isStagedFile) return;
@@ -168,6 +168,10 @@ export default {
       };
       await this.handleResizedImage(dataUrl, type, callback);
       this.resizedImages.push(this.node.attrs.uuid);
+    },
+    async loadedImg(e) {
+      await this.resizeImage();
+
       const { clientHeight: domHeight } = this.editor.view.dom.parentElement;
       const { clientHeight } = e.path[0];
       const allowedMaxHeight = domHeight * 0.9;
@@ -184,7 +188,8 @@ export default {
       base64Resize(dataUrl, scaleWidthUntilPX, type, callback);
     },
     async transformFilesIfPastedExternalUrls() {
-      if (!this.node.attrs.size) {
+      const size = this.node.attrs.size;
+      if (!size || typeof size === "string") {
         if (!this.node.attrs.src) return;
         let externalToBase64 = "";
         try {
@@ -197,6 +202,7 @@ export default {
           this.deleteNode();
           return;
         }
+
         const type = this.node.attrs.type ?? base64MimeType(externalToBase64);
 
         const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;

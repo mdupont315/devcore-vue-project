@@ -42,6 +42,13 @@ export function blockUi() {
   checkIfNeedBlock();
 }
 
+export function checkIsMobile() {
+  if (window.matchMedia("(min-width: 768px)").matches) {
+  } else {
+    window.location = `${process.env.VUE_APP_MOBILE_URL}`;
+  }
+}
+
 export function unblockUi() {
   loadingCount--;
   checkIfNeedBlock();
@@ -78,7 +85,6 @@ export function showGraphqlErrorFromResponse(networkError) {
 }
 
 export function showMessageFromResponse(response) {
-
   if (response.statusCode == 400) {
     window.vm.$snotify.error(window.vm.$t(response.message));
     return;
@@ -90,7 +96,7 @@ export function showMessageFromResponse(response) {
   }
   if (response.statusCode === 500) {
     window.vm.$snotify.error(window.vm.$t(response.message));
-    return
+    return;
   }
 
   const translationKey = `responses.${Object.keys(response.data)[0]}`;
@@ -102,8 +108,6 @@ export function showMessageFromResponse(response) {
   } else {
     window.vm.$snotify.success(window.vm.$t(`${translationKey}`));
   }
-
-
 }
 
 export function processGraphQLErrors(graphQLErrors) {
@@ -161,6 +165,7 @@ export async function loadApp() {
     window.location.pathname !== "/loading"
       ? window.location.pathname + window.location.search
       : "/";
+  checkIsMobile();
   blockUi();
   // router.replace('/loading', () => { }, () => { });
   // init the session store
@@ -184,8 +189,6 @@ export async function loadApp() {
           );
           return;
         }
-
-
       } else {
         router.replace("/login").catch(() => {});
       }
@@ -199,6 +202,7 @@ export async function loadApp() {
   } finally {
     // make the router ready
     router.replace(requested).catch(() => {});
+    console.log(window);
     console.log("App loaded!");
     store.dispatch("app/loaded");
 

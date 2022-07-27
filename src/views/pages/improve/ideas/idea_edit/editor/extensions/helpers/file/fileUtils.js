@@ -140,6 +140,7 @@ const isBase64 = url => {
 };
 
 const getBase64FromUrl = async url => {
+  if (isBase64(url)) return url
   const data = await fetch(url);
   const blob = await data.blob();
   return new Promise(resolve => {

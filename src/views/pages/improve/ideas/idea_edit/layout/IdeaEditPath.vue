@@ -392,13 +392,13 @@ export default {
           );
 
           const cleanRoles = this.listsAreEqual(
-            this.idea.companyRoleIds,
-            this.value.companyRoleIds
+            this.idea.companyRoleIds ?? [],
+            this.value.companyRoleIds ?? []
           );
 
           const cleanTools = this.listsAreEqual(
-            this.idea.companyToolIds,
-            this.value.companyToolIds
+            this.idea.companyToolIds ?? [],
+            this.value.companyToolIds ?? []
           );
 
           this.cleanIdeaPath = cleanPath && cleanRoles && cleanTools;

@@ -67,23 +67,19 @@
     </div>
 
     <idea-content-editor
-      v-show="!isLoading"
       :isEditable="isEditable && isInitialized"
-			:isRefreshing="isSaving && isLoading"
-			:isInitialized="isInitialized"
+      :isRefreshing="isSaving || isLoading"
+      :isInitialized="isInitialized"
       v-model="getIdeaContent"
       :idea="idea"
       @fileAdded="setFile"
       @fileRemoved="removeFile"
       @saveContent="saveContent"
       @initialized="setIsInitialized"
-			@contentWindowTop="setContentWindowTop"
-			:contentWindowTop="contentWindowTop"
+      @contentWindowTop="setContentWindowTop"
+      :contentWindowTop="contentWindowTop"
       :contentType="contentType"
     />
-    <div v-show="isLoading" class="ideaContent-empty-spinner">
-      <b-spinner />
-    </div>
   </div>
 </template>
 
@@ -145,21 +141,21 @@ export default {
     isEditable: false,
     isInitialized: false,
     newType: "",
-		contentWindowTop: null
+    contentWindowTop: null,
   }),
   methods: {
-		setContentWindowTop(scrollTop){
-			this.contentWindowTop = scrollTop
-		},
+    setContentWindowTop(scrollTop) {
+      this.contentWindowTop = scrollTop;
+    },
 
     setIsInitialized() {
       this.isEditable = true;
       this.isInitialized = true;
 
-			this.$emit("editorLoaded")
+      this.$emit("editorLoaded");
     },
     saveContent(reloadContent) {
-			console.log(reloadContent)
+      console.log(reloadContent);
       this.$emit("saveIdeaContent", reloadContent);
     },
     setFile(file) {
@@ -187,23 +183,6 @@ export default {
   color: #fff;
 }
 
-.ideaContent-empty-spinner {
-  text-align: center;
-  height: 100%;
-  border-radius: 3px;
-  display: flex;
-  place-content: center;
-  align-items: center;
-  background: #fff;
-  width: 100%;
-  & > span {
-    width: 40px;
-    margin-bottom: 100px;
-    color: lightgray;
-    height: 40px;
-    background: #fff;
-  }
-}
 .idea-template-create-item {
   display: flex;
   justify-content: space-between;

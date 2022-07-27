@@ -1,5 +1,8 @@
 <template>
-  <div style="padding-bottom: 100px" id="adoptedIdeas__container">
+  <div
+    style="padding-bottom: 100px; padding: 20px 0px"
+    id="adoptedIdeas__container"
+  >
     <b-row v-if="currentProcessSection" class="adoptedIdeas__container">
       <b-col cols="12">
         <div
@@ -59,7 +62,7 @@ export default {
       currentProcess: "process/current",
       ideaInEdit: "idea/ideaInEdit",
     }),
-   getIdeaInEditId: {
+    getIdeaInEditId: {
       get() {
         return this.ideaInEdit?.editIdeaId ?? null;
       },

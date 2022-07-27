@@ -90,9 +90,9 @@ export default {
     "embed-modal": EmbedModal,
   },
   mounted() {
-    this.onResize();
     this.$nextTick(() => {
       window.addEventListener("resize", this.onResize);
+      this.onResize();
     });
   },
   beforeDestroy() {
@@ -208,7 +208,6 @@ export default {
           });
         }
 
-        console.log();
 
         setTimeout(() => {
           if (!data.url) return;
@@ -316,6 +315,10 @@ export default {
     editor: {
       type: Object,
       required: true,
+    },
+    isEditable: {
+      type: Boolean,
+      required: false,
     },
   },
   computed: {

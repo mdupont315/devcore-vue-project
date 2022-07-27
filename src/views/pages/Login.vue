@@ -107,7 +107,6 @@
 import { mapGetters } from "vuex";
 import GQLForm from "@/lib/gqlform";
 import { blockUi, unblockUi } from "@/lib/utils";
-import { roleNames } from "@/lib/mode-enums.js";
 
 export default {
   data: () => ({
