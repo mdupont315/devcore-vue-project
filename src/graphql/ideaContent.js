@@ -3,13 +3,18 @@ import gql from "graphql-tag";
 // eslint-disable-next-line
 export const IDEA_CONTENT_FRAGMENT = gql`
   fragment ideaContentFields on IdeaContent {
-    id,
-    markup,
-    ideaId,
-    contentType,
-    version,
-    createdAt,
+    id
+    markup
+    ideaId
+    contentType
+    version
+    createdAt
     updatedAt
+    companyRoles {
+      id
+      name
+      avatarUrl
+    }
   }
 `;
 
@@ -52,5 +57,5 @@ export const IDEA_CONTENT = {
       }
     }
     ${IDEA_CONTENT_FULL_FRAGMENT}
-  `,
+  `
 };

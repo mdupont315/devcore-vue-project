@@ -228,6 +228,9 @@
     "ideaContentCreate": "Idea sisältö tallennettu onnistuneesti!",
     "ideaContentCreateFail": "Idea sisällön tallennus epäonnistui!",
 
+    "ideaContentUpdate": "Idea sisältö päivitettiin onnistuneesti!",
+    "ideaContentUpdateFail": "Idea sisällön päivitys epäonnistui!",
+
     "issueCloseFeedback": "Palaute suljettiin ongelmalle onnistuneest!",
     "issueCloseFeedbackFail": "Palautteen sulkeminen epäonnistui!",
     "ideaCloseFeedback": "Palaute suljettiin idealle onnistuneesti!",
@@ -698,6 +701,7 @@
     "LICENSE": "Lisenssi",
     "PROJECT": "Projektikohtainen"
   },
+  "first page": "Etusivu",
   "Idea Template": "Idea pohja",
   "View all": "Katso kaikki",
   "Super Admininstrator Panel": "Super-järjestelmänvalvojan paneeli",
@@ -712,5 +716,7 @@
   "You can upload up to size": "Suurin kuvakoko on {size} mb. Tuetut formaatit: JPEG, PNG, GIF, SVG",
   "Select or Drag Attachment": "Valitse liite tietokoneelta tai raahaa tähän.",
   "You can upload attachment up to size": "Suurin liitekoko on {size} mb.",
-  "Do not close window": "Tallentaa... Ethän sulje selaintasi ennen kuin sisältö on tallentunut."
+  "Do not close window": "Tallentaa... Ethän sulje selaintasi ennen kuin sisältö on tallentunut.",
+  "You must save idea before editing templates": "Sinun täytyy tallentaa idea ennenkuin voit muokata sisältöluokituksia!"
+
 }

@@ -6,63 +6,63 @@
           idea.title ? idea.title : $t("action.create", { name: $t("idea") })
         }}
       </div>
-      <div class="idea_edit_content_container_content-header-button">
-        <b-button
-          v-show="false"
-          ref="btnNewIdeaTemplate"
-          style="overflow: hidden; min-width: 100px"
-        >
-          <span v-if="!isLoading">{{
-            ideaContentCategories[selectedCategoryIndex].name
-          }}</span>
-          <b-spinner v-else style="width: 15px; height: 15px" />
-        </b-button>
 
-        <b-popover
-          ref="popover"
-          :target="() => $refs.btnNewIdeaTemplate"
-          placement="bottom"
-          class="idea-template-select"
-          triggers="click blur"
+      <inner-overlay
+        v-if="contentTypeSelectorVisible"
+        @click="closeContentType()"
+        style="z-index: 2"
+      />
+
+      <div class="idea_edit_content_container_content-header-button">
+        <div v-if="!idea.id">
+          <b-popover
+            target="idea_content_type_info_info_text-info"
+            triggers="click"
+            placement="top"
+            boundary="window"
+          >
+            <div class="idea_content-type_disabled-info_text">
+              {{ $t("You must save idea before editing templates") }}
+            </div>
+          </b-popover>
+
+          <div
+            id="idea_content_type_info_info_text-info"
+            class="idea_content_type_info_info_text-info"
+          >
+            <i class="mdi mdi-information idea_content_type_info_info_icon"></i>
+          </div>
+        </div>
+        <loading-button
+          :disabled="vErrors.any() || isLoading || !idea.id"
+          variant="primary"
+          id="idea_edit_content_btnNewIdeaTemplate"
+          size="lg"
+          :style="{ cursor: isLoading || !idea.id ? 'not-allowed' : 'pointer' }"
+          :loading="isLoading"
+          @click="toggleContentTypeSelector()"
         >
-          <b-card no-body style="width: 100px">
-            <b-card-body style="padding: 0">
-              <div>
-                <div
-                  v-for="(item, index) in ideaContentCategories"
-                  :key="index"
-                  class="idea-template-select-item"
-                  :class="{
-                    'is-active': getIdeaContent.contentType === item.name,
-                  }"
-                  style="color: #4294d0"
-                  @click="changeContentType(item)"
-                >
-                  {{ item.name }}
-                </div>
-              </div>
-              <!-- <div>
-                <div class="idea-template-create-item">
-                  <b-form-input
-                    v-model="newType"
-                    placeholder="Create + "
-                  ></b-form-input>
-                  <b-button
-                    id="btnNew"
-                    v-b-tooltip.hover
-                    size="sm"
-                    class="text-uppercase idea-template-select-item-action"
-                    variant="primary"
-                    :title="$t('Create New') + ' ' + $t('Idea Template')"
-                    @click="addNewIdeaTemplate"
-                  >
-                    <i class="mdi mdi-plus"></i>
-                  </b-button>
-                </div>
-              </div> -->
-            </b-card-body>
-          </b-card>
-        </b-popover>
+          <div v-if="!isLoading">{{ getContentName }}</div>
+        </loading-button>
+
+        <idea-edit-select-type
+          v-if="contentTypeSelectorVisible"
+          :primary="getPrimaryContentType"
+          :categories="getIdeaContentCategories"
+          :comments="getCommentsFromContent"
+          :selected="selectedCategoryIndex"
+          @expand="editContentType"
+          @select="changeContentType"
+          @create="createContentType"
+        />
+
+        <idea-edit-type
+          :visible="contentTypeSelectorForm"
+          :primary="getPrimaryContentType"
+          :isLoading="isLoading"
+          v-model="editContentItem"
+          @save="save"
+        />
       </div>
     </div>
 
@@ -85,10 +85,14 @@
 
 	<script>
 import ideaContentEditor from "../editor/IdeaContentEditor.vue";
+import ideaEditType from "./IdeaEditType";
+import ideaEditSelectType from "./IdeaEditSelectType";
 
 export default {
   components: {
     "idea-content-editor": ideaContentEditor,
+    "idea-edit-type": ideaEditType,
+    "idea-edit-select-type": ideaEditSelectType,
   },
   props: {
     idea: {
@@ -99,11 +103,6 @@ export default {
       type: Object,
       required: false,
     },
-    ideaContentCategories: {
-      type: Array,
-      required: true,
-      default: () => [],
-    },
     isLoading: {
       type: Boolean,
       default: true,
@@ -112,20 +111,64 @@ export default {
       type: Boolean,
       default: false,
     },
-
     selectedCategoryIndex: {
       type: Number,
       default: 0,
     },
+    comments: {
+      type: Array,
+      default: () => [],
+    },
+    ideaContentCategories: {
+      type: Array,
+      required: true,
+      default: () => [],
+    },
   },
   computed: {
+    getCommentsFromContent: {
+      get() {
+        const improvementsCount = this.comments.filter(
+          (comment) => comment.type === "IMPROVEMENT"
+        ).length;
+        const problemCount = this.comments.filter(
+          (comment) => comment.type === "PROBLEM"
+        ).length;
+        return { improvementsCount, problemCount };
+      },
+    },
+    getIdeaContentCategories: {
+      get() {
+        return this.ideaContentCategories.map(
+          (category) => category.contentForm
+        );
+      },
+    },
+    getPrimaryContentType: {
+      get() {
+        const primaryForm = this.ideaContentCategories.find(
+          (content) => content.contentForm.id == this.idea.ideaContentId
+        );
+        return primaryForm ? primaryForm.contentForm : {};
+      },
+    },
+    getContentName: {
+      get() {
+        let name = "";
+        console.log(this.ideaContentCategories);
+        if (this.ideaContentCategories.length > 0) {
+          const form = this.ideaContentCategories[this.selectedCategoryIndex];
+          name = form.contentForm.contentType;
+        }
+        return name;
+      },
+      set(value) {
+        this.$emit("contentType");
+      },
+    },
     getIdeaContent: {
       get() {
-        return {
-          contentType:
-            this.ideaContentCategories[this.selectedCategoryIndex].name,
-          markup: this.value.markup,
-        };
+        return this.value;
       },
       set(value) {
         this.$emit("input", value);
@@ -136,14 +179,48 @@ export default {
     },
   },
   data: () => ({
+    contentTypeSelectorVisible: false,
+    contentTypeSelectorForm: false,
     contentType: "Custom",
     selectingType: false,
     isEditable: false,
     isInitialized: false,
     newType: "",
     contentWindowTop: null,
+    editContentItem: null,
   }),
   methods: {
+    save() {
+      this.$emit("saveIdeaContentArea", this.editContentItem);
+    },
+    editContentType(item) {
+      console.log("edit item fields: ", item.fields);
+      this.editContentItem = item;
+      this.contentTypeSelectorForm = true;
+    },
+    toggleContentTypeSelector() {
+      this.contentTypeSelectorForm = false;
+      this.contentTypeSelectorVisible = !this.contentTypeSelectorVisible;
+    },
+    createContentType() {
+      console.log("creating new !");
+      this.contentTypeSelectorForm = true;
+      this.contentTypeSelectorVisible = true;
+    },
+    changeContentType(item) {
+      this.$emit("changeType", item);
+      this.$nextTick(() => {
+        this.contentTypeSelectorForm = false;
+      });
+    },
+
+    closeContentType() {
+      this.contentTypeSelectorForm = false;
+      this.contentTypeSelectorVisible = false;
+    },
+    addNewIdeaTemplate() {
+      console.log("addin");
+    },
     setContentWindowTop(scrollTop) {
       this.contentWindowTop = scrollTop;
     },
@@ -155,7 +232,6 @@ export default {
       this.$emit("editorLoaded");
     },
     saveContent(reloadContent) {
-      console.log(reloadContent);
       this.$emit("saveIdeaContent", reloadContent);
     },
     setFile(file) {
@@ -163,9 +239,6 @@ export default {
     },
     removeFile(file) {
       this.$emit("fileRemoved", file);
-    },
-    changeContentType(item) {
-      this.$emit("selectedType", item);
     },
   },
 };
@@ -236,12 +309,56 @@ export default {
 }
 
 .idea_edit_content_container_content-header-button {
-  margin: 20px 20px 10px 20px;
+  margin: 10px 20px;
+  border-radius: 3px;
+  font-size: 16px;
+  z-index: 2;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+
+  > #idea_edit_content_btnNewIdeaTemplate:not(:disabled) {
+    background: #fff;
+    border-radius: 5px;
+    width: 120px;
+    min-height: 41px;
+    &:hover {
+      color: #fff;
+      background: #4294d0 !important;
+      border-color: #4294d0;
+    }
+
+    > div {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }
+
 .idea_edit_content_container {
   margin: 20px;
   border-radius: 3px;
   width: 75%;
   overflow: hidden;
+}
+
+.idea_content_type_info_info_text-info {
+  margin-right: 10px;
+  cursor: pointer;
+  & > .idea_content_type_info_info_icon {
+    color: #4294d0;
+    padding-left: 3px;
+    font-size: 26px;
+    padding-right: 3px;
+  }
+}
+.idea_content_type_info_info_text-info > .popover {
+  padding: 5px;
+  max-width: 250px;
+}
+
+.idea_content-type_disabled-info_text {
+  padding: 10px;
+  font-size: 14px;
 }
 </style>

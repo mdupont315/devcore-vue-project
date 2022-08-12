@@ -68,7 +68,17 @@
               <loading-button
                 type="submit"
                 size="lg"
-                :disabled="form.busy || vErrors.any()"
+                :disabled="
+                  form.busy ||
+                  vErrors.any() ||
+                  (!form.username && !form.password)
+                "
+                :style="{
+                  cursor:
+                    !form.username && !form.password
+                      ? 'not-allowed'
+                      : 'pointer',
+                }"
                 :loading="form.busy"
                 :block="true"
                 variant="primary"

@@ -82,7 +82,7 @@ import {
   base64Resize,
   isValidExternalUrl,
   getBase64FromUrl,
-  base64MimeType
+  base64MimeType,
 } from "./helpers/file/fileUtils";
 
 export default {
@@ -171,7 +171,7 @@ export default {
     },
     async loadedImg(e) {
       await this.resizeImage();
-
+      if (!this.editor || !this.editor.view.dom.parentElement) return;
       const { clientHeight: domHeight } = this.editor.view.dom.parentElement;
       const { clientHeight } = e.path[0];
       const allowedMaxHeight = domHeight * 0.9;

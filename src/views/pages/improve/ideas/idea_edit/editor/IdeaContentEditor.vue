@@ -17,7 +17,7 @@
         style="min-height: 70vh"
         ref="editor_content"
       />
-      <div v-show="isRefreshing" class="ideaContent-empty-spinner">
+      <div v-show="isRefreshing || !value" class="ideaContent-empty-spinner">
         <b-spinner />
       </div>
 

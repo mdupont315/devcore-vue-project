@@ -593,7 +593,6 @@ export default {
 
 .idea_edit_path_container-body-process-select-title {
   margin-left: 5px;
-  /* font-family: FuturaBold; */
 }
 
 .idea_edit_path_container {
@@ -696,7 +695,6 @@ export default {
 }
 
 .idea_edit_path_select_idea_roles > .input-wrapper > div > .items {
-  /* background: #fff; */
   border-top: 1px solid #fff !important;
   border-left: 1px solid #fff !important;
   border-right: 1px solid #fff !important;

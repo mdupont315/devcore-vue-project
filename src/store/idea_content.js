@@ -55,7 +55,7 @@ const actions = {
       console.log(e);
     } finally {
       form.busy = false;
-    }
+      }
     return ret;
   },
 

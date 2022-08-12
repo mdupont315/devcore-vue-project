@@ -87,11 +87,6 @@ export const IDEA_FRAGMENT = gql`
         description
         processId
         operationId
-     #   companyRoles {
-     #     id,
-     #     name,
-     #     avatarUrl
-     #   }
         operation {
           id
           title

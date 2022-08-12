@@ -6,10 +6,12 @@
         :ideaContentCategories="ideaContentCategories"
         :isLoading="isLoading"
         :selectedCategoryIndex="selectedCategoryIndex"
+        :comments="getCommentsFromContent()"
+        @changeType="changeContentType"
         @fileAdded="setFile"
         @fileRemoved="removeFile"
-        @selectedType="setContentType"
         @saveIdeaContent="saveIdeaVersion"
+        @saveIdeaContentArea="saveIdeaAreaVersion"
         @editorLoaded="setEditorLoaded"
         @isDirty="setIsContentDirty"
         :isSaving="isSaving"
@@ -43,6 +45,7 @@ export default {
     "idea-edit-path": IdeaEditPath,
   },
   async created() {
+    console.log("CREATED!");
     this.isLoading = true;
     if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
       await this.initializeData();
@@ -61,8 +64,7 @@ export default {
     isSaving: false,
     isLoaded: false,
     filesChanged: false,
-    defaultContentName: "Custom",
-    selectedCategoryIndex: 2,
+    selectedCategoryIndex: 0,
     ideaContentIsDirty: false,
     editorLoaded: false,
     ideaForm: new GQLForm({
@@ -80,19 +82,22 @@ export default {
       title: null,
       type: null,
     }),
-    contentForm: new GQLForm({
+    defaultContentForm: new GQLForm({
       id: undefined,
       markup: null,
       ideaId: null,
       version: 1,
       contentType: null,
+      companyRoles: [],
     }),
+    // ideaContentCategories: [],
 
     ideaContentCategories: [
       {
-        name: "Cheatsheet",
         contentForm: new GQLForm({
           id: undefined,
+          contentType: "Unnamed",
+          isPrimary: true,
           markup: JSON.stringify({
             type: "doc",
             content: [
@@ -106,47 +111,6 @@ export default {
           }),
           ideaId: null,
           version: 1,
-          contentType: null,
-        }),
-      },
-      {
-        name: "Learn",
-        contentForm: new GQLForm({
-          id: undefined,
-          markup: JSON.stringify({
-            type: "doc",
-            content: [
-              {
-                attrs: {
-                  indent: 0,
-                },
-                type: "paragraph",
-              },
-            ],
-          }),
-          ideaId: null,
-          version: 1,
-          contentType: null,
-        }),
-      },
-      {
-        name: "Custom",
-        contentForm: new GQLForm({
-          id: undefined,
-          markup: JSON.stringify({
-            type: "doc",
-            content: [
-              {
-                attrs: {
-                  indent: 0,
-                },
-                type: "paragraph",
-              },
-            ],
-          }),
-          ideaId: null,
-          version: 1,
-          contentType: null,
         }),
       },
     ],
@@ -160,6 +124,7 @@ export default {
       ideaInEdit: "idea/ideaInEdit",
       ideas: "idea/all",
       currentProcess: "process/current",
+      companyRoles: "companyRole/all",
     }),
     processPath: {
       get() {
@@ -168,9 +133,10 @@ export default {
     },
     getIdea: {
       get() {
-        const idea = this.ideas.find(
-          (idea) => idea.id === this.ideaInEdit?.editIdeaId
-        );
+        const idea =
+          this.ideas.find(
+            (idea) => idea.id === this.ideaInEdit?.editIdea?.id
+          ) || null;
         if (idea) {
           return idea;
         } else {
@@ -201,8 +167,6 @@ export default {
     },
   },
   async beforeDestroy() {
-    //  await this.closeIdeaEdit();
-
     if (this.ideaInEdit) {
       await this.$store.dispatch("idea/setIdeaInEdit", null);
     }
@@ -222,6 +186,15 @@ export default {
     }
   },
   methods: {
+    changeContentType(form) {
+      this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
+        (content) => content.contentForm.id === form.id
+      );
+      this.isLoading = true;
+      this.$nextTick(() => {
+        this.isLoading = false;
+      });
+    },
     setEditorLoaded() {
       this.editorLoaded = true;
     },
@@ -243,16 +216,7 @@ export default {
       this.files = items;
       this.filesChanged = true;
     },
-    setContentType(item) {
-      this.isLoading = true;
-      this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
-        (content) => content.name === item.name
-      );
 
-      this.$nextTick(() => {
-        this.isLoading = false;
-      });
-    },
     formFieldMapper(mapTo, mapFrom) {
       this.editorLoaded = false;
       Object.keys(mapTo.fields || {})
@@ -264,24 +228,32 @@ export default {
       this.editorLoaded = true;
     },
     async initializeData() {
-      this.filter = {
-        data: {
-          where: {
-            field: "idea_id",
-            op: "eq",
-            value: this.getIdea.id,
-          },
-        },
-      };
-      await this.$store.dispatch("companyTool/findAll");
-      await this.$store.dispatch("companyRole/findAll");
-      await this.$store.dispatch("ideaContent/findAll", {
-        filter: this.filter,
-        force: true,
+      const { ideaContentId } = this.getIdea;
+      this.ideaContentCategories = this.ideaContents.map((content) => {
+        return {
+          contentForm: new GQLForm({
+            id: content.id,
+            markup: null,
+            ideaId: null,
+            version: 1,
+            contentType: "",
+            companyRoles: [],
+            isPrimary: content.id === ideaContentId,
+          }),
+        };
       });
-      this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
-        (content) => content.name === this.defaultContentName
+      console.log(this.ideaContentCategories);
+      console.log(ideaContentId);
+      console.log("idea in edit: ", this.ideaInEdit);
+      //TODO: content initializes wrong content
+      // maybe due to idea not fetched from database
+      // change idea/all to findById with filter in idea card maybe
+      // or use idea from store edit ideaContentid that sets timestamps etc
+      const categoryIndex = this.ideaContentCategories.findIndex(
+        (content) => content.contentForm.id === ideaContentId
       );
+      console.log(categoryIndex);
+      this.selectedCategoryIndex = categoryIndex >= 0 ? categoryIndex : 0;
     },
     async initializeForms() {
       if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
@@ -297,11 +269,13 @@ export default {
     },
 
     ideaContentFormFieldMapper() {
+      console.log(this.getIdea);
+      console.log(this.getIdea.ideaContentId);
       if (this.getIdea && this.getIdea.ideaContentId) {
         this.ideaContents.map((content) => {
-          const mapToCategory = this.ideaContentCategories.find(
-            (category) => category.name === content.contentType
-          );
+          const mapToCategory = this.ideaContentCategories.find((category) => {
+            return category.contentForm.id == content.id;
+          });
           const mapFromIdeaContent = Object.assign(content, {});
           this.formFieldMapper(mapToCategory.contentForm, mapFromIdeaContent);
         });
@@ -332,7 +306,6 @@ export default {
     },
 
     async saveIdea() {
-			console.log(this.files)
       this.ideaForm._fields.file = this.files
         .map((fileEntity) => fileEntity.file)
         .filter((x) => x.size && !x.uri);
@@ -365,12 +338,25 @@ export default {
       return commentNodes;
     },
 
+    getCommentsFromContent() {
+      const commentNodes = this.getCommentNodesFromContent();
+      const contentCommentIds = [];
+
+      commentNodes.forEach((node) => {
+        const parsedComment = JSON.parse(node.attrs.comment);
+        parsedComment.comments.forEach((comment) =>
+          contentCommentIds.push({ id: comment.id, type: comment.type })
+        );
+      });
+      return contentCommentIds;
+    },
+
     async syncContent() {
       //sync files
       this.syncFiles();
 
       //sync comments
-      await this.syncComments();
+      await this.closeRemovedComments();
     },
 
     syncFiles() {
@@ -414,10 +400,7 @@ export default {
         this.ideaForm._fields.removeFile = false;
       }
     },
-    async syncComments() {
-      const contentCommentIds = [];
-      const commentNodes = this.getCommentNodesFromContent();
-
+    async closeRemovedComments() {
       if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
         const editIdea = await this.$store.dispatch("idea/findById", {
           id: this.getIdea.id,
@@ -431,26 +414,54 @@ export default {
           ...editIdea.problems.filter((problem) => !problem.replied),
         ].map((comment) => comment.id);
 
-        commentNodes.forEach((node) => {
-          const parsedComment = JSON.parse(node.attrs.comment);
-          parsedComment.comments.forEach((comment) =>
-            contentCommentIds.push(comment.id)
-          );
-        });
+        const contentComments = this.getCommentsFromContent();
+        const contentCommentIds = contentComments.map((comment) => comment.id);
 
         const markRepliedToCommentIds = allNotRepliedCommentIds.filter(
           (id) => contentCommentIds.indexOf(id) < 0
         );
-
         if (markRepliedToCommentIds.length > 0) {
           await this.$store.dispatch(
             "idea/closeImprovementFeedback",
             new GQLForm({
-              id: this.getIdea.id,
+              id: editIdea.id,
               improvementIds: markRepliedToCommentIds,
             })
           );
         }
+      }
+    },
+
+    async saveIdeaAreaVersion(form) {
+      this.isLoading = true;
+      this.isSaving = true;
+      console.log(form.fields);
+      try {
+        const modifyAreaForm = new GQLForm({
+          id: form.fields.id,
+          ideaId: form.fields.ideaId,
+          version: form.fields.version,
+          companyRoles: form.fields.companyRoles,
+          contentType: form.fields.contentType,
+          isPrimary: form.fields.isPrimary,
+        });
+
+        await this.$store.dispatch(`ideaContent/update`, modifyAreaForm);
+      } catch (e) {
+        console.log(e);
+      } finally {
+        await this.$store.dispatch("idea/findById", {
+          id: form.fields.ideaId,
+          force: true,
+        });
+        const otherContent = this.ideaContentCategories.filter(
+          (content) => content.contentForm.id !== form.fields.id
+        );
+        otherContent.forEach((content) => {
+          content.contentForm.isPrimary = false;
+        });
+        this.isLoading = false;
+        this.isSaving = false;
       }
     },
 
@@ -487,8 +498,9 @@ export default {
           }
           contentForm.ideaId = ideaSave.id;
           contentForm.markup = markup;
-          contentForm.contentType =
-            this.ideaContentCategories[this.selectedCategoryIndex].name;
+          contentForm.companyRoles = contentForm.companyRoles.map(
+            (role) => role.id
+          );
 
           if (contentForm.id) {
             ideaContent = await this.$store.dispatch(
@@ -508,9 +520,6 @@ export default {
               const mapFrom = Object.assign(ideaContent, {});
               this.formFieldMapper(mapTo, mapFrom);
             }
-            // const mapTo = contentForm;
-            // const mapFrom = Object.assign(ideaContent, {});
-            // this.formFieldMapper(mapTo, mapFrom);
           }
         }
 

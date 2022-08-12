@@ -703,6 +703,7 @@ export default {
   display: flex;
   align-items: center;
   margin: 0;
+	z-index: 0;
   place-content: center;
   cursor: pointer;
 }

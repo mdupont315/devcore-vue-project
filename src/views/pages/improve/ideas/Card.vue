@@ -229,20 +229,33 @@ export default {
 
   methods: {
     async openIdeaEdit(idea) {
+      await this.$store.dispatch("companyTool/findAll");
+      await this.$store.dispatch("companyRole/findAll");
 
-      // this.$router.push({
-      //   params: {
-      //     ideaId: idea.id,
-      //   },
-      // });
-
+      await this.$store.dispatch("ideaContent/findAll", {
+        filter: {
+          data: {
+            where: {
+              field: "idea_id",
+              op: "eq",
+              value: idea.id,
+            },
+          },
+        },
+        force: true,
+      });
+      const editIdea = await this.$store.dispatch("idea/findById", {
+        id: idea.id,
+        force: true,
+      });
       await this.$store.dispatch("idea/setIdeaInEdit", {
         editIdeaMeta: {
           editStartedAt: new Date().getTime(),
         },
         editIdeaMode: "EDIT",
-        editIdeaId: idea.id,
+        editIdea: editIdea,
       });
+
       this.$emit("openIdea", idea);
     },
     async closeIdeaForFeedback() {
@@ -274,7 +287,6 @@ export default {
         force: true,
       });
 
-      /*  this.togglePopOverFeedback(); */
       this.showPopOverFeedback = false;
     },
     async setCurrentTool(event, toolId) {

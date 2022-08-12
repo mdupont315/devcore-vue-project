@@ -228,6 +228,10 @@
     "ideaContentCreate": "Idea content saved succesfully!",
     "ideaContentCreateFail": "Saving idea content failed!",
 
+
+    "ideaContentUpdate": "Idea content updated succesfully!",
+    "ideaContentUpdateFail": "Updating idea content failed!",
+
     "issueCloseFeedback": "Issue closed for feedback succesfully!",
     "issueCloseFeedbackFail": "Closing issue feedback failed!",
     "ideaCloseFeedback": "Idea closed for feedback succesfully!",
@@ -668,6 +672,7 @@
     "LICENSE": "License",
     "PROJECT": "Project"
   },
+  "first page": "First page",
   "Idea Template": "Idea Template",
   "View all": "View all",
   "Back To Process": "Back",
@@ -684,5 +689,6 @@
   "You can upload image up to size": "You can upload image sizes up to {size} mb. Supported formats JPEG, PNG, GIF, SVG.",
   "Select or Drag Attachment": "Select attachments from files or drag your attachments here.",
   "You can upload attachment up to size": "You can upload attachment sizes up to {size} mb.",
-  "Do not close window": "Saving... Please do not close or exit browser window, while content is saving."
+  "Do not close window": "Saving... Please do not close or exit browser window, while content is saving.",
+  "You must save idea before editing templates": "You must save idea before you can edit content templates!"
 }

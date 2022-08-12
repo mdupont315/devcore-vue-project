@@ -1,0 +1,295 @@
+
+<template>
+  <transition name="idea_edit_content_container_type" mode="out-in">
+    <div class="idea_edit_content_container_type" v-if="visible">
+      <div class="idea_edit_type_container-header">
+        <div class="idea_edit_type_container-header-title">
+          {{ $t("Edit idea") }}
+        </div>
+        <div class="idea_edit_type_container-header-close"></div>
+
+        <div
+          v-if="hasEdits"
+          class="ideaEdit_type_noEdit_content"
+          @click="closeIdeaEdit"
+        >
+          <i class="ri-close-line table-modal-close"></i>
+        </div>
+
+        <confirm-button
+          v-else
+          class="ideaEdit_type_Edit_content"
+          @confirm="closeIdeaTypeEdit"
+          :customButton="true"
+          :confirmPlacement="'left'"
+          :confirmMessage="$t('Unsaved Idea Data')"
+        >
+          <i class="ri-close-line table-modal-close"></i>
+        </confirm-button>
+      </div>
+      <b-form
+        class="idea_edit_type_container-body hide_labels"
+        @keyup="$validator.validateAll()"
+        @submit.prevent="save"
+        v-if="value"
+      >
+        <b-card-body class="p-0 ideaEditType-form-fields">
+          <div class="form-group">
+            <div class="idea_edit_contentType_container-title">
+              <div>{{ $t("name") }}</div>
+              <b-form-checkbox
+                v-model="value.isPrimary"
+                name="check-button"
+                style="cursor: pointer"
+                size="lg"
+                switch
+              />
+            </div>
+
+            <b-form-input
+              id="contentType"
+              class="idea_edit_type_select_title"
+              v-model.trim="value.contentType"
+              v-validate="'required|min:4'"
+              v-autofocus
+              :placeholder="$t('name')"
+              type="text"
+              name="contentType"
+              autocomplete="off"
+              autofocus
+              :state="$validateState('contentType', value)"
+            ></b-form-input>
+            <b-form-invalid-feedback>{{
+              $displayError("contentType", value)
+            }}</b-form-invalid-feedback>
+          </div>
+
+          <div class="form-group">
+            <div class="idea_edit_type_container-body-process-select-title">
+              {{ $t("roles") }}
+            </div>
+            <role-selector
+              v-if="roleIntent"
+              :key="roleIntent"
+              name="idea_content_roles"
+              id="idea_content_roles"
+              class="idea_edit_content_type_select_idea_roles"
+              autocomplete="idea_content_roles"
+              :placeholder="$t('Roles')"
+              v-model="value.companyRoles"
+              :items="[...allRoles]"
+              :show-field="true"
+              :show-add-btn="false"
+            ></role-selector>
+          </div>
+        </b-card-body>
+        <b-card-footer style="border-top: none; margin: 10px 0; padding: 0">
+          <loading-button
+            :disabled="vErrors.any() || isLoading"
+            :loading="isLoading"
+            size="lg"
+            :style="{ cursor: isLoading ? 'not-allowed' : 'pointer' }"
+            block
+            style="border-radius: 3px"
+            type="submit"
+            >{{ $t("Save") }}</loading-button
+          >
+        </b-card-footer>
+      </b-form>
+    </div>
+  </transition>
+</template>
+
+<script>
+import { mapGetters } from "vuex";
+
+export default {
+  props: {
+    value: {
+      type: Object,
+      required: false,
+    },
+    visible: {
+      type: Boolean,
+      default: () => false,
+    },
+    primary: {
+      type: Object,
+      default: () => {},
+    },
+    isLoading: {
+      type: Boolean,
+      default: () => false,
+    },
+  },
+  data: () => ({
+    selectablePathRoles: [],
+    roleIntent: null,
+  }),
+  mounted() {
+    this.selectablePathRoles = this.getSelectableRoles;
+    this.roleIntent = Math.random();
+  },
+  computed: {
+    ...mapGetters({
+      allRoles: "companyRole/all",
+    }),
+    getSelectableRoles: {
+      get() {
+        return this.allRoles;
+      },
+    },
+    isPrimaryContent: {
+      get() {
+        if (!this.value || !this.primary.id) return false;
+        return this.value._fields.id == this.primary._fields.id;
+      },
+    },
+  },
+  methods: {
+    save() {
+      this.$emit("save");
+    },
+    hasEdits() {
+      return false;
+    },
+    closeIdeaEdit() {
+      console.log("closin");
+    },
+  },
+};
+</script>
+
+
+<style lang="scss">
+.idea_edit_content_type_select_idea_roles > .input-wrapper > div > .counter {
+  color: #4294d0;
+  z-index: 1;
+}
+.ideaEdit_type_noEdit_content {
+  width: 36px;
+  margin-right: 15px;
+  height: 30px;
+  font-size: 24px;
+  color: lightgray;
+  margin-left: 30px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.idea_edit_type_container-body {
+  list-style-type: none;
+  border-radius: 3px;
+  height: 100%;
+  background: #fff;
+  padding: 20px;
+  height: calc(100% - 60px);
+}
+.ideaEditType-form-fields > .form-group {
+  width: 100%;
+}
+.ideaEditType-form-fields {
+  overflow-y: scroll;
+  display: flex;
+  height: calc(100% - 50px);
+  width: 100%;
+  scrollbar-width: none;
+  flex-direction: column;
+}
+.idea_edit_type_container-header-title {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+  height: calc(100% - 60px);
+}
+
+.idea_edit_content_container_type {
+  background: #fff;
+  position: absolute;
+  right: 0;
+  height: calc(80vh);
+  bottom: 65px;
+  width: calc((100vw - 240px) * 0.25);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.idea_edit_content_container_type-enter-active,
+.idea_edit_content_container_type-leave-active {
+  transition: 500ms;
+}
+.idea_edit_content_container_type-enter-to {
+  width: calc((100vw - 240px) * 0.25);
+}
+.idea_edit_content_container_type-leave {
+  position: relative;
+}
+.idea_edit_content_container_type-enter {
+  width: 0;
+  position: absolute;
+}
+.idea_edit_content_container_type-leave-to {
+  width: 0;
+}
+.ideaEdit_type_Edit_content > div {
+  width: 36px;
+  margin-top: 15px;
+  margin-right: 15px;
+  height: 30px;
+  font-size: 24px;
+  color: lightgray;
+  margin-left: 30px;
+  cursor: pointer;
+  text-align: center;
+}
+.idea_edit_contentType_container-title {
+  text-transform: uppercase;
+  padding: 10px 0;
+  font-size: 12px;
+		margin-left:5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.idea_edit_type_select_title {
+  color: #4294d0;
+  border-top: 1px solid #fff !important;
+  border-left: 1px solid #fff !important;
+  border-right: 1px solid #fff !important;
+  background: #fff;
+  padding-left: 5px;
+}
+
+.idea_edit_type_container-header {
+  display: flex;
+  justify-content: space-between;
+  height: 60px;
+  border-bottom: 1px solid lightgray;
+  background: #fff;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  align-items: center;
+}
+
+.idea_edit_type_container-body-process-select-title {
+  padding: 10px 0;
+  text-transform: uppercase;
+  font-size: 12px;
+  margin-left: 5px;
+}
+.idea_edit_content_type_select_idea_roles {
+  font-size: 12px;
+	margin-left: -5px;
+  & > .input-wrapper > div {
+
+    & > .items {
+      line-height: 2px;
+      border-top: 1px solid #fff !important;
+      border-left: 1px solid #fff !important;
+      border-right: 1px solid #fff !important;
+      border-bottom: 1px solid lightgray;
+      margin-left: -10px;
+    }
+  }
+}
+</style>
