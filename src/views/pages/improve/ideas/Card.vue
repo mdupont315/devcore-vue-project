@@ -68,10 +68,26 @@
         <div class="tools">
           <b-button
             class="btn-circle shadow-sm"
+            style="display: flex; align-self: center; justify-content: center"
             size="lg"
             variant="light"
             @click="toggleIdea"
-            >+
+          >
+            <div
+              v-if="!isLoading"
+              style="
+                height: 100%;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              "
+            >
+              +
+            </div>
+            <div v-else>
+              <b-spinner style="color: lightgrey"></b-spinner>
+            </div>
           </b-button>
         </div>
       </b-card-header>
@@ -157,8 +173,11 @@ export default {
   },
   data: () => ({
     showPopOverFeedback: false,
+    isLoading: false,
   }),
-  mounted() {
+  async mounted() {
+    await this.$store.dispatch("companyTool/findAll");
+    await this.$store.dispatch("companyRole/findAll");
     const route = this.$router.currentRoute;
     if (route.query) {
       if (route.query.uuid) {
@@ -229,8 +248,7 @@ export default {
 
   methods: {
     async openIdeaEdit(idea) {
-      await this.$store.dispatch("companyTool/findAll");
-      await this.$store.dispatch("companyRole/findAll");
+      this.isLoading = true;
 
       await this.$store.dispatch("ideaContent/findAll", {
         filter: {
@@ -255,6 +273,8 @@ export default {
         editIdeaMode: "EDIT",
         editIdea: editIdea,
       });
+
+      this.isLoading = false;
 
       this.$emit("openIdea", idea);
     },

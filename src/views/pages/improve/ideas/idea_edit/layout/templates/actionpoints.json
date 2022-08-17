@@ -1,0 +1,203 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "TEMPLATE GOAL: ",
+          "type": "text",
+          "marks": [{ "type": "bold" }]
+        },
+        {
+          "text": "The action point framework doesn’t try to explain all required understanding of how everything works & functions and gives readers a straight 1,2,3… point of action to achieve desired results.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 2, "indent": 0 },
+      "content": [
+        {
+          "text": "The Benefit (first title of action point manual)",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "Direct reader’s attention & create interest in the topic. A good way to create interest is to tell them the positive benefits they get in their work by utilizing this information or how they can avoid negative problems or frustrations.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 1, "indent": 0 },
+      "content": [{ "text": "How to get results x", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "To the point. Step-by-step actions only. Use short animated gifs as steps instead of writing massive texts (example: click the yellow button on the left top area of software x)",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "orderedList",
+      "attrs": { "start": 1 },
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": { "id": null, "indent": 0 },
+              "content": [{ "text": "Do 1", "type": "text" }]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": { "id": null, "indent": 0 },
+              "content": [{ "text": "Do 2", "type": "text" }]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": { "id": null, "indent": 0 },
+              "content": [{ "text": "Do 3", "type": "text" }]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 24 },
+      "content": [
+        { "text": "Attention!", "type": "text", "marks": [{ "type": "bold" }] },
+        {
+          "text": " Use this type of writing to bring up possible variables that may incur. For example, if a machine was just maintained, it cannot be operated as instructed but requires a quality check first. Tell them to do it here, before moving to the next step.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "orderedList",
+      "attrs": { "start": 4 },
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": { "id": null, "indent": 0 },
+              "content": [{ "text": "Do 4", "type": "text" }]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": { "id": null, "indent": 0 },
+              "content": [{ "text": "Do 5", "type": "text" }]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": { "id": null, "indent": 0 },
+              "content": [{ "text": "Do 6", "type": "text" }]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 2, "indent": 0 },
+      "content": [{ "text": "Problem solve A", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "In the end, you open up common problems that may appear. If someone didn’t follow your steps correctly and did something in the way he is used to, this problem may appear. Tell them what to do if they did things this way. Also, it is good to show how much extra effort he has to do now because didn’t do it like everyone else.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 2, "indent": 0 },
+      "content": [{ "text": "Problem solve B", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "In the end, you open up common problems that may appear. If someone didn’t follow your steps correctly and did something in the way he is used to, this problem may appear. Tell them what to do if they did things this way. Also, it is good to show how much extra effort he has to do now because didn’t do it like everyone else.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 2, "indent": 0 },
+      "content": [{ "text": "Problem solve C", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "In the end, you open up common problems that may appear. If someone didn’t follow your steps correctly and did something in the way he is used to, this problem may appear. Tell them what to do if they did things this way. Also, it is good to show how much extra effort he has to do now because didn’t do it like everyone else.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 1, "indent": 0 },
+      "content": [{ "text": "Reflect", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "One person cannot have all the best practices, thus it is important to involve readers to participate in improving this instruction. Tell them to do it, the possible benefit, and how to do it in ClanDeploy.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [{ "type": "hardBreak" }]
+    }
+  ]
+}

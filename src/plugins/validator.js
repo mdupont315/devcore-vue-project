@@ -59,6 +59,12 @@ function getErrorMessage(vue, ref, form = null) {
   let errorMessage = "";
   if (vue.vFields[ref]) {
 
+
+    if (form && form.contentType) {
+      console.log(ref, form)
+      console.log(vue.vErrors.first(ref))
+    }
+
     errorMessage = vue.vErrors.first(ref)
       ? vue.vErrors.first(ref)
       : form &&
@@ -91,6 +97,9 @@ Vue.use({
     Vue.prototype.$validateState = function(ref, form = null) {
 
       const message = getErrorMessage(this, ref, form);
+
+      console.log(message)
+
       const ret =
         message === null || message.message === null || message.message === "";
       return ret;

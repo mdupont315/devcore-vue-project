@@ -717,6 +717,11 @@
   "Select or Drag Attachment": "Valitse liite tietokoneelta tai raahaa tähän.",
   "You can upload attachment up to size": "Suurin liitekoko on {size} mb.",
   "Do not close window": "Tallentaa... Ethän sulje selaintasi ennen kuin sisältö on tallentunut.",
-  "You must save idea before editing templates": "Sinun täytyy tallentaa idea ennenkuin voit muokata sisältöluokituksia!"
-
+  "You must save idea before editing templates": "Sinun pitää tallentaa ohje ennen kuin voit lisätä uusia sisältö-alueita!",
+  "New Content Area": "Luo uusi sisältö-alue",
+  "Edit Content Area": "Muokkaa sisältö-aluetta",
+  "Content Template": "Sisältö-alue",
+  "Role access": "Oikeudet",
+  "Leave empty if no restrictions": "Jätä tyhjäksi jos ei rajoituksia",
+  "content_type": "nimi"
 }

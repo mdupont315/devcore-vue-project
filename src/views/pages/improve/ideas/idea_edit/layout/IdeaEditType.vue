@@ -4,12 +4,12 @@
     <div class="idea_edit_content_container_type" v-if="visible">
       <div class="idea_edit_type_container-header">
         <div class="idea_edit_type_container-header-title">
-          {{ $t("Edit idea") }}
+          {{ !value.id ? $t("New Content Area") : $t("Edit Content Area") }}
         </div>
         <div class="idea_edit_type_container-header-close"></div>
 
         <div
-          v-if="hasEdits"
+          v-if="!hasEdits"
           class="ideaEdit_type_noEdit_content"
           @click="closeIdeaEdit"
         >
@@ -19,7 +19,7 @@
         <confirm-button
           v-else
           class="ideaEdit_type_Edit_content"
-          @confirm="closeIdeaTypeEdit"
+          @confirm="closeIdeaEdit"
           :customButton="true"
           :confirmPlacement="'left'"
           :confirmMessage="$t('Unsaved Idea Data')"
@@ -36,9 +36,9 @@
         <b-card-body class="p-0 ideaEditType-form-fields">
           <div class="form-group">
             <div class="idea_edit_contentType_container-title">
-              <div>{{ $t("name") }}</div>
+              <div>{{ $t("Name") }}</div>
               <b-form-checkbox
-                v-model="value.isPrimary"
+                v-model="mutateForm.isPrimary"
                 name="check-button"
                 style="cursor: pointer"
                 size="lg"
@@ -49,24 +49,47 @@
             <b-form-input
               id="contentType"
               class="idea_edit_type_select_title"
-              v-model.trim="value.contentType"
               v-validate="'required|min:4'"
+              v-model.trim="mutateForm.contentType"
               v-autofocus
               :placeholder="$t('name')"
               type="text"
-              name="contentType"
+              name="content_type"
               autocomplete="off"
               autofocus
-              :state="$validateState('contentType', value)"
+              :state="$validateState('contentType', mutateForm)"
             ></b-form-input>
             <b-form-invalid-feedback>{{
-              $displayError("contentType", value)
+              $displayError("contentType", mutateForm)
+            }}</b-form-invalid-feedback>
+          </div>
+
+          <div v-if="!value.id" class="form-group required">
+            <div class="idea_edit_contentType_container-title">
+              {{ $t("Content Template") }}
+            </div>
+            <v-select
+              v-model="mutateForm.markup"
+              label="title"
+              v-validate="{ required: !mutateForm.id }"
+              :placeholder="$t('Content Template')"
+              class="idea_edit_content_type_select_idea_templates"
+              data-vv-name="contentType"
+              :reduce="(obj) => obj.content"
+              :options="getContentTemplates"
+              :class="{
+                'is-invalid': $validateState('markup', mutateForm) === false,
+                'is-valid': $validateState('markup', mutateForm) === true,
+              }"
+            ></v-select>
+            <b-form-invalid-feedback>{{
+              $displayError("markup", mutateForm)
             }}</b-form-invalid-feedback>
           </div>
 
           <div class="form-group">
             <div class="idea_edit_type_container-body-process-select-title">
-              {{ $t("roles") }}
+              {{ $t("Role access") }}
             </div>
             <role-selector
               v-if="roleIntent"
@@ -75,8 +98,8 @@
               id="idea_content_roles"
               class="idea_edit_content_type_select_idea_roles"
               autocomplete="idea_content_roles"
-              :placeholder="$t('Roles')"
-              v-model="value.companyRoles"
+              :placeholder="' '"
+              v-model="mutateForm.companyRoles"
               :items="[...allRoles]"
               :show-field="true"
               :show-add-btn="false"
@@ -102,6 +125,16 @@
 
 <script>
 import { mapGetters } from "vuex";
+import actionpoints from "./templates/actionpoints.json";
+import manual from "./templates/manual.json";
+import empty from "./templates/empty.json";
+import { isEqual, differenceWith, toPairs, xor } from "lodash";
+
+const emptyIdeaArea = ({ contentType = "" }) => {
+  return {
+    contentType,
+  };
+};
 
 export default {
   props: {
@@ -130,10 +163,65 @@ export default {
     this.selectablePathRoles = this.getSelectableRoles;
     this.roleIntent = Math.random();
   },
+  watch: {
+    value: {
+      deep: true,
+      handler(newVal) {
+        console.log(this.$validateState("contentType", newVal));
+        console.log(newVal);
+      },
+    },
+  },
   computed: {
     ...mapGetters({
       allRoles: "companyRole/all",
+      ideaContents: "ideaContent/all",
     }),
+    mutateForm: {
+      get() {
+        return this.value;
+      },
+      set(value) {
+        this.$emit("input", value);
+      },
+    },
+    hasEdits: {
+      get() {
+        if (this.value.id) {
+          const content = this.ideaContents.find((x) => x.id === this.value.id);
+          const flatFieldsEqual = this.objectsAreEqual(
+            emptyIdeaArea(content),
+            emptyIdeaArea(this.value.fields)
+          );
+          const listFieldsEqual = this.listsAreEqual(
+            content.companyRoles.map((role) => role.id),
+            this.value.fields.companyRoles
+          );
+
+          return !listFieldsEqual || !flatFieldsEqual;
+        }
+
+        return false;
+      },
+    },
+    getContentTemplates: {
+      get() {
+        return [
+          {
+            title: "Empty",
+            content: JSON.stringify(empty),
+          },
+          {
+            title: "Action points",
+            content: JSON.stringify(actionpoints),
+          },
+          {
+            title: "Manual",
+            content: JSON.stringify(manual),
+          },
+        ];
+      },
+    },
     getSelectableRoles: {
       get() {
         return this.allRoles;
@@ -147,14 +235,19 @@ export default {
     },
   },
   methods: {
-    save() {
+    async save() {
+      await this.$validator.reset();
       this.$emit("save");
     },
-    hasEdits() {
-      return false;
-    },
     closeIdeaEdit() {
-      console.log("closin");
+      this.$emit("close");
+    },
+    objectsAreEqual(a, b) {
+      const changes = differenceWith(toPairs(a), toPairs(b), isEqual);
+      return changes.length === 0;
+    },
+    listsAreEqual(a, b) {
+      return a.length === b.length && xor(a, b).length === 0;
     },
   },
 };
@@ -165,6 +258,11 @@ export default {
 .idea_edit_content_type_select_idea_roles > .input-wrapper > div > .counter {
   color: #4294d0;
   z-index: 1;
+}
+.idea_edit_content_type_select_idea_templates {
+  > div > input {
+    color: red;
+  }
 }
 .ideaEdit_type_noEdit_content {
   width: 36px;
@@ -219,17 +317,17 @@ export default {
   transition: 500ms;
 }
 .idea_edit_content_container_type-enter-to {
-  width: calc((100vw - 240px) * 0.25);
+  max-width: calc((100vw - 240px) * 0.25);
 }
 .idea_edit_content_container_type-leave {
   position: relative;
 }
 .idea_edit_content_container_type-enter {
-  width: 0;
+  max-width: 0;
   position: absolute;
 }
 .idea_edit_content_container_type-leave-to {
-  width: 0;
+  max-width: 0;
 }
 .ideaEdit_type_Edit_content > div {
   width: 36px;
@@ -246,7 +344,7 @@ export default {
   text-transform: uppercase;
   padding: 10px 0;
   font-size: 12px;
-		margin-left:5px;
+  margin-left: 5px;
   display: flex;
   justify-content: space-between;
 }
@@ -277,11 +375,24 @@ export default {
   font-size: 12px;
   margin-left: 5px;
 }
-.idea_edit_content_type_select_idea_roles {
-  font-size: 12px;
-	margin-left: -5px;
-  & > .input-wrapper > div {
 
+.idea_edit_content_type_select_idea_templates {
+  font-size: 14px;
+  margin-left: -5px;
+  > div {
+    background: #fff !important;
+    border-top: 1px solid #fff !important;
+    border-left: 1px solid #fff !important;
+    border-right: 1px solid #fff !important;
+    border-bottom: 1px solid lightgray;
+    margin-left: -3px;
+  }
+}
+
+.idea_edit_content_type_select_idea_roles {
+  font-size: 14px;
+  margin-left: -5px;
+  & > .input-wrapper > div {
     & > .items {
       line-height: 2px;
       border-top: 1px solid #fff !important;

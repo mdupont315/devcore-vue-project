@@ -19,9 +19,6 @@
           <div>
             {{ item.contentType }}
           </div>
-          <span @click.stop="editContentType(item)">
-            <i class="mdi mdi-pencil"></i>
-          </span>
         </div>
 
         <div class="idea_content-type-select_btnNewIdeaTemplate-item-badge">
@@ -33,12 +30,16 @@
           >
         </div>
 
+        <div>
+          <span @click.stop="editContentType(item)">
+            <i class="mdi mdi-pencil"></i>
+          </span>
+        </div>
+
         <div class="idea_content-type-select_btnNewIdeaTemplate-item-comments">
           <b-badge pill variant="primary">{{
             comments.improvementsCount
           }}</b-badge>
-        </div>
-        <div class="idea_content-type-select_btnNewIdeaTemplate-item-comments">
           <b-badge pill variant="danger">{{ comments.problemCount }}</b-badge>
         </div>
       </div>
@@ -101,11 +102,12 @@ export default {
   margin: 10px;
   flex-direction: row;
   background: transparent;
-  position: absolute;
-  width: 350px;
-  margin-left: -230px;
+  position: fixed;
+  width: 400px;
+  top: 180px;
+  margin-left: -272px;
   & > .icon-container {
-    margin-right: 10px;
+    margin-right: 5px;
     display: flex;
     cursor: pointer;
     & > svg {
@@ -137,7 +139,6 @@ export default {
   text-overflow: ellipsis;
   white-space: nowrap;
   margin: 0px 5px;
-  flex-grow: 20;
   & > div {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -156,8 +157,6 @@ export default {
 }
 
 .idea_content-type-select_btnNewIdeaTemplate-item-comments {
-  flex-grow: 1;
-  max-width: 25px;
   & > span {
     margin: 2.5px;
     border-radius: 20%;

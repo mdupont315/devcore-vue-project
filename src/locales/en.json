@@ -690,5 +690,11 @@
   "Select or Drag Attachment": "Select attachments from files or drag your attachments here.",
   "You can upload attachment up to size": "You can upload attachment sizes up to {size} mb.",
   "Do not close window": "Saving... Please do not close or exit browser window, while content is saving.",
-  "You must save idea before editing templates": "You must save idea before you can edit content templates!"
+  "You must save idea before editing templates": "You must save instruction before you can add new content areas!",
+  "New Content Area": "New content area",
+  "Edit Content Area": "Edit content area",
+  "Content Template": "Content Template",
+  "Role access": "Role access",
+  "Leave empty if no restrictions": "Leave empty if no restrictions",
+  "content_type": "name"
 }

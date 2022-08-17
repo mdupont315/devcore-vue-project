@@ -122,7 +122,6 @@ export default {
     ...mapGetters({
       ideaContents: "ideaContent/all",
       ideaInEdit: "idea/ideaInEdit",
-      ideas: "idea/all",
       currentProcess: "process/current",
       companyRoles: "companyRole/all",
     }),
@@ -133,10 +132,7 @@ export default {
     },
     getIdea: {
       get() {
-        const idea =
-          this.ideas.find(
-            (idea) => idea.id === this.ideaInEdit?.editIdea?.id
-          ) || null;
+        const idea = this.ideaInEdit?.editIdea || null;
         if (idea) {
           return idea;
         } else {
@@ -269,8 +265,6 @@ export default {
     },
 
     ideaContentFormFieldMapper() {
-      console.log(this.getIdea);
-      console.log(this.getIdea.ideaContentId);
       if (this.getIdea && this.getIdea.ideaContentId) {
         this.ideaContents.map((content) => {
           const mapToCategory = this.ideaContentCategories.find((category) => {
@@ -435,23 +429,48 @@ export default {
     async saveIdeaAreaVersion(form) {
       this.isLoading = true;
       this.isSaving = true;
-      console.log(form.fields);
+      console.log("formFIELDS: ", form.fields);
+      const fields = {
+        id: form.fields.id,
+        ideaId: form.fields.ideaId,
+        version: form.fields.version,
+        companyRoles: form.fields.companyRoles,
+        contentType: form.fields.contentType,
+        isPrimary: form.fields.isPrimary,
+      };
       try {
-        const modifyAreaForm = new GQLForm({
-          id: form.fields.id,
-          ideaId: form.fields.ideaId,
-          version: form.fields.version,
-          companyRoles: form.fields.companyRoles,
-          contentType: form.fields.contentType,
-          isPrimary: form.fields.isPrimary,
-        });
-
-        await this.$store.dispatch(`ideaContent/update`, modifyAreaForm);
+        if (form.fields.id) {
+          await this.$store.dispatch(
+            `ideaContent/update`,
+            new GQLForm({ ...fields })
+          );
+        } else {
+          await this.$store.dispatch(
+            `ideaContent/create`,
+            new GQLForm({ ...fields, markup: form.fields.markup })
+          );
+        }
       } catch (e) {
         console.log(e);
       } finally {
+
+				//TODO: figure out a way to refresh ideaContentCategories array with created data
+				// below query is redundant if we just manually set "firstpage" badge on UI
+				// instead of fetch idea again
         await this.$store.dispatch("idea/findById", {
           id: form.fields.ideaId,
+          force: true,
+        });
+        await this.$store.dispatch("ideaContent/findAll", {
+          filter: {
+            data: {
+              where: {
+                field: "idea_id",
+                op: "eq",
+                value: form.fields.ideaId,
+              },
+            },
+          },
           force: true,
         });
         const otherContent = this.ideaContentCategories.filter(

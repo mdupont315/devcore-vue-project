@@ -17,7 +17,7 @@
         <div v-if="!idea.id">
           <b-popover
             target="idea_content_type_info_info_text-info"
-            triggers="click"
+            triggers="hover"
             placement="top"
             boundary="window"
           >
@@ -62,6 +62,7 @@
           :isLoading="isLoading"
           v-model="editContentItem"
           @save="save"
+					@close="contentTypeSelectorForm = false"
         />
       </div>
     </div>
@@ -87,6 +88,7 @@
 import ideaContentEditor from "../editor/IdeaContentEditor.vue";
 import ideaEditType from "./IdeaEditType";
 import ideaEditSelectType from "./IdeaEditSelectType";
+import GQLForm from "@/lib/gqlform";
 
 export default {
   components: {
@@ -155,7 +157,6 @@ export default {
     getContentName: {
       get() {
         let name = "";
-        console.log(this.ideaContentCategories);
         if (this.ideaContentCategories.length > 0) {
           const form = this.ideaContentCategories[this.selectedCategoryIndex];
           name = form.contentForm.contentType;
@@ -191,6 +192,7 @@ export default {
   }),
   methods: {
     save() {
+      console.log(this.editContentItem);
       this.$emit("saveIdeaContentArea", this.editContentItem);
     },
     editContentType(item) {
@@ -206,6 +208,15 @@ export default {
       console.log("creating new !");
       this.contentTypeSelectorForm = true;
       this.contentTypeSelectorVisible = true;
+      this.editContentItem = new GQLForm({
+        id: undefined,
+        markup: '',
+        version: 1,
+        isPrimary: false,
+        contentType: null,
+        ideaId: this.idea.id,
+        companyRoles: [],
+      });
     },
     changeContentType(item) {
       this.$emit("changeType", item);
@@ -217,9 +228,6 @@ export default {
     closeContentType() {
       this.contentTypeSelectorForm = false;
       this.contentTypeSelectorVisible = false;
-    },
-    addNewIdeaTemplate() {
-      console.log("addin");
     },
     setContentWindowTop(scrollTop) {
       this.contentWindowTop = scrollTop;
@@ -297,6 +305,7 @@ export default {
 }
 .idea_edit_content_container_content-header {
   display: flex;
+	height: 81px;
   background: #fff;
   justify-content: space-between;
   align-items: center;
@@ -306,6 +315,8 @@ export default {
   height: 60px;
   padding: 20px;
   font-size: 16px;
+	font-weight: 800;
+	letter-spacing: 1px;
 }
 
 .idea_edit_content_container_content-header-button {
@@ -316,13 +327,14 @@ export default {
   white-space: nowrap;
   display: flex;
   align-items: center;
+  flex-direction: column;
 
-  > #idea_edit_content_btnNewIdeaTemplate:not(:disabled) {
+  > #idea_edit_content_btnNewIdeaTemplate {
     background: #fff;
     border-radius: 5px;
     width: 120px;
     min-height: 41px;
-    &:hover {
+    &:hover:not(:disabled) {
       color: #fff;
       background: #4294d0 !important;
       border-color: #4294d0;

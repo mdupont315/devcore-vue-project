@@ -419,15 +419,6 @@ export default {
         if (val.length < 15) this.budget = val;
       },
     },
-    // ifEditAndFinished: {
-    //   get() {
-    //     if (this.stage) {
-    //       return this.mode == "edit" ? this.stage.status === "FINISHED" : false;
-    //     } else {
-    //       return false;
-    //     }
-    //   },
-    // },
     getAvailableOrAllStages: {
       get() {
         return this.filteredProjects.filter(
@@ -543,7 +534,7 @@ export default {
     await Promise.all([
       this.loadUsers(),
       this.loadIdeas(),
-      this.loadToolIdeas(),
+   //   this.loadToolIdeas(),
     ]);
     await this.initForm();
     this.ready = true;
@@ -559,12 +550,12 @@ export default {
       });
       return result;
     },
-    async loadToolIdeas() {
-      const result = await this.$store.dispatch("toolIdea/findByProcess", {
-        id: this.process.id,
-      });
-      return result;
-    },
+    // async loadToolIdeas() {
+    //   const result = await this.$store.dispatch("toolIdea/findByProcess", {
+    //     id: this.process.id,
+    //   });
+    //   return result;
+    // },
     async loadUsers() {
       const result = await this.$store.dispatch("user/findAll", {});
       return result;

@@ -1,0 +1,402 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "TEMPLATE GOAL:",
+          "type": "text",
+          "marks": [{ "type": "bold" }]
+        },
+        {
+          "text": " Manuals are longer and more massive learning content. Manual can be to learn ins and outs of specific software or processes. Here it is important to always bring the topic back to the whole concept and how each thing is connected to the whole.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 2, "indent": 0 },
+      "content": [
+        {
+          "text": "The Benefit (first title of action point manual)",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "Direct reader attention & create interest in the general topic. A good way to create interest is to tell them the positive benefits they get in their work by utilizing this information or how they can avoid negative problems or frustrations.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "Also as the topic is big, it is good to open up each benefit reader can get from learning this topic",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        { "text": "Benefit A", "type": "text", "marks": [{ "type": "bold" }] }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "Business use-cases for additional benefits in workflow",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        { "text": "Benefit B", "type": "text", "marks": [{ "type": "bold" }] }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "Business use-cases for additional benefits in workflow",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        { "text": "Benefit C", "type": "text", "marks": [{ "type": "bold" }] }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "Business use-cases for additional benefits in workflow",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        { "text": "Benefit D", "type": "text", "marks": [{ "type": "bold" }] }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "Business use-cases for additional benefits in workflow",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 1, "indent": 0 },
+      "content": [{ "text": "Overview", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "This overview will explain each topic and its benefits. So the reader can quickly navigate to the wanted area through a table of contents.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        { "text": "Topic A", "type": "text", "marks": [{ "type": "bold" }] }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        { "text": "What it is, what results can be achieved.", "type": "text" }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        { "text": "Topic B", "type": "text", "marks": [{ "type": "bold" }] }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        { "text": "What it is, what results can be achieved.", "type": "text" }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 1, "indent": 0 },
+      "content": [{ "text": "Topic A Overview", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "On topic overview, open up what different elements there are in this topic and how they are interconnected with each other.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        { "text": "Element A", "type": "text", "marks": [{ "type": "bold" }] }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "What it is, what it does do, and how it affects other elements.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        { "text": "Element B", "type": "text", "marks": [{ "type": "bold" }] }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "What it is, what it does do, and how it affects other elements.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        { "text": "Element C", "type": "text", "marks": [{ "type": "bold" }] }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "What it is, what it does do, and how it affects other elements.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 2, "indent": 0 },
+      "content": [{ "text": "Topic A Element A", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "Get through elements well and in-depth. Use animated gifs to show or videos for longer explanations to teach the reader how this element functions.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 24 },
+      "content": [
+        { "text": "Attention!", "type": "text", "marks": [{ "type": "bold" }] },
+        {
+          "text": " Use this type of writing to bring up possible variables that may incur. For example, if a machine was just maintained, it cannot be operated as instructed but requires a quality check first. Tell them to do it here, before moving to the next step.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 3, "indent": 0 },
+      "content": [{ "text": "Problem solve A", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "In the end, you open up common problems that may appear and how to solve them.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 2, "indent": 0 },
+      "content": [{ "text": "Topic A Element B", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "Get through elements well and in-depth. Use animated gifs to show or videos for longer explanations to teach the reader how this element functions.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 24 },
+      "content": [
+        {
+          "text": "Attention! ",
+          "type": "text",
+          "marks": [{ "type": "bold" }]
+        },
+        {
+          "text": "Use this type of writing to bring up possible variables that may incur. For example, if a machine was just maintained, it cannot be operated as instructed but requires a quality check first. Tell them to do it here, before moving to the next step.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 2, "indent": 0 },
+      "content": [{ "text": "Topic A Element C", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "Get through elements well and in-depth. Use animated gifs to show or videos for longer explanations to teach the reader how this element functions.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 24 },
+      "content": [
+        { "text": "Attention!", "type": "text", "marks": [{ "type": "bold" }] },
+        {
+          "text": " Use this type of writing to bring up possible variables that may incur. For example, if a machine was just maintained, it cannot be operated as instructed but requires a quality check first. Tell them to do it here, before moving to the next step.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 2, "indent": 0 },
+      "content": [{ "text": "Topic A Practice", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "There can be tons of information before this, so it is good to serve readers who learn by applying. Create an example task to practice what he has learned. Here, give a task to do something.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 3, "indent": 0 },
+      "content": [{ "text": "Topic A Practice results", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "And here, you will show step-by-step how to complete the practice. Readers should be able to achieve tasks without looking at these results.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 1, "indent": 0 },
+      "content": [{ "text": "Topic B Overview", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "On topic overview, open up what different elements there are in this topic and how they are interconnected with each other.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        { "text": "Element A", "type": "text", "marks": [{ "type": "bold" }] }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "What it is, what it does do, and how it affects other elements.",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 1, "indent": 0 },
+      "content": [{ "text": "Reflect", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
+      "content": [
+        {
+          "text": "One person cannot have all the best practices, thus it is important to involve readers to participate in improving this instruction. Tell them to do it, the possible benefit, and how to do it in ClanDeploy.",
+          "type": "text"
+        }
+      ]
+    },
+    { "type": "paragraph", "attrs": { "id": null, "indent": 0 } }
+  ]
+}

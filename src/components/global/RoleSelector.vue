@@ -129,13 +129,6 @@ export default {
       return this.value;
     },
   },
-  watch: {
-    "dataValue.length": {
-      handler(newVal) {
-        console.log("dataValue", this.dataValue);
-      },
-    },
-  },
   data: () => ({
     showPopOver: false,
     dataValue: [],
@@ -164,20 +157,13 @@ export default {
     },
   },
   mounted() {
-    console.log("MOUNTED!");
     if (this.value) {
-      console.log("value: ", this.value);
-      console.log("roles", this.roles);
-
       if (this.value.length > 0) {
         const roles = this.value.filter((role) => {
           const roleId = typeof role === "object" ? role.id : role;
           const allRoleIds = this.roles.map((x) => x.id);
           return allRoleIds.includes(roleId);
-
-          //   return this.roles.find((u) => u.id === id) != null;
         });
-        console.log("result", roles);
         this.dataValue = roles.map((role) => {
           return typeof role === "object" ? role.id : role;
         });
