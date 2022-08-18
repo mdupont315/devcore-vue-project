@@ -42,7 +42,9 @@
           :loading="isLoading"
           @click="toggleContentTypeSelector()"
         >
-          <div v-if="!isLoading">{{ getContentName }}</div>
+          <div v-if="!isLoading">
+            {{ getContentName || $t("unnamed_type") }}
+          </div>
         </loading-button>
 
         <idea-edit-select-type
@@ -57,12 +59,14 @@
         />
 
         <idea-edit-type
+          v-if="editContentItem"
           :visible="contentTypeSelectorForm"
           :primary="getPrimaryContentType"
           :isLoading="isLoading"
           v-model="editContentItem"
           @save="save"
-					@close="contentTypeSelectorForm = false"
+          @remove="remove"
+          @close="contentTypeSelectorForm = false"
         />
       </div>
     </div>
@@ -146,14 +150,23 @@ export default {
         );
       },
     },
+
     getPrimaryContentType: {
       get() {
-        const primaryForm = this.ideaContentCategories.find(
-          (content) => content.contentForm.id == this.idea.ideaContentId
+        let primaryForm = this.ideaContentCategories.find(
+          (category) => category.isPrimary
         );
+
+        if (!primaryForm) {
+          primaryForm =
+            this.ideaContentCategories.find(
+              (content) => content.contentForm.id == this.idea.ideaContentId
+            ) || this.ideaContentCategories[0];
+        }
         return primaryForm ? primaryForm.contentForm : {};
       },
     },
+
     getContentName: {
       get() {
         let name = "";
@@ -189,15 +202,25 @@ export default {
     newType: "",
     contentWindowTop: null,
     editContentItem: null,
+    localPrimary: null,
   }),
   methods: {
     save() {
-      console.log(this.editContentItem);
       this.$emit("saveIdeaContentArea", this.editContentItem);
     },
+    remove() {
+      this.$emit("removeIdeaContentArea", this.editContentItem);
+    },
     editContentType(item) {
-      console.log("edit item fields: ", item.fields);
-      this.editContentItem = item;
+      this.editContentItem = new GQLForm({
+        id: item.id,
+        markup: item.markup,
+        version: item.version,
+        isPrimary: item.isPrimary,
+        name: item.contentType,
+        ideaId: item.ideaId,
+        companyRoles: item.companyRoles,
+      });
       this.contentTypeSelectorForm = true;
     },
     toggleContentTypeSelector() {
@@ -205,15 +228,15 @@ export default {
       this.contentTypeSelectorVisible = !this.contentTypeSelectorVisible;
     },
     createContentType() {
-      console.log("creating new !");
+      console.log("created!");
       this.contentTypeSelectorForm = true;
       this.contentTypeSelectorVisible = true;
       this.editContentItem = new GQLForm({
         id: undefined,
-        markup: '',
+        markup: "",
         version: 1,
         isPrimary: false,
-        contentType: null,
+        name: "",
         ideaId: this.idea.id,
         companyRoles: [],
       });
@@ -305,7 +328,7 @@ export default {
 }
 .idea_edit_content_container_content-header {
   display: flex;
-	height: 81px;
+  height: 81px;
   background: #fff;
   justify-content: space-between;
   align-items: center;
@@ -315,8 +338,8 @@ export default {
   height: 60px;
   padding: 20px;
   font-size: 16px;
-	font-weight: 800;
-	letter-spacing: 1px;
+  font-weight: 800;
+  letter-spacing: 1px;
 }
 
 .idea_edit_content_container_content-header-button {
@@ -325,13 +348,14 @@ export default {
   font-size: 16px;
   z-index: 2;
   white-space: nowrap;
+  flex-direction: row;
   display: flex;
   align-items: center;
-  flex-direction: column;
+  background: #fff;
+  border-radius: 5px;
+  min-height: 41px;
 
   > #idea_edit_content_btnNewIdeaTemplate {
-    background: #fff;
-    border-radius: 5px;
     width: 120px;
     min-height: 41px;
     &:hover:not(:disabled) {

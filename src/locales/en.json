@@ -672,7 +672,7 @@
     "LICENSE": "License",
     "PROJECT": "Project"
   },
-  "first page": "First page",
+  "first page": "Home",
   "Idea Template": "Idea Template",
   "View all": "View all",
   "Back To Process": "Back",
@@ -696,5 +696,6 @@
   "Content Template": "Content Template",
   "Role access": "Role access",
   "Leave empty if no restrictions": "Leave empty if no restrictions",
-  "content_type": "name"
+  "contentType": "name",
+  "unnamed_type": "Unnamed"
 }

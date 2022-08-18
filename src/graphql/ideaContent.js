@@ -50,6 +50,11 @@ export const IDEA_CONTENT = {
     }
     ${IDEA_CONTENT_FULL_FRAGMENT}
   `,
+  delete: gql`
+    mutation ideaContentDelete($id: ID!) {
+      ideaContentDelete(id: $id)
+    }
+  `,
   update: gql`
     mutation ideaContentUpdate($id: ID!, $input: IdeaContentUpdateInput!) {
       ideaContentUpdate(id: $id, input: $input) {

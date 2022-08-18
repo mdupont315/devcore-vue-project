@@ -57,31 +57,32 @@ function getErrorMessage(vue, ref, form = null) {
   const userLanguage = store.getters["auth/user"]?.lang ?? "en";
 
   let errorMessage = "";
+
   if (vue.vFields[ref]) {
-
-
-    if (form && form.contentType) {
-      console.log(ref, form)
-      console.log(vue.vErrors.first(ref))
-    }
-
-    errorMessage = vue.vErrors.first(ref)
-      ? vue.vErrors.first(ref)
-      : form &&
+    if (vue.vErrors.first(ref)) {
+      errorMessage = vue.vErrors.first(ref);
+    } else {
+      errorMessage =
+        form &&
         form.getError(ref) &&
         vue.vFields[ref] &&
         !vue.vFields[ref].changed
-      ? form.getError(ref).message
-      : null;
+          ? form.getError(ref).message
+          : null;
+    }
   }
-
-
   if (errorMessage) {
     const validationlocales = require(`../locales/${userLanguage}.json`);
     if (errorMessage.includes(ref)) {
       const re = new RegExp(`\\b${ref}\\b`, "gi");
-      const replaceText = validationlocales[ref]
-      ? validationlocales[ref] : validationlocales[ref.charAt(0).toUpperCase() + ref.slice(1)];
+      let replaceText = "";
+      if (validationlocales[ref]) {
+        replaceText = validationlocales[ref];
+      } else {
+        replaceText =
+          validationlocales[ref.charAt(0).toUpperCase() + ref.slice(1)];
+      }
+
       return errorMessage.replace(re, replaceText);
     }
 
@@ -95,10 +96,7 @@ function getErrorMessage(vue, ref, form = null) {
 Vue.use({
   install(Vue) {
     Vue.prototype.$validateState = function(ref, form = null) {
-
       const message = getErrorMessage(this, ref, form);
-
-      console.log(message)
 
       const ret =
         message === null || message.message === null || message.message === "";

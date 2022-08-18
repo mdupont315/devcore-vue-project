@@ -701,7 +701,7 @@
     "LICENSE": "Lisenssi",
     "PROJECT": "Projektikohtainen"
   },
-  "first page": "Etusivu",
+  "first page": "Alku",
   "Idea Template": "Idea pohja",
   "View all": "Katso kaikki",
   "Super Admininstrator Panel": "Super-järjestelmänvalvojan paneeli",
@@ -723,5 +723,6 @@
   "Content Template": "Sisältö-alue",
   "Role access": "Oikeudet",
   "Leave empty if no restrictions": "Jätä tyhjäksi jos ei rajoituksia",
-  "content_type": "nimi"
+  "contentType": "nimi",
+  "unnamed_type": "Nimetön"
 }

@@ -49,6 +49,7 @@ const actions = {
   },
 
   async setIdeaTab(context, form) {
+    console.log(form)
     EventBus.$emit("idea/currentTab", {
       form
     });

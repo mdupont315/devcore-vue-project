@@ -47,20 +47,21 @@
             </div>
 
             <b-form-input
-              id="contentType"
+              id="name"
               class="idea_edit_type_select_title"
               v-validate="'required|min:4'"
-              v-model.trim="mutateForm.contentType"
+              v-model="mutateForm.name"
               v-autofocus
-              :placeholder="$t('name')"
+              :disabled="mutateForm.busy"
+              :placeholder="$t('Name')"
               type="text"
-              name="content_type"
+              name="name"
               autocomplete="off"
               autofocus
-              :state="$validateState('contentType', mutateForm)"
+              :state="$validateState('name', value)"
             ></b-form-input>
             <b-form-invalid-feedback>{{
-              $displayError("contentType", mutateForm)
+              $displayError("name", value)
             }}</b-form-invalid-feedback>
           </div>
 
@@ -71,7 +72,7 @@
             <v-select
               v-model="mutateForm.markup"
               label="title"
-              v-validate="{ required: !mutateForm.id }"
+							 v-validate="'required'"
               :placeholder="$t('Content Template')"
               class="idea_edit_content_type_select_idea_templates"
               data-vv-name="contentType"
@@ -98,7 +99,7 @@
               id="idea_content_roles"
               class="idea_edit_content_type_select_idea_roles"
               autocomplete="idea_content_roles"
-              :placeholder="' '"
+              :placeholder="$t('Role access')"
               v-model="mutateForm.companyRoles"
               :items="[...allRoles]"
               :show-field="true"
@@ -106,16 +107,42 @@
             ></role-selector>
           </div>
         </b-card-body>
-        <b-card-footer style="border-top: none; margin: 10px 0; padding: 0">
-          <loading-button
-            :disabled="vErrors.any() || isLoading"
-            :loading="isLoading"
-            size="lg"
-            :style="{ cursor: isLoading ? 'not-allowed' : 'pointer' }"
-            block
-            style="border-radius: 3px"
-            type="submit"
-            >{{ $t("Save") }}</loading-button
+        <b-card-footer
+          style="border-top: none; margin: 10px 0; padding: 0; display: flex"
+        >
+          <b-col>
+            <loading-button
+              :disabled="vErrors.any() || isLoading"
+              :loading="isLoading"
+              size="lg"
+              :style="{ cursor: isLoading ? 'not-allowed' : 'pointer' }"
+              block
+              style="border-radius: 3px; flex-grow: 1"
+              type="submit"
+              >{{ $t("Save") }}</loading-button
+            >
+          </b-col>
+          <b-col>
+            <confirm-button
+              buttonVariant="outline-danger"
+              size="lg"
+              :isDisabled="isLoading"
+              :style="{ cursor: isLoading ? 'not-allowed' : 'pointer' }"
+              :btnClass="
+                isLoading
+                  ? 'ideaEdit_path_remove_button-disabled'
+                  : 'ideaEdit_path_remove_button-enabled'
+              "
+              :confirm-title="$t('Delete') + ' ' + mutateForm.name + '?'"
+              :confirmPlacement="'top'"
+              style="flex-grow: 1; border-radius: 3px; text-align: center"
+              :confirm-message="$t('This action cannot be undone!')"
+              @confirm="remove"
+            >
+              <div class="ideaEditPath-remove-idea-button">
+                {{ $t("Remove") }}
+              </div>
+            </confirm-button></b-col
           >
         </b-card-footer>
       </b-form>
@@ -163,15 +190,6 @@ export default {
     this.selectablePathRoles = this.getSelectableRoles;
     this.roleIntent = Math.random();
   },
-  watch: {
-    value: {
-      deep: true,
-      handler(newVal) {
-        console.log(this.$validateState("contentType", newVal));
-        console.log(newVal);
-      },
-    },
-  },
   computed: {
     ...mapGetters({
       allRoles: "companyRole/all",
@@ -179,6 +197,7 @@ export default {
     }),
     mutateForm: {
       get() {
+				console.log(this.value.errors)
         return this.value;
       },
       set(value) {
@@ -187,8 +206,11 @@ export default {
     },
     hasEdits: {
       get() {
+        console.log("remove");
+        console.log(this.value);
         if (this.value.id) {
           const content = this.ideaContents.find((x) => x.id === this.value.id);
+          if (!content) return false;
           const flatFieldsEqual = this.objectsAreEqual(
             emptyIdeaArea(content),
             emptyIdeaArea(this.value.fields)
@@ -238,6 +260,10 @@ export default {
     async save() {
       await this.$validator.reset();
       this.$emit("save");
+    },
+    async remove() {
+      await this.$validator.reset();
+      this.$emit("remove");
     },
     closeIdeaEdit() {
       this.$emit("close");

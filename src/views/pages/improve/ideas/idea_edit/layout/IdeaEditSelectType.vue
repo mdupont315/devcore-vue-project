@@ -17,7 +17,7 @@
           class="idea_content-type-select_btnNewIdeaTemplate-item-contentType"
         >
           <div>
-            {{ item.contentType }}
+            {{ !item.contentType ? $t('unnamed_type') : item.contentType }}
           </div>
         </div>
 
@@ -105,11 +105,15 @@ export default {
   position: fixed;
   width: 400px;
   top: 180px;
-  margin-left: -272px;
+  margin-left: -281px;
   & > .icon-container {
     margin-right: 5px;
+    margin-top: 1px;
+    display: flex;
+    align-items: flex-start;
     display: flex;
     cursor: pointer;
+    width: 30px;
     & > svg {
       transform: translate(0px, -2px);
     }

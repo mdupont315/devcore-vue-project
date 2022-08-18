@@ -325,20 +325,20 @@ export default {
     //     await this.closeIdeaEdit();
     //   }
 
-		// 	console.log(this.$router.params)
+    //   console.log(this.$router);
+    //   console.log("__________________");
 
-    //   if (this.$router.params && this.$router.params.type !== "New") {
+    //   const { currentRoute } = this.$router;
+
+    //   if (
+    //     currentRoute.params &&
+    //     currentRoute.params.type !== "New" &&
+    //     data.form.tab === "New"
+    //   ) {
     //     const ref = `ideas_innerView_${tabName}`;
-    //     //console.log(data);
-    //     //console.log(tabName);
     //     if (this.$refs[ref] && this.$refs[ref].$el) {
-    //       //  this.updatePathParams({ type: null });
-    //       //   this.$router.push({ params: { type: "" } });
-    //       this.updatePathParams(this.$router, { type: "New" });
     //       this.$nextTick(() => {
     //         this.$refs[ref].$el.click();
-    //         // this.setComponent("New");
-    //         //  this.currentComponent = import("./New.vue");
     //       });
     //     }
     //   }
@@ -352,21 +352,14 @@ export default {
     }
   },
   methods: {
-    // updatePathParams($router, newParams) {
-    //   // Retrieve current params
-    //   const currentParams = $router.currentRoute.params;
+    updatePathQuery($router, newQuery) {
+      // Retrieve current params
+      const currentQuery = $router.currentRoute.query;
 
-    //   // Create new params object
-    //   const mergedParams = { ...currentParams, ...newParams };
-
-    //   // console.log(currentParams);
-    //   // console.log(newParams);
-
-    //   // When router is not supplied path or name,
-    //   // it simply tries to update current route with new params or query
-    //   // Almost everything is optional.
-    //   $router.push({ params: mergedParams });
-    // },
+      // Create new params object
+      const mergedQuery = { ...currentQuery, ...newQuery };
+      $router.push({ query: mergedQuery });
+    },
     async goToIdeaByQuery() {
       // Navigated through link
       if (this.$router.currentRoute.query) {
@@ -506,6 +499,7 @@ export default {
     },
 
     async setComponent(component) {
+      console.log("SETTIN COMPONENT");
       await this.closeIdeaEdit();
       await this.loadComponent(component);
     },

@@ -48,15 +48,26 @@ const actions = {
         }
       });
       //if (reload) {
-        ret = new IdeaContent().deserialize(result.data.ideaContentUpdate);
-        context.commit("SET_ITEM", ret);
-    //  }
+      ret = new IdeaContent().deserialize(result.data.ideaContentUpdate);
+      context.commit("SET_ITEM", ret);
+      //  }
     } catch (e) {
       console.log(e);
     } finally {
       form.busy = false;
-      }
+    }
     return ret;
+  },
+
+  async delete(context, form) {
+    const result = await form.mutate({
+      mutation: IDEA_CONTENT.delete,
+      variables: {
+        id: form.id
+      }
+    });
+    context.commit("REMOVE_ITEM", form);
+    return result.data.ideaContentDelete;
   },
 
   async findAll(context, { filter = null, force = false } = {}) {
@@ -121,6 +132,9 @@ const actions = {
 const mutations = {
   SET_FILTER(state, value) {
     state.filter = value;
+  },
+  REMOVE_ITEM(state, value) {
+    state.all = state.all.filter(o => o.id != value.id);
   },
   SET_ALL(state, value) {
     state.all = value;
