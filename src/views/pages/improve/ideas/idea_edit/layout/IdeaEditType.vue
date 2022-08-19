@@ -70,7 +70,7 @@
               autofocus
               :class="{
                 'is-invalid':
-                  $validateState('name', mutateForm) === false || !isUnique,
+                  $validateState('name', mutateForm) === false || !isUnique ,
                 'is-valid':
                   $validateState('name', mutateForm) === true && isUnique,
               }"
@@ -78,7 +78,7 @@
             <b-form-invalid-feedback>{{
               $displayError("name", mutateForm)
             }}</b-form-invalid-feedback>
-            <b-form-invalid-feedback v-if="!isUnique && value.id">
+            <b-form-invalid-feedback v-if="!isUnique">
               {{
                 $t("validation.messages.unique", [$t("Name")])
               }}</b-form-invalid-feedback
@@ -154,6 +154,7 @@
             <confirm-button
               buttonVariant="outline-danger"
               size="lg"
+							:isDisabled="vErrors.any() || isLoading || mutateForm.markup === null"
               :style="{
                 cursor:
                   vErrors.any() || isLoading || mutateForm.markup === null
