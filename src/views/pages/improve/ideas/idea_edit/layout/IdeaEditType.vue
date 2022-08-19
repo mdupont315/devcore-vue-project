@@ -237,7 +237,6 @@ export default {
     isUnique: {
       get() {
         let names = this.categories.map((category) => {
-					console.log(category)
           return {
             name: category.contentType.toUpperCase(),
             id: category.id,
@@ -261,6 +260,8 @@ export default {
         return this.value;
       },
       set(value) {
+				console.log("value")
+				console.log(value)
         this.$emit("input", value);
       },
     },
@@ -323,18 +324,17 @@ export default {
     "mutateForm.isPrimary": {
       handler(newVal) {
         if (newVal) {
-          this.mutateForm.companyRoles = this.allRoles;
+          this.mutateForm.fields.companyRoles = this.allRoles;
+					this.roleIntent = Math.random()
         }
       },
     },
   },
   methods: {
     validate() {
-      console.log(this.vErrors);
       this.$validator.validateAll();
     },
     async save() {
-      console.log(this.vErrors.any());
       if (!this.vErrors.any()) {
         this.$validator.reset();
         this.$emit("save");
