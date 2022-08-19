@@ -207,6 +207,12 @@ export default {
   methods: {
     save() {
       this.$emit("saveIdeaContentArea", this.editContentItem);
+
+      setTimeout(() => {
+        if (!this.editContentItem.id) {
+          this.contentTypeSelectorForm = false;
+        }
+      }, 500);
     },
     remove() {
       if (this.editContentItem.isPrimary) {
