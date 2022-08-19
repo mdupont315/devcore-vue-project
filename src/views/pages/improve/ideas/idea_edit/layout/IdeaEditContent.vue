@@ -202,14 +202,24 @@ export default {
     newType: "",
     contentWindowTop: null,
     editContentItem: null,
-    localPrimary: null,
   }),
   methods: {
     save() {
       this.$emit("saveIdeaContentArea", this.editContentItem);
     },
     remove() {
-      this.$emit("removeIdeaContentArea", this.editContentItem);
+      if (this.editContentItem.isPrimary) {
+        window.vm.$snotify.error(this.$t("you must appoint another home page before remove"), {
+          timeout: 5000,
+          showProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+        });
+      } else {
+        this.$emit("removeIdeaContentArea", this.editContentItem);
+				this.contentTypeSelectorForm = false
+      }
+      //
     },
     editContentType(item) {
       this.editContentItem = new GQLForm({

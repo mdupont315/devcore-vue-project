@@ -228,6 +228,9 @@
     "ideaContentCreate": "Idea sisältö tallennettu onnistuneesti!",
     "ideaContentCreateFail": "Idea sisällön tallennus epäonnistui!",
 
+    "ideaContentDelete": "Idea sisältö poistettiin onnistuneesti!",
+    "ideaContentDeleteFail": "Idean sisällön poistaminen epäonnistui!",
+
     "ideaContentUpdate": "Idea sisältö päivitettiin onnistuneesti!",
     "ideaContentUpdateFail": "Idea sisällön päivitys epäonnistui!",
 
@@ -724,5 +727,6 @@
   "Role access": "Oikeudet",
   "Leave empty if no restrictions": "Jätä tyhjäksi jos ei rajoituksia",
   "contentType": "nimi",
-  "unnamed_type": "Nimetön"
+  "unnamed_type": "Nimetön",
+  "you must appoint another home page before remove": "Sinun täytyy asettaa toinen sisältö-alue alkusivuksi ennen kuin voit poistaa sen"
 }

@@ -228,6 +228,8 @@
     "ideaContentCreate": "Idea content saved succesfully!",
     "ideaContentCreateFail": "Saving idea content failed!",
 
+    "ideaContentDelete": "Idea content deleted succesfully!",
+    "ideaContentDeleteFail": "Deleting idea content failed!",
 
     "ideaContentUpdate": "Idea content updated succesfully!",
     "ideaContentUpdateFail": "Updating idea content failed!",
@@ -697,5 +699,6 @@
   "Role access": "Role access",
   "Leave empty if no restrictions": "Leave empty if no restrictions",
   "contentType": "name",
-  "unnamed_type": "Unnamed"
+  "unnamed_type": "Unnamed",
+  "you must appoint another home page before remove": "You must appoint another area as home page before deleting area"
 }

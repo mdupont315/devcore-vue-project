@@ -98,6 +98,7 @@ export default {
     },
     windowTop: {
       handler(newVal) {
+        if (!newVal) return;
         this.$emit("contentWindowTop", newVal);
       },
     },
@@ -123,9 +124,12 @@ export default {
   },
   methods: {
     onScroll(e) {
-      this.windowTop = e.srcElement.scrollTop;
 
-      if (this.editor) {
+      if (this.editor.storage.scrollPosition) {
+        this.windowTop = e.srcElement.scrollTop;
+      }
+
+      if (this.editor && this.isInitialized) {
         this.editor.storage.scrollPosition = this.windowTop ?? 0;
       }
     },
@@ -320,15 +324,19 @@ export default {
 
       this.editor = editorInstance.editor;
       this.$emit("initialized");
-      if (this.contentWindowTop) {
-        setTimeout(() => {
-          const refs = this.$refs["editor_content"];
-          if (refs && refs.$el) {
-            const container = this.$el.querySelector("#editor__content");
-            container.scrollTop = this.contentWindowTop;
-          }
-        }, 500);
-      }
+      setTimeout(() => {
+        this.editor.commands.focus("start");
+      });
+
+      // if (this.contentWindowTop) {
+      //   setTimeout(() => {
+      //     const refs = this.$refs["editor_content"];
+      //     if (refs && refs.$el) {
+      //       const container = this.$el.querySelector("#editor__content");
+      //       container.scrollTop = this.contentWindowTop;
+      //     }
+      //   }, 500);
+      // }
     },
     addParagraphAtEnd() {
       if (!this.editor) throw new Error("editor not defined");
@@ -354,7 +362,6 @@ export default {
 
 
 <style lang="scss" >
-
 .ideaContent-empty-spinner {
   text-align: center;
   height: 100vh;
@@ -424,9 +431,9 @@ export default {
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-		& > #idea-edit-editor-container {
-			padding: 5px;
-		}
+    & > #idea-edit-editor-container {
+      padding: 5px;
+    }
   }
 
   &__footer {

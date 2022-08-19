@@ -39,6 +39,7 @@ import IdeaEditPath from "./layout/IdeaEditPath.vue";
 import GQLForm from "@/lib/gqlform";
 import { mapGetters } from "vuex";
 import { Idea } from "@/models";
+import defaultContent from "./layout/templates/default";
 
 export default {
   components: {
@@ -67,8 +68,6 @@ export default {
     selectedCategoryIndex: 0,
     ideaContentIsDirty: false,
     editorLoaded: false,
-    emptyMarkup:
-      '{"type":"doc","content":[{"attrs":{"indent":0},"type":"paragraph"}]}',
     ideaForm: new GQLForm({
       id: undefined,
       processId: null,
@@ -86,7 +85,7 @@ export default {
     }),
     defaultContentForm: new GQLForm({
       id: undefined,
-      markup: null,
+      markup: JSON.stringify(defaultContent),
       ideaId: null,
       version: 1,
       isPrimary: true,
@@ -148,6 +147,7 @@ export default {
     },
     ideaContentCategories: {
       get() {
+				console.log(this.getIdea)
         const { ideaContentId } = this.getIdea;
         console.log({ ideaContentId });
         if (ideaContentId) {
@@ -155,7 +155,7 @@ export default {
             const { contentForm } = this.ideaContentCategoryData.find(
               (category) => category.contentForm.id === content.id
             ) || {
-              contentForm: this.defaultContentForm
+              contentForm: this.defaultContentForm,
             };
             Object.keys(content || {})
               .filter((key) => key in contentForm)
@@ -474,6 +474,7 @@ export default {
         contentType: form.fields.name ?? this.$t("unnamed_type"),
         isPrimary: form.fields.isPrimary,
       };
+
       try {
         if (form.fields.id) {
           await this.$store.dispatch(
@@ -491,6 +492,12 @@ export default {
       } finally {
         await this.fetchIdeaContents(form.fields.ideaId);
         await this.refreshIdea("EDIT");
+
+				this.ideaContentCategoryData.forEach(data => {
+					const { contentForm } = data;
+					contentForm.fields.isPrimary = contentForm.id === form.fields.id
+				})
+
         this.isLoading = false;
         this.isSaving = false;
       }
@@ -498,6 +505,7 @@ export default {
     async removeIdeaContentArea(form) {
       this.isLoading = true;
       this.isSaving = true;
+
       try {
         const removeForm = new GQLForm({
           id: form.fields.id,
@@ -558,7 +566,7 @@ export default {
             markup = this.setFileUrls(markup, ideaSave.files);
           }
           contentForm.ideaId = ideaSave.id;
-          contentForm.markup = markup ?? this.emptyMarkup;
+          contentForm.markup = markup;
           contentForm.companyRoles = contentForm.companyRoles.map(
             (role) => role.id
           );

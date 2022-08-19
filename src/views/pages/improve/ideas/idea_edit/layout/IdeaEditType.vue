@@ -37,13 +37,22 @@
           <div class="form-group">
             <div class="idea_edit_contentType_container-title">
               <div>{{ $t("Name") }}</div>
-              <b-form-checkbox
-                v-model="mutateForm.isPrimary"
-                name="check-button"
-                style="cursor: pointer"
-                size="lg"
-                switch
-              />
+              <div
+                style="
+                  display: flex;
+                  align-self: center;
+                  justify-content: normal;
+                "
+              >
+                <div style="margin-right: 20px">{{ $t("first page") }}</div>
+                <b-form-checkbox
+                  v-model="mutateForm.isPrimary"
+                  name="check-button"
+                  style="cursor: pointer; transform: translate(0px, -3px)"
+                  size="lg"
+                  switch
+                />
+              </div>
             </div>
 
             <b-form-input
@@ -72,7 +81,7 @@
             <v-select
               v-model="mutateForm.markup"
               label="title"
-							 v-validate="'required'"
+              v-validate="'required'"
               :placeholder="$t('Content Template')"
               class="idea_edit_content_type_select_idea_templates"
               data-vv-name="contentType"
@@ -197,7 +206,7 @@ export default {
     }),
     mutateForm: {
       get() {
-				console.log(this.value.errors)
+        console.log(this.value.errors);
         return this.value;
       },
       set(value) {
