@@ -27,7 +27,8 @@
       "required": "{0} kenttä on pakollinen",
       "size": "{0} tiedosto koko pitää olla vähemmän kuin {1}KB",
       "minlength": "Sinun pitää valita ainakin {1} {0}",
-      "maxlength": "Voit valita {1} {0} tai vähemmän"
+      "maxlength": "Voit valita {1} {0} tai vähemmän",
+      "unique": "{0} kentän täytyy olla uniikki"
     }
   },
   "responses": {

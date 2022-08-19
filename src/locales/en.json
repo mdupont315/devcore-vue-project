@@ -27,7 +27,8 @@
       "required": "Field {0} is required",
       "size": "{0} file size must be less than {1} KB",
       "minlength": "You must select at least {1} {0}",
-      "maxlength": "You can select {1} {0} or less"
+      "maxlength": "You can select {1} {0} or less",
+      "unique": "The {0} field must be unique"
     }
   },
   "responses": {

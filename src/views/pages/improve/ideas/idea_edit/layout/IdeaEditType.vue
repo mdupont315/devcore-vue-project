@@ -29,7 +29,7 @@
       </div>
       <b-form
         class="idea_edit_type_container-body hide_labels"
-        @keyup="$validator.validateAll()"
+        @keyup="validate"
         @submit.prevent="save"
         v-if="value"
       >
@@ -65,13 +65,24 @@
               :placeholder="$t('Name')"
               type="text"
               name="name"
+              data-vv-name="name"
               autocomplete="off"
               autofocus
-              :state="$validateState('name', value)"
+              :class="{
+                'is-invalid':
+                  $validateState('name', mutateForm) === false || !isUnique,
+                'is-valid':
+                  $validateState('name', mutateForm) === true && isUnique,
+              }"
             ></b-form-input>
             <b-form-invalid-feedback>{{
-              $displayError("name", value)
+              $displayError("name", mutateForm)
             }}</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!isUnique && value.id">
+              {{
+                $t("validation.messages.unique", [$t("Name")])
+              }}</b-form-invalid-feedback
+            >
           </div>
 
           <div v-if="!value.id" class="form-group required">
@@ -81,20 +92,21 @@
             <v-select
               v-model="mutateForm.markup"
               label="title"
-              v-validate="'required'"
+              v-validate="''"
+              name="markup"
               :placeholder="$t('Content Template')"
               class="idea_edit_content_type_select_idea_templates"
               data-vv-name="contentType"
               :reduce="(obj) => obj.content"
               :options="getContentTemplates"
               :class="{
-                'is-invalid': $validateState('markup', mutateForm) === false,
-                'is-valid': $validateState('markup', mutateForm) === true,
+                'is-invalid': mutateForm.markup === null,
+                'is-valid': mutateForm.markup !== null,
               }"
             ></v-select>
-            <b-form-invalid-feedback>{{
-              $displayError("markup", mutateForm)
-            }}</b-form-invalid-feedback>
+            <b-form-invalid-feedback>
+              {{ $t("validation.messages.required", [$t("Content Template")]) }}
+            </b-form-invalid-feedback>
           </div>
 
           <div class="form-group">
@@ -121,10 +133,17 @@
         >
           <b-col>
             <loading-button
-              :disabled="vErrors.any() || isLoading"
+              :disabled="
+                vErrors.any() || isLoading || mutateForm.markup === null
+              "
               :loading="isLoading"
               size="lg"
-              :style="{ cursor: isLoading ? 'not-allowed' : 'pointer' }"
+              :style="{
+                cursor:
+                  vErrors.any() || isLoading || mutateForm.markup === null
+                    ? 'not-allowed'
+                    : 'pointer',
+              }"
               block
               style="border-radius: 3px; flex-grow: 1"
               type="submit"
@@ -135,8 +154,12 @@
             <confirm-button
               buttonVariant="outline-danger"
               size="lg"
-              :isDisabled="isLoading"
-              :style="{ cursor: isLoading ? 'not-allowed' : 'pointer' }"
+              :style="{
+                cursor:
+                  vErrors.any() || isLoading || mutateForm.markup === null
+                    ? 'not-allowed'
+                    : 'pointer',
+              }"
               :btnClass="
                 isLoading
                   ? 'ideaEdit_path_remove_button-disabled'
@@ -178,6 +201,11 @@ export default {
       type: Object,
       required: false,
     },
+    categories: {
+      type: Array,
+      required: true,
+      default: () => [],
+    },
     visible: {
       type: Boolean,
       default: () => false,
@@ -194,19 +222,42 @@ export default {
   data: () => ({
     selectablePathRoles: [],
     roleIntent: null,
+    selectedRoles: [],
   }),
   mounted() {
     this.selectablePathRoles = this.getSelectableRoles;
     this.roleIntent = Math.random();
   },
+
   computed: {
     ...mapGetters({
       allRoles: "companyRole/all",
       ideaContents: "ideaContent/all",
     }),
+    isUnique: {
+      get() {
+        let names = this.categories.map((category) => {
+					console.log(category)
+          return {
+            name: category.contentType.toUpperCase(),
+            id: category.id,
+          };
+        });
+
+        if (this.value.id) {
+          names = names.filter((x) => x.id !== this.value.id);
+        }
+
+        const curName = this.mutateForm.name;
+        if (!curName) return true;
+
+        return (
+          curName && !names.map((x) => x.name).includes(curName.toUpperCase())
+        );
+      },
+    },
     mutateForm: {
       get() {
-        console.log(this.value.errors);
         return this.value;
       },
       set(value) {
@@ -215,8 +266,6 @@ export default {
     },
     hasEdits: {
       get() {
-        console.log("remove");
-        console.log(this.value);
         if (this.value.id) {
           const content = this.ideaContents.find((x) => x.id === this.value.id);
           if (!content) return false;
@@ -265,10 +314,31 @@ export default {
       },
     },
   },
+  watch: {
+    "mutateForm.markup": {
+      handler() {
+        this.validate();
+      },
+    },
+    "mutateForm.isPrimary": {
+      handler(newVal) {
+        if (newVal) {
+          this.mutateForm.companyRoles = this.allRoles;
+        }
+      },
+    },
+  },
   methods: {
+    validate() {
+      console.log(this.vErrors);
+      this.$validator.validateAll();
+    },
     async save() {
-      await this.$validator.reset();
-      this.$emit("save");
+      console.log(this.vErrors.any());
+      if (!this.vErrors.any()) {
+        this.$validator.reset();
+        this.$emit("save");
+      }
     },
     async remove() {
       await this.$validator.reset();
@@ -354,12 +424,10 @@ export default {
 .idea_edit_content_container_type-enter-to {
   max-width: calc((100vw - 240px) * 0.25);
 }
-.idea_edit_content_container_type-leave {
-  position: relative;
-}
+
 .idea_edit_content_container_type-enter {
   max-width: 0;
-  position: absolute;
+ // position: absolute;
 }
 .idea_edit_content_container_type-leave-to {
   max-width: 0;

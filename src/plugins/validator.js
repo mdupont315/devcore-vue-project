@@ -82,10 +82,11 @@ function getErrorMessage(vue, ref, form = null) {
         replaceText =
           validationlocales[ref.charAt(0).toUpperCase() + ref.slice(1)];
       }
-
-      return errorMessage.replace(re, replaceText);
+    //  return errorMessage
+     return errorMessage.replace(re, replaceText);
     }
 
+    console.log(errorMessage)
     return errorMessage;
   } else {
     return form && form.getError(ref) ? form.getError(ref).message : null;

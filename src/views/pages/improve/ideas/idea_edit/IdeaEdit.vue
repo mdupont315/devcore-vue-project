@@ -492,7 +492,7 @@ export default {
       } finally {
         await this.fetchIdeaContents(form.fields.ideaId);
 
-        if (this.ideaInEdit.editIdeaMode === "EDIT") {
+        if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
           await this.refreshIdea("EDIT");
         }
 
@@ -606,7 +606,7 @@ export default {
         console.log(e);
       } finally {
         window.vm.$snotify.clear();
-        if (this.ideaInEdit.editIdeaMode === "EDIT") {
+        if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
           await this.refreshIdea("EDIT");
         }
         this.ideaForm._fields.removeFileIds = [];

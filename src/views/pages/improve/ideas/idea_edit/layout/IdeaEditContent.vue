@@ -61,6 +61,7 @@
         <idea-edit-type
           v-if="editContentItem"
           :visible="contentTypeSelectorForm"
+          :categories="getIdeaContentCategories"
           :primary="getPrimaryContentType"
           :isLoading="isLoading"
           v-model="editContentItem"
@@ -209,29 +210,35 @@ export default {
     },
     remove() {
       if (this.editContentItem.isPrimary) {
-        window.vm.$snotify.error(this.$t("you must appoint another home page before remove"), {
-          timeout: 5000,
-          showProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-        });
+        window.vm.$snotify.error(
+          this.$t("you must appoint another home page before remove"),
+          {
+            timeout: 5000,
+            showProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+          }
+        );
       } else {
         this.$emit("removeIdeaContentArea", this.editContentItem);
-				this.contentTypeSelectorForm = false
+        this.contentTypeSelectorForm = false;
       }
       //
     },
     editContentType(item) {
-      this.editContentItem = new GQLForm({
-        id: item.id,
-        markup: item.markup,
-        version: item.version,
-        isPrimary: item.isPrimary,
-        name: item.contentType,
-        ideaId: item.ideaId,
-        companyRoles: item.companyRoles,
-      });
-      this.contentTypeSelectorForm = true;
+      this.contentTypeSelectorForm = false;
+      setTimeout(() => {
+        this.editContentItem = new GQLForm({
+          id: item.id,
+          markup: item.markup,
+          version: item.version,
+          isPrimary: item.isPrimary,
+          name: item.contentType,
+          ideaId: item.ideaId,
+          companyRoles: item.companyRoles,
+        });
+        this.contentTypeSelectorForm = true;
+      }, 200);
     },
     toggleContentTypeSelector() {
       this.contentTypeSelectorForm = false;
@@ -243,10 +250,10 @@ export default {
       this.contentTypeSelectorVisible = true;
       this.editContentItem = new GQLForm({
         id: undefined,
-        markup: "",
+        markup: null,
         version: 1,
         isPrimary: false,
-        name: "",
+        name: null,
         ideaId: this.idea.id,
         companyRoles: [],
       });
