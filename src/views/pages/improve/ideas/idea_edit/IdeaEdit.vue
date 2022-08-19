@@ -147,7 +147,7 @@ export default {
     },
     ideaContentCategories: {
       get() {
-				console.log(this.getIdea)
+        console.log(this.getIdea);
         const { ideaContentId } = this.getIdea;
         console.log({ ideaContentId });
         if (ideaContentId) {
@@ -491,12 +491,15 @@ export default {
         console.log(e);
       } finally {
         await this.fetchIdeaContents(form.fields.ideaId);
-        await this.refreshIdea("EDIT");
 
-				this.ideaContentCategoryData.forEach(data => {
-					const { contentForm } = data;
-					contentForm.fields.isPrimary = contentForm.id === form.fields.id
-				})
+        if (this.ideaInEdit.editIdeaMode === "EDIT") {
+          await this.refreshIdea("EDIT");
+        }
+
+        this.ideaContentCategoryData.forEach((data) => {
+          const { contentForm } = data;
+          contentForm.fields.isPrimary = contentForm.id === form.fields.id;
+        });
 
         this.isLoading = false;
         this.isSaving = false;
@@ -603,7 +606,9 @@ export default {
         console.log(e);
       } finally {
         window.vm.$snotify.clear();
-        await this.refreshIdea("EDIT");
+        if (this.ideaInEdit.editIdeaMode === "EDIT") {
+          await this.refreshIdea("EDIT");
+        }
         this.ideaForm._fields.removeFileIds = [];
         this.isSaving = false;
         this.isLoading = false;
