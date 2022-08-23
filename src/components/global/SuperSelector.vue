@@ -14,8 +14,8 @@
         v-model="filterValue"
         type="text"
         name="form_input"
-				id="form_input"
-				autocomplete="form_input"
+        id="form_input"
+        autocomplete="form_input"
         class="field"
         :placeholder="
           expanded
@@ -265,7 +265,7 @@ export default {
     },
     activePlaceholder: {
       required: false,
-      default () {
+      default() {
         return this.$t("Type to search");
       },
     },
@@ -405,15 +405,17 @@ export default {
       this.dataValue = value;
     },
     toggleExpanded(event) {
-      if (this.expanded) {
-        this.close(event);
-      } else {
-        this.open(event);
-        if (this.$refs.input) {
-          this.$refs.input.focus();
+      if (!this.disabled) {
+        if (this.expanded) {
+          this.close(event);
+        } else {
+          this.open(event);
+          if (this.$refs.input) {
+            this.$refs.input.focus();
+          }
         }
+        this.$emit("toggled", this.expanded, event);
       }
-      this.$emit("toggled", this.expanded, event);
     },
     close(event) {
       this.expanded = false;
@@ -426,7 +428,6 @@ export default {
       this.$emit("open", event);
     },
     isSelected(item) {
-
       if (this.isSelectedFn) {
         return this.isSelectedFn(item);
       }
@@ -434,9 +435,8 @@ export default {
       if (this.mode === "single") {
         return itemValue === this.dataValue;
       }
-        this.dataValue = this.dataValue || [];
-        return this.dataValue.some((i) => i === itemValue);
-
+      this.dataValue = this.dataValue || [];
+      return this.dataValue.some((i) => i === itemValue);
     },
     isItemDisabled(item) {
       if (this.isItemDisabledFn) {

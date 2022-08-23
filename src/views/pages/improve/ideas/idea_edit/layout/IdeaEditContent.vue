@@ -10,7 +10,7 @@
       <inner-overlay
         v-if="contentTypeSelectorVisible"
         @click="closeContentType()"
-        style="z-index: 2"
+        style="z-index: 1"
       />
 
       <div class="idea_edit_content_container_content-header-button">
@@ -369,7 +369,7 @@ export default {
   margin: 10px 20px;
   border-radius: 3px;
   font-size: 16px;
-  z-index: 2;
+  z-index: 1;
   white-space: nowrap;
   flex-direction: row;
   display: flex;

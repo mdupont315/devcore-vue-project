@@ -12,11 +12,16 @@
             :ref="`${getAttrs.uuid}`"
             :src="getAttrs.src"
             :alt="getAttrs.title"
-            @load="loadedImg"
             style="max-height: 65vh; max-width: 50%"
             :style="{ width: imgWidth, height: imgHeight }"
           />
-          <!--             style="width: 30%; height: 30%" -->
+          <!-- <img
+            :ref="`${getAttrs.uuid}`"
+            :src="getAttrs.src"
+            :alt="getAttrs.title"
+            @load="loadedImg"
+            style="max-height: 65vh; max-width: 50%"
+          /> -->
         </div>
         <button @click="remove" class="file-remove-button">
           {{ $t("Remove") }}
@@ -66,6 +71,7 @@
             style="margin-left: 8px; height: 100%"
           >
             {{ $t("Remove") }}
+            {{ getAttrs.title }}
           </button>
         </div>
       </div>
@@ -84,6 +90,7 @@ import {
   getBase64FromUrl,
   base64MimeType,
 } from "./helpers/file/fileUtils";
+import ImageResizer from "@/lib/image-resizer";
 
 export default {
   components: {
@@ -102,6 +109,7 @@ export default {
       resizedImages: [],
       imgWidth: "50%",
       imgHeight: "auto",
+      resizerInstance: new ImageResizer(),
     };
   },
 
@@ -120,6 +128,7 @@ export default {
 
     if (isStagedPreviewFile) {
       if (isValidExternalUrl(this.node.attrs.src)) {
+        console.log("TRANSFORMIN");
         await this.transformFilesIfPastedExternalUrls();
       }
     }
@@ -132,55 +141,74 @@ export default {
       const toFile = await fetch(dataUrl);
       const blob = await toFile.blob();
 
-      const file = new File([blob], this.node.attrs.title, {
-        type: type,
-      });
+      console.log("addin!");
 
-      this.extension.options.addFile({
-        uuid: this.node.attrs.uuid ?? uuidv4(),
-        file: file,
-      });
+      this.resizerInstance.resize(
+        new File([blob], this.node.attrs.title, {
+          type: type,
+        }),
+        {
+          height: this.node.attrs.dimensions.height,
+          width: this.node.attrs.dimensions.width,
+        },
+        (blob) => {
+          var file = new File([blob], this.node.attrs.title, {
+            type,
+            lastModified: Date.now(),
+          });
+          // addFile({ uuid: uuidv4(), file: file });
+          this.extension.options.addFile({
+            uuid: this.node.attrs.uuid ?? uuidv4(),
+            file: file,
+          });
+        }
+      );
     },
-    async resizeImage() {
-      const isStagedFile =
-        !this.node.attrs.href && this.node.attrs.src && !this.node.attrs.id;
-      if (!isStagedFile) return;
+    // async resizeImage(e) {
+    //   //	TODO: Figure out image dimensions here... scale big image
 
-      const dataUrl = this.getAttrs.src;
-      const type = this.node.attrs.type ?? base64MimeType(dataUrl);
+    //   console.log(this.node.attrs);
+    //   //	console.log(this.node.attrs.src)
+    //   const isStagedFile =
+    //     !this.node.attrs.href && this.node.attrs.src && !this.node.attrs.id;
+    //   if (!isStagedFile) return;
 
-      if (this.resizedImages.includes(this.node.attrs.uuid)) {
-        return;
-      }
+    //   const dataUrl = this.getAttrs.src;
+    //   const type = this.node.attrs.type ?? base64MimeType(dataUrl);
 
-      const mod = dataUrl.slice(-2) === "==" ? 2 : 1;
-      const size = dataUrl.length * (3 / 4) - mod;
+    //   if (this.resizedImages.includes(this.node.attrs.uuid)) {
+    //     return;
+    //   }
 
-      const callback = async (dataUrl) => {
-        this.updateAttributes({
-          src: dataUrl,
-          preview: true,
-          size,
-          type,
-        });
+    //   const mod = dataUrl.slice(-2) === "==" ? 2 : 1;
+    //   const size = dataUrl.length * (3 / 4) - mod;
 
-        await this.addBase64AsFile(dataUrl, type);
-      };
-      await this.handleResizedImage(dataUrl, type, callback);
-      this.resizedImages.push(this.node.attrs.uuid);
-    },
-    async loadedImg(e) {
-      await this.resizeImage();
-      if (!this.editor || !this.editor.view.dom.parentElement) return;
-      const { clientHeight: domHeight } = this.editor.view.dom.parentElement;
-      const { clientHeight } = e.path[0];
-      const allowedMaxHeight = domHeight * 0.9;
+    //   const callback = async (dataUrl) => {
+    //     this.updateAttributes({
+    //       src: dataUrl,
+    //       preview: true,
+    //       size,
+    //       type,
+    //     });
 
-      if (clientHeight > allowedMaxHeight) {
-        this.imgWidth = "auto";
-        this.imgHeight = "80vh";
-      }
-    },
+    //     await this.addBase64AsFile(dataUrl, type);
+    //   };
+    //   await this.handleResizedImage(dataUrl, type, callback);
+    //   this.resizedImages.push(this.node.attrs.uuid);
+    // },
+  //   async loadedImg(e) {
+  //     console.log(e);
+  // //    await this.resizeImage();
+  //     if (!this.editor || !this.editor.view.dom.parentElement) return;
+  //     const { clientHeight: domHeight } = this.editor.view.dom.parentElement;
+  //     const { clientHeight } = e.path[0];
+  //     const allowedMaxHeight = domHeight * 0.9;
+
+  //     if (clientHeight > allowedMaxHeight) {
+  //       this.imgWidth = "auto";
+  //       this.imgHeight = "80vh";
+  //     }
+  //   },
 
     async handleResizedImage(dataUrl, type, callback) {
       const scaleWidthUntilPX =

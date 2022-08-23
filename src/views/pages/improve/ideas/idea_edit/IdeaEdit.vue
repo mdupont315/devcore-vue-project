@@ -147,9 +147,7 @@ export default {
     },
     ideaContentCategories: {
       get() {
-        console.log(this.getIdea);
         const { ideaContentId } = this.getIdea;
-        console.log({ ideaContentId });
         if (ideaContentId) {
           return this.ideaContents.map((content) => {
             const { contentForm } = this.ideaContentCategoryData.find(
@@ -319,6 +317,7 @@ export default {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
 
+
           if (fileInIdea) {
             if (node.attrs.preview) {
               node.attrs.src = fileInIdea.url;
@@ -395,6 +394,7 @@ export default {
       const allFilesInContent = fileNodesInContent.map((x) => x.attrs);
       const savedFiles = this.getIdea.files.map((file) => file.uri);
 
+
       if (allFilesInContent.length > 0) {
         savedFiles.forEach((uri) => {
           const contentFileIds = allFilesInContent.map((x) => x.id);
@@ -466,6 +466,7 @@ export default {
     async saveIdeaAreaVersion(form) {
       this.isLoading = true;
       this.isSaving = true;
+
       const fields = {
         id: form.fields.id,
         ideaId: form.fields.ideaId,
@@ -564,6 +565,7 @@ export default {
             this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
 
           let markup = contentForm.markup;
+
 
           if (ideaSave.files.length > 0) {
             markup = this.setFileUrls(markup, ideaSave.files);

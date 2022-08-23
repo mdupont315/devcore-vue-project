@@ -125,6 +125,7 @@ export default {
 					setTimeout(() => {
 						URL.revokeObjectURL(src);
 					}, 0);
+					console.log(this.$refs.input.files[0])
 					this.$emit("input", this.$refs.input.files[0]);
 				}
 			);

@@ -15,7 +15,6 @@ const IMAGE_INPUT_REGEX = /!\[(.+|:?)\]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
 export const File = Node.create({
   name: "file",
 
-
   addOptions() {
     return {
       inline: false,
@@ -101,12 +100,17 @@ export const File = Node.create({
         },
         renderHTML: attrs => ({ uuid: attrs.uuid })
       },
-      height: {
-        default: null,
+      dimensions: {
+        default: { height: null, width: null },
         parseHTML: el => {
-          return el.getAttribute("height");
+          return el.getAttribute("dimensions");
         },
-        renderHTML: attrs => ({ uuid: attrs.height })
+        renderHTML: attrs => ({
+          dimensions: {
+            height: attrs.height,
+            width: attrs.width
+          }
+        })
       }
     };
   },
@@ -120,13 +124,13 @@ export const File = Node.create({
           id: dom.getAttribute("id"),
           src: dom.getAttribute("src"),
           size: dom.getAttribute("size"),
-          title: dom.getAttribute("title") ?? 'no-name',
+          title: dom.getAttribute("title") ?? "no-name",
           alt: dom.getAttribute("alt"),
           style: dom.getAttribute("style"),
           type: dom.getAttribute("type"),
           preview: dom.getAttribute("preview"),
           uuid: dom.getAttribute("uuid"),
-          height: dom.getAttribute("height"),
+          dimensions: dom.getAttribute("dimensions")
         };
         if (obj.src) return obj;
       }
@@ -140,11 +144,12 @@ export const File = Node.create({
           src: dom.getAttribute("src"),
           size: dom.getAttribute("size"),
           href: dom.getAttribute("href"),
-          title: dom.getAttribute("title") ?? 'no-name',
+          title: dom.getAttribute("title") ?? "no-name",
           style: dom.getAttribute("style"),
           type: dom.getAttribute("type"),
           preview: dom.getAttribute("preview"),
-          uuid: dom.getAttribute("uuid")
+          uuid: dom.getAttribute("uuid"),
+          dimensions: dom.getAttribute("dimensions")
         };
         if (obj.href) return obj;
       }
@@ -159,14 +164,15 @@ export const File = Node.create({
       style,
       preview,
       size,
-      uuid
+      uuid,
+      dimensions
     } = HTMLAttributes;
 
     if (href || src) {
       if (!preview) {
         return ["a", { href, title, style, size, alt, uuid }, title];
       } else {
-        return ["img", { title, src, alt, style, size, uuid }];
+        return ["img", { title, src, alt, style, size, uuid, dimensions }];
       }
     }
 

@@ -701,5 +701,6 @@
   "Leave empty if no restrictions": "Leave empty if no restrictions",
   "contentType": "name",
   "unnamed_type": "Unnamed",
-  "you must appoint another home page before remove": "You must appoint another area as home page before deleting area"
+  "you must appoint another home page before remove": "You must appoint another area as home page before deleting area",
+  "home page has all roles": "Home page always has all roles enabled for roles with access to instruction"
 }

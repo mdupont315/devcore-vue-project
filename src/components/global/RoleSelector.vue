@@ -10,6 +10,7 @@
     :placeholder="placeholder ? placeholder : $t('companyRoles')"
     v-if="ready"
     :state="state"
+		:disabled="isDisabled"
     :outside-close="!showPopOver"
     :show-input="showInput"
     :filter-fn="filter"
@@ -100,6 +101,9 @@ export default {
     placeholder: {
       required: false,
       default: () => null,
+    },
+    isDisabled: {
+      required: false,
     },
     value: {
       required: false,

@@ -729,5 +729,6 @@
   "Leave empty if no restrictions": "Jätä tyhjäksi jos ei rajoituksia",
   "contentType": "nimi",
   "unnamed_type": "Nimetön",
-  "you must appoint another home page before remove": "Sinun täytyy asettaa toinen sisältö-alue alkusivuksi ennen kuin voit poistaa sen"
+  "you must appoint another home page before remove": "Sinun täytyy asettaa toinen sisältö-alue alkusivuksi ennen kuin voit poistaa sen",
+  "home page has all roles": "Alkusivu on aina kaikkien ohjeen näkevien nähtävillä"
 }

@@ -26,6 +26,8 @@ export default class ImageResizer {
 
     resize(file, maxDimensions, callback) {
 
+      console.log(file)
+
         if (!file) {
             return;
         }

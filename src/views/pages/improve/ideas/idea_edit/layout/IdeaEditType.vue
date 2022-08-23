@@ -70,7 +70,7 @@
               autofocus
               :class="{
                 'is-invalid':
-                  $validateState('name', mutateForm) === false || !isUnique ,
+                  $validateState('name', mutateForm) === false || !isUnique,
                 'is-valid':
                   $validateState('name', mutateForm) === true && isUnique,
               }"
@@ -112,12 +112,36 @@
           <div class="form-group">
             <div class="idea_edit_type_container-body-process-select-title">
               {{ $t("Role access") }}
+              <div v-if="mutateForm.isPrimary">
+                <b-popover
+                  target="idea_content_type_info_info_text-info"
+                  triggers="hover"
+                  placement="top"
+                  boundary="window"
+                >
+                  <div class="idea_content-type_disabled-info_text">
+                    {{ $t("home page has all roles") }}
+                  </div>
+                </b-popover>
+
+                <div
+                  id="idea_content_type_info_info_text-info"
+                  class="idea_content_type_info_info_text-info"
+                >
+                  <i
+                    class="mdi mdi-information idea_content_type_info_info_icon"
+                  ></i>
+                </div>
+              </div>
             </div>
+
             <role-selector
               v-if="roleIntent"
               :key="roleIntent"
+              :isDisabled="mutateForm.isPrimary"
               name="idea_content_roles"
               id="idea_content_roles"
+              :class="{ is_roles_disabled: mutateForm.isPrimary }"
               class="idea_edit_content_type_select_idea_roles"
               autocomplete="idea_content_roles"
               :placeholder="$t('Role access')"
@@ -154,7 +178,9 @@
             <confirm-button
               buttonVariant="outline-danger"
               size="lg"
-							:isDisabled="vErrors.any() || isLoading || mutateForm.markup === null"
+              :isDisabled="
+                vErrors.any() || isLoading || mutateForm.markup === null
+              "
               :style="{
                 cursor:
                   vErrors.any() || isLoading || mutateForm.markup === null
@@ -261,8 +287,8 @@ export default {
         return this.value;
       },
       set(value) {
-				console.log("value")
-				console.log(value)
+        console.log("value");
+        console.log(value);
         this.$emit("input", value);
       },
     },
@@ -326,7 +352,7 @@ export default {
       handler(newVal) {
         if (newVal) {
           this.mutateForm.fields.companyRoles = this.allRoles;
-					this.roleIntent = Math.random()
+          this.roleIntent = Math.random();
         }
       },
     },
@@ -361,9 +387,16 @@ export default {
 
 
 <style lang="scss">
-.idea_edit_content_type_select_idea_roles > .input-wrapper > div > .counter {
-  color: #4294d0;
-  z-index: 1;
+.idea_edit_content_type_select_idea_roles {
+  &.is_roles_disabled > .input-wrapper > div > .counter {
+    color: lightgrey;
+		cursor: not-allowed;
+    z-index: 1;
+  }
+  & > .input-wrapper > div > .counter {
+    color: #4294d0;
+    z-index: 1;
+  }
 }
 .idea_edit_content_type_select_idea_templates {
   > div > input {
@@ -428,7 +461,7 @@ export default {
 
 .idea_edit_content_container_type-enter {
   max-width: 0;
- // position: absolute;
+  // position: absolute;
 }
 .idea_edit_content_container_type-leave-to {
   max-width: 0;
@@ -478,6 +511,9 @@ export default {
   text-transform: uppercase;
   font-size: 12px;
   margin-left: 5px;
+  align-items: center;
+  display: flex;
+  height: 38px;
 }
 
 .idea_edit_content_type_select_idea_templates {
