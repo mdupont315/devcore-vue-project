@@ -570,15 +570,13 @@ export default {
           contentForm.ideaId = ideaSave.id;
           contentForm.markup = markup;
 
-          // if (contentForm.isPrimary) {
-          //   contentForm.companyRoles = this.allRoles.map((role) => role.id);
-          // } else {
-
-          // }
-
-					   contentForm.companyRoles = contentForm.companyRoles.map(
+          if (contentForm.isPrimary) {
+            contentForm.companyRoles = this.allRoles.map((role) => role.id);
+          } else {
+            contentForm.companyRoles = contentForm.companyRoles.map(
               (role) => role.id
             );
+          }
 
           contentForm.contentType =
             contentForm.contentType ?? this.$t("unnamed_type");
