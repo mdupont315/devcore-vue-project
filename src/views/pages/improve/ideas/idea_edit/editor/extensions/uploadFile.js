@@ -14,21 +14,39 @@ const renderFileInBase64ToCoordinates = (
 ) => {
   if (!item) return;
 
-
   const { schema } = view.state;
 
   const reader = new FileReader();
 
-
   reader.onload = readerEvent => {
-
-    let node;
     if (preview) {
       const image = new Image();
       image.src = readerEvent.target?.result;
       image.onload = () => {
-        node = schema.nodes.file.create({
-          src: image.src,
+        const transaction = view.state.tr.insert(
+          coordinates.pos,
+          schema.nodes.file.create({
+            src: image.src,
+            title: item.name,
+            size: item.size,
+            type: item.type,
+            pos: coordinates.pos,
+            uuid,
+            preview,
+            dimensions: {
+              width: image.width,
+              height: image.height
+            }
+          })
+        );
+        view.dispatch(transaction);
+      };
+
+    } else {
+      const transaction = view.state.tr.insert(
+        coordinates.pos,
+        schema.nodes.file.create({
+          src: readerEvent.target?.result,
           title: item.name,
           size: item.size,
           type: item.type,
@@ -36,29 +54,13 @@ const renderFileInBase64ToCoordinates = (
           uuid,
           preview,
           dimensions: {
-            width: image.width,
-            height: image.height
+            width: null,
+            height: null
           }
-        });
-
-      };
-    } else {
-      node = schema.nodes.file.create({
-        src: readerEvent.target?.result,
-        title: item.name,
-        size: item.size,
-        type: item.type,
-        pos: coordinates.pos,
-        uuid,
-        preview,
-        dimensions: {
-          width: null,
-          height: null
-        }
-      });
+        })
+      );
+      view.dispatch(transaction);
     }
-    const transaction = view.state.tr.insert(coordinates.pos, node);
-    view.dispatch(transaction);
   };
   reader.readAsDataURL(item);
 };
@@ -94,7 +96,6 @@ const uploadFilePlugin = (addFile, notify) => {
             addFile({ uuid: uuidv4(), file: transformedFile });
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {
-
               const uuid = uuidv4();
               renderFileInBase64ToCoordinates(
                 transformedFile,
