@@ -71,7 +71,6 @@
             style="margin-left: 8px; height: 100%"
           >
             {{ $t("Remove") }}
-            {{ getAttrs.title }}
           </button>
         </div>
       </div>
@@ -123,6 +122,7 @@ export default {
     },
   },
   async mounted() {
+		console.log(this.node.attrs)
     const isStagedPreviewFile =
       !this.node.attrs.href && this.node.attrs.src && !this.node.attrs.id;
 
