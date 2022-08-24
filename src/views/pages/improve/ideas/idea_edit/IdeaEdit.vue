@@ -125,7 +125,7 @@ export default {
     ...mapGetters({
       ideaContents: "ideaContent/all",
       ideaInEdit: "idea/ideaInEdit",
-
+      allRoles: "companyRole/all",
       currentProcess: "process/current",
       companyRoles: "companyRole/all",
     }),
@@ -317,7 +317,6 @@ export default {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
 
-
           if (fileInIdea) {
             if (node.attrs.preview) {
               node.attrs.src = fileInIdea.url;
@@ -393,7 +392,6 @@ export default {
       const fileNodesInContent = this.getImageNodesFromContent();
       const allFilesInContent = fileNodesInContent.map((x) => x.attrs);
       const savedFiles = this.getIdea.files.map((file) => file.uri);
-
 
       if (allFilesInContent.length > 0) {
         savedFiles.forEach((uri) => {
@@ -566,15 +564,22 @@ export default {
 
           let markup = contentForm.markup;
 
-
           if (ideaSave.files.length > 0) {
             markup = this.setFileUrls(markup, ideaSave.files);
           }
           contentForm.ideaId = ideaSave.id;
           contentForm.markup = markup;
-          contentForm.companyRoles = contentForm.companyRoles.map(
-            (role) => role.id
-          );
+
+          // if (contentForm.isPrimary) {
+          //   contentForm.companyRoles = this.allRoles.map((role) => role.id);
+          // } else {
+
+          // }
+
+					   contentForm.companyRoles = contentForm.companyRoles.map(
+              (role) => role.id
+            );
+
           contentForm.contentType =
             contentForm.contentType ?? this.$t("unnamed_type");
 

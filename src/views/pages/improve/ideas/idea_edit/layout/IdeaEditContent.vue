@@ -13,7 +13,7 @@
         style="z-index: 1"
       />
 
-      <div class="idea_edit_content_container_content-header-button">
+      <div class="idea_edit_content_container_content-header-button" v-show="false">
         <div v-if="!idea.id">
           <b-popover
             target="idea_content_type_info_info_text-info"
