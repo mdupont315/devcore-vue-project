@@ -122,7 +122,7 @@ export default {
     },
   },
   async mounted() {
-		console.log(this.node.attrs)
+    console.log(this.node.attrs);
     const isStagedPreviewFile =
       !this.node.attrs.href && this.node.attrs.src && !this.node.attrs.id;
 
@@ -143,17 +143,27 @@ export default {
 
       console.log("addin!");
 
+      console.log({ toFile });
+      console.log({ blob });
+      console.log(type);
+
+      const fileType = toFile?.url.split(";")[0].split("/")[1] || "png";
+      const title = `${uuidv4()}.${fileType}`;
+
+			//TODO: Figure out base64str real dimensions and set them below
+			// if null values => does .txt files
+
       this.resizerInstance.resize(
-        new File([blob], this.node.attrs.title, {
-          type: type,
+        new File([blob], this.node.attrs.title ?? title, {
+          type,
         }),
         {
-          height: this.node.attrs.dimensions.height,
-          width: this.node.attrs.dimensions.width,
+          height: this.node.attrs.dimensions?.height || 500,
+          width: this.node.attrs.dimensions?.width || 500,
         },
         (blob) => {
-          var file = new File([blob], this.node.attrs.title, {
-            type,
+          var file = new File([blob], this.node.attrs.title ?? title, {
+             type,
             lastModified: Date.now(),
           });
           // addFile({ uuid: uuidv4(), file: file });
@@ -196,19 +206,19 @@ export default {
     //   await this.handleResizedImage(dataUrl, type, callback);
     //   this.resizedImages.push(this.node.attrs.uuid);
     // },
-  //   async loadedImg(e) {
-  //     console.log(e);
-  // //    await this.resizeImage();
-  //     if (!this.editor || !this.editor.view.dom.parentElement) return;
-  //     const { clientHeight: domHeight } = this.editor.view.dom.parentElement;
-  //     const { clientHeight } = e.path[0];
-  //     const allowedMaxHeight = domHeight * 0.9;
+    //   async loadedImg(e) {
+    //     console.log(e);
+    // //    await this.resizeImage();
+    //     if (!this.editor || !this.editor.view.dom.parentElement) return;
+    //     const { clientHeight: domHeight } = this.editor.view.dom.parentElement;
+    //     const { clientHeight } = e.path[0];
+    //     const allowedMaxHeight = domHeight * 0.9;
 
-  //     if (clientHeight > allowedMaxHeight) {
-  //       this.imgWidth = "auto";
-  //       this.imgHeight = "80vh";
-  //     }
-  //   },
+    //     if (clientHeight > allowedMaxHeight) {
+    //       this.imgWidth = "auto";
+    //       this.imgHeight = "80vh";
+    //     }
+    //   },
 
     async handleResizedImage(dataUrl, type, callback) {
       const scaleWidthUntilPX =
@@ -231,7 +241,21 @@ export default {
           return;
         }
 
+        console.log(externalToBase64 && this.node.attrs.title);
+
+        if (externalToBase64 && !this.node.attrs.title) {
+          const fileType =
+            externalToBase64.split(";")[0].split("/")[1] || "png";
+          const uuid = uuidv4();
+          this.updateAttributes({
+            title: `${uuid}.${fileType}`,
+            uuid,
+          });
+        }
+
         const type = this.node.attrs.type ?? base64MimeType(externalToBase64);
+
+        console.log(type);
 
         const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;
         const size = externalToBase64.length * (3 / 4) - mod;

@@ -249,6 +249,7 @@ export default {
       }
     },
     async setFile(file) {
+      console.log({ file });
       const items = [...this.files, file];
       this.files = items;
       this.filesChanged = true;
@@ -316,6 +317,9 @@ export default {
         if (node.type === "file") {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
+
+          console.log(node.attrs.preview);
+          console.log(fileInIdea);
 
           if (fileInIdea) {
             if (node.attrs.preview) {
