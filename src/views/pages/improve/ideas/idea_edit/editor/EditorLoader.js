@@ -159,12 +159,12 @@ export default class ContentEditor {
           //Remove comments
           const formatHTML1 = formatHTML.replace(/<\/?style(.*?)">/g, "");
           const formatHTML2 = formatHTML1.replace(/<br>/g, " ");
-         // const formatHTML3 = formatHTML2.replace(/<\/?p[^>]*>/g, "");
+          // const formatHTML3 = formatHTML2.replace(/<\/?p[^>]*>/g, "");
           // const formatHTMLX = formatHTML3.replace(
           //   /(<p[^>]*>)[^>]*(<img)/g,
           //   "img"
           // );
-        const formatHTML4 = formatHTML2.replace(/<\/?span[^>]*>/g, "");
+          const formatHTML4 = formatHTML2.replace(/<\/?span[^>]*>/g, "");
 
           // // console.log(formatHTML1);
           // const parser = new DOMParser();
@@ -175,8 +175,6 @@ export default class ContentEditor {
           // console.log({imgs});
           // console.log({paragraphs});
           // console.log(temp_node.childNodes);
-
-
 
           // TODO: Test if images can be stripped out from <p><span></span></span_></p>
 
@@ -202,7 +200,10 @@ export default class ContentEditor {
           // });
           // console.log(res)
 
+
           return formatHTML4;
+
+          //     return formatHTML4;
         }
       },
 

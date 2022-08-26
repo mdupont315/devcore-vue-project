@@ -141,38 +141,58 @@ export default {
       const toFile = await fetch(dataUrl);
       const blob = await toFile.blob();
 
-      console.log("addin!");
+      // 	 const image = new Image();
+      // 	 let width, height;
 
-      console.log({ toFile });
-      console.log({ blob });
-      console.log(type);
+      //  image.src = dataUrl;
 
+      //  const loadedDimensions = new Promise((resolve, reject) => {
+      // 	 			 image.onload = () => {
+      // 						resolve({
+      // 							width: image.width,
+      // 							height: image.height
+      // 						})
+
+      //  }
+
+      // image.onload = () => {
       const fileType = toFile?.url.split(";")[0].split("/")[1] || "png";
       const title = `${uuidv4()}.${fileType}`;
 
-			//TODO: Figure out base64str real dimensions and set them below
-			// if null values => does .txt files
+      const file = new File([blob], this.node.attrs.title ?? title, {
+        type,
+        lastModified: Date.now(),
+      });
 
-      this.resizerInstance.resize(
-        new File([blob], this.node.attrs.title ?? title, {
-          type,
-        }),
-        {
-          height: this.node.attrs.dimensions?.height || 500,
-          width: this.node.attrs.dimensions?.width || 500,
-        },
-        (blob) => {
-          var file = new File([blob], this.node.attrs.title ?? title, {
-             type,
-            lastModified: Date.now(),
-          });
-          // addFile({ uuid: uuidv4(), file: file });
-          this.extension.options.addFile({
-            uuid: this.node.attrs.uuid ?? uuidv4(),
-            file: file,
-          });
-        }
-      );
+      this.extension.options.addFile({
+        uuid: this.node.attrs.uuid ?? uuidv4(),
+        file: file,
+      });
+
+      //TODO: Figure out base64str real dimensions and set them below
+      // if null values => does .txt files
+
+      // this.resizerInstance.resize(
+      //   new File([blob], this.node.attrs.title ?? title, {
+      //     type,
+      //   }),
+      //   {
+      //     height: this.node.attrs.dimensions?.height || 500,
+      //     width: this.node.attrs.dimensions?.width || 500,
+      //   },
+      //   (blob) => {
+      //     var file = new File([blob], this.node.attrs.title ?? title, {
+      //       type,
+      //       lastModified: Date.now(),
+      //     });
+      //     // addFile({ uuid: uuidv4(), file: file });
+      //     this.extension.options.addFile({
+      //       uuid: this.node.attrs.uuid ?? uuidv4(),
+      //       file: file,
+      //     });
+      //   }
+      // );
+      //   };
     },
     // async resizeImage(e) {
     //   //	TODO: Figure out image dimensions here... scale big image
