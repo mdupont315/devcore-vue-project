@@ -468,7 +468,6 @@ export default {
 }
 .ideaEdit_type_Edit_content > div {
   width: 36px;
-  margin-top: 15px;
   margin-right: 15px;
   height: 30px;
   font-size: 24px;

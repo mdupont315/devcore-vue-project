@@ -409,7 +409,6 @@ export default {
   max-height: 26rem;
   color: #0d0d0d;
   background-color: #fff;
-  border-radius: 0.75rem;
   min-height: 100%;
   & > .editor__content {
     overflow-x: hidden;

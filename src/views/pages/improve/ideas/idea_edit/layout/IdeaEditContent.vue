@@ -13,7 +13,7 @@
         style="z-index: 1"
       />
 
-      <div class="idea_edit_content_container_content-header-button" v-show="false">
+      <div class="idea_edit_content_container_content-header-button">
         <div v-if="!idea.id">
           <b-popover
             target="idea_content_type_info_info_text-info"
@@ -376,11 +376,11 @@ export default {
   align-items: center;
   background: #fff;
   border-radius: 5px;
-  min-height: 41px;
+  min-height: 40px;
 
   > #idea_edit_content_btnNewIdeaTemplate {
     width: 120px;
-    min-height: 41px;
+    min-height: 40px;
     &:hover:not(:disabled) {
       color: #fff;
       background: #4294d0 !important;

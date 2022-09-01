@@ -153,26 +153,23 @@ export default {
             const { contentForm } = this.ideaContentCategoryData.find(
               (category) => category.contentForm.id === content.id
             ) || {
-              contentForm: this.defaultContentForm,
+              contentForm: new GQLForm({
+                id: undefined,
+                markup: JSON.stringify(defaultContent),
+                ideaId: null,
+                version: 1,
+                isPrimary: true,
+                contentType: null,
+                companyRoles: [],
+              }),
             };
+
             Object.keys(content || {})
               .filter((key) => key in contentForm)
               .forEach((key) => (contentForm[key] = content[key]));
             return { contentForm };
-            // return {
-            //   contentForm: new GQLForm({
-            //     id: content.id,
-            //     markup: content.markup,
-            //     ideaId: content.ideaId,
-            //     version: content.version ?? 1,
-            //     contentType: content.contentType,
-            //     companyRoles: content.companyRoles,
-            //     isPrimary: content.id === ideaContentId,
-            //   }),
-            // };
           });
         } else {
-          // return this form whe ncreating new
           return [
             {
               contentForm: this.defaultContentForm,
@@ -499,10 +496,13 @@ export default {
           await this.refreshIdea("EDIT");
         }
 
-        this.ideaContentCategoryData.forEach((data) => {
-          const { contentForm } = data;
-          contentForm.fields.isPrimary = contentForm.id === form.fields.id;
-        });
+        if (form.fields.isPrimary) {
+          this.ideaContentCategoryData.forEach((data) => {
+            const { contentForm } = data;
+            contentForm.fields.isPrimary = contentForm.id === form.fields.id;
+          });
+        }
+				this.initializeData();
 
         this.isLoading = false;
         this.isSaving = false;
