@@ -188,6 +188,7 @@ export default {
         const contentForm =
           this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
         return {
+          id: contentForm.id,
           contentType: contentForm.contentType,
           markup: JSON.parse(contentForm.markup),
         };
@@ -195,6 +196,7 @@ export default {
       set(value) {
         const contentForm =
           this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+        contentForm.id = value.id;
         contentForm.markup = JSON.stringify(value.markup);
         contentForm.contentType = value.contentType;
       },
@@ -221,6 +223,8 @@ export default {
   },
   methods: {
     changeContentType(form) {
+      console.log(form);
+
       this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
         (content) => content.contentForm.id === form.id
       );
@@ -266,6 +270,9 @@ export default {
       const { ideaContentId } = this.getIdea;
 
       this.ideaContentCategoryData = this.ideaContents.map((content) => {
+        console.log(content.markup);
+        console.log(this.getImageNodesFromContent(JSON.parse(content.markup)));
+
         return {
           contentForm: new GQLForm({
             id: content.id,
@@ -315,9 +322,6 @@ export default {
           const setImageName = node.attrs.title;
           const fileInIdea = files.find((file) => file.title === setImageName);
 
-          console.log(node.attrs.preview);
-          console.log(fileInIdea);
-
           if (fileInIdea) {
             if (node.attrs.preview) {
               node.attrs.src = fileInIdea.url;
@@ -353,8 +357,8 @@ export default {
 
       return ideaSave;
     },
-    getImageNodesFromContent() {
-      const { markup } = this.getIdeaContent;
+    getImageNodesFromContent(argMarkup) {
+      const { markup } = argMarkup ?? this.getIdeaContent;
       const imageNodes =
         markup?.content.filter((node) => node.type === "file") ?? [];
 
@@ -502,7 +506,7 @@ export default {
             contentForm.fields.isPrimary = contentForm.id === form.fields.id;
           });
         }
-				this.initializeData();
+        this.initializeData();
 
         this.isLoading = false;
         this.isSaving = false;
@@ -511,6 +515,8 @@ export default {
     async removeIdeaContentArea(form) {
       this.isLoading = true;
       this.isSaving = true;
+
+      //user is removing content area that is currently active
 
       try {
         const removeForm = new GQLForm({
@@ -521,9 +527,42 @@ export default {
         console.log(e);
       } finally {
         await this.fetchIdeaContents(form.fields.ideaId);
+
+        if (this.ideaContentCategories[this.selectedCategoryIndex]) {
+          if (
+            this.ideaContentCategories[this.selectedCategoryIndex].contentForm
+              ?.id
+          ) {
+            const removeIndex = this.ideaContentCategories.findIndex(
+              (content) => content.contentForm?.id === form.id
+            );
+            console.log(this.selectedCategoryIndex);
+            console.log({ removeIndex });
+            if (this.selectedCategoryIndex == removeIndex) {
+              this.setHomeContentActive();
+            }
+          }
+        }
+
         this.isLoading = false;
         this.isSaving = false;
       }
+    },
+
+    setHomeContentActive() {
+      console.log("setting home content active!");
+
+      const { ideaContentId } = this.getIdea;
+      const homeContent = this.ideaContentCategoryData.find(
+        (content) => content.contentForm?.fields.id === ideaContentId
+      );
+
+      console.log(homeContent);
+
+      const homeForm =
+        homeContent?.contentForm ?? this.ideaContentCategoryData[0].contentForm;
+
+      this.changeContentType(homeForm);
     },
 
     async fetchIdeaContents(id) {
@@ -717,12 +756,10 @@ export default {
 <style lang="scss" scoped>
 .idea_edit_container {
   width: 100%;
-  // max-height: 82vh;
   height: 90%;
   overflow: hidden;
   height: 100%;
   margin-top: 0px;
-  // min-height: 82vh;
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;

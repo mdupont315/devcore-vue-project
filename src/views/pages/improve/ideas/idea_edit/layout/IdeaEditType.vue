@@ -254,6 +254,9 @@ export default {
   mounted() {
     this.selectablePathRoles = this.getSelectableRoles;
     this.roleIntent = Math.random();
+
+		// default idea markup content type as default
+
   },
 
   computed: {

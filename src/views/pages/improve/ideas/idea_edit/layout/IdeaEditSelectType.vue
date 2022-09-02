@@ -142,7 +142,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin: 0px 5px;
+  margin: 0px 5px 0 0;
   flex-grow: 10;
 
   & > div {
