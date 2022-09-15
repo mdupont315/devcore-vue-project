@@ -69,6 +69,7 @@
           <b-button
             class="btn-circle shadow-sm"
             style="display: flex; align-self: center; justify-content: center"
+            :style="{ background: isLoading ? '#fff' : '#f6f8f9' }"
             size="lg"
             variant="light"
             @click="toggleIdea"
@@ -85,8 +86,8 @@
             >
               +
             </div>
-            <div v-else>
-              <b-spinner style="color: lightgrey"></b-spinner>
+            <div v-else style="background: #fff;height: 100%">
+              <b-spinner style="color: #4294d0"></b-spinner>
             </div>
           </b-button>
         </div>

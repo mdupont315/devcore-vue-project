@@ -15,6 +15,7 @@
             style="max-height: 65vh; max-width: 50%"
             :style="{ width: imgWidth, height: imgHeight }"
           />
+
           <!-- <img
             :ref="`${getAttrs.uuid}`"
             :src="getAttrs.src"
@@ -23,7 +24,7 @@
             style="max-height: 65vh; max-width: 50%"
           /> -->
         </div>
-        <button @click="remove" class="file-remove-button">
+        <button @click="removeNode" class="file-remove-button">
           {{ $t("Remove") }}
         </button>
       </div>
@@ -64,7 +65,7 @@
             >
           </div>
           <button
-            @click="remove"
+            @click="removeNode"
             v-b-tooltip.hover
             :title="$t('Remove file')"
             class="file-remove-button"
@@ -88,6 +89,7 @@ import {
   isValidExternalUrl,
   getBase64FromUrl,
   base64MimeType,
+  isBase64,
 } from "./helpers/file/fileUtils";
 import ImageResizer from "@/lib/image-resizer";
 
@@ -121,24 +123,39 @@ export default {
       return this.fileEntity;
     },
   },
+
   async mounted() {
-    console.log(this.node.attrs);
+    //  console.log(this.getAttrs);
+
+    // if (!this.getAttrs.src && !this.getAttrs.href) {
+    // 	console.log("delete")
+    //   this.deleteNode();
+    // }
+
     const isStagedPreviewFile =
-      !this.node.attrs.href && this.node.attrs.src && !this.node.attrs.id;
+      !this.getAttrs.href && this.getAttrs.src && !this.getAttrs.id;
+
+    // update attrs
+
+    const isExternalUrl = isValidExternalUrl(this.getAttrs.src);
+    const isCopyPastedBase64 = isBase64(this.getAttrs.src);
 
     if (isStagedPreviewFile) {
-      if (isValidExternalUrl(this.node.attrs.src)) {
-        console.log("TRANSFORMIN");
-        await this.transformFilesIfPastedExternalUrls();
+      if (isExternalUrl || isCopyPastedBase64) {
+        // console.log("TRANSFORMIN");
+        await this.handleExternalFiles();
       }
     }
   },
   beforeDestroy() {
-    this.editor.commands.removeFile(this.fileEntity);
+    this.removeFile();
   },
   methods: {
     async addBase64AsFile(dataUrl, type) {
-      const toFile = await fetch(dataUrl);
+      const toFile = await fetch(dataUrl, {
+        method: "GET",
+        mode: "no-cors",
+      });
       const blob = await toFile.blob();
 
       // 	 const image = new Image();
@@ -159,13 +176,15 @@ export default {
       const fileType = toFile?.url.split(";")[0].split("/")[1] || "png";
       const title = `${uuidv4()}.${fileType}`;
 
-      const file = new File([blob], this.node.attrs.title ?? title, {
+      const file = new File([blob], this.getAttrs.title ?? title, {
         type,
         lastModified: Date.now(),
       });
 
+      console.log("ADDING FILE !");
+
       this.extension.options.addFile({
-        uuid: this.node.attrs.uuid ?? uuidv4(),
+        uuid: this.getAttrs.uuid,
         file: file,
       });
 
@@ -173,21 +192,21 @@ export default {
       // if null values => does .txt files
 
       // this.resizerInstance.resize(
-      //   new File([blob], this.node.attrs.title ?? title, {
+      //   new File([blob], this.getAttrs.title ?? title, {
       //     type,
       //   }),
       //   {
-      //     height: this.node.attrs.dimensions?.height || 500,
-      //     width: this.node.attrs.dimensions?.width || 500,
+      //     height: this.getAttrs.dimensions?.height || 500,
+      //     width: this.getAttrs.dimensions?.width || 500,
       //   },
       //   (blob) => {
-      //     var file = new File([blob], this.node.attrs.title ?? title, {
+      //     var file = new File([blob], this.getAttrs.title ?? title, {
       //       type,
       //       lastModified: Date.now(),
       //     });
       //     // addFile({ uuid: uuidv4(), file: file });
       //     this.extension.options.addFile({
-      //       uuid: this.node.attrs.uuid ?? uuidv4(),
+      //       uuid: this.getAttrs.uuid ?? uuidv4(),
       //       file: file,
       //     });
       //   }
@@ -197,16 +216,16 @@ export default {
     // async resizeImage(e) {
     //   //	TODO: Figure out image dimensions here... scale big image
 
-    //   console.log(this.node.attrs);
-    //   //	console.log(this.node.attrs.src)
+    //   console.log(this.getAttrs);
+    //   //	console.log(this.getAttrs.src)
     //   const isStagedFile =
-    //     !this.node.attrs.href && this.node.attrs.src && !this.node.attrs.id;
+    //     !this.getAttrs.href && this.getAttrs.src && !this.getAttrs.id;
     //   if (!isStagedFile) return;
 
     //   const dataUrl = this.getAttrs.src;
-    //   const type = this.node.attrs.type ?? base64MimeType(dataUrl);
+    //   const type = this.getAttrs.type ?? base64MimeType(dataUrl);
 
-    //   if (this.resizedImages.includes(this.node.attrs.uuid)) {
+    //   if (this.resizedImages.includes(this.getAttrs.uuid)) {
     //     return;
     //   }
 
@@ -224,7 +243,7 @@ export default {
     //     await this.addBase64AsFile(dataUrl, type);
     //   };
     //   await this.handleResizedImage(dataUrl, type, callback);
-    //   this.resizedImages.push(this.node.attrs.uuid);
+    //   this.resizedImages.push(this.getAttrs.uuid);
     // },
     //   async loadedImg(e) {
     //     console.log(e);
@@ -245,73 +264,104 @@ export default {
         this.$el.clientWidth * PREVIEW_MAX_WIDTH_OF_VIEWPORT;
       base64Resize(dataUrl, scaleWidthUntilPX, type, callback);
     },
-    async transformFilesIfPastedExternalUrls() {
-      const size = this.node.attrs.size;
-      if (!size || typeof size === "string") {
-        if (!this.node.attrs.src) return;
-        let externalToBase64 = "";
-        try {
-          externalToBase64 = await getBase64FromUrl(this.node.attrs.src);
-        } catch (e) {
-          console.log(e);
-          this.extension.options.notify("Copying content prohibited", {
-            site: this.node.attrs.src,
-          });
-          this.deleteNode();
-          return;
-        }
+    async handleExternalFiles() {
+      const size = this.getAttrs.size;
 
-        console.log(externalToBase64 && this.node.attrs.title);
-
-        if (externalToBase64 && !this.node.attrs.title) {
-          const fileType =
-            externalToBase64.split(";")[0].split("/")[1] || "png";
-          const uuid = uuidv4();
-          this.updateAttributes({
-            title: `${uuid}.${fileType}`,
-            uuid,
-          });
-        }
-
-        const type = this.node.attrs.type ?? base64MimeType(externalToBase64);
-
-        console.log(type);
-
-        const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;
-        const size = externalToBase64.length * (3 / 4) - mod;
-
-        const isGif = type === "image/gif";
-
-        if (isGif) {
-          this.updateAttributes({
-            src: externalToBase64,
-            type,
-            preview: true,
-            size,
-          });
-          this.resizedImages.push(this.node.attrs.uuid);
-          return await this.addBase64AsFile(externalToBase64, type);
-        }
-
-        const callback = async (dataUrl) => {
-          this.updateAttributes({
-            src: dataUrl,
-            type,
-            preview: true,
-            size,
-          });
-          await this.addBase64AsFile(dataUrl, type);
-        };
-        this.resizedImages.push(this.node.attrs.uuid);
-
-        return await this.handleResizedImage(externalToBase64, type, callback);
+      //console.log(size);
+      // if (!size || typeof size === "string") {
+      if (!this.getAttrs.src) return;
+      let externalToBase64 = "";
+      try {
+        externalToBase64 = await getBase64FromUrl(this.getAttrs.src);
+      } catch (e) {
+        console.log(e);
+        this.extension.options.notify("Copying content prohibited", {
+          site: this.getAttrs.src,
+        });
+        return this.deleteNode();
       }
+
+      const fileType = externalToBase64.split(";")[0].split("/")[1] || "png";
+      const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;
+      const base64size = externalToBase64.length * (3 / 4) - mod;
+      const uuid = uuidv4();
+      this.updateAttributes({
+        title: `${uuid}.${fileType}`,
+        src: externalToBase64,
+        preview: true,
+        size: base64size,
+        uuid,
+      });
+
+      const type = this.getAttrs.type ?? base64MimeType(externalToBase64);
+      await this.addBase64AsFile(externalToBase64, type);
+
+      //   console.log(externalToBase64 && this.getAttrs.title);
+
+      //   if (externalToBase64 && !this.getAttrs.title) {
+      //     const fileType =
+      //       externalToBase64.split(";")[0].split("/")[1] || "png";
+      //     const uuid = uuidv4();
+      //     this.updateAttributes({
+      //       title: `${uuid}.${fileType}`,
+      //       uuid,
+      //     });
+      //   }
+
+      //   const type = this.getAttrs.type ?? base64MimeType(externalToBase64);
+
+      //   console.log(type);
+
+      //   const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;
+      //   const size = externalToBase64.length * (3 / 4) - mod;
+
+      //   const isGif = type === "image/gif";
+
+      //   if (isGif) {
+      //     this.updateAttributes({
+      //       src: externalToBase64,
+      //       type,
+      //       preview: true,
+      //       size,
+      //     });
+      //     this.resizedImages.push(this.getAttrs.uuid);
+      //     return await this.addBase64AsFile(externalToBase64, type);
+      //   }
+
+      //   const callback = async (dataUrl) => {
+      //     this.updateAttributes({
+      //       src: dataUrl,
+      //       type,
+      //       preview: true,
+      //       size,
+      //     });
+      //     await this.addBase64AsFile(dataUrl, type);
+      //   };
+      //   this.resizedImages.push(this.getAttrs.uuid);
+
+      //   return await this.handleResizedImage(externalToBase64, type, callback);
+      // }
     },
-    remove() {
+    removeFile() {
+      console.log("Removing file instance with attrs: ", this.getAttrs);
+
+      this.editor.commands.removeFile(this.fileEntity);
+      // const isUploaded =
+      //   (this.getAttrs.src || this.getAttrs.href) && this.getAttrs.id;
+
+      // if (isUploaded) {
+      //   this.editor.commands.removeFile(this.fileEntity);
+      // }
+    },
+    removeNode() {
       const { editor, getPos, node } = this;
 
       const from = getPos();
       const to = from + node.nodeSize;
+
+      console.log("REMOVE NODE !");
+
+      this.removeFile();
 
       editor.commands.deleteRange({ from, to });
     },
@@ -330,6 +380,8 @@ export default {
     width: 60px;
     outline: none;
     position: relative;
+    font-size: 14px;
+    font-weight: 400;
     border-radius: 3px;
     background: #fff;
     bottom: 2px;
@@ -359,6 +411,8 @@ export default {
   padding: 2px 10px;
   border-radius: 3px;
   padding: 0 10px;
+  font-size: 14px;
+  font-weight: 400;
   user-select: none;
   cursor: pointer;
   background: #fff;

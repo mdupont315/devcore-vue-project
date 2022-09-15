@@ -44,7 +44,18 @@
                   justify-content: normal;
                 "
               >
-                <div style="margin-right: 20px">{{ $t("first page") }}</div>
+                <div
+                  @click="setIsPrimary()"
+                  style="
+                    padding-right: 45px;
+                    position: absolute;
+                    z-index: 1;
+                    cursor: pointer;
+                    margin-left: -40px;
+                  "
+                >
+                  {{ $t("first page") }}
+                </div>
                 <b-form-checkbox
                   v-model="mutateForm.isPrimary"
                   name="check-button"
@@ -99,6 +110,7 @@
               data-vv-name="contentType"
               :reduce="(obj) => obj.content"
               :options="getContentTemplates"
+              :clearable="false"
               :class="{
                 'is-invalid': mutateForm.markup === null,
                 'is-valid': mutateForm.markup !== null,
@@ -250,13 +262,14 @@ export default {
     selectablePathRoles: [],
     roleIntent: null,
     selectedRoles: [],
+    comparisonForm: null,
+    hasEdits: false,
   }),
   mounted() {
     this.selectablePathRoles = this.getSelectableRoles;
     this.roleIntent = Math.random();
 
-		// default idea markup content type as default
-
+    // default idea markup content type as default
   },
 
   computed: {
@@ -290,31 +303,32 @@ export default {
         return this.value;
       },
       set(value) {
-        console.log("value");
-        console.log(value);
         this.$emit("input", value);
       },
     },
-    hasEdits: {
-      get() {
-        if (this.value.id) {
-          const content = this.ideaContents.find((x) => x.id === this.value.id);
-          if (!content) return false;
-          const flatFieldsEqual = this.objectsAreEqual(
-            emptyIdeaArea(content),
-            emptyIdeaArea(this.value.fields)
-          );
-          const listFieldsEqual = this.listsAreEqual(
-            content.companyRoles.map((role) => role.id),
-            this.value.fields.companyRoles
-          );
+    // hasEdits: {
+    //   get() {
+    //     console.log(this.value.id);
+    //     if (this.value.id) {
+    //       const content = this.ideaContents.find((x) => x.id === this.value.id);
+    //       if (!content) return false;
+    //       const flatFieldsEqual = this.objectsAreEqual(
+    //         emptyIdeaArea(content),
+    //         emptyIdeaArea(this.value.fields)
+    //       );
+    //       const listFieldsEqual = this.listsAreEqual(
+    //         content.companyRoles.map((role) => role.id),
+    //         this.value.fields.companyRoles
+    //       );
+    //       console.log(content);
+    //       console.log(this.value.fields);
 
-          return !listFieldsEqual || !flatFieldsEqual;
-        }
+    //       return !listFieldsEqual || !flatFieldsEqual;
+    //     }
 
-        return false;
-      },
-    },
+    //     return false;
+    //   },
+    // },
     getContentTemplates: {
       get() {
         return [
@@ -346,8 +360,23 @@ export default {
     },
   },
   watch: {
+    mutateForm: {
+      deep: true,
+      handler(newVal) {
+        console.log("hasEdits: ", this.hasEdits);
+        this.hasEdits = this.checkEdits();
+        if (!this.comparisonForm) {
+          this.comparisonForm = newVal.fields;
+        }
+      },
+    },
+    "mutateForm.id": {
+      handler(newVal) {
+        this.comparisonForm = null;
+      },
+    },
     "mutateForm.markup": {
-      handler() {
+      handler(newVal) {
         this.validate();
       },
     },
@@ -361,6 +390,35 @@ export default {
     },
   },
   methods: {
+    checkEdits() {
+      if (this.value.id) {
+        const content = this.ideaContents.find((x) => x.id === this.value.id);
+
+        if (!content) return false;
+
+        // create comparison object
+        const compareObj = ({ companyRoles, markup, name }) => ({
+          companyRoles,
+          markup,
+          name,
+        });
+        const flatFieldsEqual = this.objectsAreEqual(
+          emptyIdeaArea(compareObj({ ...content, name: content.contentType })),
+          emptyIdeaArea(compareObj(this.value.fields))
+        );
+        const listFieldsEqual = this.listsAreEqual(
+          content.companyRoles.map((role) => role.id ?? role),
+          this.value.fields.companyRoles.map((role) => role.id ?? role)
+        );
+
+        return !listFieldsEqual || !flatFieldsEqual;
+      }
+
+      return false;
+    },
+    setIsPrimary() {
+      this.mutateForm.isPrimary = !this.mutateForm.isPrimary;
+    },
     validate() {
       this.$validator.validateAll();
     },
@@ -382,6 +440,7 @@ export default {
       return changes.length === 0;
     },
     listsAreEqual(a, b) {
+      console.log(a, b);
       return a.length === b.length && xor(a, b).length === 0;
     },
   },
@@ -390,10 +449,13 @@ export default {
 
 
 <style lang="scss">
+input[type="checkbox"] {
+  cursor: pointer;
+}
 .idea_edit_content_type_select_idea_roles {
   &.is_roles_disabled > .input-wrapper > div > .counter {
     color: lightgrey;
-		cursor: not-allowed;
+    cursor: not-allowed;
     z-index: 1;
   }
   & > .input-wrapper > div > .counter {
@@ -408,7 +470,6 @@ export default {
 }
 .ideaEdit_type_noEdit_content {
   width: 36px;
-  margin-right: 15px;
   height: 30px;
   font-size: 24px;
   color: lightgray;
@@ -471,7 +532,6 @@ export default {
 }
 .ideaEdit_type_Edit_content > div {
   width: 36px;
-  margin-right: 15px;
   height: 30px;
   font-size: 24px;
   color: lightgray;

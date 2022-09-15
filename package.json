@@ -55,7 +55,7 @@
     "laravel-echo": "^1.8.0",
     "linkifyjs": "^3.0.5",
     "lodash": "^4.17.20",
-    "mammoth": "^1.4.21",
+    "mammoth": "^1.5.1",
     "moment": "^2.27.0",
     "numeral": "^2.0.6",
     "portal-vue": "^2.1.7",

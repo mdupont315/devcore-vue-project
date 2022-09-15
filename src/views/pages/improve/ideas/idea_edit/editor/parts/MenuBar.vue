@@ -208,7 +208,6 @@ export default {
           });
         }
 
-
         setTimeout(() => {
           if (!data.url) return;
 
@@ -225,9 +224,19 @@ export default {
       this.embedPromptOpen = false;
       this.embedType = null;
     },
-    setFiles(files) {
+    setFiles(fileData) {
       this.filePromptOpen = !this.filePromptOpen;
-      this.editor.commands.setImage(files);
+
+      if (fileData.type === "preview") {
+        this.editor.commands.setImage(fileData.files);
+      }
+      if (fileData.type === "nonpreview") {
+        this.editor.commands.setAttachment(fileData.files);
+      }
+
+      if (fileData.type === "inline") {
+        this.editor.commands.setInlineFile(fileData.files);
+      }
     },
     createTable(data) {
       const setRows = data.rows ?? 1;
@@ -283,6 +292,13 @@ export default {
             secondary: this.$t("You can upload attachment up to size", {
               size: MAX_FILE_SIZE,
             }),
+          };
+          break;
+        case "inline":
+          this.fileModalTexts = {
+            type: "inline",
+            primary: this.$t("SELECT DOCX FILE"),
+            secondary: ''
           };
           break;
         default:
@@ -644,6 +660,17 @@ export default {
           },
         },
         {
+          icon: "file-word-2-line",
+          iconType: "remix",
+          showOnSmall: false,
+          showOnLarge: true,
+          type: "item",
+          title: "DOCX",
+          action: () => {
+            this.setFilePromptOpen("inline");
+          },
+        },
+        {
           icon: "grid-line",
           iconType: "remix",
           showOnSmall: false,
@@ -703,7 +730,7 @@ export default {
   display: flex;
   align-items: center;
   margin: 0;
-	z-index: 0;
+  z-index: 0;
   place-content: center;
   cursor: pointer;
 }

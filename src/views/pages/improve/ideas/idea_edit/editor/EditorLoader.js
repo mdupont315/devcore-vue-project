@@ -30,6 +30,86 @@ import {
   Position
 } from "./extensions";
 
+// function normalizeSafariSpaceSpans(htmlString) {
+//   return htmlString.replace(
+//     /<span(?: class="Apple-converted-space"|)>(\s+)<\/span>/g,
+//     (fullMatch, spaces) => {
+//       return spaces.length === 1
+//         ? " "
+//         : Array(spaces.length + 1)
+//             .join("\u00A0 ")
+//             .substr(0, spaces.length);
+//     }
+//   );
+// }
+
+// function cleanContentAfterBody(htmlString) {
+//   const bodyCloseTag = "</body>";
+//   const htmlCloseTag = "</html>";
+
+//   const bodyCloseIndex = htmlString.indexOf(bodyCloseTag);
+
+//   if (bodyCloseIndex < 0) {
+//     return htmlString;
+//   }
+
+//   const htmlCloseIndex = htmlString.indexOf(
+//     htmlCloseTag,
+//     bodyCloseIndex + bodyCloseTag.length
+//   );
+
+//   return (
+//     htmlString.substring(0, bodyCloseIndex + bodyCloseTag.length) +
+//     (htmlCloseIndex >= 0 ? htmlString.substring(htmlCloseIndex) : "")
+//   );
+// }
+
+// const normalizeSpacerunSpans = htmlDocument => {
+//   htmlDocument.querySelectorAll("span[style*=spacerun]").forEach(el => {
+//     const innerTextLength = el.innerText.length || 0;
+
+//     el.innerText = Array(innerTextLength + 1)
+//       .join("\u00A0 ")
+//       .substr(0, innerTextLength);
+//   });
+// };
+
+// const normalizeSpacing = htmlString => {
+//   // Run normalizeSafariSpaceSpans() two times to cover nested spans.
+//   return (
+//     normalizeSafariSpaceSpans(normalizeSafariSpaceSpans(htmlString))
+//       // Remove all \r\n from "spacerun spans" so the last replace line doesn't strip all whitespaces.
+//       .replace(
+//         /(<span\s+style=['"]mso-spacerun:yes['"]>[^\S\r\n]*?)[\r\n]+([^\S\r\n]*<\/span>)/g,
+//         "$1$2"
+//       )
+//       .replace(/<span\s+style=['"]mso-spacerun:yes['"]><\/span>/g, "")
+//       .replace(/ <\//g, "\u00A0</")
+//       .replace(/ <o:p><\/o:p>/g, "\u00A0<o:p></o:p>")
+//       // Remove <o:p> block filler from empty paragraph. Safari uses \u00A0 instead of &nbsp;.
+//       .replace(/<o:p>(&nbsp;|\u00A0)<\/o:p>/g, "")
+//       // Remove all whitespaces when they contain any \r or \n.
+//       .replace(/>([^\S\r\n]*[\r\n]\s*)</g, "><")
+//   );
+// };
+
+// const parseDocxHTml = htmlString => {
+//   console.log("^^^^^^^^^^^^^^^^^BEFORE^^^^^^^^^^");
+//   console.log(htmlString);
+//   const domParser = new DOMParser();
+//   const normalizedHtml = normalizeSpacing(cleanContentAfterBody(htmlString));
+//   const htmlDocument = domParser.parseFromString(normalizedHtml, "text/html");
+
+//   normalizeSpacerunSpans(htmlDocument);
+
+//   const bodyString = htmlDocument.body.innerHTML;
+
+//   console.log("***************ÂFTER***************");
+//   console.log(bodyString);
+//   console.log("***************AFTER***************");
+//   return normalizedHtml;
+// };
+
 export default class ContentEditor {
   constructor(
     editable,
@@ -55,7 +135,8 @@ export default class ContentEditor {
         italic: false,
         bold: false,
         code: false,
-        codeBlock: false
+        codeBlock: false,
+        blockquote: false
       }),
       Position,
       Paragraph,
@@ -159,12 +240,16 @@ export default class ContentEditor {
           //Remove comments
           const formatHTML1 = formatHTML.replace(/<\/?style(.*?)">/g, "");
           const formatHTML2 = formatHTML1.replace(/<br>/g, " ");
+          const formatHTML3 = formatHTML2.replace(/<br>/g, " ");
           // const formatHTML3 = formatHTML2.replace(/<\/?p[^>]*>/g, "");
           // const formatHTMLX = formatHTML3.replace(
           //   /(<p[^>]*>)[^>]*(<img)/g,
           //   "img"
           // );
-          const formatHTML4 = formatHTML2.replace(/<\/?span[^>]*>/g, "");
+          const formatHTML4 = formatHTML3.replace("<!--StartFragment-->", "");
+          const formatHTML5 = formatHTML4.replace("<!--EndFragment-->", "");
+
+          //const transformHtml = parseDocxHTml(formatHTML5)
 
           // // console.log(formatHTML1);
           // const parser = new DOMParser();
@@ -198,10 +283,11 @@ export default class ContentEditor {
           //     }
           //   },
           // });
-          // console.log(res)
+          // console.log(res
 
+          console.log(formatHTML5);
 
-          return formatHTML4;
+          return formatHTML5;
 
           //     return formatHTML4;
         }
@@ -209,36 +295,21 @@ export default class ContentEditor {
 
       onUpdate: ({ editor }) => {
         setTimeout(() => {
-          editor.state.doc.descendants((node, pos, parent) => {
-            if (
-              ["orderedList", "bulletList", "listItem"].includes(node.type.name)
-            ) {
-              return true;
+          if (editor.isActive("listItem")) {
+            const node = editor.state.selection.$head.node();
+            if (node.attrs.indent) {
+              editor.commands.updateAttributes(node.type.name, { indent: 0 });
             }
-
-            if (
-              node.type.name === "paragraph" &&
-              parent.type.name === "listItem" &&
-              node.attrs.indent > 0
-            ) {
-              editor.view.dispatch(
-                editor.state.tr.setNodeMarkup(pos, null, { indent: 0 })
-              );
-            }
-
-            return false;
-          });
-
-          // if (!this.dedupedCommentNodes) {
-          //   this.dedupedCommentNodes = true;
-          // }
-
-          // this.dedupedCommentNodes = false;
+          }
 
           const json = editor.getJSON();
 
           this.options.onUpdate(json);
         });
+      },
+
+      onTransaction: ({ editor, transaction }) => {
+      //  console.log(transaction)
       }
     });
   }

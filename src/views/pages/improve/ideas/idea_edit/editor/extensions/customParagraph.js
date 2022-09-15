@@ -42,8 +42,9 @@ export const Paragraph = Node.create({
       setParagraph: id => ({ commands }) => {
         if (id) {
           return commands.setNode(this.name, { id });
-        } return commands.setNode(this.name);
-      },
+        }
+        return commands.setNode(this.name);
+      }
 
       // setComment: uuid => ({ commands }) => {
       //   return commands.toggleNode(this.name, "comments", uuid);

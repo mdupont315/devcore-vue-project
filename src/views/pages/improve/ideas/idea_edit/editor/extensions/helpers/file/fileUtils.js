@@ -121,26 +121,33 @@ const base64Resize = (sourceBase64, toWidth, _type, callback) => {
     const ihScaled = ih * scl;
     canvas.width = iwScaled;
     canvas.height = ihScaled;
+    ctx.mozImageSmoothingEnabled = false;
+    ctx.webkitImageSmoothingEnabled = false;
+    ctx.msImageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = false;
+    console.log("scale: ")
+    console.log(iwScaled)
+    console.log(ihScaled)
     ctx.drawImage(img, 0, 0, iwScaled, ihScaled);
     const newBase64 = canvas.toDataURL(type, scl);
 
     callback(newBase64);
   };
   img.onerror = function() {
-    console.log('Could not resize image');
-};
+    console.log("Could not resize image");
+  };
 };
 
 const isValidExternalUrl = url => {
-  return VALID_EXTERNAL_URL_REGEX.test(url);
+  return new RegExp(VALID_EXTERNAL_URL_REGEX).test(url);
 };
 
 const isBase64 = url => {
-  return VALID_BASE64URL_REGEX.test(url);
+  return new RegExp(VALID_BASE64URL_REGEX).test(url);
 };
 
 const getBase64FromUrl = async url => {
-  if (isBase64(url)) return url
+  if (isBase64(url)) return url;
   const data = await fetch(url);
   const blob = await data.blob();
   return new Promise(resolve => {

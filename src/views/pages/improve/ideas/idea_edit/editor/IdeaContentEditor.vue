@@ -125,7 +125,7 @@ export default {
   methods: {
     onScroll(e) {
 
-      if (this.editor.storage.scrollPosition) {
+      if (this.editor && this.editor.storage.scrollPosition) {
         this.windowTop = e.srcElement.scrollTop;
       }
 

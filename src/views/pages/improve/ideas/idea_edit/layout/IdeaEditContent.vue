@@ -67,7 +67,7 @@
           v-model="editContentItem"
           @save="save"
           @remove="remove"
-          @close="contentTypeSelectorForm = false"
+          @close="closeContentTypeSelectorForm"
         />
       </div>
     </div>
@@ -94,6 +94,7 @@ import ideaContentEditor from "../editor/IdeaContentEditor.vue";
 import ideaEditType from "./IdeaEditType";
 import ideaEditSelectType from "./IdeaEditSelectType";
 import GQLForm from "@/lib/gqlform";
+import empty from "./templates/empty.json";
 
 export default {
   components: {
@@ -205,6 +206,10 @@ export default {
     editContentItem: null,
   }),
   methods: {
+    closeContentTypeSelectorForm() {
+      this.contentTypeSelectorForm = false;
+      this.editContentItem = null;
+    },
     save() {
       this.$emit("saveIdeaContentArea", this.editContentItem);
 
@@ -251,12 +256,14 @@ export default {
       this.contentTypeSelectorVisible = !this.contentTypeSelectorVisible;
     },
     createContentType() {
-      console.log("created!");
       this.contentTypeSelectorForm = true;
       this.contentTypeSelectorVisible = true;
       this.editContentItem = new GQLForm({
         id: undefined,
-        markup: null,
+        markup: {
+          title: "Empty",
+          content: JSON.stringify(empty),
+        },
         version: 1,
         isPrimary: false,
         name: null,
@@ -272,7 +279,7 @@ export default {
     },
 
     closeContentType() {
-      this.contentTypeSelectorForm = false;
+      this.closeContentTypeSelectorForm();
       this.contentTypeSelectorVisible = false;
     },
     setContentWindowTop(scrollTop) {
@@ -399,6 +406,8 @@ export default {
   border-radius: 3px;
   width: 75%;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .idea_content_type_info_info_text-info {

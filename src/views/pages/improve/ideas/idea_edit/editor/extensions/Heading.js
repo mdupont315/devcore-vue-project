@@ -133,13 +133,15 @@ export const Heading = Node.create({
   },
 
   addInputRules() {
-    return this.options.levels.map(level => {
+    const { options, type, editor } = this;
+    return options.levels.map(level => {
       return textblockTypeInputRule({
         find: new RegExp(`^(#{1,${level}})\\s$`),
-        type: this.type,
-        getAttributes: {
-          level
-        }
+        type,
+        getAttributes: () => ({
+          level,
+          indent: editor.state.selection.$head.node().attrs.indent
+        })
       });
     });
   }

@@ -26,8 +26,21 @@
             <div @drop="dragFile" class="choose_file_dropzone_dropArea">
               <div class="dropzone-content">
                 <div class="dropzone-custom-image">
-                  <i class="ri-image-line ri-4x" style="color: #c4c4c4" v-if="fileModalTexts.type === 'preview'"></i>
-                  <i class="ri-file-3-line ri-4x" style="color: #c4c4c4" v-else></i>
+                  <i
+                    class="ri-image-line ri-4x"
+                    style="color: #c4c4c4"
+                    v-if="fileModalTexts.type === 'preview'"
+                  ></i>
+                  <i
+                    class="ri-file-word-2-line ri-4x"
+                    style="color: #c4c4c4"
+                    v-else-if="fileModalTexts.type === 'inline'"
+                  ></i>
+                  <i
+                    class="ri-file-3-line ri-4x"
+                    style="color: #c4c4c4"
+                    v-else
+                  ></i>
                 </div>
                 <div class="dropzone-custom-title">
                   {{ fileModalTexts.primary }}
@@ -90,12 +103,14 @@ export default {
     dragFile(event) {
       this.draggingFile = false;
       const files = event.dataTransfer.files;
+			console.log(files)
       this.$emit("setFiles", files);
     },
     setFile(event) {
+      console.log(this);
       const files = event.target.files;
 
-      this.$emit("setFiles", files);
+      this.$emit("setFiles", { files, type: this.fileModalTexts.type });
     },
   },
   watch: {
