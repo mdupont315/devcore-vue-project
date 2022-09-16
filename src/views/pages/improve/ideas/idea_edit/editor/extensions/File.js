@@ -243,6 +243,8 @@ export const File = Node.create({
 
         let that = this;
 
+        console.log(attrs)
+
         if (nonPreviewFiles.length > 0) {
           nonPreviewFiles.forEach(async item => {
             var reader = new FileReader();

@@ -234,9 +234,9 @@ export default {
         this.editor.commands.setAttachment(fileData.files);
       }
 
-      if (fileData.type === "inline") {
-        this.editor.commands.setInlineFile(fileData.files);
-      }
+      // if (fileData.type === "inline") {
+      //   this.editor.commands.setInlineFile(fileData.files);
+      // }
     },
     createTable(data) {
       const setRows = data.rows ?? 1;
@@ -294,13 +294,13 @@ export default {
             }),
           };
           break;
-        case "inline":
-          this.fileModalTexts = {
-            type: "inline",
-            primary: this.$t("SELECT DOCX FILE"),
-            secondary: ''
-          };
-          break;
+        // case "inline":
+        //   this.fileModalTexts = {
+        //     type: "inline",
+        //     primary: this.$t("SELECT DOCX FILE"),
+        //     secondary: ''
+        //   };
+        //   break;
         default:
           this.fileModalTexts = {
             type: "preview",
@@ -659,17 +659,17 @@ export default {
             this.setFilePromptOpen("nonpreview");
           },
         },
-        {
-          icon: "file-word-2-line",
-          iconType: "remix",
-          showOnSmall: false,
-          showOnLarge: true,
-          type: "item",
-          title: "DOCX",
-          action: () => {
-            this.setFilePromptOpen("inline");
-          },
-        },
+        // {
+        //   icon: "file-word-2-line",
+        //   iconType: "remix",
+        //   showOnSmall: false,
+        //   showOnLarge: true,
+        //   type: "item",
+        //   title: "DOCX",
+        //   action: () => {
+        //     this.setFilePromptOpen("inline");
+        //   },
+        // },
         {
           icon: "grid-line",
           iconType: "remix",

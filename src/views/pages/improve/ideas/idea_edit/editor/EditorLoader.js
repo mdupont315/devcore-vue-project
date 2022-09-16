@@ -136,7 +136,8 @@ export default class ContentEditor {
         bold: false,
         code: false,
         codeBlock: false,
-        blockquote: false
+        blockquote: false,
+        strike: false
       }),
       Position,
       Paragraph,
@@ -301,15 +302,9 @@ export default class ContentEditor {
               editor.commands.updateAttributes(node.type.name, { indent: 0 });
             }
           }
-
           const json = editor.getJSON();
-
           this.options.onUpdate(json);
         });
-      },
-
-      onTransaction: ({ editor, transaction }) => {
-      //  console.log(transaction)
       }
     });
   }

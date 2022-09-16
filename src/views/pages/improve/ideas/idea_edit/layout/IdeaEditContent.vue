@@ -1,19 +1,46 @@
 <template>
   <div class="idea_edit_content_container">
     <div class="idea_edit_content_container_content-header">
-      <div class="idea_edit_content_container_content-header-title">
-        {{
-          idea.title ? idea.title : $t("action.create", { name: $t("idea") })
-        }}
-      </div>
-
       <inner-overlay
-        v-if="contentTypeSelectorVisible"
+        v-if="contentTypeSelectorVisible || contentTypeSelectorUpload"
         @click="closeContentType()"
         style="z-index: 1"
       />
+      <div class="idea_edit_content_container_content-header-title">
+        <div class="idea_edit_content_container_content-header-title-text">
+          {{
+            idea.title ? idea.title : $t("action.create", { name: $t("idea") })
+          }}
+        </div>
+        <div
+          class="idea_edit_content_container_content-header-upload"
+          :style="{ 'z-index': contentTypeSelectorUpload ? 1 : 0 }"
+        >
+          <loading-button
+            :disabled="vErrors.any() || isLoading || !idea.id"
+            variant="primary"
+            id="idea_edit_content_btnUploadIdeaTemplate"
+            size="lg"
+            :style="{
+              cursor: isLoading || !idea.id ? 'not-allowed' : 'pointer',
+            }"
+            :loading="isLoading"
+            @click="toggleContentUploadSelector()"
+          >
+            <i class="ri-file-download-line" style="margin-top:2px"></i>
+          </loading-button>
 
-      <div class="idea_edit_content_container_content-header-button">
+          <idea-edit-select-upload
+            v-if="contentTypeSelectorUpload"
+            @processFile="processFileToEditor"
+          />
+        </div>
+      </div>
+
+      <div
+        class="idea_edit_content_container_content-header-button"
+        :style="{ 'z-index': contentTypeSelectorVisible ? 1 : 0 }"
+      >
         <div v-if="!idea.id">
           <b-popover
             target="idea_content_type_info_info_text-info"
@@ -38,7 +65,9 @@
           variant="primary"
           id="idea_edit_content_btnNewIdeaTemplate"
           size="lg"
-          :style="{ cursor: isLoading || !idea.id ? 'not-allowed' : 'pointer' }"
+          :style="{
+            cursor: isLoading || !idea.id ? 'not-allowed' : 'pointer',
+          }"
           :loading="isLoading"
           @click="toggleContentTypeSelector()"
         >
@@ -73,6 +102,7 @@
     </div>
 
     <idea-content-editor
+      ref="editorContainer"
       :isEditable="isEditable && isInitialized"
       :isRefreshing="isSaving || isLoading"
       :isInitialized="isInitialized"
@@ -93,6 +123,7 @@
 import ideaContentEditor from "../editor/IdeaContentEditor.vue";
 import ideaEditType from "./IdeaEditType";
 import ideaEditSelectType from "./IdeaEditSelectType";
+import ideaEditSelectUpload from "./ideaEditSelectUpload";
 import GQLForm from "@/lib/gqlform";
 import empty from "./templates/empty.json";
 
@@ -101,6 +132,7 @@ export default {
     "idea-content-editor": ideaContentEditor,
     "idea-edit-type": ideaEditType,
     "idea-edit-select-type": ideaEditSelectType,
+    "idea-edit-select-upload": ideaEditSelectUpload,
   },
   props: {
     idea: {
@@ -197,6 +229,7 @@ export default {
   data: () => ({
     contentTypeSelectorVisible: false,
     contentTypeSelectorForm: false,
+    contentTypeSelectorUpload: false,
     contentType: "Custom",
     selectingType: false,
     isEditable: false,
@@ -206,6 +239,9 @@ export default {
     editContentItem: null,
   }),
   methods: {
+    toggleContentUploadSelector() {
+      this.contentTypeSelectorUpload = !this.contentTypeSelectorUpload;
+    },
     closeContentTypeSelectorForm() {
       this.contentTypeSelectorForm = false;
       this.editContentItem = null;
@@ -280,17 +316,18 @@ export default {
 
     closeContentType() {
       this.closeContentTypeSelectorForm();
+      this.contentTypeSelectorUpload = false;
       this.contentTypeSelectorVisible = false;
     },
     setContentWindowTop(scrollTop) {
       this.contentWindowTop = scrollTop;
     },
 
-    setIsInitialized() {
+    setIsInitialized(editor) {
       this.isEditable = true;
       this.isInitialized = true;
 
-      this.$emit("editorLoaded");
+      this.$emit("editorLoaded", editor);
     },
     saveContent(reloadContent) {
       this.$emit("saveIdeaContent", reloadContent);
@@ -300,6 +337,15 @@ export default {
     },
     removeFile(file) {
       this.$emit("fileRemoved", file);
+    },
+    processFileToEditor(file) {
+      const editor = this.$refs["editorContainer"]?.editor;
+
+      if (editor) {
+        editor.commands.setInlineFile(file);
+      }
+
+      this.contentTypeSelectorUpload = false;
     },
   },
 };
@@ -370,13 +416,28 @@ export default {
   font-size: 16px;
   font-weight: 800;
   letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+}
+
+.idea_edit_content_container_content-header-upload {
+  margin-left: 10px;
+  & > #idea_edit_content_btnUploadIdeaTemplate {
+    border-radius: 3px;
+    border: none;
+    background: #fff;
+    &:hover:not(:disabled) {
+      color: #fff;
+      background: #4294d0 !important;
+      border-color: #4294d0;
+    }
+  }
 }
 
 .idea_edit_content_container_content-header-button {
   margin: 10px 20px;
   border-radius: 3px;
   font-size: 16px;
-  z-index: 1;
   white-space: nowrap;
   flex-direction: row;
   display: flex;

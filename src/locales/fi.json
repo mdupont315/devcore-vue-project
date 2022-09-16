@@ -732,5 +732,6 @@
   "unnamed_type": "Nimetön",
   "you must appoint another home page before remove": "Sinun täytyy asettaa toinen sisältö-alue alkusivuksi ennen kuin voit poistaa sen",
   "home page has all roles": "Alkusivu on aina kaikkien ohjeen näkevien nähtävillä",
-  "SELECT DOCX FILE": "Valitse .docx tiedosto"
+  "SELECT DOCX FILE": "Valitse .docx tiedosto",
+  "import-docx-file": "Tuo .docx"
 }

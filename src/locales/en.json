@@ -703,5 +703,6 @@
   "unnamed_type": "Unnamed",
   "you must appoint another home page before remove": "You must appoint another area as home page before deleting area",
   "home page has all roles": "Home page always has all roles enabled for roles with access to instruction",
-  "SELECT DOCX FILE": "Click to select .docx file"
+  "SELECT DOCX FILE": "Click to select .docx file",
+  "import-docx-file": "Import .docx"
 }
