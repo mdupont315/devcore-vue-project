@@ -17,17 +17,17 @@
           :style="{ 'z-index': contentTypeSelectorUpload ? 1 : 0 }"
         >
           <loading-button
-            :disabled="vErrors.any() || isLoading || !idea.id"
+            :disabled="vErrors.any() || isLoading"
             variant="primary"
             id="idea_edit_content_btnUploadIdeaTemplate"
             size="lg"
             :style="{
-              cursor: isLoading || !idea.id ? 'not-allowed' : 'pointer',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
             }"
             :loading="isLoading"
             @click="toggleContentUploadSelector()"
           >
-            <i class="ri-file-download-line" style="margin-top:2px"></i>
+            <i class="ri-file-download-line" style="margin-top:2px" v-if="!isLoading"></i>
           </loading-button>
 
           <idea-edit-select-upload

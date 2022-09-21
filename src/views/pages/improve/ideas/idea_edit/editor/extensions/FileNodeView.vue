@@ -7,13 +7,17 @@
         v-if="getAttrs.preview"
         style="display: flex; flex-direction: column"
       >
-        <div style="margin-right: 5px; margin-bottom: 10px">
+        <div class="content-dom-file-image-container">
+          <!--   -->
           <img
+            :key="imgKey"
             :ref="`${getAttrs.uuid}`"
             :src="getAttrs.src"
             :alt="getAttrs.title"
-            style="max-height: 65vh; max-width: 50%"
-            :style="{ width: imgWidth, height: imgHeight }"
+            :style="{ width: `${imgWidth}px`, height: `${imgHeight}px` }"
+            class="fileNodeView-preview-image"
+            @load="onImgLoad"
+            loading="lazy"
           />
 
           <!-- <img
@@ -108,9 +112,11 @@ export default {
       FolderIcon,
       disableTooltip: false,
       resizedImages: [],
-      imgWidth: "50%",
-      imgHeight: "auto",
+      imgWidth: 0,
+      imgHeight: 0,
       resizerInstance: new ImageResizer(),
+      resized: false,
+      imgKey: Math.random(),
     };
   },
 
@@ -151,6 +157,38 @@ export default {
     this.removeFile();
   },
   methods: {
+    onImgLoad(e) {
+      console.log("restrict dimensions");
+      console.log(e);
+      const imgEl = e.path[0];
+      if (imgEl && imgEl.localName === "img") {
+        const { naturalHeight: imgHeight, naturalWidth: imgWidth } = imgEl;
+        const { clientHeight: viewportHeight, clientWidth: viewportWidth } =
+          this.editor.view.dom.parentElement;
+        const hasParent = e.path[1] && e.path[1].localName === "div";
+        if (hasParent) {
+          console.log({ viewportHeight });
+          console.log({ viewportWidth });
+          const MAX_IMG_WIDTH = viewportWidth / 2;
+          const MAX_IMG_HEIGHT = viewportHeight - 100;
+
+          const RATIO_WIDTH = imgWidth / MAX_IMG_WIDTH;
+          const RATIO_HEIGHT = imgHeight / MAX_IMG_HEIGHT;
+
+          const RATIO_ASPECT =
+            RATIO_WIDTH > RATIO_HEIGHT ? RATIO_WIDTH : RATIO_HEIGHT;
+          console.log(imgWidth / RATIO_ASPECT);
+          console.log(imgHeight / RATIO_ASPECT);
+
+          this.imgWidth = imgWidth / RATIO_ASPECT;
+          this.imgHeight = imgHeight / RATIO_ASPECT;
+          if (!this.resized) {
+            this.resized = true;
+            this.imgKey = Math.random();
+          }
+        }
+      }
+    },
     async addBase64AsFile(dataUrl, type) {
       const toFile = await fetch(dataUrl, {
         method: "GET",
@@ -180,8 +218,6 @@ export default {
         type,
         lastModified: Date.now(),
       });
-
-      console.log("ADDING FILE !");
 
       this.extension.options.addFile({
         uuid: this.getAttrs.uuid,
@@ -343,8 +379,6 @@ export default {
       // }
     },
     removeFile() {
-      console.log("Removing file instance with attrs: ", this.getAttrs);
-
       this.editor.commands.removeFile(this.fileEntity);
       // const isUploaded =
       //   (this.getAttrs.src || this.getAttrs.href) && this.getAttrs.id;
@@ -359,8 +393,6 @@ export default {
       const from = getPos();
       const to = from + node.nodeSize;
 
-      console.log("REMOVE NODE !");
-
       this.removeFile();
 
       editor.commands.deleteRange({ from, to });
@@ -370,6 +402,18 @@ export default {
 </script>
 
 <style lang="scss">
+.content-dom-file-image-container {
+  margin-right: 5px;
+  margin-bottom: 10px;
+}
+.fileNodeView-preview-image {
+  /* IE, only works on <img> tags */
+  -ms-interpolation-mode: nearest-neighbor;
+  /* Firefox */
+  image-rendering: crisp-edges;
+  /* Chromium + Safari */
+  image-rendering: pixelated;
+}
 .file-component {
   padding-top: 3px;
   padding-bottom: 3px;

@@ -20,7 +20,9 @@ const renderFileInBase64ToCoordinates = (
     if (preview) {
       const image = new Image();
       image.src = readerEvent.target?.result;
-      console.log(item.name);
+
+
+
       image.onload = () => {
         const transaction = view.state.tr.insert(
           coordinates.pos,

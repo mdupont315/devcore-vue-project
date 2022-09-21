@@ -86,42 +86,19 @@ export default {
     }),
     defaultContentForm: new GQLForm({
       id: undefined,
-      markup: JSON.stringify(defaultContent),
+      markup: null,
       ideaId: null,
       version: 1,
       isPrimary: true,
       contentType: null,
       companyRoles: [],
     }),
-    // ideaContentCategories: [],
-
-    // ideaContentCategories: [
-    //   {
-    //     contentForm: new GQLForm({
-    //       id: undefined,
-    //       contentType: "Unnamed",
-    //       isPrimary: true,
-    //       markup: JSON.stringify({
-    //         type: "doc",
-    //         content: [
-    //           {
-    //             attrs: {
-    //               indent: 0,
-    //             },
-    //             type: "paragraph",
-    //           },
-    //         ],
-    //       }),
-    //       ideaId: null,
-    //       version: 1,
-    //     }),
-    //   },
-    // ],
     newIdea: null,
     isLoading: false,
     ideaContentCategoryData: [],
     files: [],
   }),
+	//TODO: Check that ideaContents get refreshed!
   computed: {
     ...mapGetters({
       ideaContents: "ideaContent/all",
@@ -156,7 +133,7 @@ export default {
             ) || {
               contentForm: new GQLForm({
                 id: undefined,
-                markup: JSON.stringify(defaultContent),
+                markup: defaultContent,
                 ideaId: null,
                 version: 1,
                 isPrimary: true,
@@ -188,6 +165,7 @@ export default {
       get() {
         const contentForm =
           this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+
         return {
           contentType: contentForm.contentType,
           markup: JSON.parse(contentForm.markup),
@@ -220,7 +198,10 @@ export default {
       this.ideaForm._fields.companyToolIds = companyToolIds;
 
       this.filesInView = await this.getFilesFromIdea();
-    }
+    } else {
+			this.defaultContentForm.fields.contentType = this.$t("unnamed_type")
+			this.defaultContentForm.fields.markup = JSON.stringify(defaultContent)
+		}
 
     //	console.log(this,.)
 
@@ -244,7 +225,6 @@ export default {
       this.ideaContentIsDirty = true;
     },
     removeFile(file) {
-      console.log(file);
       if (this.isSaving) return;
       if (file.id) {
         if (this.filesInView.some((loadedFile) => loadedFile.id === file.id)) {
@@ -256,7 +236,6 @@ export default {
       }
     },
     async setFile(file) {
-      console.log(file);
       const items = [...this.filesInView, file];
       this.filesInView = items;
       this.filesChanged = true;

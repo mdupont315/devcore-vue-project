@@ -14,7 +14,6 @@
         class="editor__content"
         id="editor__content"
         :editor="editor"
-        style="min-height: 70vh"
         ref="editor_content"
       />
       <div v-show="isRefreshing || !value" class="ideaContent-empty-spinner">
@@ -961,6 +960,8 @@ export default {
       color: #d0424d;
       border: 1px solid lightgray;
       width: 60px;
+			font-size: 12px;
+			font-weight: normal;
       height: 20px;
       position: relative;
       border-radius: 3px;
