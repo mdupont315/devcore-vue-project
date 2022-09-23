@@ -133,27 +133,25 @@ export default {
   },
 
   async mounted() {
-    console.log("HELLO");
-    console.log(this.getAttrs);
 
     if (!this.getAttrs.src && !this.getAttrs.href) this.deleteNode();
 
     const isStagedPreviewFile =
       !this.getAttrs.href && this.getAttrs.src && !this.getAttrs.id;
 
-    // if (this.getAttrs.title) {
-    //   const hasUuidInName = this.getAttrs.title.includes(this.getAttrs.uuid);
-    //   if (this.getAttrs.uuid && !this.nameSet && !hasUuidInName) {
-    //     const extension = getExtension(this.getAttrs.title);
-    //     const fileName = getFileName(this.getAttrs.title);
+    if (this.getAttrs.title) {
+      const hasUuidInName = this.getAttrs.title.includes(this.getAttrs.uuid);
+      if (this.getAttrs.uuid && !this.nameSet && !hasUuidInName) {
+        const extension = getExtension(this.getAttrs.title);
+        const fileName = getFileName(this.getAttrs.title);
 
-    //     this.updateAttributes({
-    //       title: `${fileName}-${this.getAttrs.uuid}.${extension}`,
-    //     });
+        this.updateAttributes({
+          title: `${fileName}-${this.getAttrs.uuid}.${extension}`,
+        });
 
-    //     this.nameSet = true;
-    //   }
-    // }
+        this.nameSet = true;
+      }
+    }
 
     const isExternalUrl = isValidExternalUrl(this.getAttrs.src);
 
@@ -229,7 +227,6 @@ export default {
     async handleExternalFiles() {
       const size = this.getAttrs.size;
 
-      console.log("handleExternalFiles");
       //console.log(size);
       // if (!size || typeof size === "string") {
       if (!this.getAttrs.src) return;
