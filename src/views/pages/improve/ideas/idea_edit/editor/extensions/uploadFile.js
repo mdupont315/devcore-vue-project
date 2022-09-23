@@ -13,15 +13,10 @@ const renderFileInBase64ToCoordinates = (
   const { schema } = view.state;
 
   const reader = new FileReader();
-  console.log("***************RENDERING*******");
-  console.log(item);
-
   reader.onload = readerEvent => {
     if (preview) {
       const image = new Image();
       image.src = readerEvent.target?.result;
-
-
 
       image.onload = () => {
         const transaction = view.state.tr.insert(
@@ -87,14 +82,12 @@ const uploadFilePlugin = (addFile, notify) => {
         items.forEach(function(item) {
           if (item.kind != "file") return;
           if (item.type.indexOf("image") === 0) {
-            console.log(item);
             event.preventDefault();
             const preview = true;
 
             const itemAsFile = item.getAsFile();
-            const transformedFile = fileWithUniqueName(view, itemAsFile);
-            //const transformedFile = itemAsFile;
-       //     addFile({ uuid: uuidv4(), file: transformedFile });
+            const uuid = uuidv4();
+            const transformedFile = fileWithUniqueName(itemAsFile, uuid);
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {
               const uuid = uuidv4();
@@ -109,12 +102,12 @@ const uploadFilePlugin = (addFile, notify) => {
           } else {
             const preview = false;
             const itemAsFile = item.getAsFile();
-            const transformedFile = fileWithUniqueName(view, itemAsFile);
+            const uuid = uuidv4();
+            const transformedFile = fileWithUniqueName(itemAsFile, uuid);
             const valid = validateFileSize(notify, itemAsFile);
             console.log("ITEM:::::::::::::");
             console.log(itemAsFile);
             if (valid) {
-              const uuid = uuidv4();
               addFile({ uuid, file: transformedFile });
               renderFileInBase64ToCoordinates(
                 transformedFile,
@@ -156,9 +149,8 @@ const uploadFilePlugin = (addFile, notify) => {
               const valid = validateFileSize(notify, item);
               if (valid) {
                 const uuid = uuidv4();
-                const transformedFile = fileWithUniqueName(view, item);
-                console.log("ADD FILE !")
-               // addFile({ uuid, file: transformedFile });
+                const transformedFile = fileWithUniqueName(item, uuid);
+
                 renderFileInBase64ToCoordinates(
                   transformedFile,
                   view,
@@ -176,7 +168,8 @@ const uploadFilePlugin = (addFile, notify) => {
               const valid = validateFileSize(notify, item);
               if (valid) {
                 const uuid = uuidv4();
-                const transformedFile = fileWithUniqueName(view, item);
+                const transformedFile = fileWithUniqueName(item, uuid);
+
                 addFile({ uuid, file: transformedFile });
                 renderFileInBase64ToCoordinates(
                   transformedFile,

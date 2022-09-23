@@ -2,65 +2,71 @@ import {
   FILE_SIZE_LIMIT,
   VALID_EXTERNAL_URL_REGEX,
   VALID_BASE64URL_REGEX,
-  SUPPORTED_PREVIEW_RESIZE_IMAGE_TYPES
+  SUPPORTED_PREVIEW_RESIZE_IMAGE_TYPES,
 } from "./constants";
 
-const addCounterToFileName = (name, counter) => {
-  const fileName = getFileName(name);
-  const extension = getExtension(name);
-  if (counter > 0) {
-    return `${fileName}(${counter}).${extension}`;
-  } else {
-    return `${fileName}.${extension}`;
-  }
-};
+// const addCounterToFileName = (name, counter) => {
+//   const fileName = getFileName(name);
+//   const extension = getExtension(name);
+//   if (counter > 0) {
+//     return `${fileName}(${counter}).${extension}`;
+//   } else {
+//     return `${fileName}.${extension}`;
+//   }
+// };
 
 const getExtension = name => name.split(".").pop();
 const getFileName = name => name.replace(`.${getExtension(name)}`, "");
 
-const getSimilarNamesFromContent = (fileNodes, name) => {
-  return fileNodes.filter(node => {
-    return (
-      getExtension(node.attrs.title).toUpperCase() ===
-        getExtension(name).toUpperCase() &&
-      node.attrs.title.includes(getFileName(name))
-    );
-  });
-};
+// const getSimilarNamesFromContent = (fileNodes, name) => {
+//   return fileNodes.filter(node => {
+//     return (
+//       getExtension(node.attrs.title).toUpperCase() ===
+//         getExtension(name).toUpperCase() &&
+//       node.attrs.title.includes(getFileName(name))
+//     );
+//   });
+// };
 
-const findUniqueName = (items, name) => {
-  let fileNames = items.length > 0 ? items.map(node => node.attrs.title) : [];
-  let newName = name;
-  const isUnique = (fileNames, name) => {
-    return fileNames.filter(fileName => fileName === name).length === 0;
-  };
-  // return name
-  if (isUnique(fileNames, name)) {
-    return newName;
-  } else {
-    // return name appended with (counter)
-    newName = addCounterToFileName(newName, items.length);
-  }
+// const findUniqueName = (items, name) => {
+//   let fileNames = items.length > 0 ? items.map(node => node.attrs.title) : [];
+//   let newName = name;
+//   const isUnique = (fileNames, name) => {
+//     return fileNames.filter(fileName => fileName === name).length === 0;
+//   };
+//   // return name
+//   if (isUnique(fileNames, name)) {
+//     return newName;
+//   } else {
+//     // return name appended with (counter)
+//     newName = addCounterToFileName(newName, items.length);
+//   }
 
-  return newName;
-};
+//   return newName;
+// };
 
-const getUniqueFileName = (view, name) => {
-  const { doc } = view.state;
-  const { content } = doc.content;
-  let fileTitle = name;
-  const fileNodes = content.filter(
-    node => node.type && node.type.name === "file"
-  );
-  const sameNameFiles = getSimilarNamesFromContent(fileNodes, name);
-  if (sameNameFiles.length > 0) {
-    fileTitle = findUniqueName(sameNameFiles, fileTitle);
-  }
-  return fileTitle;
-};
+// const getUniqueFileName = (view, name) => {
+//   const { doc } = view.state;
+//   const { content } = doc.content;
+//   let fileTitle = name;
 
-const fileWithUniqueName = (view, originalFile) => {
-  const newName = getUniqueFileName(view, originalFile.name);
+//   console.log(content)
+//   const fileNodes = content.filter(
+//     node => node.type && node.type.name === "file"
+//   );
+//   const sameNameFiles = getSimilarNamesFromContent(fileNodes, name);
+//   if (sameNameFiles.length > 0) {
+//     fileTitle = findUniqueName(sameNameFiles, fileTitle);
+//   }
+//   return fileTitle;
+// };
+
+const fileWithUniqueName = (originalFile, uuid) => {
+  const name = getFileName(originalFile.name);
+  const extension = getExtension(originalFile.name);
+
+  const newName = `${name}-${uuid}.${extension}`;
+
   return new File([originalFile], newName, {
     type: originalFile.type,
     lastModified: originalFile.lastModified
@@ -125,9 +131,9 @@ const base64Resize = (sourceBase64, toWidth, _type, callback) => {
     ctx.webkitImageSmoothingEnabled = false;
     ctx.msImageSmoothingEnabled = false;
     ctx.imageSmoothingEnabled = false;
-    console.log("scale: ")
-    console.log(iwScaled)
-    console.log(ihScaled)
+    console.log("scale: ");
+    console.log(iwScaled);
+    console.log(ihScaled);
     ctx.drawImage(img, 0, 0, iwScaled, ihScaled);
     const newBase64 = canvas.toDataURL(type, scl);
 
@@ -194,12 +200,14 @@ const getBase64FromFile = file => {
 export {
   fileWithUniqueName,
   validateFileSize,
-  getUniqueFileName,
+  //getUniqueFileName,
   base64Resize,
   isValidExternalUrl,
   getBase64FromUrl,
   isBase64,
   getBase64FromFile,
   base64MimeType,
-  base64ToFile
+  base64ToFile,
+  getExtension,
+  getFileName
 };

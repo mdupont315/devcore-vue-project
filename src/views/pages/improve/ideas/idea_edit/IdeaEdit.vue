@@ -68,7 +68,7 @@ export default {
     selectedCategoryIndex: 0,
     ideaContentIsDirty: false,
     editorLoaded: false,
-    filesInView: [],
+    loadedFiles: [],
     ideaForm: new GQLForm({
       id: undefined,
       processId: null,
@@ -98,7 +98,7 @@ export default {
     ideaContentCategoryData: [],
     files: [],
   }),
-	//TODO: Check that ideaContents get refreshed!
+  //TODO: Check that ideaContents get refreshed!
   computed: {
     ...mapGetters({
       ideaContents: "ideaContent/all",
@@ -174,6 +174,7 @@ export default {
       set(value) {
         const contentForm =
           this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+
         contentForm.markup = JSON.stringify(value.markup);
         contentForm.contentType = value.contentType;
       },
@@ -197,11 +198,13 @@ export default {
       this.ideaForm._fields.companyRoleIds = companyRoleIds;
       this.ideaForm._fields.companyToolIds = companyToolIds;
 
-      this.filesInView = await this.getFilesFromIdea();
+      console.log("MOUNT!");
+
+      this.loadedFiles = await this.getFileNodesFromIdea();
     } else {
-			this.defaultContentForm.fields.contentType = this.$t("unnamed_type")
-			this.defaultContentForm.fields.markup = JSON.stringify(defaultContent)
-		}
+      this.defaultContentForm.fields.contentType = this.$t("unnamed_type");
+      this.defaultContentForm.fields.markup = JSON.stringify(defaultContent);
+    }
 
     //	console.log(this,.)
 
@@ -212,7 +215,8 @@ export default {
       this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
         (content) => content.contentForm.id === form.id
       );
-      this.filesInView = await this.getFilesFromIdea();
+      this.loadedFiles = await this.getFileNodesFromIdea();
+      this.files = [];
       this.isLoading = true;
       this.$nextTick(() => {
         this.isLoading = false;
@@ -225,9 +229,12 @@ export default {
       this.ideaContentIsDirty = true;
     },
     removeFile(file) {
+      //TODO: If loaded files contains uploaded file it means that existing file was removed
+      // console.log(file);
+      //console.log(this.loadedFiles);
       if (this.isSaving) return;
       if (file.id) {
-        if (this.filesInView.some((loadedFile) => loadedFile.id === file.id)) {
+        if (this.loadedFiles.some((loadedFile) => loadedFile.id === file.id)) {
           this.filesChanged = true;
           if (!this.ideaForm._fields.removeFileIds.includes(file.id)) {
             this.ideaForm._fields.removeFileIds.push(file.id);
@@ -236,8 +243,9 @@ export default {
       }
     },
     async setFile(file) {
-      const items = [...this.filesInView, file];
-      this.filesInView = items;
+      console.log("set File!");
+      const items = [...this.files, file];
+      this.files = items;
       this.filesChanged = true;
     },
 
@@ -298,7 +306,7 @@ export default {
       }
     },
 
-    async getFilesFromIdea(argMarkup) {
+    async getFileNodesFromIdea(argMarkup) {
       const contentForm =
         this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
 
@@ -307,11 +315,9 @@ export default {
         argMarkup ?? contentForm.markup,
         "file",
         (node) => {
-          console.log(node);
-          const ids = filesInIdea.map((x) => x.id);
-          if (!ids.includes(node.attrs.id)) {
-            filesInIdea.push(node.attrs);
-          }
+          console.log(node.attrs.id);
+
+          filesInIdea.push(node);
         }
       );
 
@@ -343,9 +349,75 @@ export default {
     },
 
     async saveIdea() {
-      this.ideaForm._fields.file = this.filesInView
-        .filter((fileInView) => fileInView.file)
-        .map((fileEntity) => fileEntity.file);
+      console.log("****");
+
+      //TODO: set ideaForm.fields.file to actual files in content
+      // set removeFileIds to actual files in content
+      // check if possible to do these from onTransaction
+      // propably better that way
+
+      console.log(
+        "loadedFiles: ",
+        this.loadedFiles.map((x) => {
+          return { href: x.attrs.href, id: x.attrs.id, uri: x.attrs.uri };
+        })
+      );
+
+      // console.log("files: ", this.files);
+
+      const contentFiles = await this.getFileNodesFromIdea();
+      // console.log({ contentFiles });
+
+      const currentUploadedContentFileIds = contentFiles
+        .filter((node) => node.attrs.id)
+        .map((node) => node.attrs.id);
+      const addedFiles = contentFiles.filter((node) => !node.attrs.id);
+
+      // console.log({ contentFiles });
+      // console.log({ addedFiles });
+      // console.log("uploadedContentFiles: ", currentUploadedContentFileIds);
+
+      //compare to mounted state
+
+      console.log(contentFiles);
+
+      const addedFilesNotRemoved = this.files.filter((file) =>
+        addedFiles.map((node) => node.attrs.uuid).includes(file.uuid)
+      );
+
+      const mountedUploadedFileIds = this.loadedFiles.map(
+        (loaded) => loaded.attrs.id
+      );
+
+      console.log({ mountedUploadedFileIds });
+      // const loadedFileIdsNotInContent = uploadedContentFiles.filter(
+      //   (node) =>
+      //     !contentFiles.map((node) => node.attrs.id).includes(node.attrs.id)
+      // );
+
+      // const contentFileUuids = contentFiles.map((node) => node.attrs.uuid);
+
+      // console.log("___________");
+
+      console.log(
+        "REMOVING RESOURCES: ",
+        mountedUploadedFileIds.filter(
+          (id) => !currentUploadedContentFileIds.includes(id)
+        )
+      );
+
+      console.log({ addedFilesNotRemoved });
+
+      this.ideaForm._fields.file = addedFilesNotRemoved.map(
+        (item) => item.file
+      );
+      // this.ideaForm._fields.fileResource = addedFilesNotRemoved.map((x) => {
+      //   return { uuid: x.uuid, file: [x.file] };
+      // });
+      this.ideaForm._fields.removeFileIds = mountedUploadedFileIds.filter(
+        (id) => !currentUploadedContentFileIds.includes(id)
+      );
+      console.log("FILLLLLEEE", this.ideaForm.fields);
       let ideaSave = null;
       this.ideaForm.processId = this.processPath.process.id;
       if (this.ideaForm.id) {
@@ -354,8 +426,7 @@ export default {
         ideaSave = await this.$store.dispatch(`idea/create`, this.ideaForm);
       }
 
-      this.files = [];
-      this.ideaForm._fields.removeFileIds = [];
+      console.log(ideaSave);
 
       return ideaSave;
     },
@@ -612,31 +683,56 @@ export default {
 
           let markup = contentForm.markup;
 
-          if (this.filesInView.length > 0 && ideaSave.files.length > 0) {
-            markup = await this.execCallbackToNodeType(
+          console.log("***********");
+          console.log("files: ", ideaSave.files);
+
+          if (this.files.length > 0) {
+            const modifiedMarkup = await this.execCallbackToNodeType(
               markup,
               "file",
               (node) => {
-                const setImageName = node.attrs.title;
-                const fileInIdea = ideaSave.files.find(
-                  (file) => file.title === setImageName
-                );
+                const hrefMatch =
+                  node.attrs.href &&
+                  node.attrs.href.includes(process.env.BASE_URL);
+                const srcMatch =
+                  node.attrs.src &&
+                  node.attrs.src.includes(process.env.BASE_URL);
+                const isAlreadyUploadedNode = hrefMatch || srcMatch;
+                console.log({
+                  isAlreadyUploadedNode,
+                  node,
+                  hrefMatch,
+                  srcMatch,
+                });
+                if (!isAlreadyUploadedNode) {
+                  console.log({ node });
+                  const setFileUri = node.attrs.title;
+                  const fileInIdea = ideaSave.files.find(
+                    (file) => file.title === setFileUri
+                  );
+                  console.log("Found file matching", { fileInIdea });
 
-                if (fileInIdea) {
-                  console.log(fileInIdea);
-                  node.attrs.id = fileInIdea.uri;
-                  node.attrs.uuid = fileInIdea.uuid;
-                  if (node.attrs.preview) {
-                    node.attrs.src = fileInIdea.url;
-                    node.attrs.href = "";
-                  } else {
-                    node.attrs.href = fileInIdea.url;
-                    node.attrs.src = "";
+                  if (fileInIdea) {
+                    node.attrs.id = fileInIdea.uri;
+                    node.attrs.uuid = fileInIdea.uuid;
+                    if (node.attrs.preview) {
+                      node.attrs.src = fileInIdea.url;
+                      node.attrs.href = "";
+                      node.attrs.uri = fileInIdea.uri;
+                      node.attrs.size = fileInIdea.size;
+                    } else {
+                      node.attrs.href = fileInIdea.url;
+                      node.attrs.src = "";
+                      node.attrs.uri = fileInIdea.uri;
+                      node.attrs.size = fileInIdea.size;
+                    }
                   }
                 }
               }
             );
+            markup = modifiedMarkup;
           }
+          console.log("***********");
           contentForm.ideaId = ideaSave.id;
           contentForm.markup = markup;
 
@@ -685,10 +781,11 @@ export default {
           await this.refreshIdea("EDIT");
         }
         this.ideaForm._fields.removeFileIds = [];
-        this.filesInView = await this.getFilesFromIdea();
+        this.loadedFiles = await this.getFileNodesFromIdea();
         this.isSaving = false;
         this.isLoading = false;
         this.ideaContentIsDirty = false;
+        this.files = [];
       }
     },
     async navigateToPath(ideaUuid) {

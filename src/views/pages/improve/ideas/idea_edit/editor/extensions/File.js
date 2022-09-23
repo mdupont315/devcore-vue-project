@@ -98,6 +98,14 @@ export const File = Node.create({
         },
         renderHTML: attrs => ({ src: attrs.src })
       },
+      name: {
+        default: null,
+        parseHTML: el => {
+          console.log(el)
+          return el.getAttribute("name");
+        },
+        renderHTML: attrs => ({ name: attrs.name })
+      },
       uuid: {
         default: null,
         parseHTML: el => {
@@ -209,15 +217,16 @@ export const File = Node.create({
       preview,
       size,
       uuid,
-      dimensions
+      name,
+      dimensions,
+
     } = HTMLAttributes;
 
-
     if (href || src) {
-      if (!preview) {
-        return ["a", { href, title, style, size, alt, uuid }, title];
+      if (preview) {
+        return ["img", { title, src, alt, style, size, uuid, dimensions, name }];
       } else {
-        return ["img", { title, src, alt, style, size, uuid, dimensions }];
+        return ["a", { href, title, style, size, alt, uuid, name }, title];
       }
     }
 
@@ -232,7 +241,6 @@ export const File = Node.create({
     return {
       setInlineFile: attrs => ({ view, tr }) => {
         let pos = 1;
-        console.log("inlining")
         if (tr && tr.curSelection && tr.curSelection.$head) {
           pos = tr.curSelection.$head.pos;
         }
@@ -243,21 +251,17 @@ export const File = Node.create({
 
         let that = this;
 
-        console.log(attrs)
-
         if (nonPreviewFiles.length > 0) {
           nonPreviewFiles.forEach(async item => {
             var reader = new FileReader();
 
             reader.onloadend = function(event) {
               var arrayBuffer = reader.result;
-              // debugger
 
               mammoth
                 .convertToHtml({ arrayBuffer: arrayBuffer })
                 .then(function(resultObject) {
                   content = resultObject.value;
-                  console.log(content);
                   that.editor.commands.insertContentAt(pos, content);
                 });
             };

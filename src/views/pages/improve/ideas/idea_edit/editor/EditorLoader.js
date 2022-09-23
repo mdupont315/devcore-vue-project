@@ -286,7 +286,7 @@ export default class ContentEditor {
           // });
           // console.log(res
 
-          console.log(formatHTML5);
+        //  console.log(formatHTML5);
 
           return formatHTML5;
 
