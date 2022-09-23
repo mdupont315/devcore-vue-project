@@ -10,52 +10,85 @@ const renderFileInBase64ToCoordinates = (
 ) => {
   if (!item) return;
 
-  const { schema } = view.state;
+  const { editor } = view.dom;
+
+  if (!editor) return;
+
+  const fileHTML = item => {
+    const { url, title, preview, uuid } = item;
+    console.log(item)
+    return `<p><file-component src="${url}" title="${title}" uuid="${uuid}" data-type="${preview ? 'image' : 'link'}"></file-component></p>`;
+  };
 
   const reader = new FileReader();
+  editor.commands.createParagraphNear();
+  console.log(item);
   reader.onload = readerEvent => {
-    if (preview) {
-      const image = new Image();
-      image.src = readerEvent.target?.result;
+    const fileAttrs = {
+      url: readerEvent.target?.result,
+      title: item.name,
+      uuid,
+      type: item.type,
+      preview
+    };
 
-      image.onload = () => {
-        const transaction = view.state.tr.insert(
-          coordinates.pos,
-          schema.nodes.file.create({
-            src: image.src,
-            title: item.name,
-            size: item.size,
-            type: item.type,
-            pos: coordinates.pos,
-            uuid,
-            preview,
-            dimensions: {
-              width: image.width,
-              height: image.height
-            }
-          })
-        );
-        view.dispatch(transaction);
-      };
-    } else {
-      const transaction = view.state.tr.insert(
-        coordinates.pos,
-        schema.nodes.file.create({
-          src: readerEvent.target?.result,
-          title: item.name,
-          size: item.size,
-          type: item.type,
-          pos: coordinates.pos,
-          uuid,
-          preview,
-          dimensions: {
-            width: null,
-            height: null
-          }
-        })
-      );
-      view.dispatch(transaction);
-    }
+    editor
+      .chain()
+      .createParagraphNear()
+      .insertContentAt(coordinates.pos, fileHTML(fileAttrs))
+      .run();
+    // };
+
+    // if (preview) {
+    //  // const image = new Image();
+    //  // image.src = readerEvent.target?.result;
+
+    //   // Simple ??? WTF
+    //   const imageAttrs = { url: image.src, title: item.name, preview };
+    //   editor
+    //     .chain()
+    //     .createParagraphNear()
+    //     .insertContentAt(
+    //       coordinates.pos,
+    //       `<file-component url="${image.src}" title="${item.name}" preview="${item.preview}></file-component>`
+    //     )
+    //     .run();
+    //   // };
+    // } else {
+    //   // view.dom.editor.commands.insertContentAt(
+    //   //   coordinates.pos,
+    //   //   `<p><img src="${image.src}" title="${item.title}" preview="${item.preview}"/></p>`
+    //   // );
+
+    //   const fileAttrs = {
+    //     url: readerEvent.target?.result,
+    //     title: item.name,
+    //     preview
+    //   };
+    //   editor
+    //     .chain()
+    //     .createParagraphNear()
+    //     .insertContentAt(coordinates.pos, fileHtml(fileAttrs))
+    //     .run();
+
+    //   // const transaction = view.state.tr.insert(
+    //   //   coordinates.pos,
+    //   //   schema.nodes.file.create({
+    //   //     src: readerEvent.target?.result,
+    //   //     title: item.name,
+    //   //     size: item.size,
+    //   //     type: item.type,
+    //   //     pos: coordinates.pos,
+    //   //     uuid,
+    //   //     preview,
+    //   //     dimensions: {
+    //   //       width: null,
+    //   //       height: null
+    //   //     }
+    //   //   })
+    //   // );
+    //   //   view.dispatch(transaction);
+    // }
   };
   reader.readAsDataURL(item);
 };
@@ -69,7 +102,7 @@ const uploadFilePlugin = (addFile, notify) => {
 
         if (items.length === 0) return;
 
-        let pos = 1;
+        let pos = 0;
         if (
           view.state.tr &&
           view.state.tr.curSelection &&
@@ -77,6 +110,7 @@ const uploadFilePlugin = (addFile, notify) => {
         ) {
           pos = view.state.tr.curSelection.$head.pos;
         }
+        console.log(view);
         const coordinates = { pos, inside: 0 };
 
         items.forEach(function(item) {
@@ -143,6 +177,7 @@ const uploadFilePlugin = (addFile, notify) => {
             top: event.clientY
           });
 
+          console.log(coordinates.pos);
           if (previewFiles.length > 0) {
             previewFiles.forEach(async item => {
               const preview = true;

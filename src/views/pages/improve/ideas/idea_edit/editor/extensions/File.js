@@ -18,8 +18,6 @@ export const File = Node.create({
 
   //priority: 1000,
 
-  // inline: true
-
   addOptions() {
     return {
       inline: true,
@@ -84,6 +82,13 @@ export const File = Node.create({
         },
         renderHTML: attrs => ({ type: attrs.type })
       },
+      'data-type': {
+        default: null,
+        parseHTML: el => {
+          return el.getAttribute("data-type");
+        },
+        renderHTML: attrs => ({ type: attrs['data-type'] })
+      },
       preview: {
         default: null,
         parseHTML: el => {
@@ -98,14 +103,6 @@ export const File = Node.create({
         },
         renderHTML: attrs => ({ src: attrs.src })
       },
-      name: {
-        default: null,
-        parseHTML: el => {
-          console.log(el)
-          return el.getAttribute("name");
-        },
-        renderHTML: attrs => ({ name: attrs.name })
-      },
       uuid: {
         default: null,
         parseHTML: el => {
@@ -119,18 +116,6 @@ export const File = Node.create({
           return el.getAttribute("uri");
         },
         renderHTML: attrs => ({ uri: attrs.uri })
-      },
-      dimensions: {
-        default: { height: null, width: null },
-        parseHTML: el => {
-          return el.getAttribute("dimensions");
-        },
-        renderHTML: attrs => ({
-          dimensions: {
-            height: attrs.height,
-            width: attrs.width
-          }
-        })
       }
     };
   },
@@ -185,26 +170,33 @@ export const File = Node.create({
       //   if (obj.src) return obj;
       // }
     },
+    // {
+    //   tag: "a",
+    //   getAttrs: dom => !!dom.href && null
+    //   // tag: "a",
+    //   // getAttrs: dom => {
+    //   //   if (typeof dom === "string") return {};
+    //   //   const obj = {
+    //   //     id: dom.getAttribute("id"),
+    //   //     src: dom.getAttribute("src"),
+    //   //     size: dom.getAttribute("size"),
+    //   //     href: dom.getAttribute("href"),
+    //   //     title: dom.getAttribute("title"),
+    //   //     style: dom.getAttribute("style"),
+    //   //     type: dom.getAttribute("type"),
+    //   //     preview: dom.getAttribute("preview"),
+    //   //     uuid: dom.getAttribute("uuid"),
+    //   //     dimensions: dom.getAttribute("dimensions")
+    //   //   };
+    //   //   if (obj.href) return obj;
+    //   // }
+    // },
     {
-      tag: "a",
-      getAttrs: dom => !!dom.href && null
-      // tag: "a",
-      // getAttrs: dom => {
-      //   if (typeof dom === "string") return {};
-      //   const obj = {
-      //     id: dom.getAttribute("id"),
-      //     src: dom.getAttribute("src"),
-      //     size: dom.getAttribute("size"),
-      //     href: dom.getAttribute("href"),
-      //     title: dom.getAttribute("title"),
-      //     style: dom.getAttribute("style"),
-      //     type: dom.getAttribute("type"),
-      //     preview: dom.getAttribute("preview"),
-      //     uuid: dom.getAttribute("uuid"),
-      //     dimensions: dom.getAttribute("dimensions")
-      //   };
-      //   if (obj.href) return obj;
-      // }
+      tag: "file-component",
+      getAttrs: dom => {
+        console.log(dom);
+        return dom && null;
+      }
     }
   ],
   renderHTML: ({ HTMLAttributes }) => {
@@ -212,25 +204,31 @@ export const File = Node.create({
       href,
       title,
       src,
-      alt,
-      style,
       preview,
-      size,
-      uuid,
-      name,
-      dimensions,
-
+      uuid
     } = HTMLAttributes;
 
-    if (href || src) {
-      if (preview) {
-        return ["img", { title, src, alt, style, size, uuid, dimensions, name }];
-      } else {
-        return ["a", { href, title, style, size, alt, uuid, name }, title];
-      }
-    }
+    console.log({ HTMLAttributes });
 
-    return true;
+    // return [
+    //   "file-component",
+    //   { title, src, href, style, size, uuid, name, preview }
+    // ];
+
+    console.log(HTMLAttributes);
+    return ["file-component", { title, src,uuid, href, preview, 'data-type': HTMLAttributes['data-type'] }];
+    // if (href || src) {
+    //   if (preview) {
+    //     return [
+    //       "img",
+    //       { title, src, size, uuid, preview }
+    //     ];
+    //   } else {
+    //     return ["a", { href, title, size, uuid, preview }, title];
+    //   }
+    // }
+
+  //  return true;
   },
   addNodeView() {
     return VueNodeViewRenderer(FileNodeView);
@@ -286,8 +284,8 @@ export const File = Node.create({
             const preview = false;
             const valid = validateFileSize(notify, item);
             if (valid) {
-              const transformedFile = await fileWithUniqueName(view, item);
               const uuid = uuidv4();
+              const transformedFile = await fileWithUniqueName(item, uuid);
               addFile({ uuid, file: transformedFile });
               renderFileInBase64ToCoordinates(
                 transformedFile,
@@ -317,8 +315,8 @@ export const File = Node.create({
             const preview = true;
             const valid = validateFileSize(notify, item);
             if (valid) {
-              const transformedFile = await fileWithUniqueName(view, item);
               const uuid = uuidv4();
+              const transformedFile = await fileWithUniqueName(item, uuid);
               addFile({ uuid, file: transformedFile });
               renderFileInBase64ToCoordinates(
                 transformedFile,

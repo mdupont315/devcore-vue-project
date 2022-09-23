@@ -17,6 +17,8 @@ export const CustomLink = Mark.create({
 
   keepOnSplit: false,
 
+  content: 'text*',
+
   onCreate() {
     this.options.protocols.forEach(registerCustomProtocol);
   },

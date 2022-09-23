@@ -1,38 +1,9 @@
 <template>
-  <node-view-wrapper as="div" class="file-component">
+  <node-view-wrapper as="div" class="file-component" contenteditable="false">
     <node-view-content class="content-dom" />
 
     <section class="content-dom-file">
-      <div
-        v-if="getAttrs.preview"
-        style="display: flex; flex-direction: column"
-      >
-        <div class="content-dom-file-image-container">
-          <!--   -->
-          <img
-            :key="imgKey"
-            :ref="`${getAttrs.uuid}`"
-            :src="getAttrs.src"
-            :alt="getAttrs.title"
-            :style="{ width: `${imgWidth}px`, height: `${imgHeight}px` }"
-            class="fileNodeView-preview-image"
-            @load="onImgLoad"
-          />
-
-          <!-- <img
-            :ref="`${getAttrs.uuid}`"
-            :src="getAttrs.src"
-            :alt="getAttrs.title"
-            @load="loadedImg"
-            style="max-height: 65vh; max-width: 50%"
-          /> -->
-        </div>
-        <button @click="removeNode" class="file-remove-button">
-          {{ $t("Remove") }}
-        </button>
-      </div>
-
-      <div v-else style="display: flex">
+      <div v-if="isAttachmentFile" style="display: flex">
         <div style="display: flex; place-items: center">
           <b-tooltip
             :disabled="!!getAttrs.href === false"
@@ -80,6 +51,31 @@
           </button>
         </div>
       </div>
+      <div v-else style="display: flex; flex-direction: column">
+        <div class="content-dom-file-image-container">
+          <!--   -->
+          <img
+            :key="imgKey"
+            :ref="`${getAttrs.uuid}`"
+            :src="getAttrs.src"
+            :alt="getAttrs.title"
+            :style="{ width: `${imgWidth}px`, height: `${imgHeight}px` }"
+            class="fileNodeView-preview-image"
+            @load="onImgLoad"
+          />
+
+          <!-- <img
+            :ref="`${getAttrs.uuid}`"
+            :src="getAttrs.src"
+            :alt="getAttrs.title"
+            @load="loadedImg"
+            style="max-height: 65vh; max-width: 50%"
+          /> -->
+        </div>
+        <button @click="removeNode" class="file-remove-button">
+          {{ $t("Remove") }}
+        </button>
+      </div>
     </section>
   </node-view-wrapper>
 </template>
@@ -124,6 +120,9 @@ export default {
   },
 
   computed: {
+    isAttachmentFile() {
+      return this.getAttrs["data-type"] === "link";
+    },
     fileEntity() {
       const stringFileEntity = this.node?.attrs;
       return stringFileEntity;
@@ -134,30 +133,29 @@ export default {
   },
 
   async mounted() {
+    console.log("HELLO");
     console.log(this.getAttrs);
+
+    if (!this.getAttrs.src && !this.getAttrs.href) this.deleteNode();
 
     const isStagedPreviewFile =
       !this.getAttrs.href && this.getAttrs.src && !this.getAttrs.id;
 
-    if (this.getAttrs.title) {
-      const hasUuidInName = this.getAttrs.title.includes(this.getAttrs.uuid);
-      if (this.getAttrs.uuid && !this.nameSet && !hasUuidInName) {
-        const extension = getExtension(this.getAttrs.title);
-        const fileName = getFileName(this.getAttrs.title);
+    // if (this.getAttrs.title) {
+    //   const hasUuidInName = this.getAttrs.title.includes(this.getAttrs.uuid);
+    //   if (this.getAttrs.uuid && !this.nameSet && !hasUuidInName) {
+    //     const extension = getExtension(this.getAttrs.title);
+    //     const fileName = getFileName(this.getAttrs.title);
 
-        this.updateAttributes({
-          title: `${fileName}-${this.getAttrs.uuid}.${extension}`,
-        });
+    //     this.updateAttributes({
+    //       title: `${fileName}-${this.getAttrs.uuid}.${extension}`,
+    //     });
 
-        this.nameSet = true;
-      }
-    }
+    //     this.nameSet = true;
+    //   }
+    // }
 
     const isExternalUrl = isValidExternalUrl(this.getAttrs.src);
-
-    console.log(isBase64(this.getAttrs.src));
-
-    console.log(this.editor);
 
     if (isStagedPreviewFile) {
       if (isExternalUrl || isBase64(this.getAttrs.src)) {
@@ -212,7 +210,6 @@ export default {
       const fileType = dataUrl.split(";")[0].split("/")[1] || "jpg";
       const title = `${uuidv4()}.${fileType}`;
 
-      console.log(type);
       const file = new File([blob], this.getAttrs.title ?? title, {
         type,
         lastModified: Date.now(),
@@ -232,6 +229,7 @@ export default {
     async handleExternalFiles() {
       const size = this.getAttrs.size;
 
+      console.log("handleExternalFiles");
       //console.log(size);
       // if (!size || typeof size === "string") {
       if (!this.getAttrs.src) return;
@@ -253,7 +251,7 @@ export default {
       this.updateAttributes({
         title: `${uuid}.${fileType}`,
         src: externalToBase64,
-        preview: true,
+        "data-type": "image",
         size: base64size,
         uuid,
       });

@@ -715,7 +715,10 @@ export default {
                   if (fileInIdea) {
                     node.attrs.id = fileInIdea.uri;
                     node.attrs.uuid = fileInIdea.uuid;
-                    if (node.attrs.preview) {
+                    if (
+                      node.attrs["data-type"] &&
+                      node.attrs["data-type"] === "image"
+                    ) {
                       node.attrs.src = fileInIdea.url;
                       node.attrs.href = "";
                       node.attrs.uri = fileInIdea.uri;
