@@ -141,7 +141,7 @@ export default {
       this.isLoading = true;
 
       const ideaIssueCloseForm = new GQLForm({
-        id: this.editingIdea.editIdeaId,
+        id: this.editingIdea.editIdea.id,
         improvementIds: [this.comment.id],
       });
 

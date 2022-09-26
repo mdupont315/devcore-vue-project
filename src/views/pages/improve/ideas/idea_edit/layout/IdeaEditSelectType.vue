@@ -42,9 +42,9 @@
 
         <div class="idea_content-type-select_btnNewIdeaTemplate-item-comments">
           <b-badge pill variant="primary">{{
-            comments.improvementsCount
+            getImprovementsFrom(item)
           }}</b-badge>
-          <b-badge pill variant="danger">{{ comments.problemCount }}</b-badge>
+          <b-badge pill variant="danger"> {{ getProblemsFrom(item) }}</b-badge>
         </div>
       </div>
     </b-card-body>
@@ -70,9 +70,9 @@ export default {
       default: () => {},
     },
     comments: {
-      type: Object,
+      type: Array,
       required: true,
-      default: () => {},
+      default: () => [],
     },
     selected: {
       type: Number,
@@ -80,6 +80,15 @@ export default {
     },
   },
   methods: {
+    getImprovementsFrom(item) {
+      const commentObj = this.comments.find((x) => x.id === item.id);
+			console.log("comments")
+      return commentObj.comments.improvements ?? 0;
+    },
+    getProblemsFrom(item) {
+      const commentObj = this.comments.find((x) => x.id === item.id);
+      return commentObj.comments.problems ?? 0;
+    },
     createContentType() {
       this.$emit("create");
     },
@@ -105,7 +114,7 @@ export default {
 }
 .idea_content-type-select_container {
   display: flex;
-  margin: 10px;
+  margin: 7.5px;
   flex-direction: row;
   background: transparent;
   position: fixed;

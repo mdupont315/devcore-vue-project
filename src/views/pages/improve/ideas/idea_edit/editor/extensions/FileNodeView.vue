@@ -80,6 +80,7 @@
   </node-view-wrapper>
 </template>
 
+//e703eae5-5bb6-458e-9f07-43
 <script>
 import { NodeViewWrapper, nodeViewProps, NodeViewContent } from "@tiptap/vue-2";
 import { FolderIcon } from "@/assets";
@@ -121,7 +122,7 @@ export default {
 
   computed: {
     isAttachmentFile() {
-      return this.getAttrs["data-type"] === "link";
+      return this.getAttrs["data-type"] === "link" && !this.getAttrs.preview;
     },
     fileEntity() {
       const stringFileEntity = this.node?.attrs;
@@ -133,27 +134,52 @@ export default {
   },
 
   async mounted() {
-
     if (!this.getAttrs.src && !this.getAttrs.href) this.deleteNode();
 
     const isStagedPreviewFile =
       !this.getAttrs.href && this.getAttrs.src && !this.getAttrs.id;
 
-    if (this.getAttrs.title) {
+    // console.log("**************");
+
+    // console.log(this.getAttrs);
+
+    // console.log("uuid: ", this.getAttrs.uuid);
+    // console.log("title: ", this.getAttrs.title);
+
+    // console.log("**************");
+
+		if (this.getAttrs['data-type'] === null) {
+
+		}
+
+    if (this.getAttrs.title && this.getAttrs.uuid && this.isAttachmentFile) {
       const hasUuidInName = this.getAttrs.title.includes(this.getAttrs.uuid);
       if (this.getAttrs.uuid && !this.nameSet && !hasUuidInName) {
         const extension = getExtension(this.getAttrs.title);
         const fileName = getFileName(this.getAttrs.title);
-
-        this.updateAttributes({
-          title: `${fileName}-${this.getAttrs.uuid}.${extension}`,
-        });
-
+        const newTitle = `${fileName}-${this.getAttrs.uuid}.${extension}`;
+        if (newTitle !== this.getAttrs.title) {
+          this.updateAttributes({
+            title: `${fileName}-${this.getAttrs.uuid}.${extension}`,
+          });
+        }
         this.nameSet = true;
       }
     }
 
-    const isExternalUrl = isValidExternalUrl(this.getAttrs.src);
+    const isUploadedImage = this.getAttrs.src?.includes(process.env.BASE_URL);
+    const isUploadedFile = this.getAttrs.href?.includes(process.env.BASE_URL);
+		const isProdUploadedFile = this.getAttrs.src?.includes("https://devcore.app")
+		const isStageUploadedFile = this.getAttrs.src?.includes("https://stage.devcore.app")
+
+		console.log(isUploadedImage)
+		console.log(isUploadedFile)
+
+    const isExternalUrl =
+      isValidExternalUrl(this.getAttrs.src) &&
+      (!isUploadedImage && !isUploadedFile && !isProdUploadedFile && !isStageUploadedFile);
+
+    console.log(process.env.BASE_URL);
 
     if (isStagedPreviewFile) {
       if (isExternalUrl || isBase64(this.getAttrs.src)) {
@@ -199,6 +225,7 @@ export default {
       }
     },
     async addBase64AsFile(dataUrl, type) {
+			console.log("ADDING TYPE")
       const toFile = await fetch(dataUrl, {
         method: "GET",
         mode: "no-cors",
@@ -213,6 +240,8 @@ export default {
         lastModified: Date.now(),
       });
 
+      console.log(this.getAttrs);
+
       this.extension.options.addFile({
         uuid: this.getAttrs.uuid,
         file: file,
@@ -225,11 +254,9 @@ export default {
       base64Resize(dataUrl, scaleWidthUntilPX, type, callback);
     },
     async handleExternalFiles() {
-      const size = this.getAttrs.size;
-
       //console.log(size);
       // if (!size || typeof size === "string") {
-      if (!this.getAttrs.src) return;
+      if (!this.getAttrs.src || this.isAttachmentFile) return;
       let externalToBase64 = "";
       try {
         externalToBase64 = await getBase64FromUrl(this.getAttrs.src);

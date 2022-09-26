@@ -84,7 +84,7 @@
           v-if="contentTypeSelectorVisible"
           :primary="getPrimaryContentType"
           :categories="getIdeaContentCategories"
-          :comments="getCommentsFromContent"
+          :comments="comments"
           :selected="selectedCategoryIndex"
           @expand="editContentType"
           @select="changeContentType"
@@ -170,17 +170,7 @@ export default {
     },
   },
   computed: {
-    getCommentsFromContent: {
-      get() {
-        const improvementsCount = this.comments.filter(
-          (comment) => comment.type === "IMPROVEMENT"
-        ).length;
-        const problemCount = this.comments.filter(
-          (comment) => comment.type === "PROBLEM"
-        ).length;
-        return { improvementsCount, problemCount };
-      },
-    },
+
     getIdeaContentCategories: {
       get() {
         return this.ideaContentCategories.map(
@@ -442,7 +432,7 @@ export default {
 }
 
 .idea_edit_content_container_content-header-button {
-  margin: 10px 20px 5px 20px;
+  margin: 7px 20px;
   border-radius: 3px;
   font-size: 16px;
   white-space: nowrap;

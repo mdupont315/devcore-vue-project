@@ -6,7 +6,7 @@
         :ideaContentCategories="ideaContentCategories"
         :isLoading="isLoading"
         :selectedCategoryIndex="selectedCategoryIndex"
-        :comments="getCommentsFromContent()"
+        :comments="getCommentNodesFromContent()"
         @changeType="changeContentType"
         @fileAdded="setFile"
         @fileRemoved="removeFile"
@@ -246,6 +246,8 @@ export default {
     },
     async setFile(file) {
       console.log("set File!");
+      console.log(file);
+
       const items = [...this.files, file];
       this.files = items;
       this.filesChanged = true;
@@ -413,13 +415,10 @@ export default {
       this.ideaForm._fields.file = addedFilesNotRemoved.map(
         (item) => item.file
       );
-      // this.ideaForm._fields.fileResource = addedFilesNotRemoved.map((x) => {
-      //   return { uuid: x.uuid, file: [x.file] };
-      // });
+
       this.ideaForm._fields.removeFileIds = mountedUploadedFileIds.filter(
         (id) => !currentUploadedContentFileIds.includes(id)
       );
-      console.log("FILLLLLEEE", this.ideaForm.fields);
       let ideaSave = null;
       this.ideaForm.processId = this.processPath.process.id;
       if (this.ideaForm.id) {
@@ -442,26 +441,57 @@ export default {
     //   return imageNodes;
     // },
     getCommentNodesFromContent() {
-      const { markup } = this.getIdeaContent;
+      return this.ideaContents.map((content) => {
+        const id = content.id;
+        const contentType = content.contentType;
+        let comments = {
+          improvements: 0,
+          problems: 0,
+        };
+        if (content.markup) {
+          const markup = JSON.parse(content.markup);
+          const commentNodes =
+            markup?.content?.filter((node) => node.type === "comment") ?? [];
 
-      const commentNodes =
-        markup?.content?.filter((node) => node.type === "comment") ?? [];
+          commentNodes.forEach((node) => {
+            if (node.type !== "comment") return;
 
-      return commentNodes;
-    },
-
-    getCommentsFromContent() {
-      const commentNodes = this.getCommentNodesFromContent();
-      const contentCommentIds = [];
-
-      commentNodes.forEach((node) => {
-        const parsedComment = JSON.parse(node.attrs.comment);
-        parsedComment.comments.forEach((comment) =>
-          contentCommentIds.push({ id: comment.id, type: comment.type })
-        );
+            const commentContent = JSON.parse(node.attrs.comment);
+            commentContent.comments.forEach((commentNode) => {
+              if (commentNode.type === "IMPROVEMENT") {
+                comments.improvements += 1;
+              }
+              if (commentNode.type === "PROBLEM") {
+                comments.problems += 1;
+              }
+            });
+          });
+        }
+        return { id, contentType, comments };
       });
-      return contentCommentIds;
     },
+
+    // getCommentsFromContent() {
+    //   // const contents = this.ideaContents;
+
+    //   // const comments = []
+
+    //   // contents.forEach(content => {
+    //   // 	const { markup } = comment
+    //   // })
+    //   const commentNodes = this.getCommentNodesFromContent();
+
+    // 	console.log(commentNodes)
+    //   const contentCommentIds = [];
+
+    //   // commentNodes.forEach((node) => {
+    //   //   const parsedComment = JSON.parse(node.attrs.comment);
+    //   //   parsedComment.comments.forEach((comment) =>
+    //   //     contentCommentIds.push({ id: comment.id, type: comment.type })
+    //   //   );
+    //   // });
+    //   return contentCommentIds;
+    // },
 
     async syncContent() {
       //sync files
@@ -530,7 +560,11 @@ export default {
           ...editIdea.problems.filter((problem) => !problem.replied),
         ].map((comment) => comment.id);
 
-        const contentComments = this.getCommentsFromContent();
+        const { markup } = this.getIdeaContent;
+
+        const contentComments =
+          markup?.content?.filter((node) => node.type === "comment") ?? [];
+
         const contentCommentIds = contentComments.map((comment) => comment.id);
 
         const markRepliedToCommentIds = allNotRepliedCommentIds.filter(
@@ -688,6 +722,7 @@ export default {
 
           let markup = contentForm.markup;
 
+          console.log(ideaSave);
 
           if (this.files.length > 0) {
             const modifiedMarkup = await this.execCallbackToNodeType(
@@ -708,6 +743,10 @@ export default {
                     (file) => file.title === setFileUri
                   );
 
+                  node.attrs.src = "";
+                  node.attrs.href = "";
+
+                  console.log({ fileInIdea });
                   if (fileInIdea) {
                     node.attrs.id = fileInIdea.uri;
                     node.attrs.uuid = fileInIdea.uuid;

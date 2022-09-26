@@ -210,6 +210,8 @@ export const File = Node.create({
     // return [
     //   "file-component",
     //   { title, src, href, style, size, uuid, name, preview }
+
+    console.log(HTMLAttributes)
     // ];
 
     return ["file-component", { title, src, uuid, href, preview, 'data-type': HTMLAttributes['data-type'] }];
