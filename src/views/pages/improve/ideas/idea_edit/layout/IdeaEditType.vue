@@ -1,10 +1,10 @@
 
 <template>
   <transition name="idea_edit_content_container_type" mode="out-in">
-    <div class="idea_edit_content_container_type" v-if="visible">
+    <div class="idea_edit_content_container_type" v-show="visible">
       <div class="idea_edit_type_container-header">
         <div class="idea_edit_type_container-header-title">
-          {{ !value.id ? $t("New Content Area") : $t("Edit Content Area") }}
+          {{ value && value.id ? $t("Edit Content Area") : $t("New Content Area") }}
         </div>
         <div class="idea_edit_type_container-header-close"></div>
 
@@ -29,9 +29,8 @@
       </div>
       <b-form
         class="idea_edit_type_container-body hide_labels"
-        @keyup="validate"
         @submit.prevent="save"
-        v-if="value"
+        v-if="value && mutateForm"
       >
         <b-card-body class="p-0 ideaEditType-form-fields">
           <div class="form-group">
@@ -51,7 +50,7 @@
                     position: absolute;
                     z-index: 1;
                     cursor: pointer;
-                    margin-left: -40px;
+                    margin-left: -50px;
                   "
                 >
                   {{ $t("first page") }}
@@ -96,7 +95,7 @@
             >
           </div>
 
-          <div v-if="!value.id" class="form-group required">
+          <div v-if="!value.id && mutateForm" class="form-group required">
             <div class="idea_edit_contentType_container-title">
               {{ $t("Content Template") }}
             </div>
@@ -190,17 +189,22 @@
             <confirm-button
               buttonVariant="outline-danger"
               size="lg"
-              :isDisabled="
-                vErrors.any() || isLoading || mutateForm.markup === null
-              "
+              :isDisabled="isRemoveButtonDisabled()"
               :style="{
                 cursor:
-                  vErrors.any() || isLoading || mutateForm.markup === null
+                  vErrors.any() ||
+                  isLoading ||
+                  !mutateForm ||
+                  mutateForm.markup === null ||
+                  !mutateForm.id
                     ? 'not-allowed'
                     : 'pointer',
               }"
               :btnClass="
-                isLoading
+                isLoading ||
+                !mutateForm ||
+                mutateForm.markup === null ||
+                !mutateForm.id
                   ? 'ideaEdit_path_remove_button-disabled'
                   : 'ideaEdit_path_remove_button-enabled'
               "
@@ -363,7 +367,6 @@ export default {
     mutateForm: {
       deep: true,
       handler(newVal) {
-        console.log("hasEdits: ", this.hasEdits);
         this.hasEdits = this.checkEdits();
         if (!this.comparisonForm) {
           this.comparisonForm = newVal.fields;
@@ -373,11 +376,6 @@ export default {
     "mutateForm.id": {
       handler(newVal) {
         this.comparisonForm = null;
-      },
-    },
-    "mutateForm.markup": {
-      handler(newVal) {
-        this.validate();
       },
     },
     "mutateForm.isPrimary": {
@@ -390,8 +388,14 @@ export default {
     },
   },
   methods: {
+    isRemoveButtonDisabled() {
+      if (this.mutateForm || this.mutateForm.markup) {
+        return this.vErrors.any() || this.isLoading || !this.mutateForm.id;
+      }
+      return true;
+    },
     checkEdits() {
-      if (this.value.id) {
+      if (this.value && this.value.id) {
         const content = this.ideaContents.find((x) => x.id === this.value.id);
 
         if (!content) return false;
@@ -423,8 +427,9 @@ export default {
       this.$validator.validateAll();
     },
     async save() {
+      await this.$validator.validateAll();
       if (!this.vErrors.any()) {
-        this.$validator.reset();
+        await this.$validator.reset();
         this.$emit("save");
       }
     },
@@ -432,7 +437,8 @@ export default {
       await this.$validator.reset();
       this.$emit("remove");
     },
-    closeIdeaEdit() {
+    async closeIdeaEdit() {
+      await this.$validator.reset();
       this.$emit("close");
     },
     objectsAreEqual(a, b) {
@@ -440,7 +446,6 @@ export default {
       return changes.length === 0;
     },
     listsAreEqual(a, b) {
-      console.log(a, b);
       return a.length === b.length && xor(a, b).length === 0;
     },
   },
@@ -511,7 +516,8 @@ input[type="checkbox"] {
   height: calc(80vh);
   bottom: 65px;
   width: calc((100vw - 240px) * 0.25);
-  border-radius: 5px;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
   overflow: hidden;
 }
 

@@ -24,7 +24,7 @@
       >
         <svg
           class="remix menuFile-remix"
-          style="margin-right: 10px; width: 20px; height: 20px;font-size:20px"
+          style="margin-right: 10px; width: 20px; height: 20px; font-size: 20px"
         >
           <use :xlink:href="`${remixiconUrl}#ri-${item.icon}`" />
         </svg>
@@ -69,12 +69,15 @@ export default {
 </script>
 
 <style scoped lang="scss">
+#idea_edit_content_container_content-header-upload-input {
+}
 .idea_edit_content_container_content-header-upload-label {
   width: 100%;
   height: 100%;
   position: absolute;
   cursor: pointer;
 }
+
 .idea_edit_content_container_content-header-upload-selector {
   position: fixed;
   min-width: 100px;
@@ -91,11 +94,23 @@ export default {
     height: 40px;
     display: flex;
     align-items: center;
+    color: #9fa0a0;
+    border-radius: 3px;
+    border: none;
+    background: #fff;
+    &:hover {
+      color: #fff;
+      background: #4294d0 !important;
+      border-color: #4294d0;
+      > .idea_edit_content_container_content-header-upload-selector-item-icon {
+        fill: #fff;
+      }
+    }
     cursor: pointer;
     & > .idea_edit_content_container_content-header-upload-selector-item-text {
       text-overflow: ellipsis;
       white-space: nowrap;
-      color: #9fa0a0;
+
       font-weight: normal;
     }
     & > .idea_edit_content_container_content-header-upload-selector-item-icon {

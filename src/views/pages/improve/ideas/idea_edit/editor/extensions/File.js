@@ -194,13 +194,12 @@ export const File = Node.create({
     {
       tag: "file-component",
       getAttrs: dom => {
-        console.log(dom);
         return dom && null;
       }
     }
   ],
   renderHTML: ({ HTMLAttributes }) => {
-    const {
+      const {
       href,
       title,
       src,
@@ -208,15 +207,12 @@ export const File = Node.create({
       uuid
     } = HTMLAttributes;
 
-    console.log({ HTMLAttributes });
-
     // return [
     //   "file-component",
     //   { title, src, href, style, size, uuid, name, preview }
     // ];
 
-    console.log(HTMLAttributes);
-    return ["file-component", { title, src,uuid, href, preview, 'data-type': HTMLAttributes['data-type'] }];
+    return ["file-component", { title, src, uuid, href, preview, 'data-type': HTMLAttributes['data-type'] }];
     // if (href || src) {
     //   if (preview) {
     //     return [

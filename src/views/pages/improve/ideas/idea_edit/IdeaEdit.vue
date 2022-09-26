@@ -49,6 +49,8 @@ export default {
   async created() {
     this.isLoading = true;
     if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
+      console.log("created");
+      console.log(this.ideaContentCategories);
       await this.initializeData();
       await this.initializeForms();
     }
@@ -259,9 +261,7 @@ export default {
 
       this.editorLoaded = true;
     },
-    async initializeData() {
-      const { ideaContentId } = this.getIdea;
-
+    async initializeData(selectedFormId = null) {
       this.ideaContentCategoryData = this.ideaContents.map((content) => {
         return {
           contentForm: new GQLForm({
@@ -271,13 +271,15 @@ export default {
             version: content.version ?? 1,
             contentType: content.contentType,
             companyRoles: content.companyRoles,
-            isPrimary: content.id === ideaContentId,
+            isPrimary: content.id === this.getIdea.ideaContentId,
           }),
         };
       });
 
+      const selectedIndex = selectedFormId ?? this.getIdea.ideaContentId;
+
       const categoryIndex = this.ideaContentCategories.findIndex(
-        (content) => content.contentForm.id === ideaContentId
+        (content) => content.contentForm.id === selectedIndex
       );
       this.selectedCategoryIndex = categoryIndex >= 0 ? categoryIndex : 0;
     },
@@ -561,14 +563,16 @@ export default {
 
       const markup = form.fields.markup.content ?? form.fields.markup;
 
+      let resp;
+
       try {
         if (form.fields.id) {
-          await this.$store.dispatch(
+          resp = await this.$store.dispatch(
             `ideaContent/update`,
             new GQLForm({ ...fields })
           );
         } else {
-          await this.$store.dispatch(
+          resp = await this.$store.dispatch(
             `ideaContent/create`,
             new GQLForm({ ...fields, markup })
           );
@@ -588,7 +592,8 @@ export default {
             contentForm.fields.isPrimary = contentForm.id === form.fields.id;
           });
         }
-        this.initializeData();
+
+        this.initializeData(resp.id);
 
         this.isLoading = false;
         this.isSaving = false;
@@ -683,8 +688,6 @@ export default {
 
           let markup = contentForm.markup;
 
-          console.log("***********");
-          console.log("files: ", ideaSave.files);
 
           if (this.files.length > 0) {
             const modifiedMarkup = await this.execCallbackToNodeType(
@@ -698,19 +701,12 @@ export default {
                   node.attrs.src &&
                   node.attrs.src.includes(process.env.BASE_URL);
                 const isAlreadyUploadedNode = hrefMatch || srcMatch;
-                console.log({
-                  isAlreadyUploadedNode,
-                  node,
-                  hrefMatch,
-                  srcMatch,
-                });
+
                 if (!isAlreadyUploadedNode) {
-                  console.log({ node });
                   const setFileUri = node.attrs.title;
                   const fileInIdea = ideaSave.files.find(
                     (file) => file.title === setFileUri
                   );
-                  console.log("Found file matching", { fileInIdea });
 
                   if (fileInIdea) {
                     node.attrs.id = fileInIdea.uri;
@@ -735,7 +731,6 @@ export default {
             );
             markup = modifiedMarkup;
           }
-          console.log("***********");
           contentForm.ideaId = ideaSave.id;
           contentForm.markup = markup;
 

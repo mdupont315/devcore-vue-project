@@ -11,12 +11,16 @@
         :class="{
           'is-active': index == selected,
         }"
-        @click="changeContentType(item)"
       >
         <div
           class="idea_content-type-select_btnNewIdeaTemplate-item-contentType"
         >
-          <div>
+          <div
+            @click="changeContentType(item)"
+            class="
+              idea_content-type-select_btnNewIdeaTemplate-item-contentType-title
+            "
+          >
             {{ !item.contentType ? $t("unnamed_type") : item.contentType }}
           </div>
         </div>
@@ -105,11 +109,11 @@ export default {
   flex-direction: row;
   background: transparent;
   position: fixed;
-  width: 400px;
-  top: 185px;
-  margin-left: -281px;
+  width: 450px;
+  top: 180px;
+  margin-left: -331px;
   & > .icon-container {
-    margin-right: 10px;
+    margin-right: 5px;
     margin-top: 1px;
     display: flex;
     align-items: flex-start;
@@ -123,7 +127,7 @@ export default {
 }
 .idea_content-type-select_btnNewIdeaTemplate-item {
   font-size: 16px;
-  padding: 5px 10px;
+  padding: 5px 13px 5px 10px;
   color: #9fa0a0;
   align-items: center;
   box-sizing: border-box;
@@ -136,6 +140,12 @@ export default {
   }
 }
 
+.idea_content-type-select_btnNewIdeaTemplate-item-contentType-title:hover {
+  color: #fff;
+  background: #4294d0 !important;
+  border-color: #4294d0;
+}
+
 .idea_content-type-select_btnNewIdeaTemplate-item-contentType {
   width: 115px;
   display: flex;
@@ -144,11 +154,19 @@ export default {
   white-space: nowrap;
   margin: 0px 5px 0 0;
   flex-grow: 10;
+  font-size: 14px;
+  font-family: FuturaLight;
+
+  // &:hover {
+  //   & >
+  // }
 
   & > div {
     overflow: hidden;
     text-overflow: ellipsis;
-		cursor: pointer;
+    cursor: pointer;
+    padding: 3px 5px;
+    border-radius: 3px;
   }
   & > span {
     margin-left: 5px;
@@ -170,13 +188,27 @@ export default {
   flex-grow: 1;
   display: flex;
   justify-content: flex-end;
-	cursor: pointer;
+  cursor: pointer;
+  & > span {
+    width: 100%;
+    border-radius: 3px;
+    display: flex;
+    place-content: center;
+  }
+  &:hover {
+    & > span {
+      color: #fff;
+      background: #4294d0 !important;
+      border-color: #4294d0;
+    }
+  }
 }
 
 .idea_content-type-select_btnNewIdeaTemplate-item-comments {
   display: flex;
   flex-grow: 1;
   justify-content: flex-end;
+  max-width: 55px;
   & > span {
     margin: 2.5px;
     border-radius: 20%;

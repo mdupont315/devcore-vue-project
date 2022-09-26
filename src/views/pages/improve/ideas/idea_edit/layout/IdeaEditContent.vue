@@ -27,7 +27,11 @@
             :loading="isLoading"
             @click="toggleContentUploadSelector()"
           >
-            <i class="ri-file-download-line" style="margin-top:2px" v-if="!isLoading"></i>
+            <i
+              class="ri-file-download-line"
+              style="margin-top: 2px"
+              v-if="!isLoading"
+            ></i>
           </loading-button>
 
           <idea-edit-select-upload
@@ -88,7 +92,7 @@
         />
 
         <idea-edit-type
-          v-if="editContentItem"
+          v-show="editContentItem"
           :visible="contentTypeSelectorForm"
           :categories="getIdeaContentCategories"
           :primary="getPrimaryContentType"
@@ -292,20 +296,23 @@ export default {
       this.contentTypeSelectorVisible = !this.contentTypeSelectorVisible;
     },
     createContentType() {
+      this.editContentItem = null;
       this.contentTypeSelectorForm = true;
       this.contentTypeSelectorVisible = true;
-      this.editContentItem = new GQLForm({
-        id: undefined,
-        markup: {
-          title: "Empty",
-          content: JSON.stringify(empty),
-        },
-        version: 1,
-        isPrimary: false,
-        name: null,
-        ideaId: this.idea.id,
-        companyRoles: [],
-      });
+      setTimeout(() => {
+        this.editContentItem = new GQLForm({
+          id: undefined,
+          markup: {
+            title: "Empty",
+            content: JSON.stringify(empty),
+          },
+          version: 1,
+          isPrimary: false,
+          name: null,
+          ideaId: this.idea.id,
+          companyRoles: [],
+        });
+      }, 100);
     },
     changeContentType(item) {
       this.$emit("changeType", item);
@@ -435,7 +442,7 @@ export default {
 }
 
 .idea_edit_content_container_content-header-button {
-  margin: 10px 20px;
+  margin: 10px 20px 5px 20px;
   border-radius: 3px;
   font-size: 16px;
   white-space: nowrap;
