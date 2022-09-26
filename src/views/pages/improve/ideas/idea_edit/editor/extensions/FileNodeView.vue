@@ -305,7 +305,7 @@ export default {
     font-family: "FuturaMedium";
     color: #d0424d;
     border: 1px solid lightgray;
-    width: 60px;
+    width: 65px;
     outline: none;
     position: relative;
     font-size: 14px;
