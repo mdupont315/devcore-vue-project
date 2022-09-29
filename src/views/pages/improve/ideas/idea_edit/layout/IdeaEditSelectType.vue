@@ -82,7 +82,6 @@ export default {
   methods: {
     getImprovementsFrom(item) {
       const commentObj = this.comments.find((x) => x.id === item.id);
-			console.log("comments")
       return commentObj.comments.improvements ?? 0;
     },
     getProblemsFrom(item) {

@@ -8,6 +8,7 @@ const initialState = () => {
   return {
     ideaInEdit: null,
     loading: false,
+    files: [],
     all: [],
     filter: null,
     loadedProcess: []
@@ -19,6 +20,7 @@ const state = initialState();
 const getters = {
   ideaInEdit: state => state.ideaInEdit,
   loading: state => state.loading,
+  files: state => state.files,
   all: state => state.all,
   filter: state => state.filter,
   currentTab: state => state.tab,
@@ -79,6 +81,19 @@ const actions = {
     context.commit("SET_ITEM", idea);
     await context.dispatch('findAll', { force: true });
     return idea;
+  },
+
+  async setResources(context, form) {
+    const result = await form.mutate({
+      mutation: IDEA.setResources,
+      variables: {
+        id: form.id
+      }
+    });
+   // const files = new Idea().deserialize(result.data.ideaResources);
+    context.commit("SET_FILES", result.data.ideaResources);
+  //  await context.dispatch('findAll', { force: true });
+    return result.data.ideaResources;
   },
 
   async changeStatus(context, form) {
@@ -267,6 +282,9 @@ const mutations = {
   },
   SET_ALL(state, value) {
     state.all = value;
+  },
+  SET_FILES(state, value) {
+    state.files = value;
   },
   SET_ITEM(state, value) {
     const index = state.all.findIndex(el => el.id === value.id);

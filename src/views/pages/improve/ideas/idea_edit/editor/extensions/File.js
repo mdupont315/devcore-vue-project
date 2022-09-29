@@ -5,6 +5,10 @@ import {
   renderFileInBase64ToCoordinates
 } from "./uploadFile";
 import { fileWithUniqueName, validateFileSize } from "./helpers/file/fileUtils";
+import {
+  SUPPORTED_PREVIEW_RESIZE_IMAGE_TYPES,
+  FILE_SIZE_LIMIT
+} from "./helpers/file/constants";
 
 import FileNodeView from "./FileNodeView.vue";
 import { VueNodeViewRenderer } from "@tiptap/vue-2";
@@ -12,6 +16,65 @@ import { v4 as uuidv4 } from "uuid";
 // import { generateJSON } from '@tiptap/html'
 const mammoth = require("mammoth");
 const IMAGE_INPUT_REGEX = /!\[(.+|:?)\]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
+
+const formatFileSize = (bytes, decimalPoint) => {
+  if (bytes == 0) return "0 Bytes";
+  const k = 1000;
+  const dm = decimalPoint || 2;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+};
+
+const convertDocxFileToHtml = async (file, notify) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onloadend = function(event) {
+      const arrayBuffer = reader.result;
+      mammoth
+        .convertToHtml(
+          { arrayBuffer: arrayBuffer },
+          { convertImage: docxFileParser(notify) }
+        )
+        .then(function(resultObject) {
+          if (!resultObject) {
+            reject(resultObject);
+          }
+          resolve(resultObject.value);
+        });
+    };
+    reader.readAsArrayBuffer(file);
+  });
+};
+
+const docxFileParser = notify =>
+  mammoth.images.imgElement(function(image) {
+    if (!SUPPORTED_PREVIEW_RESIZE_IMAGE_TYPES.includes(image.contentType)) {
+      return notify("Unknown file type in docx file", {
+        type: image.contentType
+      });
+    }
+    return image.read("base64").then(function(imageBuffer) {
+      const mod = imageBuffer.slice(-2) === "==" ? 2 : 1;
+      const base64size = imageBuffer.length * (3 / 4) - mod;
+      console.log(base64size);
+      console.log(image.contentType);
+      if (base64size <= FILE_SIZE_LIMIT) {
+        return {
+          src: "data:" + image.contentType + ";base64," + imageBuffer
+        };
+      } else {
+        const data = {
+          type: image.contentType,
+          size: formatFileSize(base64size, 2),
+          limit: formatFileSize(FILE_SIZE_LIMIT)
+        };
+
+        notify("File size too big in docx file", data);
+      }
+    });
+  });
 
 export const File = Node.create({
   name: "file",
@@ -24,7 +87,8 @@ export const File = Node.create({
       HTMLAttributes: {},
       addFile: () => {},
       removeFile: () => {},
-      notify: () => {}
+      notify: () => {},
+      setIsLoading: () => {}
     };
   },
 
@@ -82,12 +146,12 @@ export const File = Node.create({
         },
         renderHTML: attrs => ({ type: attrs.type })
       },
-      'data-type': {
+      "data-type": {
         default: null,
         parseHTML: el => {
           return el.getAttribute("data-type");
         },
-        renderHTML: attrs => ({ type: attrs['data-type'] })
+        renderHTML: attrs => ({ type: attrs["data-type"] })
       },
       preview: {
         default: null,
@@ -199,22 +263,25 @@ export const File = Node.create({
     }
   ],
   renderHTML: ({ HTMLAttributes }) => {
-      const {
-      href,
-      title,
-      src,
-      preview,
-      uuid
-    } = HTMLAttributes;
+    const { href, title, src, preview, uuid } = HTMLAttributes;
 
     // return [
     //   "file-component",
     //   { title, src, href, style, size, uuid, name, preview }
 
-    console.log(HTMLAttributes)
     // ];
 
-    return ["file-component", { title, src, uuid, href, preview, 'data-type': HTMLAttributes['data-type'] }];
+    return [
+      "file-component",
+      {
+        title,
+        src,
+        uuid,
+        href,
+        preview,
+        "data-type": HTMLAttributes["data-type"]
+      }
+    ];
     // if (href || src) {
     //   if (preview) {
     //     return [
@@ -226,16 +293,16 @@ export const File = Node.create({
     //   }
     // }
 
-  //  return true;
+    //  return true;
   },
   addNodeView() {
     return VueNodeViewRenderer(FileNodeView);
   },
 
   addCommands() {
-    const { addFile, notify } = this.options;
+    const { addFile, notify, setIsLoading } = this.options;
     return {
-      setInlineFile: attrs => ({ view, tr }) => {
+      setInlineFile: attrs => async ({ view, tr }) => {
         let pos = 1;
         if (tr && tr.curSelection && tr.curSelection.$head) {
           pos = tr.curSelection.$head.pos;
@@ -243,26 +310,37 @@ export const File = Node.create({
         const input = attrs ? attrs : [];
         const files = Array.from(input);
         const nonPreviewFiles = files.filter(file => !/image/i.test(file.type));
-        let content = null;
-
         let that = this;
+        console.log(nonPreviewFiles);
 
-        if (nonPreviewFiles.length > 0) {
-          nonPreviewFiles.forEach(async item => {
-            var reader = new FileReader();
+        if (nonPreviewFiles[0]) {
+          setIsLoading(true);
+          console.log(nonPreviewFiles);
+          notify(
+            "Importing document",
+            { title: nonPreviewFiles[0].name },
+            "info"
+          );
+          try {
+            const res = await convertDocxFileToHtml(
+              nonPreviewFiles[0],
+              notify,
+              pos,
+              that
+            );
+            setIsLoading(false);
 
-            reader.onloadend = function(event) {
-              var arrayBuffer = reader.result;
-
-              mammoth
-                .convertToHtml({ arrayBuffer: arrayBuffer })
-                .then(function(resultObject) {
-                  content = resultObject.value;
-                  that.editor.commands.insertContentAt(pos, content);
-                });
-            };
-            reader.readAsArrayBuffer(item);
-          });
+            console.log({ res });
+            if (res) {
+              setTimeout(() => {
+                this.editor.commands.insertContentAt(pos, res);
+              });
+            }
+          } catch (e) {
+            console.log(e);
+          } finally {
+            window.vm.$snotify.clear();
+          }
         } else {
           notify("File type not supported");
         }

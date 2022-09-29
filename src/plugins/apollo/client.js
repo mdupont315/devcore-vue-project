@@ -7,7 +7,6 @@ import {
 import { ApolloLink } from "apollo-link";
 import { createUploadLink } from "apollo-upload-client";
 import config from "./config";
-import EchoLink from "./echolink";
 import store from "@/store";
 import introspectionQueryResultData from "@/fragmentTypes.json";
 import { showGraphqlErrorFromResponse } from "../../lib/utils";

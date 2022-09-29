@@ -117,6 +117,7 @@
       @saveContent="saveContent"
       @initialized="setIsInitialized"
       @contentWindowTop="setContentWindowTop"
+			@setIsLoading="setIsLoading"
       :contentWindowTop="contentWindowTop"
       :contentType="contentType"
     />
@@ -233,6 +234,9 @@ export default {
     editContentItem: null,
   }),
   methods: {
+		setIsLoading(val){
+			this.$emit("setIsLoading", val)
+		},
     toggleContentUploadSelector() {
       this.contentTypeSelectorUpload = !this.contentTypeSelectorUpload;
     },

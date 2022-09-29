@@ -202,7 +202,8 @@ export default class ContentEditor {
       File.configure({
         addFile: fileHandlers.addFile,
         removeFile: fileHandlers.removeFile,
-        notify: fileHandlers.notify
+        notify: fileHandlers.notify,
+        setIsLoading: fileHandlers.setIsLoading
       }),
       Comment.configure({
         saveContent,

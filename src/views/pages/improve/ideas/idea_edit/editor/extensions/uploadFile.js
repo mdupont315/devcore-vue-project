@@ -1,6 +1,7 @@
 import { Plugin } from "prosemirror-state";
 import { v4 as uuidv4 } from "uuid";
 import { fileWithUniqueName, validateFileSize } from "./helpers/file/fileUtils";
+
 const renderFileInBase64ToCoordinates = (
   item,
   view,
@@ -15,14 +16,15 @@ const renderFileInBase64ToCoordinates = (
   if (!editor) return;
 
   const fileHTML = item => {
-    const { url, title, preview, uuid } = item;
-    console.log(item)
-    return `<p><file-component src="${url}" title="${title}" uuid="${uuid}" data-type="${preview ? 'image' : 'link'}"></file-component></p>`;
+    console.log(item);
+    const { url, title, preview, uuid, type } = item;
+    return `<p><file-component src="${url}" title="${title}" uuid="${uuid}" type="${type}" data-type="${
+      preview ? "image" : "link"
+    }"></file-component></p>`;
   };
 
   const reader = new FileReader();
-  editor.commands.createParagraphNear();
-  console.log(item);
+  //editor.commands.createParagraphNear();
   reader.onload = readerEvent => {
     const fileAttrs = {
       url: readerEvent.target?.result,
@@ -34,7 +36,6 @@ const renderFileInBase64ToCoordinates = (
 
     editor
       .chain()
-      .createParagraphNear()
       .insertContentAt(coordinates.pos, fileHTML(fileAttrs))
       .run();
     // };
@@ -110,7 +111,6 @@ const uploadFilePlugin = (addFile, notify) => {
         ) {
           pos = view.state.tr.curSelection.$head.pos;
         }
-        console.log(view);
         const coordinates = { pos, inside: 0 };
 
         items.forEach(function(item) {
@@ -120,13 +120,14 @@ const uploadFilePlugin = (addFile, notify) => {
             const preview = true;
 
             const itemAsFile = item.getAsFile();
-            const uuid = uuidv4();
-            const transformedFile = fileWithUniqueName(itemAsFile, uuid);
+            //    const transformedFile = fileWithUniqueName(itemAsFile, uuid);
+
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {
               const uuid = uuidv4();
+              //   addFile({ uuid, file: transformedFile });
               renderFileInBase64ToCoordinates(
-                transformedFile,
+                itemAsFile,
                 view,
                 coordinates,
                 preview,
@@ -137,14 +138,12 @@ const uploadFilePlugin = (addFile, notify) => {
             const preview = false;
             const itemAsFile = item.getAsFile();
             const uuid = uuidv4();
-            const transformedFile = fileWithUniqueName(itemAsFile, uuid);
+            //  const transformedFile = fileWithUniqueName(itemAsFile, uuid);
             const valid = validateFileSize(notify, itemAsFile);
-            console.log("ITEM:::::::::::::");
-            console.log(itemAsFile);
             if (valid) {
-              addFile({ uuid, file: transformedFile });
+              addFile({ uuid, file: itemAsFile });
               renderFileInBase64ToCoordinates(
-                transformedFile,
+                itemAsFile,
                 view,
                 coordinates,
                 preview,
@@ -177,17 +176,16 @@ const uploadFilePlugin = (addFile, notify) => {
             top: event.clientY
           });
 
-          console.log(coordinates.pos);
           if (previewFiles.length > 0) {
             previewFiles.forEach(async item => {
               const preview = true;
               const valid = validateFileSize(notify, item);
               if (valid) {
                 const uuid = uuidv4();
-                const transformedFile = fileWithUniqueName(item, uuid);
+                //  const transformedFile = fileWithUniqueName(item, uuid);
 
                 renderFileInBase64ToCoordinates(
-                  transformedFile,
+                  item,
                   view,
                   coordinates,
                   preview,
@@ -203,11 +201,11 @@ const uploadFilePlugin = (addFile, notify) => {
               const valid = validateFileSize(notify, item);
               if (valid) {
                 const uuid = uuidv4();
-                const transformedFile = fileWithUniqueName(item, uuid);
+                // const transformedFile = fileWithUniqueName(item, uuid);
 
-                addFile({ uuid, file: transformedFile });
+                addFile({ uuid, file: item });
                 renderFileInBase64ToCoordinates(
-                  transformedFile,
+                  item,
                   view,
                   coordinates,
                   preview,

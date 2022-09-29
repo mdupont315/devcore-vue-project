@@ -15,6 +15,7 @@
         @removeIdeaContentArea="removeIdeaContentArea"
         @editorLoaded="setEditorLoaded"
         @isDirty="setIsContentDirty"
+        @setIsLoading="setIsLoading"
         :isSaving="isSaving"
         v-model="getIdeaContent"
       ></idea-edit-content>
@@ -47,10 +48,8 @@ export default {
     "idea-edit-path": IdeaEditPath,
   },
   async created() {
-    this.isLoading = true;
+    this.setIsLoading(true);
     if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
-      console.log("created");
-      console.log(this.ideaContentCategories);
       await this.initializeData();
       await this.initializeForms();
     }
@@ -60,7 +59,7 @@ export default {
       this.isLoaded = true;
     }
 
-    this.isLoading = false;
+    this.setIsLoading(false);
   },
   data: () => ({
     filter: null,
@@ -200,28 +199,87 @@ export default {
       this.ideaForm._fields.companyRoleIds = companyRoleIds;
       this.ideaForm._fields.companyToolIds = companyToolIds;
 
-      console.log("MOUNT!");
-
       this.loadedFiles = await this.getFileNodesFromIdea();
     } else {
       this.defaultContentForm.fields.contentType = this.$t("unnamed_type");
       this.defaultContentForm.fields.markup = JSON.stringify(defaultContent);
     }
-
-    //	console.log(this,.)
-
-    //this.files = this.getIdea.files
   },
   methods: {
+    setIsLoading(val) {
+      console.log(val);
+      this.isLoading = val;
+    },
+    sliceIntoChunks(arr, chunkSize) {
+      const res = [];
+      for (let i = 0; i < arr.length; i += chunkSize) {
+        const chunk = arr.slice(i, i + chunkSize);
+        res.push(chunk);
+      }
+      return res;
+    },
+
+    async uploadFiles(files, props) {
+      console.log("UPLOADING FILES: ", files);
+      const { id, contentId } = props;
+      let result = [];
+
+      try {
+        result = await this.$store.dispatch(
+          `idea/setResources`,
+          new GQLForm({
+            files,
+            id,
+            contentId,
+          })
+        );
+      } catch (e) {
+        console.log(e);
+      }
+
+      console.log("RECEIVED FILES", result);
+      return result;
+    },
+    async batchUploadResources(data) {
+      const BATCH_MAX_FILES = 10;
+
+      const uploadFileBatches = this.sliceIntoChunks(
+        data.files,
+        BATCH_MAX_FILES
+      );
+
+      window.vm.$snotify.info(this.$t("Do not close window"), {
+        timeout: 10000,
+        showProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+      });
+      this.setIsLoading(true);
+      this.isSaving = true;
+      let result = [];
+
+      try {
+        //Last response has every data point so overwrite result
+        for (const uploadFileBatch of uploadFileBatches) {
+          result = await this.uploadFiles(uploadFileBatch, data);
+        }
+      } catch (e) {
+        console.log(e);
+      } finally {
+        window.vm.$snotify.clear();
+      }
+      return result;
+    },
     async changeContentType(form) {
       this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
         (content) => content.contentForm.id === form.id
       );
       this.loadedFiles = await this.getFileNodesFromIdea();
       this.files = [];
-      this.isLoading = true;
+      this.setIsLoading(true);
+
       this.$nextTick(() => {
-        this.isLoading = false;
+        this.setIsLoading(false);
       });
     },
     setEditorLoaded() {
@@ -232,8 +290,6 @@ export default {
     },
     removeFile(file) {
       //TODO: If loaded files contains uploaded file it means that existing file was removed
-      // console.log(file);
-      //console.log(this.loadedFiles);
       if (this.isSaving) return;
       if (file.id) {
         if (this.loadedFiles.some((loadedFile) => loadedFile.id === file.id)) {
@@ -245,9 +301,6 @@ export default {
       }
     },
     async setFile(file) {
-      console.log("set File!");
-      console.log(file);
-
       const items = [...this.files, file];
       this.files = items;
       this.filesChanged = true;
@@ -284,6 +337,7 @@ export default {
         (content) => content.contentForm.id === selectedIndex
       );
       this.selectedCategoryIndex = categoryIndex >= 0 ? categoryIndex : 0;
+      this.loadedFiles = await this.getFileNodesFromIdea();
     },
     async initializeForms() {
       if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
@@ -319,8 +373,6 @@ export default {
         argMarkup ?? contentForm.markup,
         "file",
         (node) => {
-          console.log(node.attrs.id);
-
           filesInIdea.push(node);
         }
       );
@@ -360,22 +412,14 @@ export default {
       // check if possible to do these from onTransaction
       // propably better that way
 
-      console.log(
-        "loadedFiles: ",
-        this.loadedFiles.map((x) => {
-          return { href: x.attrs.href, id: x.attrs.id, uri: x.attrs.uri };
-        })
-      );
+      // console.log(
+      //   "loadedFiles: ",
+      //   this.loadedFiles.map((x) => {
+      //     return { href: x.attrs.href, id: x.attrs.id, uri: x.attrs.uri };
+      //   })
+      // );
 
       // console.log("files: ", this.files);
-
-      const contentFiles = await this.getFileNodesFromIdea();
-      // console.log({ contentFiles });
-
-      const currentUploadedContentFileIds = contentFiles
-        .filter((node) => node.attrs.id)
-        .map((node) => node.attrs.id);
-      const addedFiles = contentFiles.filter((node) => !node.attrs.id);
 
       // console.log({ contentFiles });
       // console.log({ addedFiles });
@@ -383,39 +427,63 @@ export default {
 
       //compare to mounted state
 
-      console.log(contentFiles);
+      // console.log(contentFiles);
 
-      const addedFilesNotRemoved = this.files.filter((file) =>
-        addedFiles.map((node) => node.attrs.uuid).includes(file.uuid)
-      );
-
-      const mountedUploadedFileIds = this.loadedFiles.map(
-        (loaded) => loaded.attrs.id
-      );
-
-      console.log({ mountedUploadedFileIds });
-      // const loadedFileIdsNotInContent = uploadedContentFiles.filter(
-      //   (node) =>
-      //     !contentFiles.map((node) => node.attrs.id).includes(node.attrs.id)
+      // console.log(
+      //   "files uuids: ",
+      //   this.files.map((file) => file.uuid)
+      // );
+      // console.log(
+      //   "added file uuids: ",
+      //   addedFiles.map((node) => node.attrs.uuid)
       // );
 
-      // const contentFileUuids = contentFiles.map((node) => node.attrs.uuid);
+      // const addedFilesNotRemoved = this.files.filter((file) =>
+      //   addedFiles.map((node) => node.attrs.uuid).includes(file.uuid)
+      // );
 
-      // console.log("___________");
+      // const mountedUploadedFileIds = this.loadedFiles.map(
+      //   (loaded) => loaded.attrs.id
+      // );
 
-      console.log(
-        "REMOVING RESOURCES: ",
-        mountedUploadedFileIds.filter(
-          (id) => !currentUploadedContentFileIds.includes(id)
-        )
+      // console.log({ mountedUploadedFileIds });
+      // // const loadedFileIdsNotInContent = uploadedContentFiles.filter(
+      // //   (node) =>
+      // //     !contentFiles.map((node) => node.attrs.id).includes(node.attrs.id)
+      // // );
+
+      // // const contentFileUuids = contentFiles.map((node) => node.attrs.uuid);
+
+      // // console.log("___________");
+
+      // console.log(
+      //   "REMOVING RESOURCES: ",
+      //   mountedUploadedFileIds.filter(
+      //     (id) => id && !currentUploadedContentFileIds.includes(id)
+      //   )
+      // );
+
+      // console.log({ addedFilesNotRemoved });
+
+      // const contentForm =
+      //   this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+
+      // this.ideaForm._fields.file = addedFilesNotRemoved.map(
+      //   (item) => item.file
+      // );
+      const contentFiles = await this.getFileNodesFromIdea();
+      const mountedUploadedFileIds = this.loadedFiles.map(
+        (loaded) => loaded.attrs.id ?? loaded.attrs.uuid
       );
 
-      console.log({ addedFilesNotRemoved });
+      console.log(contentFiles);
+      const currentUploadedContentFileIds = contentFiles
+        .filter((node) => node.attrs.id ?? node.attrs.uuid)
+        .map((node) => node.attrs.id ?? node.attrs.uuid);
 
-      this.ideaForm._fields.file = addedFilesNotRemoved.map(
-        (item) => item.file
-      );
+      this.ideaForm._fields.file = [];
 
+      console.log(mountedUploadedFileIds);
       this.ideaForm._fields.removeFileIds = mountedUploadedFileIds.filter(
         (id) => !currentUploadedContentFileIds.includes(id)
       );
@@ -427,19 +495,59 @@ export default {
         ideaSave = await this.$store.dispatch(`idea/create`, this.ideaForm);
       }
 
-      console.log(ideaSave);
+      //   console.log(ideaSave);
 
       return ideaSave;
     },
-    // getImageNodesFromContent(argMarkup) {
-    //   const { markup } = argMarkup ?? this.getIdeaContent;
+    async saveIdeaResources() {
+      let resources = [];
 
-    //   console.log(markup.content);
-    //   const imageNodes =
-    //     markup?.content?.filter((node) => node.type === "file") ?? [];
+      try {
+        const contentFiles = await this.getFileNodesFromIdea();
+        const addedFiles = contentFiles.filter((node) => !node.attrs.id);
+        const addedFilesNotRemoved = this.files.filter((file) =>
+          addedFiles.map((node) => node.attrs.uuid).includes(file.uuid)
+        );
 
-    //   return imageNodes;
-    // },
+        if (addedFilesNotRemoved.length > 0) {
+          const contentForm =
+            this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+
+          const uploadParameters = {
+            files: addedFilesNotRemoved,
+            id: this.ideaForm.id,
+            contentId: contentForm.id,
+          };
+
+          resources = await this.batchUploadResources(uploadParameters);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+
+      if (resources && resources.files) {
+        resources = resources.files.map((resource) => {
+          const { id, title, size, uri, url } = resource;
+          let key = title;
+          if (resource.properties) {
+            const parsedProperties = JSON.parse(resource.properties);
+            //fileNode uuid stored in properties
+            key = parsedProperties.content_key;
+          }
+          return {
+            id,
+            title,
+            size,
+            uri,
+            url,
+            key,
+          };
+        });
+      }
+
+      return resources;
+    },
+
     getCommentNodesFromContent() {
       return this.ideaContents.map((content) => {
         const id = content.id;
@@ -471,28 +579,6 @@ export default {
       });
     },
 
-    // getCommentsFromContent() {
-    //   // const contents = this.ideaContents;
-
-    //   // const comments = []
-
-    //   // contents.forEach(content => {
-    //   // 	const { markup } = comment
-    //   // })
-    //   const commentNodes = this.getCommentNodesFromContent();
-
-    // 	console.log(commentNodes)
-    //   const contentCommentIds = [];
-
-    //   // commentNodes.forEach((node) => {
-    //   //   const parsedComment = JSON.parse(node.attrs.comment);
-    //   //   parsedComment.comments.forEach((comment) =>
-    //   //     contentCommentIds.push({ id: comment.id, type: comment.type })
-    //   //   );
-    //   // });
-    //   return contentCommentIds;
-    // },
-
     async syncContent() {
       //sync files
       //  this.syncFiles();
@@ -501,51 +587,6 @@ export default {
       await this.closeRemovedComments();
     },
 
-    // syncFiles() {
-    //   const fileNodesInContent = this.getImageNodesFromContent();
-
-    //   console.log(fileNodesInContent);
-    //   const allFilesInContent = fileNodesInContent.map((x) => x.attrs);
-    //   const savedFiles = this.getIdea.files.map((file) => file.uri);
-
-    //   //  if (allFilesInContent.length > 0) {
-    //   savedFiles.forEach((uri) => {
-    //     const contentFileIds = allFilesInContent.map((x) => x.id);
-    //     if (
-    //       !contentFileIds.includes(uri) &&
-    //       !this.ideaForm._fields.removeFileIds.includes(uri)
-    //     ) {
-    //       this.ideaForm._fields.removeFileIds.push(uri);
-    //     }
-    //   });
-    //   //  }
-
-    //   // dont remove files that actually exist in content
-    //   const allFilesInContentIds = allFilesInContent.map((x) => x.id);
-
-    //   console.log(allFilesInContent);
-
-    //   const contentFileUuids = this.files.map((x) => x.uuid);
-
-    //   this.files = this.files.filter((file) => {
-    //     if (file.uuid && contentFileUuids.includes(file.uuid)) {
-    //       return true;
-    //     }
-    //     return false;
-    //   });
-
-    //   this.ideaForm._fields.removeFileIds =
-    //     this.ideaForm._fields.removeFileIds.filter((uri) => {
-    //       if (allFilesInContentIds.includes(uri)) return false;
-    //       return true;
-    //     });
-
-    //   if (fileNodesInContent.length === 0) {
-    //     this.ideaForm._fields.removeFile = true;
-    //   } else {
-    //     this.ideaForm._fields.removeFile = false;
-    //   }
-    // },
     async closeRemovedComments() {
       if (this.ideaInEdit && this.ideaInEdit.editIdeaMode === "EDIT") {
         const editIdea = await this.$store.dispatch("idea/findById", {
@@ -583,7 +624,8 @@ export default {
     },
 
     async saveIdeaAreaVersion(form) {
-      this.isLoading = true;
+      this.setIsLoading(true);
+
       this.isSaving = true;
 
       const fields = {
@@ -628,13 +670,12 @@ export default {
         }
 
         this.initializeData(resp.id);
-
-        this.isLoading = false;
+        this.setIsLoading(false);
         this.isSaving = false;
       }
     },
     async removeIdeaContentArea(form) {
-      this.isLoading = true;
+      this.setIsLoading(true);
       this.isSaving = true;
 
       //user is removing content area that is currently active
@@ -663,7 +704,7 @@ export default {
           }
         }
 
-        this.isLoading = false;
+        this.setIsLoading(false);
         this.isSaving = false;
       }
     },
@@ -698,21 +739,24 @@ export default {
     async saveIdeaVersion(reloadContent = true) {
       if (reloadContent) {
         window.vm.$snotify.info(this.$t("Do not close window"), {
-          timeout: 5000,
+          timeout: 10000,
           showProgressBar: false,
           closeOnClick: false,
           pauseOnHover: true,
         });
-        this.isLoading = true;
+        this.setIsLoading(true);
         this.isSaving = true;
       }
 
-      let ideaSave;
+      let ideaSave, resources;
       try {
         //Sync files in server with files in content
 
         await this.syncContent();
         ideaSave = await this.saveIdea();
+        resources = await this.saveIdeaResources();
+
+        console.log("WTF: ", resources);
 
         if (ideaSave && ideaSave.id) {
           let ideaContent = null;
@@ -721,8 +765,6 @@ export default {
             this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
 
           let markup = contentForm.markup;
-
-          console.log(ideaSave);
 
           if (this.files.length > 0) {
             const modifiedMarkup = await this.execCallbackToNodeType(
@@ -737,32 +779,44 @@ export default {
                   node.attrs.src.includes(process.env.BASE_URL);
                 const isAlreadyUploadedNode = hrefMatch || srcMatch;
 
-                if (!isAlreadyUploadedNode) {
-                  const setFileUri = node.attrs.title;
-                  const fileInIdea = ideaSave.files.find(
-                    (file) => file.title === setFileUri
-                  );
+                // console.log({
+                //   node,
+                //   title: node.attrs.title,
+                //   hrefMatch,
+                //   srcMatch,
+                // });
 
+                if (!isAlreadyUploadedNode) {
+                  const uploadedFile = resources.find(
+                    (file) => file.key === node.attrs.uuid
+                  );
                   node.attrs.src = "";
                   node.attrs.href = "";
 
-                  console.log({ fileInIdea });
-                  if (fileInIdea) {
-                    node.attrs.id = fileInIdea.uri;
-                    node.attrs.uuid = fileInIdea.uuid;
+                  if (!uploadedFile) {
+                    console.log({ node });
+                    console.log(resources.map((x) => x.key));
+                  }
+
+                  //  console.log({ uploadedFile });
+                  if (uploadedFile) {
+                    node.attrs.id = uploadedFile.uri;
+                    node.attrs.uuid = uploadedFile.uuid;
                     if (
                       node.attrs["data-type"] &&
                       node.attrs["data-type"] === "image"
                     ) {
-                      node.attrs.src = fileInIdea.url;
+                      node.attrs.preview = true;
+                      node.attrs.src = uploadedFile.url;
                       node.attrs.href = "";
-                      node.attrs.uri = fileInIdea.uri;
-                      node.attrs.size = fileInIdea.size;
+                      node.attrs.uri = uploadedFile.uri;
+                      node.attrs.size = uploadedFile.size;
                     } else {
-                      node.attrs.href = fileInIdea.url;
+                      node.attrs.preview = false;
+                      node.attrs.href = uploadedFile.url;
                       node.attrs.src = "";
-                      node.attrs.uri = fileInIdea.uri;
-                      node.attrs.size = fileInIdea.size;
+                      node.attrs.uri = uploadedFile.uri;
+                      node.attrs.size = uploadedFile.size;
                     }
                   }
                 }
@@ -820,7 +874,7 @@ export default {
         this.ideaForm._fields.removeFileIds = [];
         this.loadedFiles = await this.getFileNodesFromIdea();
         this.isSaving = false;
-        this.isLoading = false;
+        this.setIsLoading(false);
         this.ideaContentIsDirty = false;
         this.files = [];
       }
@@ -848,7 +902,7 @@ export default {
       // });
     },
     async updateIdeaVersionStatus() {
-      this.isLoading = true;
+      this.setIsLoading(true);
 
       try {
         const editForm = new GQLForm({
@@ -863,7 +917,7 @@ export default {
       } catch (e) {
         console.log(e);
       } finally {
-        this.isLoading = false;
+        this.setIsLoading(false);
         await this.closeIdeaEdit();
       }
     },

@@ -11,6 +11,7 @@ export const RESOURCE_FRAGMENT = gql `
       section,
       mimeType,
       displayType,
+      properties,
       url,
       uri,
       _metadata{
@@ -19,3 +20,14 @@ export const RESOURCE_FRAGMENT = gql `
     }
     ${META_FRAGMENT}
 `;
+
+// export const IDEA_CONTENT_RESOURCES_FRAGMENT = gql `
+//     fragment ideaContentResourceFields on IdeaContentResource{
+//       uuid,
+//       files {
+//         ...resourceFields
+//       }
+//     }
+//     ${RESOURCE_FRAGMENT}
+// `;
+

@@ -2,7 +2,7 @@ import {
   FILE_SIZE_LIMIT,
   VALID_EXTERNAL_URL_REGEX,
   VALID_BASE64URL_REGEX,
-  SUPPORTED_PREVIEW_RESIZE_IMAGE_TYPES,
+  SUPPORTED_PREVIEW_RESIZE_IMAGE_TYPES
 } from "./constants";
 
 // const addCounterToFileName = (name, counter) => {
@@ -99,6 +99,7 @@ const validateFileSize = (notify, file) => {
 };
 
 const base64Resize = (sourceBase64, toWidth, _type, callback) => {
+  console.log(_type);
   let type = _type;
 
   if (!SUPPORTED_PREVIEW_RESIZE_IMAGE_TYPES.includes(type)) {
@@ -131,9 +132,7 @@ const base64Resize = (sourceBase64, toWidth, _type, callback) => {
     ctx.webkitImageSmoothingEnabled = false;
     ctx.msImageSmoothingEnabled = false;
     ctx.imageSmoothingEnabled = false;
-    console.log("scale: ");
-    console.log(iwScaled);
-    console.log(ihScaled);
+
     ctx.drawImage(img, 0, 0, iwScaled, ihScaled);
     const newBase64 = canvas.toDataURL(type, scl);
 

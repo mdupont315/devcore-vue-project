@@ -208,7 +208,6 @@
 
     "ideaCreate": "Ohjeen luonti onnistui!",
     "ideaCreateFail": "Ohjeen luonti epäonnistui!",
-    "ideaUpdate": "Ohjeen päivitys onnistui!",
     "ideaUpdateFail": "Ohjeen päivitys epäonnistui!",
     "ideaChangeStatus": "Ohjeen tilan vaihto onnistui!",
     "ideaChangeStatusFail": "Ohjeen tilan vaihto epäonnistui!",
@@ -733,5 +732,10 @@
   "you must appoint another home page before remove": "Sinun täytyy asettaa toinen sisältö-alue aloitussivuksi ennen kuin voit poistaa sen",
   "home page has all roles": "Aloitussivu on aina kaikkien ohjeen näkevien nähtävillä",
   "SELECT DOCX FILE": "Valitse .docx tiedosto",
-  "import-docx-file": "Tuo .docx"
+  "import-docx-file": "Tuo .docx",
+  "File type not supported": "Tiedostotyyppi ei tuettu",
+  "File size too big in docx file": "Dokumentista jätettiin liian suuri tiedostoformaatti {type} ({size}). Suurin sallittu koko on {limit}",
+  "Unknown file type in docx file" : "Dokumentista jätettiin tunnistamaton tyyppi ({type}) tuomatta.",
+  "Saving resources": "Tallennetaan tiedostoja ({amount})",
+  "Importing document": "Tuodaan tiedostoa {title}... Ethän sulje selaintasi."
 }

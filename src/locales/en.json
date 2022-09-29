@@ -210,7 +210,6 @@
 
     "ideaCreate": "Idea created succesfully!",
     "ideaCreateFail": "Creating idea failed!",
-    "ideaUpdate": "Idea updated succesfully!",
     "ideaUpdateFail": "Updating idea failed!",
     "ideaChangeStatus": "Idea status changed succesfully!",
     "ideaChangeStatusFail": "Changing idea status failed!",
@@ -704,5 +703,9 @@
   "you must appoint another home page before remove": "You must appoint another area as home page before deleting area",
   "home page has all roles": "Home page always has all roles enabled for roles with access to instruction",
   "SELECT DOCX FILE": "Click to select .docx file",
-  "import-docx-file": "Import .docx"
+  "import-docx-file": "Import .docx",
+  "File size too big in docx file": "Excluded too big file of type {type} ({size}) from the document import. Size limit for files is {limit}",
+  "Unknown file type in docx file" : "Excluded unknown file type ({type}) from the document import.",
+  "Saving resources": "Saving files ({amount}).",
+  "Importing document": "Importing document {title}... Please do not window"
 }

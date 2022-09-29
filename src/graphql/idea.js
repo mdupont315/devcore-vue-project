@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import { RESOURCE_FRAGMENT } from "./resource";
+import { RESOURCE_FRAGMENT, IDEA_CONTENT_RESOURCES_FRAGMENT } from "./resource";
 import { META_FRAGMENT } from "./meta";
 // eslint-disable-next-line
 export const IDEA_FRAGMENT = gql`
@@ -109,6 +109,7 @@ export const IDEA_FRAGMENT = gql`
   ${RESOURCE_FRAGMENT}
 `;
 
+
 export const IDEA_FULL_FRAGMENT = gql`
   fragment ideaFullFields on Idea {
     ...ideaFields
@@ -164,6 +165,19 @@ export const IDEA_FULL_FRAGMENT = gql`
   ${IDEA_FRAGMENT}
 `;
 
+
+export const IDEA_RESOURCE_FRAGMENT = gql`
+  fragment ideaResourceFields on IdeaResource {
+    id
+    contentId
+    uuid
+    files {
+      ...resourceFields
+    }
+  }
+  ${META_FRAGMENT}
+  ${RESOURCE_FRAGMENT}`;
+
 export const IDEA = {
   findAll: gql`
     query ideaFindAll($filter: Filter) {
@@ -196,6 +210,14 @@ export const IDEA = {
       }
     }
     ${IDEA_FULL_FRAGMENT}
+  `,
+  setResources: gql`
+    mutation ideaResources($input: IdeaResourceInput!) {
+      ideaResources(input: $input) {
+        ...ideaResourceFields
+      }
+    }
+    ${IDEA_RESOURCE_FRAGMENT}
   `,
   changeStatus: gql`
     mutation ideaChangeStatus($input: IdeaChangeStatusInput!) {

@@ -12,6 +12,7 @@
       <editor-content
         v-show="!isRefreshing"
         class="editor__content"
+        style="overflow-x: hidden; overflow-y: hidden; height: 75vh"
         id="editor__content"
         :editor="editor"
         ref="editor_content"
@@ -123,7 +124,6 @@ export default {
   },
   methods: {
     onScroll(e) {
-
       if (this.editor && this.editor.storage.scrollPosition) {
         this.windowTop = e.srcElement.scrollTop;
       }
@@ -205,11 +205,17 @@ export default {
         removeFile: (file) => {
           this.$emit("fileRemoved", file);
         },
-        notify: (translationKey, data) => {
+        setIsLoading: (val) => {
+          this.$emit("setIsLoading", val);
+        },
+        notify: (translationKey, data, type = "error", timeout = 3000) => {
+          console.log(translationKey);
           const message = this.$t(translationKey, {
             ...data,
           });
-          window.vm.$snotify.error(window.vm.$t(message));
+          window.vm.$snotify[type](window.vm.$t(message), {
+            timeout,
+          });
         },
       };
 
@@ -529,6 +535,8 @@ export default {
       overflow: hidden;
     }
 
+
+
     th {
       font-weight: bold;
       overflow: hidden;
@@ -570,10 +578,10 @@ export default {
     font-size: 14px !important;
     font-family: FuturaLight !important;
     font-weight: 400;
-    margin-bottom: 4px !important;
-    margin-top: 4px !important;
-    margin-block-start: 4px !important;
-    margin-block-end: 4px !important;
+    margin-bottom: 7.5px !important;
+    margin-top: 7.5px !important;
+    margin-block-start: 7.5px !important;
+    margin-block-end: 7.5px !important;
   }
 
   p > span.is-link:hover {
@@ -960,8 +968,8 @@ export default {
       color: #d0424d;
       border: 1px solid lightgray;
       width: 60px;
-			font-size: 12px;
-			font-weight: normal;
+      font-size: 12px;
+      font-weight: normal;
       height: 20px;
       position: relative;
       border-radius: 3px;

@@ -35,9 +35,7 @@
                 />
               </svg>
 
-              <span style="margin-left: 10px">{{
-                parseUuid(getAttrs.title)
-              }}</span></a
+              <span style="margin-left: 10px">{{ getAttrs.title }}</span></a
             >
           </div>
           <button
@@ -52,17 +50,28 @@
         </div>
       </div>
       <div v-else style="display: flex; flex-direction: column">
-        <div class="content-dom-file-image-container">
+        <div class="content-dom-file-image-container" v-lazyload>
           <!--   -->
+          <div class="fileNodeView-lazy-load-image-spinner">
+            <b-spinner />
+          </div>
           <img
             :key="imgKey"
+            :ref="`file-image-node-${imgKey}`"
+            :data-url="getAttrs.src"
+            class="fileNodeView-preview-image"
+          />
+
+          <!-- <img
+            :key="imgKey"
             :ref="`${getAttrs.uuid}`"
-            :src="getAttrs.src"
+            :data-url="getAttrs.src"
             :alt="getAttrs.title"
             :style="{ width: `${imgWidth}px`, height: `${imgHeight}px` }"
             class="fileNodeView-preview-image"
-            @load="onImgLoad"
-          />
+						    @load="onImgLoad"
+
+          /> -->
 
           <!-- <img
             :ref="`${getAttrs.uuid}`"
@@ -80,23 +89,22 @@
   </node-view-wrapper>
 </template>
 
-//e703eae5-5bb6-458e-9f07-43
 <script>
 import { NodeViewWrapper, nodeViewProps, NodeViewContent } from "@tiptap/vue-2";
 import { FolderIcon } from "@/assets";
-import { PREVIEW_MAX_WIDTH_OF_VIEWPORT } from "./helpers/file/constants";
+import LazyLoadDirective from "./helpers/file/editorimage.directive";
 import { v4 as uuidv4 } from "uuid";
 import {
-  base64Resize,
   isValidExternalUrl,
   getBase64FromUrl,
   base64MimeType,
   isBase64,
-  getExtension,
-  getFileName,
 } from "./helpers/file/fileUtils";
 
 export default {
+  directives: {
+    lazyload: LazyLoadDirective,
+  },
   components: {
     NodeViewWrapper,
     NodeViewContent,
@@ -111,8 +119,8 @@ export default {
       FolderIcon,
       disableTooltip: false,
       resizedImages: [],
-      imgWidth: 0,
-      imgHeight: 0,
+      imgWidth: "auto",
+      imgHeight: "auto",
       resized: false,
       name: null,
       imgKey: Math.random(),
@@ -121,6 +129,10 @@ export default {
   },
 
   computed: {
+    // imageElementSrcAttribute() {
+    //   const image = this.$refs[`file-image-node-${this.imgKey}`];
+    //   return !!image.src;
+    // },
     isAttachmentFile() {
       return this.getAttrs["data-type"] === "link" && !this.getAttrs.preview;
     },
@@ -134,52 +146,33 @@ export default {
   },
 
   async mounted() {
-    if (!this.getAttrs.src && !this.getAttrs.href) this.deleteNode();
+    if (!this.getAttrs.src && !this.getAttrs.href) {
+      this.deleteNode();
+    }
 
     const isStagedPreviewFile =
       !this.getAttrs.href && this.getAttrs.src && !this.getAttrs.id;
 
-    // console.log("**************");
-
-    // console.log(this.getAttrs);
-
-    // console.log("uuid: ", this.getAttrs.uuid);
-    // console.log("title: ", this.getAttrs.title);
-
-    // console.log("**************");
-
-		if (this.getAttrs['data-type'] === null) {
-
-		}
-
-    if (this.getAttrs.title && this.getAttrs.uuid && this.isAttachmentFile) {
-      const hasUuidInName = this.getAttrs.title.includes(this.getAttrs.uuid);
-      if (this.getAttrs.uuid && !this.nameSet && !hasUuidInName) {
-        const extension = getExtension(this.getAttrs.title);
-        const fileName = getFileName(this.getAttrs.title);
-        const newTitle = `${fileName}-${this.getAttrs.uuid}.${extension}`;
-        if (newTitle !== this.getAttrs.title) {
-          this.updateAttributes({
-            title: `${fileName}-${this.getAttrs.uuid}.${extension}`,
-          });
-        }
-        this.nameSet = true;
-      }
-    }
-
     const isUploadedImage = this.getAttrs.src?.includes(process.env.BASE_URL);
     const isUploadedFile = this.getAttrs.href?.includes(process.env.BASE_URL);
-		const isProdUploadedFile = this.getAttrs.src?.includes("https://devcore.app")
-		const isStageUploadedFile = this.getAttrs.src?.includes("https://stage.devcore.app")
+    const isProdUploadedFile = this.getAttrs.src?.includes(
+      "https://devcore.app"
+    );
+    const isStageUploadedFile = this.getAttrs.src?.includes(
+      "https://stage.devcore.app"
+    );
 
-		console.log(isUploadedImage)
-		console.log(isUploadedFile)
+    // console.log(isUploadedImage);
+    // console.log(isUploadedFile);
 
     const isExternalUrl =
       isValidExternalUrl(this.getAttrs.src) &&
-      (!isUploadedImage && !isUploadedFile && !isProdUploadedFile && !isStageUploadedFile);
+      !isUploadedImage &&
+      !isUploadedFile &&
+      !isProdUploadedFile &&
+      !isStageUploadedFile;
 
-    console.log(process.env.BASE_URL);
+    // console.log(process.env.BASE_URL);
 
     if (isStagedPreviewFile) {
       if (isExternalUrl || isBase64(this.getAttrs.src)) {
@@ -190,10 +183,13 @@ export default {
 
   methods: {
     parseUuid(name) {
-      if (name && name.length > 40) {
-        const extension = getExtension(this.getAttrs.title);
-        const fileName = getFileName(this.getAttrs.title);
-        return `${fileName.substring(0, fileName.length - 37)}.${extension}`;
+      // if (name && name.length > 40) {
+      //   const extension = getExtension(this.getAttrs.title);
+      //   const fileName = getFileName(this.getAttrs.title);
+      //   return `${fileName.substring(0, fileName.length - 37)}.${extension}`;
+      // }
+      if (this.getAttrs.uuid) {
+        return name.replace(this.getAttrs.uuid, "");
       }
       return name;
     },
@@ -217,6 +213,9 @@ export default {
 
           this.imgWidth = imgWidth / RATIO_ASPECT;
           this.imgHeight = imgHeight / RATIO_ASPECT;
+          if (this.imgWidth === 0 || this.imgHeight === 0) {
+            this.deleteNode();
+          }
           if (!this.resized) {
             this.resized = true;
             this.imgKey = Math.random();
@@ -224,23 +223,23 @@ export default {
         }
       }
     },
-    async addBase64AsFile(dataUrl, type) {
-			console.log("ADDING TYPE")
-      const toFile = await fetch(dataUrl, {
+    async addBase64AsFile() {
+      //  console.log("ADDING TYPE");
+      const toFile = await fetch(this.getAttrs.src, {
         method: "GET",
         mode: "no-cors",
       });
       const blob = await toFile.blob();
 
-      const fileType = dataUrl.split(";")[0].split("/")[1] || "jpg";
-      const title = `${uuidv4()}.${fileType}`;
+      const fileType = this.getAttrs.src.split(";")[0].split("/")[1] || "jpg";
+      const title = `${this.getAttrs.uuid}.${fileType}`;
 
       const file = new File([blob], this.getAttrs.title ?? title, {
-        type,
+        type: this.getAttrs.type,
         lastModified: Date.now(),
       });
 
-      console.log(this.getAttrs);
+      // console.log(this.getAttrs);
 
       this.extension.options.addFile({
         uuid: this.getAttrs.uuid,
@@ -248,15 +247,23 @@ export default {
       });
     },
 
-    async handleResizedImage(dataUrl, type, callback) {
-      const scaleWidthUntilPX =
-        this.$el.clientWidth * PREVIEW_MAX_WIDTH_OF_VIEWPORT;
-      base64Resize(dataUrl, scaleWidthUntilPX, type, callback);
-    },
+    // async handleResizedImage(dataUrl, type, callback) {
+    //   const scaleWidthUntilPX =
+    //     this.$el.clientWidth * PREVIEW_MAX_WIDTH_OF_VIEWPORT;
+    //   base64Resize(dataUrl, scaleWidthUntilPX, type, callback);
+    // },
     async handleExternalFiles() {
       //console.log(size);
       // if (!size || typeof size === "string") {
+
+      const size = this.node.attrs.size;
+      if (size || typeof size === "string") return;
+      if (this.resizedImages.includes(this.node.attrs.uuid)) {
+        return;
+      }
+
       if (!this.getAttrs.src || this.isAttachmentFile) return;
+
       let externalToBase64 = "";
       try {
         externalToBase64 = await getBase64FromUrl(this.getAttrs.src);
@@ -268,21 +275,29 @@ export default {
         return this.deleteNode();
       }
 
+      //  console.log({ externalToBase64 });
+
+      //  console.log("*****");
+      //  console.log(this.node.attrs);
+      const type = this.getAttrs.type ?? base64MimeType(externalToBase64);
+
       const fileType = externalToBase64.split(";")[0].split("/")[1] || "png";
       const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;
       const base64size = externalToBase64.length * (3 / 4) - mod;
-      const uuid = uuidv4();
-      this.updateAttributes({
-        title: `${uuid}.${fileType}`,
-        src: externalToBase64,
-        "data-type": "image",
-        size: base64size,
-        uuid,
-      });
+      if (externalToBase64) {
+        const uuid = uuidv4();
+        this.updateAttributes({
+          title: `${uuid}.${fileType}`,
+          src: externalToBase64,
+          type,
+          "data-type": "image",
+          size: base64size,
+          uuid: this.getAttrs.uuid ?? uuid,
+        });
+      }
 
-      const type = this.getAttrs.type ?? base64MimeType(externalToBase64);
+      await this.addBase64AsFile();
       // await this.addBase64AsFile(externalToBase64, type);
-      await this.addBase64AsFile(externalToBase64, type);
 
       // const callback = async (dataUrl) => {
       //   this.updateAttributes({
@@ -294,6 +309,18 @@ export default {
       //   await this.addBase64AsFile(dataUrl, type);
       // };
       // }
+      // const callback = async (dataUrl) => {
+      //   this.updateAttributes({
+      //     src: dataUrl,
+      //     type,
+      //     preview: true,
+      //     size: base64size,
+      //   });
+      //   await this.addBase64AsFile(dataUrl, type);
+      // };
+      // this.resizedImages.push(this.node.attrs.uuid);
+
+      //   return await this.handleResizedImage(externalToBase64, type, callback);
     },
     removeFile() {
       this.editor.commands.removeFile(this.fileEntity);
@@ -313,6 +340,13 @@ export default {
 </script>
 
 <style lang="scss">
+.fileNodeView-lazy-load-image-spinner {
+  display: flex;
+  width: 200px;
+  height: 200px;
+  align-items: center;
+  margin-left: 10%;
+}
 .content-dom-file-image-container {
   margin-right: 5px;
   margin-bottom: 10px;
