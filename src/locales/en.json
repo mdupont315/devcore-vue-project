@@ -705,7 +705,8 @@
   "SELECT DOCX FILE": "Click to select .docx file",
   "import-docx-file": "Import .docx",
   "File size too big in docx file": "Excluded too big file of type {type} ({size}) from the document import. Size limit for files is {limit}",
-  "Unknown file type in docx file" : "Excluded unknown file type ({type}) from the document import.",
+  "Unknown file type in docx file": "Excluded unknown file type ({type}) from the document import.",
   "Saving resources": "Saving files ({amount}).",
-  "Importing document": "Importing document {title}... Please do not window"
+  "Importing document": "Importing document {title}... Please do not window",
+  "Unsaved Idea Data In Type": "You have unsaved data in content: {title}. Pending changes in {title} will be discarded if you save another content area."
 }

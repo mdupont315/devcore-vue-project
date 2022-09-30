@@ -84,6 +84,7 @@
           v-if="contentTypeSelectorVisible"
           :primary="getPrimaryContentType"
           :categories="getIdeaContentCategories"
+          :ideaContentIsDirty="ideaContentIsDirty"
           :comments="comments"
           :selected="selectedCategoryIndex"
           @expand="editContentType"
@@ -117,7 +118,7 @@
       @saveContent="saveContent"
       @initialized="setIsInitialized"
       @contentWindowTop="setContentWindowTop"
-			@setIsLoading="setIsLoading"
+      @setIsLoading="setIsLoading"
       :contentWindowTop="contentWindowTop"
       :contentType="contentType"
     />
@@ -160,6 +161,10 @@ export default {
       type: Number,
       default: 0,
     },
+    ideaContentIsDirty: {
+      type: String,
+      default: null,
+    },
     comments: {
       type: Array,
       default: () => [],
@@ -171,7 +176,6 @@ export default {
     },
   },
   computed: {
-
     getIdeaContentCategories: {
       get() {
         return this.ideaContentCategories.map(
@@ -234,9 +238,9 @@ export default {
     editContentItem: null,
   }),
   methods: {
-		setIsLoading(val){
-			this.$emit("setIsLoading", val)
-		},
+    setIsLoading(val) {
+      this.$emit("setIsLoading", val);
+    },
     toggleContentUploadSelector() {
       this.contentTypeSelectorUpload = !this.contentTypeSelectorUpload;
     },

@@ -22,16 +22,16 @@ export const IDEA_FRAGMENT = gql`
     uuid
     companyToolIds
     companyRoleIds
- #   companyRoles{
- #     id,
- #     name,
- #     avatarUrl
- # },
+    #   companyRoles{
+    #     id,
+    #     name,
+    #     avatarUrl
+    # },
     ideaContentId
     comments {
       id
-      description,
-      type,
+      description
+      type
     }
     stats {
       problems
@@ -57,11 +57,11 @@ export const IDEA_FRAGMENT = gql`
         dOrder
         description
         processId
-      #  companyRoles {
-      #    id,
-       #   name,
-       #   avatarUrl
-      #  }
+        #  companyRoles {
+        #    id,
+        #   name,
+        #   avatarUrl
+        #  }
       }
       ... on ProcessOperation {
         id
@@ -70,11 +70,11 @@ export const IDEA_FRAGMENT = gql`
         description
         processId
         stageId
-      #  companyRoles {
-       #   id,
-      #    name,
-      #    avatarUrl
-     #   }
+        #  companyRoles {
+        #   id,
+        #    name,
+        #    avatarUrl
+        #   }
         stage {
           id
           title
@@ -109,7 +109,6 @@ export const IDEA_FRAGMENT = gql`
   ${RESOURCE_FRAGMENT}
 `;
 
-
 export const IDEA_FULL_FRAGMENT = gql`
   fragment ideaFullFields on Idea {
     ...ideaFields
@@ -123,8 +122,8 @@ export const IDEA_FULL_FRAGMENT = gql`
       replied
       comments {
         id
-        description,
-        type,
+        description
+        type
         createdAt
       }
       files {
@@ -147,8 +146,8 @@ export const IDEA_FULL_FRAGMENT = gql`
       replied
       comments {
         id
-        description,
-        type,
+        description
+        type
         createdAt
       }
       files {
@@ -165,7 +164,6 @@ export const IDEA_FULL_FRAGMENT = gql`
   ${IDEA_FRAGMENT}
 `;
 
-
 export const IDEA_RESOURCE_FRAGMENT = gql`
   fragment ideaResourceFields on IdeaResource {
     id
@@ -176,7 +174,8 @@ export const IDEA_RESOURCE_FRAGMENT = gql`
     }
   }
   ${META_FRAGMENT}
-  ${RESOURCE_FRAGMENT}`;
+  ${RESOURCE_FRAGMENT}
+`;
 
 export const IDEA = {
   findAll: gql`
@@ -212,12 +211,17 @@ export const IDEA = {
     ${IDEA_FULL_FRAGMENT}
   `,
   setResources: gql`
-    mutation ideaResources($input: IdeaResourceInput!) {
-      ideaResources(input: $input) {
+    mutation ideaUploadResources($input: IdeaResourceInput!) {
+      ideaUploadResources(input: $input) {
         ...ideaResourceFields
       }
     }
     ${IDEA_RESOURCE_FRAGMENT}
+  `,
+  removeResources: gql`
+    mutation ideaRemoveResources($input: IdeaResourceInput!) {
+      ideaRemoveResources(input: $input)
+    }
   `,
   changeStatus: gql`
     mutation ideaChangeStatus($input: IdeaChangeStatusInput!) {
@@ -246,11 +250,11 @@ export const IDEA = {
     ${IDEA_FULL_FRAGMENT}
   `,
   closeImprovementFeedback: gql`
-  mutation ideaImprovementCloseFeedback($input: IdeaImprovementCloseInput!) {
-    ideaImprovementCloseFeedback(input: $input) {
-      ...ideaFullFields
+    mutation ideaImprovementCloseFeedback($input: IdeaImprovementCloseInput!) {
+      ideaImprovementCloseFeedback(input: $input) {
+        ...ideaFullFields
+      }
     }
-  }
-  ${IDEA_FULL_FRAGMENT}
-`
+    ${IDEA_FULL_FRAGMENT}
+  `
 };

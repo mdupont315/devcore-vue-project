@@ -361,10 +361,9 @@ export const File = Node.create({
             const valid = validateFileSize(notify, item);
             if (valid) {
               const uuid = uuidv4();
-              const transformedFile = await fileWithUniqueName(item, uuid);
-              addFile({ uuid, file: transformedFile });
+              addFile({ uuid, file: item });
               renderFileInBase64ToCoordinates(
-                transformedFile,
+                item,
                 view,
                 coordinates,
                 preview,
@@ -392,10 +391,10 @@ export const File = Node.create({
             const valid = validateFileSize(notify, item);
             if (valid) {
               const uuid = uuidv4();
-              const transformedFile = await fileWithUniqueName(item, uuid);
-              addFile({ uuid, file: transformedFile });
+             // const transformedFile = await fileWithUniqueName(item, uuid);
+              addFile({ uuid, file: item });
               renderFileInBase64ToCoordinates(
-                transformedFile,
+                item,
                 view,
                 coordinates,
                 preview,

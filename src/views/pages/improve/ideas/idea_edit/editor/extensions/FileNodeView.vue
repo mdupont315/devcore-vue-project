@@ -15,6 +15,7 @@
           <div
             class="attachment-file-non-preview-container"
             :id="`attachment-file-non-preview-container-${getAttrs.title}`"
+            :hidden="false"
             :class="
               !!getAttrs.href === true
                 ? 'is_uploaded_file'
@@ -52,7 +53,10 @@
       <div v-else style="display: flex; flex-direction: column">
         <div class="content-dom-file-image-container" v-lazyload>
           <!--   -->
-          <div class="fileNodeView-lazy-load-image-spinner">
+          <div
+            class="fileNodeView-lazy-load-image-spinner"
+            id="fileNodeView-lazy-load-image-spinner"
+          >
             <b-spinner />
           </div>
           <img
@@ -60,6 +64,7 @@
             :ref="`file-image-node-${imgKey}`"
             :data-url="getAttrs.src"
             class="fileNodeView-preview-image"
+            id="fileNodeView-lazy-load-preview-image"
           />
 
           <!-- <img

@@ -90,10 +90,19 @@ const actions = {
         id: form.id
       }
     });
-   // const files = new Idea().deserialize(result.data.ideaResources);
-    context.commit("SET_FILES", result.data.ideaResources);
+   // const files = new Idea().deserialize(result.data.ideaUploadResources);
+    context.commit("SET_FILES", result.data.ideaUploadResources);
   //  await context.dispatch('findAll', { force: true });
-    return result.data.ideaResources;
+    return result.data.ideaUploadResources;
+  },
+  async removeResources(context, form) {
+    const result = await form.mutate({
+      mutation: IDEA.removeResources,
+      variables: {
+        id: form.id
+      }
+    });
+    return result.data.ideaRemoveResources;
   },
 
   async changeStatus(context, form) {

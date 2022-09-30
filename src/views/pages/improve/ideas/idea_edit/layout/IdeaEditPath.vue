@@ -352,9 +352,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    ideaContentIsDirty: {
-      type: Boolean,
-      default: false,
+   ideaContentIsDirty: {
+      type: String,
+      default: null,
     },
     editorLoaded: {
       type: Boolean,
@@ -367,6 +367,11 @@ export default {
   },
 
   watch: {
+		cleanIdeaPath: {
+			handler(newVal){
+				this.$emit("ideaPathDirty", newVal)
+			}
+		},
     mutateForm: {
       deep: true,
       handler() {

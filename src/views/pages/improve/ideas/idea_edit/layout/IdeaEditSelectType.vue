@@ -8,18 +8,40 @@
         v-for="(item, index) in categories"
         :key="index"
         class="idea_content-type-select_btnNewIdeaTemplate-item"
-        :class="{
-          'is-active': index == selected,
-        }"
       >
         <div
           class="idea_content-type-select_btnNewIdeaTemplate-item-contentType"
         >
+          <confirm-button
+            v-if="selectedIdeaContentHasChanges(item)"
+            class="
+              idea_content-type-select_btnNewIdeaTemplate-item-confirm-button
+            "
+            @confirm="changeContentType(item)"
+            :customButton="true"
+            :confirmPlacement="'left'"
+            :confirmMessage="getConfirmMessage(item)"
+          >
+            <div
+              :class="{
+                'is-active': isIndexSelected(index),
+              }"
+              class="
+                idea_content-type-select_btnNewIdeaTemplate-item-contentType-title
+              "
+            >
+              {{ !item.contentType ? $t("unnamed_type") : item.contentType }}
+            </div>
+          </confirm-button>
           <div
+            v-else
             @click="changeContentType(item)"
             class="
               idea_content-type-select_btnNewIdeaTemplate-item-contentType-title
             "
+            :class="{
+              'is-active': isIndexSelected(index),
+            }"
           >
             {{ !item.contentType ? $t("unnamed_type") : item.contentType }}
           </div>
@@ -69,6 +91,10 @@ export default {
       required: true,
       default: () => {},
     },
+    ideaContentIsDirty: {
+      type: String,
+      default: null,
+    },
     comments: {
       type: Array,
       required: true,
@@ -76,10 +102,29 @@ export default {
     },
     selected: {
       type: Number,
+      required: true,
       default: 0,
     },
   },
   methods: {
+    isIndexSelected(index) {
+      return index == this.selected;
+    },
+    getConfirmMessage(item) {
+      return this.$t("Unsaved Idea Data In Type", {
+        title: item.contentType ?? this.$t("unnamed_type"),
+      });
+    },
+    selectedIdeaContentHasChanges(item) {
+      const selectedCategory = this.categories[this.selected];
+
+      return (
+        selectedCategory.id &&
+        this.ideaContentIsDirty &&
+        selectedCategory.id == this.ideaContentIsDirty &&
+        item.id !== this.ideaContentIsDirty
+      );
+    },
     getImprovementsFrom(item) {
       const commentObj = this.comments.find((x) => x.id === item.id);
       return commentObj.comments.improvements ?? 0;
@@ -95,6 +140,13 @@ export default {
       this.$emit("expand", item);
     },
     changeContentType(item) {
+      if (
+        item.id &&
+        this.categories[this.selected].id &&
+        item.id === this.categories[this.selected].id
+      ) {
+        return;
+      }
       this.$emit("select", item);
     },
   },
@@ -147,8 +199,34 @@ export default {
     color: #4294d0;
   }
 }
+.idea_content-type-select_btnNewIdeaTemplate-item-confirm-button {
+  font-size: 16px;
+  color: #9fa0a0;
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  height: 40px;
+  width: 100%;
+  margin-left: 0;
+  & > .confirm-buttom-custom {
+    margin-left: 0;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    border-radius: 3px;
+    > .idea_content-type-select_btnNewIdeaTemplate-item-contentType-title {
+      color: #9fa0a0;
+    }
 
-.idea_content-type-select_btnNewIdeaTemplate-item-contentType-title:hover {
+    > div {
+      padding: 3px 5px;
+    }
+  }
+}
+
+.idea_content-type-select_btnNewIdeaTemplate-item-contentType-title:not(.is-active):hover {
   color: #fff;
   background: #4294d0 !important;
   border-color: #4294d0;
@@ -165,11 +243,7 @@ export default {
   font-size: 14px;
   font-family: FuturaLight;
 
-  // &:hover {
-  //   & >
-  // }
-
-  & > div {
+  & > .idea_content-type-select_btnNewIdeaTemplate-item-contentType-title {
     overflow: hidden;
     text-overflow: ellipsis;
     cursor: pointer;
@@ -179,6 +253,9 @@ export default {
   & > span {
     margin-left: 5px;
   }
+}
+.idea_content-type-select_btnNewIdeaTemplate-item-contentType-title.is-active {
+  color: #4294d0;
 }
 .idea_content-type-select_btnNewIdeaTemplate-item-badge {
   margin: 0 2.5px;

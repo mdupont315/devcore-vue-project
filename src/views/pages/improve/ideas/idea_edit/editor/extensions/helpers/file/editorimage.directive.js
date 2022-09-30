@@ -1,14 +1,21 @@
 export default {
   inserted: el => {
     function loadImage() {
-      if (!el) return
+      if (!el) return;
+      console.log("***************")
       console.log("LOADING!");
+      console.log(el);
       const imageElement = Array.from(el.children).find(
-        el => el.nodeName === "IMG"
+        el =>
+          el.nodeName === "IMG" &&
+          el.id === "fileNodeView-lazy-load-preview-image"
       );
       const spinnerElement = Array.from(el.children).find(
-        el => el.nodeName === "DIV"
+        el => el.id === "fileNodeView-lazy-load-image-spinner"
       );
+
+      console.log({ imageElement });
+      console.log({ spinnerElement });
 
       if (imageElement) {
         imageElement.addEventListener("load", () => {
@@ -47,8 +54,8 @@ export default {
           spinnerElement.hidden = true;
         };
       }
+      console.log("***************")
     }
-
 
     function handleIntersect(entries, observer) {
       entries.forEach(entry => {
@@ -63,7 +70,7 @@ export default {
       const options = {
         // circumstances under which the observer's callback is invoked
         root: editorDom, // defaults to the browser viewport if not specified or if null
-        threshold: 0.5 // the degree of intersection between the target element and its root (0 - 1)
+        threshold: 0.1 // the degree of intersection between the target element and its root (0 - 1)
         // threshold of 1.0 means that when 100% of the target is visible within
         //the element specified by the root option, the callback is invoked
       };

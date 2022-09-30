@@ -4,7 +4,9 @@
     <div class="idea_edit_content_container_type" v-show="visible">
       <div class="idea_edit_type_container-header">
         <div class="idea_edit_type_container-header-title">
-          {{ value && value.id ? $t("Edit Content Area") : $t("New Content Area") }}
+          {{
+            value && value.id ? $t("Edit Content Area") : $t("New Content Area")
+          }}
         </div>
         <div class="idea_edit_type_container-header-close"></div>
 
@@ -102,7 +104,6 @@
             <v-select
               v-model="mutateForm.markup"
               label="title"
-              v-validate="''"
               name="markup"
               :placeholder="$t('Content Template')"
               class="idea_edit_content_type_select_idea_templates"
@@ -270,6 +271,8 @@ export default {
     hasEdits: false,
   }),
   mounted() {
+
+
     this.selectablePathRoles = this.getSelectableRoles;
     this.roleIntent = Math.random();
 
@@ -367,9 +370,12 @@ export default {
     mutateForm: {
       deep: true,
       handler(newVal) {
-        this.hasEdits = this.checkEdits();
-        if (!this.comparisonForm) {
-          this.comparisonForm = newVal.fields;
+        console.log(newVal);
+        if (newVal) {
+          this.hasEdits = this.checkEdits();
+          if (!this.comparisonForm && newVal) {
+            this.comparisonForm = newVal.fields;
+          }
         }
       },
     },
@@ -529,13 +535,20 @@ input[type="checkbox"] {
   max-width: calc((100vw - 240px) * 0.25);
 }
 
+.idea_edit_content_container_type-leave-to {
+  max-width: 0;
+}
+
+.idea_edit_content_container_type-leave {
+  max-width: calc((100vw - 240px) * 0.25);
+  // position: absolute;
+}
+
 .idea_edit_content_container_type-enter {
   max-width: 0;
   // position: absolute;
 }
-.idea_edit_content_container_type-leave-to {
-  max-width: 0;
-}
+
 .ideaEdit_type_Edit_content > div {
   width: 36px;
   height: 30px;

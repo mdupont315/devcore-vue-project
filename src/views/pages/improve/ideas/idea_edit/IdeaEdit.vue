@@ -16,6 +16,7 @@
         @editorLoaded="setEditorLoaded"
         @isDirty="setIsContentDirty"
         @setIsLoading="setIsLoading"
+        :ideaContentIsDirty="ideaContentIsDirty"
         :isSaving="isSaving"
         v-model="getIdeaContent"
       ></idea-edit-content>
@@ -24,6 +25,7 @@
         @save="saveIdeaVersion"
         @deleteIdea="deleteIdeaVersion"
         @updateStatus="updateIdeaVersionStatus"
+        @ideaPathDirty="setIsIdeaPathDirty"
         :isLoading="isLoading"
         v-model="getIdeaPath"
         :ideaContentIsDirty="ideaContentIsDirty"
@@ -67,9 +69,10 @@ export default {
     isLoaded: false,
     filesChanged: false,
     selectedCategoryIndex: 0,
-    ideaContentIsDirty: false,
+    ideaContentIsDirty: null,
     editorLoaded: false,
     loadedFiles: [],
+    isIdeaPathDirty: false,
     ideaForm: new GQLForm({
       id: undefined,
       processId: null,
@@ -206,8 +209,10 @@ export default {
     }
   },
   methods: {
+    setIsIdeaPathDirty(val) {
+      this.isIdeaPathDirty = val;
+    },
     setIsLoading(val) {
-      console.log(val);
       this.isLoading = val;
     },
     sliceIntoChunks(arr, chunkSize) {
@@ -219,6 +224,19 @@ export default {
       return res;
     },
 
+    async removeFiles(ids) {
+      try {
+        await this.$store.dispatch(
+          `idea/removeResources`,
+          new GQLForm({
+            id: this.ideaForm.id,
+            removeFileIds: ids,
+          })
+        );
+      } catch (e) {
+        console.log(e);
+      }
+    },
     async uploadFiles(files, props) {
       console.log("UPLOADING FILES: ", files);
       const { id, contentId } = props;
@@ -240,6 +258,7 @@ export default {
       console.log("RECEIVED FILES", result);
       return result;
     },
+
     async batchUploadResources(data) {
       const BATCH_MAX_FILES = 10;
 
@@ -248,12 +267,15 @@ export default {
         BATCH_MAX_FILES
       );
 
-      window.vm.$snotify.info(this.$t("Do not close window"), {
-        timeout: 10000,
-        showProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-      });
+      window.vm.$snotify.info(
+        this.$t("Saving resources", { amount: data.files.length }),
+        {
+          timeout: 10000,
+          showProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+        }
+      );
       this.setIsLoading(true);
       this.isSaving = true;
       let result = [];
@@ -278,15 +300,25 @@ export default {
       this.files = [];
       this.setIsLoading(true);
 
-      this.$nextTick(() => {
+      setTimeout(() => {
         this.setIsLoading(false);
-      });
+      }, 200);
+
+      // this.$nextTick(() => {
+      //   this.setIsLoading(false);
+      // });
     },
     setEditorLoaded() {
       this.editorLoaded = true;
     },
     setIsContentDirty() {
-      this.ideaContentIsDirty = true;
+      console.log(this);
+      const contentForm =
+        this.ideaContentCategories[this.selectedCategoryIndex]?.contentForm;
+
+      if (contentForm && contentForm.id) {
+        this.ideaContentIsDirty = contentForm.id;
+      }
     },
     removeFile(file) {
       //TODO: If loaded files contains uploaded file it means that existing file was removed
@@ -365,12 +397,17 @@ export default {
     },
 
     async getFileNodesFromIdea(argMarkup) {
-      const contentForm =
-        this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+      let searchMarkup = argMarkup;
+
+      if (!searchMarkup) {
+        const contentForm =
+          this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+        searchMarkup = contentForm.markup;
+      }
 
       const filesInIdea = [];
       await this.execCallbackToNodeType(
-        argMarkup ?? contentForm.markup,
+        searchMarkup,
         "file",
         (node) => {
           filesInIdea.push(node);
@@ -404,110 +441,63 @@ export default {
       return JSON.stringify({ type: "doc", content: modifiedMarkup });
     },
 
-    async saveIdea() {
-      console.log("****");
+    async userRemovedResources(argMarkup = null) {
+      const contentFiles = await this.getFileNodesFromIdea(argMarkup);
 
-      //TODO: set ideaForm.fields.file to actual files in content
-      // set removeFileIds to actual files in content
-      // check if possible to do these from onTransaction
-      // propably better that way
-
-      // console.log(
-      //   "loadedFiles: ",
-      //   this.loadedFiles.map((x) => {
-      //     return { href: x.attrs.href, id: x.attrs.id, uri: x.attrs.uri };
-      //   })
-      // );
-
-      // console.log("files: ", this.files);
-
-      // console.log({ contentFiles });
-      // console.log({ addedFiles });
-      // console.log("uploadedContentFiles: ", currentUploadedContentFileIds);
-
-      //compare to mounted state
-
-      // console.log(contentFiles);
-
-      // console.log(
-      //   "files uuids: ",
-      //   this.files.map((file) => file.uuid)
-      // );
-      // console.log(
-      //   "added file uuids: ",
-      //   addedFiles.map((node) => node.attrs.uuid)
-      // );
-
-      // const addedFilesNotRemoved = this.files.filter((file) =>
-      //   addedFiles.map((node) => node.attrs.uuid).includes(file.uuid)
-      // );
-
-      // const mountedUploadedFileIds = this.loadedFiles.map(
-      //   (loaded) => loaded.attrs.id
-      // );
-
-      // console.log({ mountedUploadedFileIds });
-      // // const loadedFileIdsNotInContent = uploadedContentFiles.filter(
-      // //   (node) =>
-      // //     !contentFiles.map((node) => node.attrs.id).includes(node.attrs.id)
-      // // );
-
-      // // const contentFileUuids = contentFiles.map((node) => node.attrs.uuid);
-
-      // // console.log("___________");
-
-      // console.log(
-      //   "REMOVING RESOURCES: ",
-      //   mountedUploadedFileIds.filter(
-      //     (id) => id && !currentUploadedContentFileIds.includes(id)
-      //   )
-      // );
-
-      // console.log({ addedFilesNotRemoved });
-
-      // const contentForm =
-      //   this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
-
-      // this.ideaForm._fields.file = addedFilesNotRemoved.map(
-      //   (item) => item.file
-      // );
-      const contentFiles = await this.getFileNodesFromIdea();
+      console.log(contentFiles);
       const mountedUploadedFileIds = this.loadedFiles.map(
         (loaded) => loaded.attrs.id ?? loaded.attrs.uuid
       );
 
-      console.log(contentFiles);
       const currentUploadedContentFileIds = contentFiles
         .filter((node) => node.attrs.id ?? node.attrs.uuid)
         .map((node) => node.attrs.id ?? node.attrs.uuid);
 
-      this.ideaForm._fields.file = [];
+      console.log(currentUploadedContentFileIds);
 
-      console.log(mountedUploadedFileIds);
-      this.ideaForm._fields.removeFileIds = mountedUploadedFileIds.filter(
-        (id) => !currentUploadedContentFileIds.includes(id)
+      return mountedUploadedFileIds.filter(
+        (id) => id && !currentUploadedContentFileIds.includes(id)
       );
+    },
+    async saveIdea() {
       let ideaSave = null;
-      this.ideaForm.processId = this.processPath.process.id;
-      if (this.ideaForm.id) {
-        ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
-      } else {
-        ideaSave = await this.$store.dispatch(`idea/create`, this.ideaForm);
+
+      try {
+        this.ideaForm._fields.removeFileIds = [];
+        this.ideaForm._fields.file = [];
+        this.ideaForm.processId = this.processPath.process.id;
+        if (this.ideaForm.id) {
+          ideaSave = await this.$store.dispatch(`idea/update`, this.ideaForm);
+        } else {
+          ideaSave = await this.$store.dispatch(`idea/create`, this.ideaForm);
+        }
+      } catch (e) {
+        console.log(e);
+      } finally {
+        this.isIdeaPathDirty = false;
       }
-
-      //   console.log(ideaSave);
-
       return ideaSave;
     },
-    async saveIdeaResources() {
+    async syncIdeaResources(ideaId) {
       let resources = [];
 
       try {
         const contentFiles = await this.getFileNodesFromIdea();
         const addedFiles = contentFiles.filter((node) => !node.attrs.id);
+
         const addedFilesNotRemoved = this.files.filter((file) =>
           addedFiles.map((node) => node.attrs.uuid).includes(file.uuid)
         );
+
+        // TODO REMOVE FILES WHEN CONTENT AREA REMOVED
+
+        const removeFileIds = await this.userRemovedResources();
+
+        console.log(removeFileIds);
+
+        if (removeFileIds.length > 0) {
+          await this.removeFiles(removeFileIds);
+        }
 
         if (addedFilesNotRemoved.length > 0) {
           const contentForm =
@@ -515,7 +505,7 @@ export default {
 
           const uploadParameters = {
             files: addedFilesNotRemoved,
-            id: this.ideaForm.id,
+            id: ideaId ?? this.ideaForm.id,
             contentId: contentForm.id,
           };
 
@@ -678,31 +668,48 @@ export default {
       this.setIsLoading(true);
       this.isSaving = true;
 
-      //user is removing content area that is currently active
+      // user is removing content area that is currently active
+      // set to home
+
+      if (this.ideaContentCategories[this.selectedCategoryIndex]) {
+        console.log("remove index2 ");
+        if (
+          this.ideaContentCategories[this.selectedCategoryIndex].contentForm?.id
+        ) {
+          const removeIndex = this.ideaContentCategories.findIndex(
+            (content) => content.contentForm?.id === form.id
+          );
+
+          console.log("remove index3 ");
+          console.log(this.selectedCategoryIndex);
+          if (this.selectedCategoryIndex == removeIndex) {
+            this.setHomeContentActive();
+          }
+        }
+      }
 
       try {
         const removeForm = new GQLForm({
           id: form.fields.id,
         });
         await this.$store.dispatch(`ideaContent/delete`, removeForm);
+
+        const contentFiles = await this.getFileNodesFromIdea(
+          form.fields.markup
+        );
+
+        // TODO: THis will not work becuase id and uuid are empty because content is not loaded.
+        // EIther go by title (which might remove other resources)
+        // href populated for some reason ? has uuid
+        console.log({ contentFiles });
+
+        if (contentFiles.length > 0) {
+          await this.removeFiles(contentFiles.map((x) => x.attrs.id));
+        }
       } catch (e) {
         console.log(e);
       } finally {
         await this.fetchIdeaContents(form.fields.ideaId);
-
-        if (this.ideaContentCategories[this.selectedCategoryIndex]) {
-          if (
-            this.ideaContentCategories[this.selectedCategoryIndex].contentForm
-              ?.id
-          ) {
-            const removeIndex = this.ideaContentCategories.findIndex(
-              (content) => content.contentForm?.id === form.id
-            );
-            if (this.selectedCategoryIndex == removeIndex) {
-              this.setHomeContentActive();
-            }
-          }
-        }
 
         this.setIsLoading(false);
         this.isSaving = false;
@@ -752,11 +759,17 @@ export default {
       try {
         //Sync files in server with files in content
 
-        await this.syncContent();
-        ideaSave = await this.saveIdea();
-        resources = await this.saveIdeaResources();
+        console.log("Saving IDEA !");
+        console.log(this.isIdeaPathDirty || !this.getIdea.id);
 
-        console.log("WTF: ", resources);
+        await this.syncContent();
+        ideaSave = this.getIdea;
+
+        if (this.isIdeaPathDirty || !this.getIdea.id) {
+          ideaSave = await this.saveIdea();
+        }
+
+        resources = await this.syncIdeaResources(ideaSave.id);
 
         if (ideaSave && ideaSave.id) {
           let ideaContent = null;
@@ -875,7 +888,7 @@ export default {
         this.loadedFiles = await this.getFileNodesFromIdea();
         this.isSaving = false;
         this.setIsLoading(false);
-        this.ideaContentIsDirty = false;
+        this.ideaContentIsDirty = null;
         this.files = [];
       }
     },

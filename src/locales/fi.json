@@ -737,5 +737,8 @@
   "File size too big in docx file": "Dokumentista jätettiin liian suuri tiedostoformaatti {type} ({size}). Suurin sallittu koko on {limit}",
   "Unknown file type in docx file" : "Dokumentista jätettiin tunnistamaton tyyppi ({type}) tuomatta.",
   "Saving resources": "Tallennetaan tiedostoja ({amount})",
-  "Importing document": "Tuodaan tiedostoa {title}... Ethän sulje selaintasi."
+  "Importing document": "Tuodaan tiedostoa {title}... Ethän sulje selaintasi.",
+
+  "Unsaved Idea Data In Type": "Sinulla on tallentamattomia muutoksia sisällössä: {title}. Muutokset hylätään jos poistut ja tallennat muun sisältö-alueen."
+
 }
