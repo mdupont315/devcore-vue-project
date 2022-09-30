@@ -318,18 +318,33 @@ export const CustomTable = Table.extend({
     return ({ editor, node: nodeViewNode, getPos }) => {
       let tempNode = nodeViewNode;
 
-      const setCols =
-        this.editor.extensionStorage.table?.cols ??
-        tempNode.attrs["data-table-cols"];
+      const editorDom = document.getElementById("idea-edit-editor-container");
+      let editorWidth = 500;
+      if (editorDom) {
+        editorWidth = editorDom.clientWidth;
+      }
+      let cols = 0;
+
+      for (let i = 0, col = 0; i < nodeViewNode.firstChild.childCount; i += 1) {
+        const { colspan } = nodeViewNode.firstChild.child(i).attrs;
+        for (let j = 0; j < colspan; j += 1, col += 1) {
+          cols += 1;
+        }
+      }
+
+      let cellMinWidth = (editorWidth / cols) * 0.8;
+
+      console.log({ cols });
+
+      const setCols = cols ?? tempNode.attrs["data-table-cols"];
 
       tempNode.attrs["data-table-width"] = setCols
-        ? Math.round(editor.view.dom.clientWidth)
+        ? Math.round(editorWidth)
         : null;
 
       tempNode.attrs["data-table-cols"] = setCols ?? null;
 
-
-      const cellMinWidth = 40;
+      console.log(editorDom);
 
       const dom = getElementWithAttributes("div", { class: "tableWrapper" });
 

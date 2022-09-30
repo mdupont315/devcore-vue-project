@@ -515,6 +515,25 @@ export default {
       background: #c7dbfc;
     }
 
+    tbody > tr:not(:first-child):nth-child(odd) > th {
+      background: #c7dbfc;
+
+      & > p {
+        font-family: FuturaLight;
+        color: #707070;
+        overflow: hidden;
+      }
+    }
+
+    tbody > tr:not(:first-child):nth-child(even) > th {
+      background: #fff;
+      & > p {
+        font-family: FuturaLight;
+        color: #707070;
+        overflow: hidden;
+      }
+    }
+
     td,
     th {
       min-width: 1em;
@@ -534,8 +553,6 @@ export default {
       color: #707070;
       overflow: hidden;
     }
-
-
 
     th {
       font-weight: bold;

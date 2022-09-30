@@ -35,7 +35,9 @@ const convertDocxFileToHtml = async (file, notify) => {
       mammoth
         .convertToHtml(
           { arrayBuffer: arrayBuffer },
-          { convertImage: docxFileParser(notify) }
+          {
+            convertImage: docxFileParser(notify)
+          }
         )
         .then(function(resultObject) {
           if (!resultObject) {
@@ -391,7 +393,7 @@ export const File = Node.create({
             const valid = validateFileSize(notify, item);
             if (valid) {
               const uuid = uuidv4();
-             // const transformedFile = await fileWithUniqueName(item, uuid);
+              // const transformedFile = await fileWithUniqueName(item, uuid);
               addFile({ uuid, file: item });
               renderFileInBase64ToCoordinates(
                 item,

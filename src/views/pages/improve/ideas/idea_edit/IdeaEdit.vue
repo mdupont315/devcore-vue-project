@@ -312,7 +312,6 @@ export default {
       this.editorLoaded = true;
     },
     setIsContentDirty() {
-      console.log(this);
       const contentForm =
         this.ideaContentCategories[this.selectedCategoryIndex]?.contentForm;
 

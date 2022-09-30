@@ -106,7 +106,6 @@ export default {
       this.$emit("setFiles", files);
     },
     setFile(event) {
-      console.log(this);
       const files = event.target.files;
 
       this.$emit("setFiles", { files, type: this.fileModalTexts.type });

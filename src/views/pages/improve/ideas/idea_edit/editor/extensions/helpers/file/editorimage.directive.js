@@ -2,9 +2,7 @@ export default {
   inserted: el => {
     function loadImage() {
       if (!el) return;
-      console.log("***************")
-      console.log("LOADING!");
-      console.log(el);
+
       const imageElement = Array.from(el.children).find(
         el =>
           el.nodeName === "IMG" &&
@@ -14,12 +12,8 @@ export default {
         el => el.id === "fileNodeView-lazy-load-image-spinner"
       );
 
-      console.log({ imageElement });
-      console.log({ spinnerElement });
-
       if (imageElement) {
         imageElement.addEventListener("load", () => {
-          console.log("LOADED IMAGE !");
           setTimeout(() => el.classList.add("loaded"), 100);
         });
         imageElement.addEventListener("error", () => console.log("error"));
