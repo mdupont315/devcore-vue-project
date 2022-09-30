@@ -168,7 +168,7 @@ export default {
     getIdeaContent: {
       get() {
         const contentForm =
-          this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
+          this.ideaContentCategories[this.selectedCategoryIndex]?.contentForm;
 
         return {
           contentType: contentForm.contentType,
@@ -405,13 +405,9 @@ export default {
       }
 
       const filesInIdea = [];
-      await this.execCallbackToNodeType(
-        searchMarkup,
-        "file",
-        (node) => {
-          filesInIdea.push(node);
-        }
-      );
+      await this.execCallbackToNodeType(searchMarkup, "file", (node) => {
+        filesInIdea.push(node);
+      });
 
       return filesInIdea;
     },
@@ -482,6 +478,7 @@ export default {
 
       try {
         const contentFiles = await this.getFileNodesFromIdea();
+        console.log(contentFiles);
         const addedFiles = contentFiles.filter((node) => !node.attrs.id);
 
         const addedFilesNotRemoved = this.files.filter((file) =>
@@ -671,7 +668,6 @@ export default {
       // set to home
 
       if (this.ideaContentCategories[this.selectedCategoryIndex]) {
-        console.log("remove index2 ");
         if (
           this.ideaContentCategories[this.selectedCategoryIndex].contentForm?.id
         ) {
@@ -679,13 +675,14 @@ export default {
             (content) => content.contentForm?.id === form.id
           );
 
-          console.log("remove index3 ");
-          console.log(this.selectedCategoryIndex);
           if (this.selectedCategoryIndex == removeIndex) {
+            console.log("Setting home content Active!");
             this.setHomeContentActive();
           }
         }
       }
+
+      console.log(this.ideaContentCategoryData);
 
       try {
         const removeForm = new GQLForm({
@@ -697,9 +694,6 @@ export default {
           form.fields.markup
         );
 
-        // TODO: THis will not work becuase id and uuid are empty because content is not loaded.
-        // EIther go by title (which might remove other resources)
-        // href populated for some reason ? has uuid
         console.log({ contentFiles });
 
         if (contentFiles.length > 0) {
@@ -708,6 +702,11 @@ export default {
       } catch (e) {
         console.log(e);
       } finally {
+        // this.ideaContentCategoryData = [
+        //   ...this.ideaContentCategoryData.filter(
+        //     (x) => x.contentForm.id !== form.fields.id
+        //   ),
+        // ];
         await this.fetchIdeaContents(form.fields.ideaId);
 
         this.setIsLoading(false);

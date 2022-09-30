@@ -119,6 +119,7 @@ export default {
       const selectedCategory = this.categories[this.selected];
 
       return (
+				selectedCategory &&
         selectedCategory.id &&
         this.ideaContentIsDirty &&
         selectedCategory.id == this.ideaContentIsDirty &&

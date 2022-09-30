@@ -125,7 +125,7 @@ export const File = Node.create({
         parseHTML: el => {
           return el.getAttribute("id");
         },
-        renderHTML: attrs => ({ href: attrs.id })
+        renderHTML: attrs => ({ id: attrs.id })
       },
       title: {
         default: null,

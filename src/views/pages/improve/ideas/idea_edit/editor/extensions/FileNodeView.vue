@@ -151,6 +151,7 @@ export default {
   },
 
   async mounted() {
+    console.log("attrs: ", this.getAttrs);
     if (!this.getAttrs.src && !this.getAttrs.href) {
       this.deleteNode();
     }
@@ -158,26 +159,30 @@ export default {
     const isStagedPreviewFile =
       !this.getAttrs.href && this.getAttrs.src && !this.getAttrs.id;
 
-    const isUploadedImage = this.getAttrs.src?.includes(process.env.BASE_URL);
-    const isUploadedFile = this.getAttrs.href?.includes(process.env.BASE_URL);
-    const isProdUploadedFile = this.getAttrs.src?.includes(
-      "https://devcore.app"
-    );
-    const isStageUploadedFile = this.getAttrs.src?.includes(
-      "https://stage.devcore.app"
-    );
+    // const isUploadedImage = this.getAttrs.src?.includes(process.env.BASE_URL);
+    // const isUploadedFile = this.getAttrs.href?.includes(process.env.BASE_URL);
+    // const isProdUploadedFile = this.getAttrs.src?.includes(
+    //   "https://devcore.app"
+    // );
+    // const isStageUploadedFile = this.getAttrs.src?.includes(
+    //   "https://stage.devcore.app"
+    // );
 
     // console.log(isUploadedImage);
     // console.log(isUploadedFile);
 
-    const isExternalUrl =
-      isValidExternalUrl(this.getAttrs.src) &&
-      !isUploadedImage &&
-      !isUploadedFile &&
-      !isProdUploadedFile &&
-      !isStageUploadedFile;
+    const isExternalUrl = isValidExternalUrl(this.getAttrs.src);
+    //  &&
+    // //!isUploadedImage &&
+    // !isUploadedFile &&
+    // !isProdUploadedFile &&
+    // !isStageUploadedFile;
 
     // console.log(process.env.BASE_URL);
+
+    console.log(isStagedPreviewFile);
+    console.log(isExternalUrl);
+    console.log(isBase64(this.getAttrs.src));
 
     if (isStagedPreviewFile) {
       if (isExternalUrl || isBase64(this.getAttrs.src)) {
@@ -285,6 +290,8 @@ export default {
       //  console.log("*****");
       //  console.log(this.node.attrs);
       const type = this.getAttrs.type ?? base64MimeType(externalToBase64);
+
+      console.log({ externalToBase64 });
 
       const fileType = externalToBase64.split(";")[0].split("/")[1] || "png";
       const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;

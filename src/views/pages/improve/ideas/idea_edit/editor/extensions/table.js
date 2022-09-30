@@ -334,8 +334,6 @@ export const CustomTable = Table.extend({
 
       let cellMinWidth = (editorWidth / cols) * 0.8;
 
-      console.log({ cols });
-
       const setCols = cols ?? tempNode.attrs["data-table-cols"];
 
       tempNode.attrs["data-table-width"] = setCols
@@ -343,8 +341,6 @@ export const CustomTable = Table.extend({
         : null;
 
       tempNode.attrs["data-table-cols"] = setCols ?? null;
-
-      console.log(editorDom);
 
       const dom = getElementWithAttributes("div", { class: "tableWrapper" });
 
