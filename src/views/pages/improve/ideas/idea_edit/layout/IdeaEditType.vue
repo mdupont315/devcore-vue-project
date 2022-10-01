@@ -158,7 +158,7 @@
               autocomplete="idea_content_roles"
               :placeholder="$t('Role access')"
               v-model="mutateForm.companyRoles"
-              :items="[...allRoles]"
+              :items="[...getSelectableRoles]"
               :show-field="true"
               :show-add-btn="false"
             ></role-selector>
@@ -262,18 +262,20 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    selectedIdeaRoles: {
+      type: Array,
+      default: () => [],
+    },
   },
   data: () => ({
-    selectablePathRoles: [],
     roleIntent: null,
     selectedRoles: [],
     comparisonForm: null,
     hasEdits: false,
   }),
   mounted() {
+    console.log(this.mutateForm);
 
-
-    this.selectablePathRoles = this.getSelectableRoles;
     this.roleIntent = Math.random();
 
     // default idea markup content type as default
@@ -356,7 +358,9 @@ export default {
     },
     getSelectableRoles: {
       get() {
-        return this.allRoles;
+        return this.allRoles.filter((role) =>
+          this.selectedIdeaRoles.includes(role.id)
+        );
       },
     },
     isPrimaryContent: {
@@ -386,7 +390,7 @@ export default {
     "mutateForm.isPrimary": {
       handler(newVal) {
         if (newVal) {
-          this.mutateForm.fields.companyRoles = this.allRoles;
+          this.mutateForm.fields.companyRoles = this.getSelectableRoles;
           this.roleIntent = Math.random();
         }
       },

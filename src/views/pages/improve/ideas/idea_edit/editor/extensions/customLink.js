@@ -10,6 +10,22 @@ import { autolink } from "./helpers/link/autolink";
 import { clickHandler } from "./helpers/link/clickHandler";
 import { pasteHandler } from "./helpers/link/pasteHandler";
 
+const URL_INCLUDE_REGEX = /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi;
+const URL_EXCLUDE_REGEX = /.*@.*/;
+
+const validateUrlNotEmail = link => {
+  let result = false;
+
+  link.replace(URL_INCLUDE_REGEX, matchedText => {
+    if (!URL_EXCLUDE_REGEX.test(matchedText)) {
+      result = true;
+    }
+  });
+  console.log(result)
+
+  return result;
+};
+
 export const CustomLink = Mark.create({
   name: "link",
 
@@ -17,7 +33,7 @@ export const CustomLink = Mark.create({
 
   keepOnSplit: false,
 
-  content: 'text*',
+  content: "text*",
 
   onCreate() {
     this.options.protocols.forEach(registerCustomProtocol);
@@ -31,7 +47,7 @@ export const CustomLink = Mark.create({
       openOnClick: true,
       linkOnPaste: true,
       autolink: true,
-      protocols: ['www'],
+      protocols: ["www"],
       HTMLAttributes: {
         target: "_blank",
         rel: "noopener noreferrer nofollow",
@@ -99,14 +115,12 @@ export const CustomLink = Mark.create({
   },
   renderHTML({ HTMLAttributes }) {
     const { uuid, href, target } = HTMLAttributes;
-    const validate = /^https?:\/\//.test(href);
 
     if (!href) return true;
 
-    if (!validate) {
-      return ["p", 0];
-    }
+    const validate = validateUrlNotEmail(href);
 
+    if (!validate) return true;
     if (!uuid) {
       return [
         "a",

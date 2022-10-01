@@ -182,7 +182,7 @@ export default class ContentEditor {
       // Draggable,
       CustomLink.configure({
         removeLink: linkHandlers.removeLink,
-        protocols: ["www", "mailto"]
+        protocols: ["www"]
       }),
       TextStyle,
       Color,

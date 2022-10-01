@@ -96,6 +96,7 @@
           v-show="editContentItem"
           :visible="contentTypeSelectorForm"
           :categories="getIdeaContentCategories"
+          :selectedIdeaRoles="selectedIdeaRoles"
           :primary="getPrimaryContentType"
           :isLoading="isLoading"
           v-model="editContentItem"
@@ -169,6 +170,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    selectedIdeaRoles: {
+      type: Array,
+      default: () => [],
+    },
     ideaContentCategories: {
       type: Array,
       required: true,
@@ -225,6 +230,7 @@ export default {
       },
     },
   },
+
   data: () => ({
     contentTypeSelectorVisible: false,
     contentTypeSelectorForm: false,
@@ -276,6 +282,8 @@ export default {
     },
     editContentType(item) {
       this.contentTypeSelectorForm = false;
+
+      console.log(this.editContentItem);
       setTimeout(() => {
         this.editContentItem = new GQLForm({
           id: item.id,
@@ -287,7 +295,7 @@ export default {
           companyRoles: item.companyRoles,
         });
         this.contentTypeSelectorForm = true;
-      }, 200);
+      });
     },
     toggleContentTypeSelector() {
       this.contentTypeSelectorForm = false;
@@ -310,7 +318,7 @@ export default {
           ideaId: this.idea.id,
           companyRoles: [],
         });
-      }, 100);
+      });
     },
     changeContentType(item) {
       this.$emit("changeType", item);

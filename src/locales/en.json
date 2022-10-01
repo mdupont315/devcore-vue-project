@@ -708,5 +708,5 @@
   "Unknown file type in docx file": "Excluded unknown file type ({type}) from the document import.",
   "Saving resources": "Saving files ({amount}).",
   "Importing document": "Importing document {title}... Please do not window",
-  "Unsaved Idea Data In Type": "You have unsaved data in content: {title}. Pending changes in {title} will be discarded if you save another content area."
+  "Unsaved Idea Data In Type": "You have unsaved data in content."
 }

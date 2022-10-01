@@ -7,6 +7,7 @@
         :isLoading="isLoading"
         :selectedCategoryIndex="selectedCategoryIndex"
         :comments="getCommentNodesFromContent()"
+				:selectedIdeaRoles="ideaForm.companyRoleIds"
         @changeType="changeContentType"
         @fileAdded="setFile"
         @fileRemoved="removeFile"
@@ -93,7 +94,7 @@ export default {
       markup: null,
       ideaId: null,
       version: 1,
-      isPrimary: true,
+      isPrimary: false,
       contentType: null,
       companyRoles: [],
     }),
@@ -142,7 +143,7 @@ export default {
                 markup: defaultContent,
                 ideaId: null,
                 version: 1,
-                isPrimary: true,
+                isPrimary: false,
                 contentType: null,
                 companyRoles: [],
               }),
@@ -171,6 +172,7 @@ export default {
       get() {
         const contentForm =
           this.ideaContentCategories[this.selectedCategoryIndex]?.contentForm;
+
 
         return {
           contentType: contentForm.contentType,
@@ -294,8 +296,13 @@ export default {
       }
       return result;
     },
-    async changeContentType(form) {
-      this.selectedCategoryIndex = this.ideaContentCategories.findIndex(
+    async changeContentType(form, newCategories) {
+      let categories = newCategories;
+
+      if (!categories) {
+        categories = this.ideaContentCategories;
+      }
+      this.selectedCategoryIndex = categories.findIndex(
         (content) => content.contentForm.id === form.id
       );
       this.loadedFiles = await this.getFileNodesFromIdea();
@@ -666,6 +673,8 @@ export default {
       const currentSelectedFormId =
         this.ideaContentCategories[this.selectedCategoryIndex].contentForm.id;
 
+      console.log(currentSelectedFormId);
+
       // is removing form that is visible. We need to set another page active before remove
 
       // remove removal form from local data
@@ -675,13 +684,14 @@ export default {
         ),
       ];
 
+			console.log(currentSelectedFormId === form.id)
+
       if (currentSelectedFormId === form.id) {
         this.setContentActive();
       } else {
         this.setContentActive(currentSelectedFormId);
       }
 
-      console.log(this.ideaContentCategoryData);
 
       try {
         const removeForm = new GQLForm({
@@ -701,24 +711,8 @@ export default {
       } catch (e) {
         console.log(e);
       } finally {
-        // this.ideaContentCategoryData = [
-        //   ...this.ideaContentCategoryData.filter(
-        //     (x) => x.contentForm.id !== form.fields.id
-        //   ),
-        // ];
-
-        //TODO: Removal fails because ideaContentCategories maps ideaContents to empty forms
-        // remove || {
-        // contentForm: new GQLForm({
-        //   id: undefined,
-        //   markup: defaultContent,
-        //   ideaId: null,
-        //   version: 1,
-        //   isPrimary: true,
-        //   contentType: null,
-        //   companyRoles: [],
-        // }),
         await this.fetchIdeaContents(form.fields.ideaId, false);
+				await this.initializeData(currentSelectedFormId)
 
         this.setIsLoading(false);
         this.isSaving = false;
@@ -728,8 +722,7 @@ export default {
     setContentActive(contentId) {
       const { ideaContentId } = this.getIdea;
       const homeContent = this.ideaContentCategoryData.find(
-        (content) =>
-          content.contentForm?.fields.id === contentId ?? ideaContentId
+        (content) => content.contentForm?.id === contentId ?? ideaContentId
       );
 
       const homeForm =
