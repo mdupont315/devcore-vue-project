@@ -730,7 +730,7 @@
   "contentType": "nimi",
   "unnamed_type": "Nimetön",
   "you must appoint another home page before remove": "Sinun täytyy asettaa toinen sisältö-alue aloitussivuksi ennen kuin voit poistaa sen",
-  "home page has all roles": "Aloitussivu on aina kaikkien ohjeen näkevien nähtävillä",
+  "home page has all roles": "Aloitussivu on aina kaikkien ohjeen näkevien nähtävillä.",
   "SELECT DOCX FILE": "Valitse .docx tiedosto",
   "import-docx-file": "Tuo .docx",
   "File type not supported": "Tiedostotyyppi ei tuettu",
