@@ -25,7 +25,7 @@
         @save="saveIdeaVersion"
         @deleteIdea="deleteIdeaVersion"
         @updateStatus="updateIdeaVersionStatus"
-        @ideaPathDirty="setIsIdeaPathDirty"
+        @cleanIdeaPath="setIsCleanIdeaPath"
         :isLoading="isLoading"
         v-model="getIdeaPath"
         :ideaContentIsDirty="ideaContentIsDirty"
@@ -72,7 +72,7 @@ export default {
     ideaContentIsDirty: null,
     editorLoaded: false,
     loadedFiles: [],
-    isIdeaPathDirty: false,
+    isIdeaPathClean: true,
     ideaForm: new GQLForm({
       id: undefined,
       processId: null,
@@ -133,7 +133,9 @@ export default {
         if (ideaContentId) {
           return this.ideaContents.map((content) => {
             const { contentForm } = this.ideaContentCategoryData.find(
-              (category) => category.contentForm.id === content.id
+              (category) => {
+                return category.contentForm.id === content.id;
+              }
             ) || {
               contentForm: new GQLForm({
                 id: undefined,
@@ -209,8 +211,8 @@ export default {
     }
   },
   methods: {
-    setIsIdeaPathDirty(val) {
-      this.isIdeaPathDirty = val;
+    setIsCleanIdeaPath(val) {
+      this.isIdeaPathClean = val;
     },
     setIsLoading(val) {
       this.isLoading = val;
@@ -303,10 +305,6 @@ export default {
       setTimeout(() => {
         this.setIsLoading(false);
       }, 200);
-
-      // this.$nextTick(() => {
-      //   this.setIsLoading(false);
-      // });
     },
     setEditorLoaded() {
       this.editorLoaded = true;
@@ -469,7 +467,7 @@ export default {
       } catch (e) {
         console.log(e);
       } finally {
-        this.isIdeaPathDirty = false;
+        this.isIdeaPathClean = false;
       }
       return ideaSave;
     },
@@ -664,22 +662,23 @@ export default {
       this.setIsLoading(true);
       this.isSaving = true;
 
-      // user is removing content area that is currently active
-      // set to home
+      // check current active form
+      const currentSelectedFormId =
+        this.ideaContentCategories[this.selectedCategoryIndex].contentForm.id;
 
-      if (this.ideaContentCategories[this.selectedCategoryIndex]) {
-        if (
-          this.ideaContentCategories[this.selectedCategoryIndex].contentForm?.id
-        ) {
-          const removeIndex = this.ideaContentCategories.findIndex(
-            (content) => content.contentForm?.id === form.id
-          );
+      // is removing form that is visible. We need to set another page active before remove
 
-          if (this.selectedCategoryIndex == removeIndex) {
-            console.log("Setting home content Active!");
-            this.setHomeContentActive();
-          }
-        }
+      // remove removal form from local data
+      this.ideaContentCategoryData = [
+        ...this.ideaContentCategoryData.filter(
+          (x) => x.contentForm.id !== form.id
+        ),
+      ];
+
+      if (currentSelectedFormId === form.id) {
+        this.setContentActive();
+      } else {
+        this.setContentActive(currentSelectedFormId);
       }
 
       console.log(this.ideaContentCategoryData);
@@ -707,17 +706,30 @@ export default {
         //     (x) => x.contentForm.id !== form.fields.id
         //   ),
         // ];
-        await this.fetchIdeaContents(form.fields.ideaId);
+
+        //TODO: Removal fails because ideaContentCategories maps ideaContents to empty forms
+        // remove || {
+        // contentForm: new GQLForm({
+        //   id: undefined,
+        //   markup: defaultContent,
+        //   ideaId: null,
+        //   version: 1,
+        //   isPrimary: true,
+        //   contentType: null,
+        //   companyRoles: [],
+        // }),
+        await this.fetchIdeaContents(form.fields.ideaId, false);
 
         this.setIsLoading(false);
         this.isSaving = false;
       }
     },
 
-    setHomeContentActive() {
+    setContentActive(contentId) {
       const { ideaContentId } = this.getIdea;
       const homeContent = this.ideaContentCategoryData.find(
-        (content) => content.contentForm?.fields.id === ideaContentId
+        (content) =>
+          content.contentForm?.fields.id === contentId ?? ideaContentId
       );
 
       const homeForm =
@@ -726,7 +738,7 @@ export default {
       this.changeContentType(homeForm);
     },
 
-    async fetchIdeaContents(id) {
+    async fetchIdeaContents(id, byPassCache = true) {
       await this.$store.dispatch("ideaContent/findAll", {
         filter: {
           data: {
@@ -737,7 +749,7 @@ export default {
             },
           },
         },
-        force: true,
+        force: byPassCache,
       });
     },
 
@@ -757,13 +769,10 @@ export default {
       try {
         //Sync files in server with files in content
 
-        console.log("Saving IDEA !");
-        console.log(this.isIdeaPathDirty || !this.getIdea.id);
-
         await this.syncContent();
         ideaSave = this.getIdea;
 
-        if (this.isIdeaPathDirty || !this.getIdea.id) {
+        if (!this.isIdeaPathClean || !this.getIdea.id) {
           ideaSave = await this.saveIdea();
         }
 

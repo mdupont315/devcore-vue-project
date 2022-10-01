@@ -115,7 +115,6 @@ export const Comment = Node.create({
       Backspace: ({ editor }) => {
 
         if (editor && editor.isActive("comment")) {
-          console.log("COMMENT!")
           editor.commands.first(({ commands }) => [
             () => commands.deleteSelection(),
             () => commands.joinBackward(),

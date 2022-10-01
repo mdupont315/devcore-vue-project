@@ -5,14 +5,13 @@ const VALID_EXTERNAL_URL_REGEX = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(
 const VALID_BASE64URL_REGEX = /^data:image\/([a-zA-Z]*);base64,([^\"]*)/g;
 const SUPPORTED_PREVIEW_RESIZE_IMAGE_TYPES = [
   'image/png',
-  'image/jpeg',
   'image/apng',
   'image/avif',
   'image/gif',
   'image/jpeg',
   'image/png',
   'image/svg+xml',
-  'image/webp'
+  'image/webp',
 ]
 export {
   FILE_SIZE_LIMIT,

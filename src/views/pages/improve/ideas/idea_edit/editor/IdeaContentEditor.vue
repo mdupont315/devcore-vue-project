@@ -209,7 +209,6 @@ export default {
           this.$emit("setIsLoading", val);
         },
         notify: (translationKey, data, type = "error", timeout = 3000) => {
-          console.log(translationKey);
           const message = this.$t(translationKey, {
             ...data,
           });

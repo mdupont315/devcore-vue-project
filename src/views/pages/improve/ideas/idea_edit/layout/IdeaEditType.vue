@@ -370,7 +370,6 @@ export default {
     mutateForm: {
       deep: true,
       handler(newVal) {
-        console.log(newVal);
         if (newVal) {
           this.hasEdits = this.checkEdits();
           if (!this.comparisonForm && newVal) {

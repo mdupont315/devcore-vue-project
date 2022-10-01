@@ -352,7 +352,7 @@ export default {
       type: Boolean,
       default: false,
     },
-   ideaContentIsDirty: {
+    ideaContentIsDirty: {
       type: String,
       default: null,
     },
@@ -367,14 +367,14 @@ export default {
   },
 
   watch: {
-		cleanIdeaPath: {
-			handler(newVal){
-				this.$emit("ideaPathDirty", newVal)
-			}
-		},
+    cleanIdeaPath: {
+      handler(newVal) {
+        this.$emit("cleanIdeaPath", newVal);
+      },
+    },
     mutateForm: {
       deep: true,
-      handler() {
+      handler(newVal) {
         if (this.editorLoaded && this.idea.id) {
           const initialIdea = {
             title: this.idea.title,
@@ -407,6 +407,8 @@ export default {
           );
 
           this.cleanIdeaPath = cleanPath && cleanRoles && cleanTools;
+        } else {
+          this.cleanIdeaPath = false;
         }
       },
     },

@@ -104,7 +104,10 @@ import {
   getBase64FromUrl,
   base64MimeType,
   isBase64,
+  base64Resize,
 } from "./helpers/file/fileUtils";
+
+import { PREVIEW_MAX_WIDTH_OF_VIEWPORT } from "./helpers/file/constants";
 
 export default {
   directives: {
@@ -150,8 +153,30 @@ export default {
     },
   },
 
+  // if (itemAsFile.type === "image/svg+xml") {
+  //   console.log("2");
+  //   console.log("CONVERTING SVG");
+  //   const reader = new FileReader();
+  //   reader.onload = function(e) {
+  //     itemAsFile = new File(
+  //       [
+  //         new Blob([new Uint8Array(e.target.result)], {
+  //           type: "image/png"
+  //         })
+  //       ],
+  //       "test.png",
+  //       {
+  //         type: "image/png"
+  //       }
+  //     );
+
+  //     console.log({ itemAsFile });
+  //   };
+  //   reader.readAsArrayBuffer(itemAsFile);
+  // }
+
   async mounted() {
-    console.log("attrs: ", this.getAttrs);
+    console.log(this.getAttrs);
     if (!this.getAttrs.src && !this.getAttrs.href) {
       this.deleteNode();
     }
@@ -180,11 +205,27 @@ export default {
 
     // console.log(process.env.BASE_URL);
 
-    console.log(isStagedPreviewFile);
-    console.log(isExternalUrl);
-    console.log(isBase64(this.getAttrs.src));
-
+    console.log({ isStagedPreviewFile });
+    console.log({ isExternalUrl });
+    console.log("is base 64: ", isBase64(this.getAttrs.src));
     if (isStagedPreviewFile) {
+      // if (this.getAttrs.type === "image/svg+xml") {
+      //   const test = await this.urltoFile(
+      //     this.getAttrs.src,
+      //     "hello.png",
+      //     "image/png"
+      //   );
+
+      //   const reader = new FileReader();
+      //   reader.onload = (readerEvent) => {
+      //     console.log(readerEvent.target?.result);
+      //     this.updateAttributes({
+      //       url: readerEvent.target?.result,
+      //       type: "image/png",
+      //     });
+      //   };
+      // 	 reader.readAsDataURL(test);
+      // }
       if (isExternalUrl || isBase64(this.getAttrs.src)) {
         await this.handleExternalFiles();
       }
@@ -233,8 +274,17 @@ export default {
         }
       }
     },
+    async urltoFile(url, filename, mimeType) {
+      return fetch(url)
+        .then(function (res) {
+          return res.arrayBuffer();
+        })
+        .then(function (buf) {
+          return new File([buf], filename, { type: mimeType });
+        });
+    },
     async addBase64AsFile() {
-      //  console.log("ADDING TYPE");
+      console.log("FETCING ITEM ! ");
       const toFile = await fetch(this.getAttrs.src, {
         method: "GET",
         mode: "no-cors",
@@ -257,11 +307,6 @@ export default {
       });
     },
 
-    // async handleResizedImage(dataUrl, type, callback) {
-    //   const scaleWidthUntilPX =
-    //     this.$el.clientWidth * PREVIEW_MAX_WIDTH_OF_VIEWPORT;
-    //   base64Resize(dataUrl, scaleWidthUntilPX, type, callback);
-    // },
     async handleExternalFiles() {
       //console.log(size);
       // if (!size || typeof size === "string") {
@@ -289,11 +334,24 @@ export default {
 
       //  console.log("*****");
       //  console.log(this.node.attrs);
-      const type = this.getAttrs.type ?? base64MimeType(externalToBase64);
 
       console.log({ externalToBase64 });
 
+      // if (externalToBase64) {
+      //   const uuid = uuidv4();
+      //   this.updateAttributes({
+      //     title: `${uuid}.${fileType}`,
+      //     src: externalToBase64,
+      //     type,
+      //     "data-type": "image",
+      //     size: base64size,
+      //     uuid: this.getAttrs.uuid ?? uuid,
+      //   });
+      // }
+      const type = this.getAttrs.type ?? base64MimeType(externalToBase64);
+
       const fileType = externalToBase64.split(";")[0].split("/")[1] || "png";
+
       const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;
       const base64size = externalToBase64.length * (3 / 4) - mod;
       if (externalToBase64) {
@@ -307,8 +365,33 @@ export default {
           uuid: this.getAttrs.uuid ?? uuid,
         });
       }
-
       await this.addBase64AsFile();
+
+      // if (externalToBase64) {
+      //   console.log("TRANSFORMING!");
+      //   const type = this.getAttrs.type ?? base64MimeType(externalToBase64);
+      //   const fileType = externalToBase64.split(";")[0].split("/")[1] || "png";
+      //   const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;
+      //   const base64size = externalToBase64.length * (3 / 4) - mod;
+      //   const callback = async (dataUrl) => {
+      //     const uuid = uuidv4();
+      //     this.updateAttributes({
+      //       title: `${uuid}.${fileType}`,
+      //       src: dataUrl,
+      //       type,
+      //       "data-type": "image",
+      //       size: base64size,
+      //       uuid: this.getAttrs.uuid ?? uuid,
+      //     });
+      //   };
+      //   await this.handleResizedImage(externalToBase64, type, callback);
+      // }
+
+      // await this.addBase64AsFile(dataUrl, type);
+
+      //	return await this.handleResizedImage(externalToBase64, type, callback);
+
+      //  await this.addBase64AsFile();
       // await this.addBase64AsFile(externalToBase64, type);
 
       // const callback = async (dataUrl) => {
@@ -333,6 +416,13 @@ export default {
       // this.resizedImages.push(this.node.attrs.uuid);
 
       //   return await this.handleResizedImage(externalToBase64, type, callback);
+    },
+    async handleResizedImage(dataUrl, type, callback) {
+      const scaleWidthUntilPX =
+        this.$el.clientWidth * PREVIEW_MAX_WIDTH_OF_VIEWPORT;
+
+      console.log(scaleWidthUntilPX);
+      base64Resize(dataUrl, 1000, type, callback);
     },
     removeFile() {
       this.editor.commands.removeFile(this.fileEntity);

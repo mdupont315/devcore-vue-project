@@ -313,11 +313,9 @@ export const File = Node.create({
         const files = Array.from(input);
         const nonPreviewFiles = files.filter(file => !/image/i.test(file.type));
         let that = this;
-        console.log(nonPreviewFiles);
 
         if (nonPreviewFiles[0]) {
           setIsLoading(true);
-          console.log(nonPreviewFiles);
           notify(
             "Importing document",
             { title: nonPreviewFiles[0].name },

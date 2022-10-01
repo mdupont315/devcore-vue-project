@@ -98,50 +98,90 @@ const validateFileSize = (notify, file) => {
   return valid;
 };
 
-const base64Resize = (sourceBase64, toWidth, _type, callback) => {
+const base64Resize = async (sourceBase64, toWidth, _type, callback) => {
   console.log(_type);
   let type = _type;
 
-  if (!SUPPORTED_PREVIEW_RESIZE_IMAGE_TYPES.includes(type)) {
-    callback(sourceBase64);
-    return;
-  }
+  console.log("TRANSOFRMIN");
+  var svgData = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(sourceBase64)));
 
-  const img = document.createElement("img");
-  img.setAttribute("src", sourceBase64);
 
-  img.onload = () => {
-    const canvas = document.createElement("canvas");
-    const scale = toWidth / img.width;
+  var canvas = document.createElement("canvas");
+  // get canvas context for drawing on canvas
+  var context = canvas.getContext("2d");
+  // set canvas size
+  canvas.width = 200;
+  canvas.height = 200;
 
-    canvas.width = img.width * scale;
-    canvas.height = img.height * scale;
+  var image = new Image();
 
-    const ctx = canvas.getContext("2d");
-    const maxW = img.width * scale;
-    const maxH = img.height * scale;
+  console.log(svgData)
 
-    const iw = img.width;
-    const ih = img.height;
-    const scl = Math.min(maxW / iw, maxH / ih);
-    const iwScaled = iw * scl;
-    const ihScaled = ih * scl;
-    canvas.width = iwScaled;
-    canvas.height = ihScaled;
-    ctx.mozImageSmoothingEnabled = false;
-    ctx.webkitImageSmoothingEnabled = false;
-    ctx.msImageSmoothingEnabled = false;
-    ctx.imageSmoothingEnabled = false;
-
-    ctx.drawImage(img, 0, 0, iwScaled, ihScaled);
-    const newBase64 = canvas.toDataURL(type, scl);
-
-    callback(newBase64);
-  };
-  img.onerror = function() {
-    console.log("Could not resize image");
-  };
+  image.onload = function() {
+    // async (happens later)
+    // clear canvas
+    context.clearRect(0, 0, 200, 200);
+    // draw image with SVG data to canvas
+    context.drawImage(image, 0, 0, 200, 200);
+    // snapshot canvas as png
+    var pngData = canvas.toDataURL("image/" + "png");
+    console.log(pngData);
+    // pass png data URL to callback
+    callback(pngData);
+  }; // end async
+  // start loading SVG data into in memory image
+  image.src = svgData;
 };
+
+// const base64Resize = (sourceBase64, toWidth, _type, callback) => {
+//   console.log(_type);
+//   let type = _type;
+
+//   // if (!SUPPORTED_PREVIEW_RESIZE_IMAGE_TYPES.includes(type)) {
+//   //   callback(sourceBase64);
+//   //   return;
+//   // }
+
+//   console.log("TRANSOFRMIN");
+
+//   const img = document.createElement("img");
+//   img.setAttribute("src", sourceBase64);
+//   console.log(toWidth, _type);
+
+//   img.onload = () => {
+//     console.log("HELLO WORLD");
+//     const canvas = document.createElement("canvas");
+//     const scale = toWidth / img.width;
+
+//     canvas.width = img.width * scale;
+//     canvas.height = img.height * scale;
+
+//     console.log({ canvas });
+
+//     const ctx = canvas.getContext("2d");
+//     const maxW = img.width * scale;
+//     const maxH = img.height * scale;
+
+//     const iw = img.width;
+//     const ih = img.height;
+//     const scl = Math.min(maxW / iw, maxH / ih);
+//     const iwScaled = iw * scl;
+//     const ihScaled = ih * scl;
+//     canvas.width = iwScaled;
+//     canvas.height = ihScaled;
+
+//     console.log(type, scl);
+
+//     ctx.drawImage(img, 0, 0, iwScaled, ihScaled);
+//     const newBase64 = canvas.toDataURL(type, scl);
+//     console.log(newBase64);
+
+//     callback(newBase64);
+//   };
+//   img.onerror = function() {
+//     console.log("Could not resize image");
+//   };
+// };
 
 const isValidExternalUrl = url => {
   return new RegExp(VALID_EXTERNAL_URL_REGEX).test(url);
@@ -151,8 +191,9 @@ const isBase64 = url => {
   return new RegExp(VALID_BASE64URL_REGEX).test(url);
 };
 
-const getBase64FromUrl = async url => {
+const getBase64FromUrl = async (url, type) => {
   if (isBase64(url)) return url;
+
   const data = await fetch(url);
   const blob = await data.blob();
   return new Promise(resolve => {

@@ -13,10 +13,13 @@ const renderFileInBase64ToCoordinates = (
 
   const { editor } = view.dom;
 
+  let _item = item;
+
+  console.log("Rendering: ", _item)
+
   if (!editor) return;
 
   const fileHTML = item => {
-    console.log(item);
     const { url, title, preview, uuid, type } = item;
     return `<p><file-component src="${url}" title="${title}" uuid="${uuid}" type="${type}" data-type="${
       preview ? "image" : "link"
@@ -24,13 +27,13 @@ const renderFileInBase64ToCoordinates = (
   };
 
   const reader = new FileReader();
-  //editor.commands.createParagraphNear();
+  editor.commands.createParagraphNear();
   reader.onload = readerEvent => {
     const fileAttrs = {
       url: readerEvent.target?.result,
-      title: item.name,
+      title: _item.name,
       uuid,
-      type: item.type,
+      type: _item.type,
       preview
     };
 
@@ -91,7 +94,7 @@ const renderFileInBase64ToCoordinates = (
     //   //   view.dispatch(transaction);
     // }
   };
-  reader.readAsDataURL(item);
+  reader.readAsDataURL(_item);
 };
 
 const uploadFilePlugin = (addFile, notify) => {
@@ -118,13 +121,13 @@ const uploadFilePlugin = (addFile, notify) => {
           if (item.type.indexOf("image") === 0) {
             event.preventDefault();
             const preview = true;
+            const uuid = uuidv4();
 
-            const itemAsFile = item.getAsFile();
-            //    const transformedFile = fileWithUniqueName(itemAsFile, uuid);
+            let itemAsFile = item.getAsFile();
+
 
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {
-              const uuid = uuidv4();
               //   addFile({ uuid, file: transformedFile });
               renderFileInBase64ToCoordinates(
                 itemAsFile,
