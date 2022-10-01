@@ -29,7 +29,8 @@ import {
   FocusNode,
   Position
 } from "./extensions";
-
+const URL_INCLUDE_REGEX = /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi;
+const URL_EXCLUDE_REGEX = /.*@.*/;
 // function normalizeSafariSpaceSpans(htmlString) {
 //   return htmlString.replace(
 //     /<span(?: class="Apple-converted-space"|)>(\s+)<\/span>/g,
@@ -182,7 +183,16 @@ export default class ContentEditor {
       // Draggable,
       CustomLink.configure({
         removeLink: linkHandlers.removeLink,
-        protocols: ["www"]
+        protocols: ["www"],
+        validate: href => {
+          return href.replace(URL_INCLUDE_REGEX, matchedText => {
+            let result = false;
+            if (!URL_EXCLUDE_REGEX.test(matchedText)) {
+              result = true;
+            }
+            return result
+          });
+        }
       }),
       TextStyle,
       Color,

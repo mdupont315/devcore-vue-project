@@ -111,9 +111,7 @@ export default {
       return index == this.selected;
     },
     getConfirmMessage(item) {
-      return this.$t("Unsaved Idea Data In Type", {
-        title: item.contentType ?? this.$t("unnamed_type"),
-      });
+      return this.$t("Unsaved Idea Data In Type");
     },
     selectedIdeaContentHasChanges(item) {
       const selectedCategory = this.categories[this.selected];
