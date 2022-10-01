@@ -75,7 +75,7 @@
           :loading="isLoading"
           @click="toggleContentTypeSelector()"
         >
-          <div v-if="!isLoading">
+          <div v-if="!isLoading" style="font-size:16px">
             {{ getContentName || $t("unnamed_type") }}
           </div>
         </loading-button>
