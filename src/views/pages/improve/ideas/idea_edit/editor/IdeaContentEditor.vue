@@ -510,8 +510,34 @@ export default {
     margin: 0;
     overflow: hidden;
 
-    tbody > tr:nth-child(odd) {
+    tbody > tr:not(:first-child):nth-child(odd) {
       background: #c7dbfc;
+    }
+
+    tbody > tr:first-child > td {
+      font-weight: bold;
+      overflow: hidden;
+      text-align: left;
+      background-color: #4294d0;
+      font-size: 14px;
+      font-family: FuturaMedium;
+      color: #fff;
+      & > p {
+        color: #fff;
+      }
+    }
+
+    tbody:first-child {
+      font-weight: bold;
+      overflow: hidden;
+      text-align: left;
+      background-color: #4294d0;
+      font-size: 14px;
+      font-family: FuturaMedium;
+      color: #fff;
+      & > p {
+        color: #fff;
+      }
     }
 
     tbody > tr:not(:first-child):nth-child(odd) > th {
@@ -935,6 +961,7 @@ export default {
 
 .tableWrapper {
   max-width: 100%;
+  margin-bottom: 20px;
 
   .table-first-row {
     display: flex;

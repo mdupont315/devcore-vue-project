@@ -471,6 +471,7 @@ export default {
     width: 65px;
     outline: none;
     position: relative;
+    margin-bottom: 20px;
     font-size: 14px;
     font-weight: 400;
     border-radius: 3px;
