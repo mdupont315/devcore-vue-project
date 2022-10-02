@@ -50,7 +50,7 @@
           </button>
         </div>
       </div>
-      <div v-else style="display: flex; flex-direction: column">
+      <div v-else style="display: flex; flex-direction: column;margin-bottom:20px">
         <div class="content-dom-file-image-container" v-lazyload>
           <!--   -->
           <div
@@ -471,7 +471,6 @@ export default {
     width: 65px;
     outline: none;
     position: relative;
-    margin-bottom: 20px;
     font-size: 14px;
     font-weight: 400;
     border-radius: 3px;
