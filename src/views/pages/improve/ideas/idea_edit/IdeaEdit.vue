@@ -130,7 +130,7 @@ export default {
     },
     ideaContentCategories: {
       get() {
-        const { ideaContentId } = this.getIdea;
+				const ideaContentId = this.getIdea?.ideaContentId
         if (ideaContentId) {
           return this.ideaContents.map((content) => {
             const { contentForm } = this.ideaContentCategoryData.find(
@@ -330,9 +330,9 @@ export default {
       if (file.id) {
         if (this.loadedFiles.some((loadedFile) => loadedFile.id === file.id)) {
           this.filesChanged = true;
-          if (!this.ideaForm._fields.removeFileIds.includes(file.id)) {
-            this.ideaForm._fields.removeFileIds.push(file.id);
-          }
+          // if (!this.ideaForm._fields.removeFileIds.includes(file.id)) {
+          //   this.ideaForm._fields.removeFileIds.push(file.id);
+          // }
         }
       }
     },

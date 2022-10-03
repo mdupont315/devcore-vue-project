@@ -101,11 +101,7 @@
                   size="xs"
                   variant="action"
                   class="btn-primary btn-block text-uppercase text-bold"
-                  style="
-                    font-size: 1.2rem;
-                    padding: 3px;
-                    min-width: 120px;
-                  "
+                  style="font-size: 1.2rem; padding: 3px; min-width: 120px"
                   @click="newIdea(row)"
                   >{{ $t("New idea") }}</b-button
                 >
@@ -176,7 +172,7 @@
                   text-uppercase text-bold
                   m-0
                 "
-                style="font-size: 1.2rem; 3px 10px;white-space: nowrap;"
+                style="font-size: 1.2rem; 3px 10px;white-space: nowrap; max-width: 120px"
                 :ref="`issuePath-${row.index}`"
                 @click="showDetails(row)"
                 >{{
@@ -394,7 +390,6 @@ export default {
       if (item.pathIssues.length > 0) {
         item.pathIssues.forEach((issue) => {
           pathTotalHours += issue.issueHoursTotal;
-
         });
       }
       if (pathTotalHours < 0) {

@@ -1100,7 +1100,6 @@ export default {
   color: #fff;
   padding: 4px 2px;
   font-size: 12px;
-  min-width: 80px;
   border-radius: 5px;
   pointer-events: none;
 }
