@@ -284,7 +284,7 @@ export default {
         });
     },
     async addBase64AsFile() {
-      console.log("FETCING ITEM ! ");
+      console.log("addBase64AsFile");
       const toFile = await fetch(this.getAttrs.src, {
         method: "GET",
         mode: "no-cors",

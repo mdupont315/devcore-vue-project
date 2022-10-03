@@ -21,9 +21,9 @@ const renderFileInBase64ToCoordinates = (
 
   const fileHTML = item => {
     const { url, title, preview, uuid, type } = item;
-    return `<p><file-component src="${url}" title="${title}" uuid="${uuid}" type="${type}" data-type="${
+    return `<file-component src="${url}" title="${title}" uuid="${uuid}" type="${type}" data-type="${
       preview ? "image" : "link"
-    }"></file-component></p>`;
+    }"></file-component>`;
   };
 
   const reader = new FileReader();

@@ -60,8 +60,6 @@ const docxFileParser = notify =>
     return image.read("base64").then(function(imageBuffer) {
       const mod = imageBuffer.slice(-2) === "==" ? 2 : 1;
       const base64size = imageBuffer.length * (3 / 4) - mod;
-      console.log(base64size);
-      console.log(image.contentType);
       if (base64size <= FILE_SIZE_LIMIT) {
         return {
           src: "data:" + image.contentType + ";base64," + imageBuffer
@@ -330,7 +328,6 @@ export const File = Node.create({
             );
             setIsLoading(false);
 
-            console.log({ res });
             if (res) {
               setTimeout(() => {
                 this.editor.commands.insertContentAt(pos, res);
