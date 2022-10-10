@@ -122,3 +122,4 @@ export default class IdeaModel extends BaseModel {
     return this;
   }
 }
+

@@ -121,6 +121,7 @@ export const CustomLink = Mark.create({
   //   const validate = validateUrlNotEmail(href);
 
   //  if (!validate) return true;
+
     if (!uuid) {
       return [
         "a",

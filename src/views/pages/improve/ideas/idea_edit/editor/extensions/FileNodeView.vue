@@ -1,5 +1,5 @@
 <template>
-  <node-view-wrapper as="div" class="file-component" contenteditable="false">
+  <node-view-wrapper as="div" class="file-component">
     <node-view-content class="content-dom" />
 
     <section class="content-dom-file">
@@ -8,13 +8,13 @@
           <b-tooltip
             :disabled="!!getAttrs.href === false"
             ref="tooltip"
-            :target="`attachment-file-non-preview-container-${getAttrs.title}`"
+            :target="`attachment-file-non-preview-container-${fileKey}`"
           >
             {{ $t("Download file") }}
           </b-tooltip>
           <div
             class="attachment-file-non-preview-container"
-            :id="`attachment-file-non-preview-container-${getAttrs.title}`"
+            :id="`attachment-file-non-preview-container-${fileKey}`"
             :hidden="false"
             :class="
               !!getAttrs.href === true
@@ -50,7 +50,7 @@
           </button>
         </div>
       </div>
-      <div v-else style="display: flex; flex-direction: column;margin-bottom:20px">
+      <div v-else style="display: flex; flex-direction: column">
         <div class="content-dom-file-image-container" v-lazyload>
           <!--   -->
           <div
@@ -60,15 +60,15 @@
             <b-spinner />
           </div>
           <img
-            :key="imgKey"
-            :ref="`file-image-node-${imgKey}`"
+            :key="fileKey"
+            :ref="`file-image-node-${fileKey}`"
             :data-url="getAttrs.src"
             class="fileNodeView-preview-image"
             id="fileNodeView-lazy-load-preview-image"
           />
 
           <!-- <img
-            :key="imgKey"
+            :key="fileKey"
             :ref="`${getAttrs.uuid}`"
             :data-url="getAttrs.src"
             :alt="getAttrs.title"
@@ -131,14 +131,14 @@ export default {
       imgHeight: "auto",
       resized: false,
       name: null,
-      imgKey: Math.random(),
+      fileKey: Math.random(),
       nameSet: false,
     };
   },
 
   computed: {
     // imageElementSrcAttribute() {
-    //   const image = this.$refs[`file-image-node-${this.imgKey}`];
+    //   const image = this.$refs[`file-image-node-${this.fileKey}`];
     //   return !!image.src;
     // },
     isAttachmentFile() {
@@ -269,7 +269,7 @@ export default {
           }
           if (!this.resized) {
             this.resized = true;
-            this.imgKey = Math.random();
+            this.fileKey = Math.random();
           }
         }
       }
@@ -442,6 +442,15 @@ export default {
 </script>
 
 <style lang="scss">
+// HACKS
+p > .file-component ~ img.ProseMirror-separator {
+  visibility: hidden;
+}
+
+p > img.ProseMirror-separator ~ br.ProseMirror-trailingBreak {
+  visibility: hidden;
+}
+
 .fileNodeView-lazy-load-image-spinner {
   display: flex;
   width: 200px;
@@ -451,8 +460,15 @@ export default {
 }
 .content-dom-file-image-container {
   margin-right: 5px;
-  margin-bottom: 10px;
 }
+.content-dom-file-image-container ~ .file-remove-button {
+  transform: translate(0px, 15px);
+	margin-bottom: 5px;
+}
+.fileNodeView-preview-image{
+	margin-top: 10px;
+}
+
 // .fileNodeView-preview-image {
 //   /* IE, only works on <img> tags */
 //   -ms-interpolation-mode: nearest-neighbor;
@@ -464,6 +480,12 @@ export default {
 .file-component {
   padding-top: 3px;
   padding-bottom: 3px;
+
+
+  &.node-has-focus > section > div > .loaded-file-node-component > img {
+    outline: 3px solid #4294d0;
+  }
+
   .file-remove-button {
     font-family: "FuturaMedium";
     color: #d0424d;

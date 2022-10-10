@@ -708,5 +708,6 @@
   "Unknown file type in docx file": "Excluded unknown file type ({type}) from the document import.",
   "Saving resources": "Saving files ({amount}).",
   "Importing document": "Importing document {title}... Please do not window",
-  "Unsaved Idea Data In Type": "You have unsaved data in content."
+  "Unsaved Idea Data In Type": "You have unsaved data in content.",
+  "Failed to parse docx to editor": "Failed to import .docx file. {message}"
 }

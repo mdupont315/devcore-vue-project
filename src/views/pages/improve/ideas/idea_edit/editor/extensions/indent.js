@@ -46,6 +46,10 @@ export const Indent = Extension.create({
         const { selection } = state;
         tr = tr.setSelection(selection);
 
+        if (this.editor.isActive('file')) {
+          return false
+        }
+
         if (this.editor.isActive("comment") || selection.node) {
           return this.editor
             .chain()

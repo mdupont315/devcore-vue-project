@@ -258,6 +258,7 @@ export function updateColumns(
 export const CustomTable = Table.extend({
   name: "table",
   // @ts-ignore
+
   addOptions() {
     return {
       HTMLAttributes: {},

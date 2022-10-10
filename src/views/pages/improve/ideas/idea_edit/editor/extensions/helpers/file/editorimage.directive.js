@@ -14,7 +14,7 @@ export default {
 
       if (imageElement) {
         imageElement.addEventListener("load", () => {
-          setTimeout(() => el.classList.add("loaded"), 100);
+          setTimeout(() => el.classList.add("loaded-file-node-component"), 100);
         });
         imageElement.addEventListener("error", () => console.log("error"));
 
@@ -41,14 +41,15 @@ export default {
           const RATIO_ASPECT =
             RATIO_WIDTH > RATIO_HEIGHT ? RATIO_WIDTH : RATIO_HEIGHT;
 
-          imageElement.width = imgWidth / RATIO_ASPECT;
-          imageElement.height = imgHeight / RATIO_ASPECT;
-          imageElement.src = img.src;
-          imageElement.dataset.url = "";
-          spinnerElement.hidden = true;
+          if (!imageElement.src) {
+            imageElement.width = imgWidth / RATIO_ASPECT;
+            imageElement.height = imgHeight / RATIO_ASPECT;
+            imageElement.src = img.src;
+            imageElement.dataset.url = "";
+            spinnerElement.hidden = true;
+          }
         };
       }
-      console.log("***************")
     }
 
     function handleIntersect(entries, observer) {

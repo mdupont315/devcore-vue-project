@@ -1,11 +1,11 @@
-import { Extension } from '@tiptap/core';
-import { PluginKey, Plugin } from 'prosemirror-state';
-import { uniqueArray, includes } from '@remirror/core-helpers';
+import { Extension } from "@tiptap/core";
+import { PluginKey, Plugin } from "prosemirror-state";
+import { uniqueArray, includes } from "@remirror/core-helpers";
 
-const trailingNodePluginKey = new PluginKey('trailingNode');
+const trailingNodePluginKey = new PluginKey("trailingNode");
 
 export function trailingNode(options) {
-  const { ignoredNodes = [], nodeName = 'paragraph' } = options ?? {};
+  const { ignoredNodes = [], nodeName = "paragraph" } = options ?? {};
 
   // The names of the nodes for which this rule should not be applied.
   const ignoredNodeNames = uniqueArray([...ignoredNodes, nodeName]);
@@ -14,18 +14,24 @@ export function trailingNode(options) {
   let type;
 
   // The list of nodes for this schema that should have content injected after them.
-  let types;
+  let types = ["file", "table"];
 
   return new Plugin({
     key: trailingNodePluginKey,
     appendTransaction(_, __, state) {
-      const { doc: { content, lastChild }, tr } = state;
+      const {
+        doc: { content, lastChild },
+        tr
+      } = state;
 
-      const shouldInsertNodeAtEnd = trailingNodePluginKey.getState(state) || (lastChild.type.name === 'paragraph' && lastChild.textContent.trim().length);
+      const shouldInsertNodeAtEnd =
+        trailingNodePluginKey.getState(state) ||
+        (lastChild.type.name === "paragraph" &&
+          lastChild.textContent.trim().length);
 
       const endPosition = content.size;
 
-      if (!shouldInsertNodeAtEnd) return
+      if (!shouldInsertNodeAtEnd) return;
 
       return tr.insert(endPosition, type.create());
     },
@@ -34,33 +40,40 @@ export function trailingNode(options) {
         const nodeType = schema.nodes[nodeName];
 
         if (!nodeType) {
-          throw new Error(`Invalid node being used for trailing node extension: '${nodeName}'`);
+          throw new Error(
+            `Invalid node being used for trailing node extension: '${nodeName}'`
+          );
         }
 
         // Save the type for continued use.
         type = nodeType;
         types = Object.values(schema.nodes)
-          .map((node) => node)
-          .filter((node) => !ignoredNodeNames.includes(node.name));
+          .map(node => node)
+          .filter(node => !ignoredNodeNames.includes(node.name));
 
         return includes(types, doc.lastChild?.type);
       },
       apply: (tr, value) => {
-        if (!tr.docChanged) return value
+        if (!tr.docChanged) return value;
 
-        const { doc: { lastChild } } = tr
+        const {
+          doc: { lastChild }
+        } = tr;
 
-        const shouldApply = (lastChild.type.name === 'paragraph' && lastChild.textContent.trim().length);
-
+        const shouldApply =
+          lastChild.type.name === "paragraph" &&
+          lastChild.textContent.trim().length;
+        console.log({ shouldApply });
         return includes(types, lastChild?.type) || shouldApply;
-      },
-    },
+      }
+    }
   });
 }
 
-
 export const TrailingNode = Extension.create({
-  name: 'trailingNode',
+  name: "trailingNode",
 
-  addProseMirrorPlugins: () => [trailingNode({ ignoredNodes: [], nodeName: 'paragraph' })],
+  addProseMirrorPlugins: () => [
+    trailingNode({ ignoredNodes: [], nodeName: "paragraph" })
+  ]
 });

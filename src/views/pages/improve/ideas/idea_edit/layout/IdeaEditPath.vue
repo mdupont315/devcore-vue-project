@@ -605,7 +605,7 @@ export default {
 .idea_edit_path_container {
   border-radius: 5px;
   width: 25%;
-  min-width: 300px;
+
   margin: 20px 20px 0px 0px;
 }
 
@@ -762,7 +762,6 @@ export default {
 @media screen and (max-height: 900px) {
   .ideaEditPath-report-chart > div > .idea-report {
     max-height: 350px !important;
-    min-height: 350px !important;
   }
   .ideaEdit-form-hasReviews {
     max-height: 20vh;

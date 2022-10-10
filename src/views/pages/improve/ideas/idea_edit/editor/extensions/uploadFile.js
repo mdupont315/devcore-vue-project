@@ -15,7 +15,7 @@ const renderFileInBase64ToCoordinates = (
 
   let _item = item;
 
-  console.log("Rendering: ", _item)
+  console.log("Rendering: ", _item);
 
   if (!editor) return;
 
@@ -27,7 +27,7 @@ const renderFileInBase64ToCoordinates = (
   };
 
   const reader = new FileReader();
-  editor.commands.createParagraphNear();
+  //editor.commands
   reader.onload = readerEvent => {
     const fileAttrs = {
       url: readerEvent.target?.result,
@@ -41,6 +41,11 @@ const renderFileInBase64ToCoordinates = (
       .chain()
       .insertContentAt(coordinates.pos, fileHTML(fileAttrs))
       .run();
+
+    editor.chain().enter().run()
+
+    // const setFile = editor.commands.setNodeSelection(coordinates.pos);
+    // console.log({ setFile });
     // };
 
     // if (preview) {
@@ -117,6 +122,20 @@ const uploadFilePlugin = (addFile, notify) => {
         const coordinates = { pos, inside: 0 };
 
         items.forEach(function(item) {
+          // if (item.kind === "string") {
+          //   // console.log(item);
+          //   if (item.type === "text/html") {
+          //     const parser = new DOMParser();
+          //     item.getAsString(data => {
+          //       const test = parser.parseFromString(data, "text/html");
+          //       console.log(test);
+
+          //       // const test = JSON.parse(data);
+          //       // console.log(test);
+          //       // console.log(test.data);
+          //     });
+          //   }
+          // }
           if (item.kind != "file") return;
           if (item.type.indexOf("image") === 0) {
             event.preventDefault();
@@ -124,7 +143,6 @@ const uploadFilePlugin = (addFile, notify) => {
             const uuid = uuidv4();
 
             let itemAsFile = item.getAsFile();
-
 
             const valid = validateFileSize(notify, itemAsFile);
             if (valid) {

@@ -738,6 +738,6 @@
   "Unknown file type in docx file" : "Dokumentista jätettiin tunnistamaton tyyppi ({type}) tuomatta.",
   "Saving resources": "Tallennetaan tiedostoja ({amount})",
   "Importing document": "Tuodaan tiedostoa {title}... Ethän sulje selaintasi.",
-  "Unsaved Idea Data In Type": "Sinulla on tallentamattomia muutoksia sisällössä."
-
+  "Unsaved Idea Data In Type": "Sinulla on tallentamattomia muutoksia sisällössä.",
+  "Failed to parse docx to editor": "Sisällön tuominen .docx tiedostosta epäonnistui!. {message}"
 }

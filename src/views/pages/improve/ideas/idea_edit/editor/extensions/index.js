@@ -1,17 +1,18 @@
 export * from "./comment";
 export * from "./table";
 export * from "./indent";
-export * from "./customStyle";
+export * from "./CustomStyle";
+export * from "./helpers/table/tableCell";
 export * from "./eventHandler";
 export { default as ExternalVideo } from "./ExternalVideo";
 export * from "./File";
 export * from "./heading";
 export * from "./customLine";
-export * from './TrailingNode'
-export * from './customParagraph'
-export * from './customLink'
-export * from './focus'
-export * from './customUnderLine'
-export * from './position'
+export * from "./TrailingNode";
+export * from "./customParagraph";
+export * from "./customLink";
+export * from "./focus";
+export * from "./customUnderLine";
+export * from "./position";
 export { default as Draggable } from "./draggable";
-export * from './plugins/selectionDecorator'
+export * from "./plugins/selectionDecorator";

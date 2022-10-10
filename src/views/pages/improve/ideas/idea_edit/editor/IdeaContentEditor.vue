@@ -961,9 +961,6 @@ export default {
 
 .tableWrapper {
   max-width: 100%;
-    margin-bottom: 20px;
-
-
   .table-first-row {
     display: flex;
     width: 100%;

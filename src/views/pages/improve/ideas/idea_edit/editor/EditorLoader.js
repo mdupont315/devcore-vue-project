@@ -3,7 +3,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
 import Gapcursor from "@tiptap/extension-gapcursor";
 import TableRow from "@tiptap/extension-table-row";
-import TableCell from "@tiptap/extension-table-cell";
+//import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import Text from "@tiptap/extension-text";
 import TextStyle from "@tiptap/extension-text-style";
@@ -18,6 +18,7 @@ import {
   Indent,
   EventHandler,
   Heading,
+  CustomTableCell,
   CustomTable,
   File,
   Comment,
@@ -31,6 +32,69 @@ import {
 } from "./extensions";
 const URL_INCLUDE_REGEX = /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi;
 const URL_EXCLUDE_REGEX = /.*@.*/;
+
+function findImageNodeIndexInChildren(element) {
+  for (let i = 0; i < element.childNodes.length; i++) {
+    if (element.childNodes.item(i).nodeName === "IMG") {
+      return i;
+    }
+  }
+  return null;
+}
+
+function processImageNode(image) {
+  console.log(image);
+  const parent = image.parentElement;
+  const grandParent = parent?.parentElement;
+  if (!parent || !grandParent) return;
+
+  console.log(parent.nodeName);
+  console.log(grandParent.nodeName);
+  if (parent.nodeName === "SPAN" && grandParent.nodeName === "P") {
+    let imageIndex = findImageNodeIndexInChildren(parent);
+    if (imageIndex === null) return;
+    // Move all nodes before the image in a parent before the current one
+    if (imageIndex > 1) {
+      const pBefore = document.createElement(parent.nodeName);
+      grandParent.insertBefore(pBefore, parent);
+      for (; imageIndex > 0; imageIndex--) {
+        pBefore.append(parent.childNodes.item(0));
+      }
+    }
+    // Move the image before the current parent
+    const imageNode = parent.childNodes.item(0);
+    grandParent.insertBefore(imageNode, parent);
+    // If the old parent is now empty, delete it
+    if (parent.childNodes.length === 0) {
+      grandParent.removeChild(parent);
+    }
+  } else {
+    console.log(parent);
+    parent.replaceWith(image);
+  }
+}
+
+// function unwrapImages(htmlString) {
+//   const div = document.createElement("div");
+//   div.className = "root";
+//   div.innerHTML = htmlString;
+
+//   // Security to not loop too deep
+//   let maxLevel = 5;
+//   let images;
+//   do {
+//     images = div.querySelectorAll("*:not(.root) > img");
+//     console.log(images);
+//     for (let i = 0; i < images.length; i++) {
+//       // console.log(images[i])
+//       images[i].parentElement.setAttribute("contenteditable", false);
+//       //  processImageNode(images[i]);
+//     }
+//     maxLevel--;
+//   } while (maxLevel > 0 && images.length > 0);
+//   return div.innerHTML;
+// }
+
 // function normalizeSafariSpaceSpans(htmlString) {
 //   return htmlString.replace(
 //     /<span(?: class="Apple-converted-space"|)>(\s+)<\/span>/g,
@@ -176,9 +240,10 @@ export default class ContentEditor {
         }
       }),
       History.configure({ depth: 10 }),
-      FontFamily.configure({
-        types: ["textStyle"]
-      }),
+      // FontFamily.configure({
+      //   types: ["textStyle"]
+      // }),
+      //FontFamily,
       Text,
       // Draggable,
       CustomLink.configure({
@@ -190,19 +255,19 @@ export default class ContentEditor {
             if (!URL_EXCLUDE_REGEX.test(matchedText)) {
               result = true;
             }
-            return result
+            return result;
           });
         }
       }),
-      TextStyle,
+      // TextStyle,
       Color,
       Indent,
       Highlight,
       ExternalVideo,
       CustomUnderLine,
+      CustomTableCell,
       TableRow,
       TableHeader,
-      TableCell,
       Gapcursor,
       Heading,
       CustomTable,
@@ -298,8 +363,16 @@ export default class ContentEditor {
           // console.log(res
 
           //  console.log(formatHTML5);
-
-          return formatHTML5;
+          // console.log(
+          //   unwrapImages(
+          //     formatHTML5.replace("img", "file-component").replace("span", "p")
+          //   )
+          // );
+          // return unwrapImages(formatHTML5);
+          return formatHTML5
+            .replace("img", "file-component")
+            .replace("span", "p");
+          // return formatHTML5.replace('img', 'file-component')
 
           //     return formatHTML4;
         }
@@ -313,6 +386,7 @@ export default class ContentEditor {
               editor.commands.updateAttributes(node.type.name, { indent: 0 });
             }
           }
+
           const json = editor.getJSON();
           this.options.onUpdate(json);
         });

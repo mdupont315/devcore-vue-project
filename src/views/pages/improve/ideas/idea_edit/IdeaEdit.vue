@@ -7,7 +7,7 @@
         :isLoading="isLoading"
         :selectedCategoryIndex="selectedCategoryIndex"
         :comments="getCommentNodesFromContent()"
-				:selectedIdeaRoles="ideaForm.companyRoleIds"
+        :selectedIdeaRoles="ideaForm.companyRoleIds"
         @changeType="changeContentType"
         @fileAdded="setFile"
         @fileRemoved="removeFile"
@@ -94,7 +94,7 @@ export default {
       markup: null,
       ideaId: null,
       version: 1,
-      isPrimary: false,
+      isPrimary: true,
       contentType: null,
       companyRoles: [],
     }),
@@ -130,7 +130,7 @@ export default {
     },
     ideaContentCategories: {
       get() {
-				const ideaContentId = this.getIdea?.ideaContentId
+        const ideaContentId = this.getIdea?.ideaContentId;
         if (ideaContentId) {
           return this.ideaContents.map((content) => {
             const { contentForm } = this.ideaContentCategoryData.find(
@@ -140,7 +140,7 @@ export default {
             ) || {
               contentForm: new GQLForm({
                 id: undefined,
-                markup: defaultContent,
+                markup: null,
                 ideaId: null,
                 version: 1,
                 isPrimary: false,
@@ -172,7 +172,6 @@ export default {
       get() {
         const contentForm =
           this.ideaContentCategories[this.selectedCategoryIndex]?.contentForm;
-
 
         return {
           contentType: contentForm.contentType,
@@ -404,9 +403,8 @@ export default {
       let searchMarkup = argMarkup;
 
       if (!searchMarkup) {
-        const contentForm =
-          this.ideaContentCategories[this.selectedCategoryIndex].contentForm;
-        searchMarkup = contentForm.markup;
+        const contentForm = this.getIdeaContent;
+        searchMarkup = JSON.stringify(contentForm.markup);
       }
 
       const filesInIdea = [];
@@ -684,14 +682,12 @@ export default {
         ),
       ];
 
-			console.log(currentSelectedFormId === form.id)
 
       if (currentSelectedFormId === form.id) {
         this.setContentActive();
       } else {
         this.setContentActive(currentSelectedFormId);
       }
-
 
       try {
         const removeForm = new GQLForm({
@@ -712,7 +708,7 @@ export default {
         console.log(e);
       } finally {
         await this.fetchIdeaContents(form.fields.ideaId, false);
-				await this.initializeData(currentSelectedFormId)
+        await this.initializeData(currentSelectedFormId);
 
         this.setIsLoading(false);
         this.isSaving = false;

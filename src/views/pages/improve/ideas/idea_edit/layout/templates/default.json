@@ -11,32 +11,17 @@
       "attrs": { "id": null, "indent": 0 },
       "content": [
         {
-          "text": "Your first-page style depends on how large your topic is. If it is large, it is better to split it into different content areas and have your first page as overview and general process manual.",
+          "text": "Your first-page style depends on how large your topic is. If it is large, it is better to split it into different content areas and have your first page as an overview and general process manual.",
           "type": "text"
         }
       ]
-    },
-    {
-      "type": "file",
-      "attrs": {
-        "id": "uQ2GNlzb4pvJqAefDgBvQAynbqwIcaNUEOFVaz3z.png",
-        "src": "https://devcore.app/resources/ideas/51a9d59b-a68c-4813-a5e7-5ed6e8f59309?id=c9e8fd5c-4917-4a1f-80e4-22ae97911b16",
-        "href": "",
-        "size": 14484.5,
-        "type": "image/png",
-        "uuid": null,
-        "style": "margin-left:0px;margin-top:0px;",
-        "title": "no-name",
-        "height": "254",
-        "preview": true
-      }
     },
     {
       "type": "paragraph",
       "attrs": { "id": null, "indent": 0 },
       "content": [
         {
-          "text": "Always keep your instructions simple, so readers don’t get self-defeated by the whole document.",
+          "text": "Always keep your instructions simple and readable in one sitting, so readers don’t get self-defeated by the whole document.",
           "type": "text"
         }
       ]
@@ -53,60 +38,23 @@
       ]
     },
     {
-      "type": "heading",
-      "attrs": { "id": "heading-", "level": 2, "indent": 0 },
+      "type": "paragraph",
+      "attrs": { "id": null, "indent": 0 },
       "content": [
         {
-          "text": "Do you have existing instructions in the word?",
-          "type": "text"
-        }
-      ]
-    },
-    {
-      "type": "orderedList",
-      "attrs": { "start": 1 },
-      "content": [
-        {
-          "type": "listItem",
-          "content": [
-            {
-              "type": "paragraph",
-              "attrs": { "id": null, "indent": 0 },
-              "content": [
-                {
-                  "text": "Upload them to your google drive (if the company’s information security allows it)",
-                  "type": "text"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "listItem",
-          "content": [
-            {
-              "type": "paragraph",
-              "attrs": { "id": null, "indent": 0 },
-              "content": [
-                {
-                  "text": "Copy whole document (ctrl+a, ctrl+c)",
-                  "type": "text"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "listItem",
-          "content": [
-            {
-              "type": "paragraph",
-              "attrs": { "id": null, "indent": 0 },
-              "content": [
-                { "text": "Paste it into this page (ctrl+v)", "type": "text" }
-              ]
-            }
-          ]
+          "type": "file",
+          "attrs": {
+            "id": "NiGVytuVb7T0JqtoLWZHCqInCXsC3zTyRkoTEvjZ.gif",
+            "src": "https://devcore.app/resources/ideas/51a9d59b-a68c-4813-a5e7-5ed6e8f59309?id=c4c897a1-2782-428e-84af-6669b05209a3",
+            "uri": "NiGVytuVb7T0JqtoLWZHCqInCXsC3zTyRkoTEvjZ.gif",
+            "href": "",
+            "size": 1714005,
+            "type": "image/gif",
+            "style": null,
+            "title": "076c5ae7-2933-45c5-a4be-22496bd1f901.gif",
+            "preview": true,
+            "data-type": "image"
+          }
         }
       ]
     },
@@ -126,21 +74,11 @@
               "attrs": { "id": null, "indent": 0 },
               "content": [
                 {
-                  "text": "Some learn by seeing (add animated gifs)",
-                  "type": "text"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "listItem",
-          "content": [
-            {
-              "type": "paragraph",
-              "attrs": { "id": null, "indent": 0 },
-              "content": [
-                { "text": "Some learn by hearing (add videos)", "type": "text" }
+                  "text": "Some learn by seeing",
+                  "type": "text",
+                  "marks": [{ "type": "bold" }]
+                },
+                { "text": " (add animated gifs)", "type": "text" }
               ]
             }
           ]
@@ -153,7 +91,104 @@
               "attrs": { "id": null, "indent": 0 },
               "content": [
                 {
-                  "text": "Some learn by applying (create example projects to apply their learning)",
+                  "text": "Some learn by hearing",
+                  "type": "text",
+                  "marks": [{ "type": "bold" }]
+                },
+                { "text": " (add videos)", "type": "text" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": { "id": null, "indent": 0 },
+              "content": [
+                {
+                  "text": "Some learn by applying",
+                  "type": "text",
+                  "marks": [{ "type": "bold" }]
+                },
+                {
+                  "text": " (create example projects to apply their learning)",
+                  "type": "text"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "id": "heading-", "level": 2, "indent": 0 },
+      "content": [
+        {
+          "text": "How people change their way of doing things",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "bulletList",
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": { "id": "heading-", "indent": 0 },
+              "content": [
+                {
+                  "text": "Maximize possibility ",
+                  "type": "text",
+                  "marks": [{ "type": "bold" }]
+                },
+                {
+                  "text": "(Time to experiment and test, opportunity to utilize pracitce in work)",
+                  "type": "text"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": { "id": "heading-", "indent": 0 },
+              "content": [
+                {
+                  "text": "Increase willingness",
+                  "type": "text",
+                  "marks": [{ "type": "bold" }]
+                },
+                {
+                  "text": " (Positive: do things faster/easier, Negative: avoid frustration, problems, Incentive: free lunch, performance reward, ClanDeploy Score)",
+                  "type": "text"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": { "id": "heading-", "indent": 0 },
+              "content": [
+                {
+                  "text": "Enable ability ",
+                  "type": "text",
+                  "marks": [{ "type": "bold" }]
+                },
+                {
+                  "text": "(show action steps, make things straightforward and move nuanches and deeper understanding at the end/another content-area)",
                   "type": "text"
                 }
               ]
@@ -191,6 +226,16 @@
       "type": "heading",
       "attrs": { "id": "heading-", "level": 1, "indent": 0 },
       "content": [{ "text": "Overview style first page", "type": "text" }]
+    },
+    {
+      "type": "paragraph",
+      "attrs": { "id": "heading-", "indent": 0 },
+      "content": [
+        {
+          "text": "This template is to create overview page for larger topic. If this doesn’t suit your purpose, check action step template when creating new content area.",
+          "type": "text"
+        }
+      ]
     },
     {
       "type": "heading",

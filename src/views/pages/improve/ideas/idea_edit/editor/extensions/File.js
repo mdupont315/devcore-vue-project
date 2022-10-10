@@ -9,6 +9,7 @@ import {
   SUPPORTED_PREVIEW_RESIZE_IMAGE_TYPES,
   FILE_SIZE_LIMIT
 } from "./helpers/file/constants";
+import { PluginKey, Plugin } from "prosemirror-state";
 
 import FileNodeView from "./FileNodeView.vue";
 import { VueNodeViewRenderer } from "@tiptap/vue-2";
@@ -26,23 +27,41 @@ const formatFileSize = (bytes, decimalPoint) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 };
 
+function transformElementTable(element) {
+  console.log(element);
+  if (element.children && element.children[0]) {
+    const table = element.children.find(x => x.type === "table");
+    if (table && table.children && table.children[0] && table.children[0].type && table.children[0].type === "tableRow") {
+      table.children[0].styleId = 'header';
+    }
+    console.log(element)
+    return { ...element };
+  } else {
+    return element;
+  }
+}
+
 const convertDocxFileToHtml = async (file, notify) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
     reader.onloadend = function(event) {
       const arrayBuffer = reader.result;
+
+      const options = {
+        convertImage: docxFileParser(notify),
+        styleMap: ["em => p:fresh"],
+        transformDocument: transformElementTable
+      };
+
       mammoth
-        .convertToHtml(
-          { arrayBuffer: arrayBuffer },
-          {
-            convertImage: docxFileParser(notify)
-          }
-        )
+        .convertToHtml({ arrayBuffer: arrayBuffer }, options)
         .then(function(resultObject) {
           if (!resultObject) {
+            //  console.log("HELLO")
             reject(resultObject);
           }
+          console.log(resultObject.value);
           resolve(resultObject.value);
         });
     };
@@ -78,8 +97,11 @@ const docxFileParser = notify =>
 
 export const File = Node.create({
   name: "file",
-
-  //priority: 1000,
+  // isolating: true,
+  // defining: true,
+  // allowGapCursor: true,
+  priority: 1001,
+  selectable: true,
 
   addOptions() {
     return {
@@ -186,10 +208,6 @@ export const File = Node.create({
 
   parseHTML: () => [
     // {
-    //   tag: "p img[src]",
-    //   getAttrs: dom => dom.src && null
-    // },
-    // {
     //   tag: "p > img[src]",
     //   getAttrs: dom => {
     //     if (typeof dom === "string") return {};
@@ -257,9 +275,7 @@ export const File = Node.create({
     // },
     {
       tag: "file-component",
-      getAttrs: dom => {
-        return dom && null;
-      }
+      getAttrs: dom => dom && null
     }
   ],
   renderHTML: ({ HTMLAttributes }) => {
@@ -330,7 +346,13 @@ export const File = Node.create({
 
             if (res) {
               setTimeout(() => {
-                this.editor.commands.insertContentAt(pos, res);
+                try {
+                  this.editor.commands.insertContentAt(pos, res);
+                } catch (e) {
+                  let reason = e && e.message ? `${e.message}` : "";
+
+                  notify("Failed to parse docx to editor", { message: reason });
+                }
               });
             }
           } catch (e) {
@@ -422,9 +444,34 @@ export const File = Node.create({
       })
     ];
   },
+
+  // const test =
+
   addProseMirrorPlugins() {
     const { addFile } = this.options;
     const { notify } = this.options;
-    return [uploadFilePlugin(addFile, notify)];
+    return [
+      uploadFilePlugin(addFile, notify)
+      // new Plugin({
+      //   key: "fileNodeContentEditable",
+      //   props: {
+      //     decorations: ({ doc, selection }) => {
+      //       const { anchor, from, to } = selection;
+      //       const decorations = [];
+      //       const attrsToAdd = { contenteditable: "false" };
+
+      //       console.log(selection);
+
+      //       doc.descendants((node, pos, parent) => {
+      //         if (node.type.name === "file") {
+      //           console.log({ parent });
+      //         }
+      //       });
+
+      //       return false;
+      //     }
+      //   }
+      // })
+    ];
   }
 });

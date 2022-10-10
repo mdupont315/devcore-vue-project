@@ -419,10 +419,13 @@ export default {
           emptyIdeaArea(compareObj({ ...content, name: content.contentType })),
           emptyIdeaArea(compareObj(this.value.fields))
         );
-        const listFieldsEqual = this.listsAreEqual(
-          content.companyRoles.map((role) => role.id ?? role),
-          this.value.fields.companyRoles.map((role) => role.id ?? role)
-        );
+
+        const listFieldsEqual = !this.value.isPrimary
+          ? this.listsAreEqual(
+              content.companyRoles.map((role) => role.id ?? role),
+              this.value.fields.companyRoles.map((role) => role.id ?? role)
+            )
+          : true;
 
         return !listFieldsEqual || !flatFieldsEqual;
       }
@@ -463,6 +466,9 @@ export default {
 
 
 <style lang="scss">
+.test {
+  min-width: 320px;
+}
 input[type="checkbox"] {
   cursor: pointer;
 }
@@ -524,7 +530,7 @@ input[type="checkbox"] {
   right: 0;
   height: calc(80vh);
   bottom: 65px;
-  width: calc((100vw - 240px) * 0.25);
+  width: calc((100% - 180px) * 0.25);
   border-top-left-radius: 3px;
   border-bottom-left-radius: 3px;
   overflow: hidden;
@@ -535,7 +541,8 @@ input[type="checkbox"] {
   transition: 500ms;
 }
 .idea_edit_content_container_type-enter-to {
-  max-width: calc((100vw - 240px) * 0.25);
+  max-width: calc((100% - 180px) * 0.25);
+
 }
 
 .idea_edit_content_container_type-leave-to {
@@ -543,12 +550,13 @@ input[type="checkbox"] {
 }
 
 .idea_edit_content_container_type-leave {
-  max-width: calc((100vw - 240px) * 0.25);
+  max-width: calc((100% - 180px) * 0.25);
   // position: absolute;
 }
 
 .idea_edit_content_container_type-enter {
   max-width: 0;
+
   // position: absolute;
 }
 
@@ -556,6 +564,7 @@ input[type="checkbox"] {
   width: 36px;
   height: 30px;
   font-size: 24px;
+  margin-right: 15px;
   color: lightgray;
   margin-left: 30px;
   cursor: pointer;
