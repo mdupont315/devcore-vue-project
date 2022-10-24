@@ -63,7 +63,6 @@ export function trailingNode(options) {
         const shouldApply =
           lastChild.type.name === "paragraph" &&
           lastChild.textContent.trim().length;
-        console.log({ shouldApply });
         return includes(types, lastChild?.type) || shouldApply;
       }
     }

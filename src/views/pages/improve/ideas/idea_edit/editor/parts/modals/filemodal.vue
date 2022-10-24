@@ -185,7 +185,7 @@ input[type="file"] {
   color: #c4c4c4;
   font-family: FuturaLight;
   font-size: 16px;
-  max-width: 325px;
+  max-width: 350px;
   margin: auto;
   text-align: center;
 }

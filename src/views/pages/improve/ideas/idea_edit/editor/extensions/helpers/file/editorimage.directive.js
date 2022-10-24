@@ -3,6 +3,8 @@ export default {
     function loadImage() {
       if (!el) return;
 
+      console.log(el)
+
       const imageElement = Array.from(el.children).find(
         el =>
           el.nodeName === "IMG" &&

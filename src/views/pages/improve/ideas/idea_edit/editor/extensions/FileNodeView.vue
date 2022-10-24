@@ -52,7 +52,6 @@
       </div>
       <div v-else style="display: flex; flex-direction: column">
         <div class="content-dom-file-image-container" v-lazyload>
-          <!--   -->
           <div
             class="fileNodeView-lazy-load-image-spinner"
             id="fileNodeView-lazy-load-image-spinner"
@@ -66,25 +65,6 @@
             class="fileNodeView-preview-image"
             id="fileNodeView-lazy-load-preview-image"
           />
-
-          <!-- <img
-            :key="fileKey"
-            :ref="`${getAttrs.uuid}`"
-            :data-url="getAttrs.src"
-            :alt="getAttrs.title"
-            :style="{ width: `${imgWidth}px`, height: `${imgHeight}px` }"
-            class="fileNodeView-preview-image"
-						    @load="onImgLoad"
-
-          /> -->
-
-          <!-- <img
-            :ref="`${getAttrs.uuid}`"
-            :src="getAttrs.src"
-            :alt="getAttrs.title"
-            @load="loadedImg"
-            style="max-height: 65vh; max-width: 50%"
-          /> -->
         </div>
         <button @click="removeNode" class="file-remove-button">
           {{ $t("Remove") }}
@@ -133,14 +113,12 @@ export default {
       name: null,
       fileKey: Math.random(),
       nameSet: false,
+      defaultFileExtension: "jpg",
+      defaultFileMimeType: "image/jpg",
     };
   },
 
   computed: {
-    // imageElementSrcAttribute() {
-    //   const image = this.$refs[`file-image-node-${this.fileKey}`];
-    //   return !!image.src;
-    // },
     isAttachmentFile() {
       return this.getAttrs["data-type"] === "link" && !this.getAttrs.preview;
     },
@@ -153,30 +131,7 @@ export default {
     },
   },
 
-  // if (itemAsFile.type === "image/svg+xml") {
-  //   console.log("2");
-  //   console.log("CONVERTING SVG");
-  //   const reader = new FileReader();
-  //   reader.onload = function(e) {
-  //     itemAsFile = new File(
-  //       [
-  //         new Blob([new Uint8Array(e.target.result)], {
-  //           type: "image/png"
-  //         })
-  //       ],
-  //       "test.png",
-  //       {
-  //         type: "image/png"
-  //       }
-  //     );
-
-  //     console.log({ itemAsFile });
-  //   };
-  //   reader.readAsArrayBuffer(itemAsFile);
-  // }
-
   async mounted() {
-    console.log(this.getAttrs);
     if (!this.getAttrs.src && !this.getAttrs.href) {
       this.deleteNode();
     }
@@ -184,61 +139,16 @@ export default {
     const isStagedPreviewFile =
       !this.getAttrs.href && this.getAttrs.src && !this.getAttrs.id;
 
-    // const isUploadedImage = this.getAttrs.src?.includes(process.env.BASE_URL);
-    // const isUploadedFile = this.getAttrs.href?.includes(process.env.BASE_URL);
-    // const isProdUploadedFile = this.getAttrs.src?.includes(
-    //   "https://devcore.app"
-    // );
-    // const isStageUploadedFile = this.getAttrs.src?.includes(
-    //   "https://stage.devcore.app"
-    // );
-
-    // console.log(isUploadedImage);
-    // console.log(isUploadedFile);
-
     const isExternalUrl = isValidExternalUrl(this.getAttrs.src);
-    //  &&
-    // //!isUploadedImage &&
-    // !isUploadedFile &&
-    // !isProdUploadedFile &&
-    // !isStageUploadedFile;
+    let isBase64Url = isBase64(this.getAttrs.src);
 
-    // console.log(process.env.BASE_URL);
-
-    console.log({ isStagedPreviewFile });
-    console.log({ isExternalUrl });
-    console.log("is base 64: ", isBase64(this.getAttrs.src));
-    if (isStagedPreviewFile) {
-      // if (this.getAttrs.type === "image/svg+xml") {
-      //   const test = await this.urltoFile(
-      //     this.getAttrs.src,
-      //     "hello.png",
-      //     "image/png"
-      //   );
-
-      //   const reader = new FileReader();
-      //   reader.onload = (readerEvent) => {
-      //     console.log(readerEvent.target?.result);
-      //     this.updateAttributes({
-      //       url: readerEvent.target?.result,
-      //       type: "image/png",
-      //     });
-      //   };
-      // 	 reader.readAsDataURL(test);
-      // }
-      if (isExternalUrl || isBase64(this.getAttrs.src)) {
-        await this.handleExternalFiles();
-      }
+    if (isStagedPreviewFile && (isExternalUrl || isBase64Url)) {
+      await this.handleExternalFiles();
     }
   },
 
   methods: {
     parseUuid(name) {
-      // if (name && name.length > 40) {
-      //   const extension = getExtension(this.getAttrs.title);
-      //   const fileName = getFileName(this.getAttrs.title);
-      //   return `${fileName.substring(0, fileName.length - 37)}.${extension}`;
-      // }
       if (this.getAttrs.uuid) {
         return name.replace(this.getAttrs.uuid, "");
       }
@@ -274,32 +184,23 @@ export default {
         }
       }
     },
-    async urltoFile(url, filename, mimeType) {
-      return fetch(url)
-        .then(function (res) {
-          return res.arrayBuffer();
-        })
-        .then(function (buf) {
-          return new File([buf], filename, { type: mimeType });
-        });
-    },
+
     async addBase64AsFile() {
-      console.log("addBase64AsFile");
       const toFile = await fetch(this.getAttrs.src, {
         method: "GET",
         mode: "no-cors",
       });
       const blob = await toFile.blob();
 
-      const fileType = this.getAttrs.src.split(";")[0].split("/")[1] || "jpg";
+      const fileType =
+        this.getAttrs.src.split(";")[0].split("/")[1] ||
+        this.defaultFileExtension;
       const title = `${this.getAttrs.uuid}.${fileType}`;
 
       const file = new File([blob], this.getAttrs.title ?? title, {
         type: this.getAttrs.type,
         lastModified: Date.now(),
       });
-
-      // console.log(this.getAttrs);
 
       this.extension.options.addFile({
         uuid: this.getAttrs.uuid,
@@ -308,9 +209,6 @@ export default {
     },
 
     async handleExternalFiles() {
-      //console.log(size);
-      // if (!size || typeof size === "string") {
-
       const size = this.node.attrs.size;
       if (size || typeof size === "string") return;
       if (this.resizedImages.includes(this.node.attrs.uuid)) {
@@ -329,28 +227,11 @@ export default {
         });
         return this.deleteNode();
       }
-
-      //  console.log({ externalToBase64 });
-
-      //  console.log("*****");
-      //  console.log(this.node.attrs);
-
-      console.log({ externalToBase64 });
-
-      // if (externalToBase64) {
-      //   const uuid = uuidv4();
-      //   this.updateAttributes({
-      //     title: `${uuid}.${fileType}`,
-      //     src: externalToBase64,
-      //     type,
-      //     "data-type": "image",
-      //     size: base64size,
-      //     uuid: this.getAttrs.uuid ?? uuid,
-      //   });
-      // }
       const type = this.getAttrs.type ?? base64MimeType(externalToBase64);
 
-      const fileType = externalToBase64.split(";")[0].split("/")[1] || "png";
+      const fileType =
+        externalToBase64.split(";")[0].split("/")[1] ||
+        this.defaultFileExtension;
 
       const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;
       const base64size = externalToBase64.length * (3 / 4) - mod;
@@ -366,56 +247,6 @@ export default {
         });
       }
       await this.addBase64AsFile();
-
-      // if (externalToBase64) {
-      //   console.log("TRANSFORMING!");
-      //   const type = this.getAttrs.type ?? base64MimeType(externalToBase64);
-      //   const fileType = externalToBase64.split(";")[0].split("/")[1] || "png";
-      //   const mod = externalToBase64.slice(-2) === "==" ? 2 : 1;
-      //   const base64size = externalToBase64.length * (3 / 4) - mod;
-      //   const callback = async (dataUrl) => {
-      //     const uuid = uuidv4();
-      //     this.updateAttributes({
-      //       title: `${uuid}.${fileType}`,
-      //       src: dataUrl,
-      //       type,
-      //       "data-type": "image",
-      //       size: base64size,
-      //       uuid: this.getAttrs.uuid ?? uuid,
-      //     });
-      //   };
-      //   await this.handleResizedImage(externalToBase64, type, callback);
-      // }
-
-      // await this.addBase64AsFile(dataUrl, type);
-
-      //	return await this.handleResizedImage(externalToBase64, type, callback);
-
-      //  await this.addBase64AsFile();
-      // await this.addBase64AsFile(externalToBase64, type);
-
-      // const callback = async (dataUrl) => {
-      //   this.updateAttributes({
-      //     src: dataUrl,
-      //     type,
-      //     preview: true,
-      //     size,
-      //   });
-      //   await this.addBase64AsFile(dataUrl, type);
-      // };
-      // }
-      // const callback = async (dataUrl) => {
-      //   this.updateAttributes({
-      //     src: dataUrl,
-      //     type,
-      //     preview: true,
-      //     size: base64size,
-      //   });
-      //   await this.addBase64AsFile(dataUrl, type);
-      // };
-      // this.resizedImages.push(this.node.attrs.uuid);
-
-      //   return await this.handleResizedImage(externalToBase64, type, callback);
     },
     async handleResizedImage(dataUrl, type, callback) {
       const scaleWidthUntilPX =
@@ -463,10 +294,10 @@ p > img.ProseMirror-separator ~ br.ProseMirror-trailingBreak {
 }
 .content-dom-file-image-container ~ .file-remove-button {
   transform: translate(0px, 15px);
-	margin-bottom: 5px;
+  margin-bottom: 5px;
 }
-.fileNodeView-preview-image{
-	margin-top: 10px;
+.fileNodeView-preview-image {
+  margin-top: 10px;
 }
 
 // .fileNodeView-preview-image {
@@ -480,7 +311,6 @@ p > img.ProseMirror-separator ~ br.ProseMirror-trailingBreak {
 .file-component {
   padding-top: 3px;
   padding-bottom: 3px;
-
 
   &.node-has-focus > section > div > .loaded-file-node-component > img {
     outline: 3px solid #4294d0;

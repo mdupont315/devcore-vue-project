@@ -775,6 +775,8 @@ export default {
 
           let markup = contentForm.markup;
 
+					console.log("files: ", this.files)
+
           if (this.files.length > 0) {
             const modifiedMarkup = await this.execCallbackToNodeType(
               markup,
@@ -788,12 +790,12 @@ export default {
                   node.attrs.src.includes(process.env.BASE_URL);
                 const isAlreadyUploadedNode = hrefMatch || srcMatch;
 
-                // console.log({
-                //   node,
-                //   title: node.attrs.title,
-                //   hrefMatch,
-                //   srcMatch,
-                // });
+                console.log({
+                  node,
+                  title: node.attrs.title,
+                  hrefMatch,
+                  srcMatch,
+                });
 
                 if (!isAlreadyUploadedNode) {
                   const uploadedFile = resources.find(

@@ -1,6 +1,6 @@
 import { Plugin } from "prosemirror-state";
 import { v4 as uuidv4 } from "uuid";
-import { fileWithUniqueName, validateFileSize } from "./helpers/file/fileUtils";
+import { validateFileSize } from "./helpers/file/fileUtils";
 
 const renderFileInBase64ToCoordinates = (
   item,
@@ -10,13 +10,8 @@ const renderFileInBase64ToCoordinates = (
   uuid
 ) => {
   if (!item) return;
-
   const { editor } = view.dom;
-
   let _item = item;
-
-  console.log("Rendering: ", _item);
-
   if (!editor) return;
 
   const fileHTML = item => {
@@ -27,7 +22,7 @@ const renderFileInBase64ToCoordinates = (
   };
 
   const reader = new FileReader();
-  //editor.commands
+
   reader.onload = readerEvent => {
     const fileAttrs = {
       url: readerEvent.target?.result,
@@ -36,68 +31,12 @@ const renderFileInBase64ToCoordinates = (
       type: _item.type,
       preview
     };
-
     editor
       .chain()
       .insertContentAt(coordinates.pos, fileHTML(fileAttrs))
       .run();
 
     editor.chain().enter().run()
-
-    // const setFile = editor.commands.setNodeSelection(coordinates.pos);
-    // console.log({ setFile });
-    // };
-
-    // if (preview) {
-    //  // const image = new Image();
-    //  // image.src = readerEvent.target?.result;
-
-    //   // Simple ??? WTF
-    //   const imageAttrs = { url: image.src, title: item.name, preview };
-    //   editor
-    //     .chain()
-    //     .createParagraphNear()
-    //     .insertContentAt(
-    //       coordinates.pos,
-    //       `<file-component url="${image.src}" title="${item.name}" preview="${item.preview}></file-component>`
-    //     )
-    //     .run();
-    //   // };
-    // } else {
-    //   // view.dom.editor.commands.insertContentAt(
-    //   //   coordinates.pos,
-    //   //   `<p><img src="${image.src}" title="${item.title}" preview="${item.preview}"/></p>`
-    //   // );
-
-    //   const fileAttrs = {
-    //     url: readerEvent.target?.result,
-    //     title: item.name,
-    //     preview
-    //   };
-    //   editor
-    //     .chain()
-    //     .createParagraphNear()
-    //     .insertContentAt(coordinates.pos, fileHtml(fileAttrs))
-    //     .run();
-
-    //   // const transaction = view.state.tr.insert(
-    //   //   coordinates.pos,
-    //   //   schema.nodes.file.create({
-    //   //     src: readerEvent.target?.result,
-    //   //     title: item.name,
-    //   //     size: item.size,
-    //   //     type: item.type,
-    //   //     pos: coordinates.pos,
-    //   //     uuid,
-    //   //     preview,
-    //   //     dimensions: {
-    //   //       width: null,
-    //   //       height: null
-    //   //     }
-    //   //   })
-    //   // );
-    //   //   view.dispatch(transaction);
-    // }
   };
   reader.readAsDataURL(_item);
 };
@@ -122,20 +61,6 @@ const uploadFilePlugin = (addFile, notify) => {
         const coordinates = { pos, inside: 0 };
 
         items.forEach(function(item) {
-          // if (item.kind === "string") {
-          //   // console.log(item);
-          //   if (item.type === "text/html") {
-          //     const parser = new DOMParser();
-          //     item.getAsString(data => {
-          //       const test = parser.parseFromString(data, "text/html");
-          //       console.log(test);
-
-          //       // const test = JSON.parse(data);
-          //       // console.log(test);
-          //       // console.log(test.data);
-          //     });
-          //   }
-          // }
           if (item.kind != "file") return;
           if (item.type.indexOf("image") === 0) {
             event.preventDefault();
