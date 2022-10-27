@@ -274,8 +274,6 @@ export default {
     hasEdits: false,
   }),
   mounted() {
-    console.log(this.mutateForm);
-
     this.roleIntent = Math.random();
 
     // default idea markup content type as default

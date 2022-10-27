@@ -299,14 +299,10 @@ export default class ContentEditor {
           id: "idea-edit-editor-container"
         },
         transformPastedText(text) {
-          //Remove spaces
-          //  console.log(text);
+
           const formatHTML = text.replace(/&nbsp;/g, " ");
 
-          //Remove comments
-          // const _formatHTML = formatHTML.replace(/ comment(.*?)">/g, ">");
-          //  console.log(formatHTML)
-          // console.log(_formatHTML)
+
           return formatHTML;
         },
         transformPastedHTML(html) {
@@ -318,63 +314,14 @@ export default class ContentEditor {
           const formatHTML1 = formatHTML.replace(/<\/?style(.*?)">/g, "");
           const formatHTML2 = formatHTML1.replace(/<br>/g, " ");
           const formatHTML3 = formatHTML2.replace(/<br>/g, " ");
-          // const formatHTML3 = formatHTML2.replace(/<\/?p[^>]*>/g, "");
-          // const formatHTMLX = formatHTML3.replace(
-          //   /(<p[^>]*>)[^>]*(<img)/g,
-          //   "img"
-          // );
+
           const formatHTML4 = formatHTML3.replace("<!--StartFragment-->", "");
           const formatHTML5 = formatHTML4.replace("<!--EndFragment-->", "");
 
-          //const transformHtml = parseDocxHTml(formatHTML5)
 
-          // // console.log(formatHTML1);
-          // const parser = new DOMParser();
-          // const temp_node = parser.parseFromString(formatHTML2, "text/html")
-          //   .body;
-          //   const imgs = temp_node.getElementsByTagName('img')
-          //   const paragraphs = temp_node.getElementsByTagName('p')
-          // console.log({imgs});
-          // console.log({paragraphs});
-          // console.log(temp_node.childNodes);
-
-          // TODO: Test if images can be stripped out from <p><span></span></span_></p>
-
-          //  const ____formatHTML = ___formatHTML.replace(/\<head[^>]*\>([^]*)\<\/head/g, '');
-          //  const _____formatHTML = ____formatHTML.replace(/\<script[^>]*\>([^]*)\<\/script>/g, '');
-
-          // const ast = parse(____formatHTML);
-          // let res = ""
-
-          // walk(ast, {
-          //   enter: (node) => {
-          //     console.log(node)
-          //     if (node.type === SyntaxKind.Tag && node.name === 'title' && Array.isArray(node.body)) {
-          //       const text = node.body[0];
-          //       if (text.type !== SyntaxKind.Text) {
-          //         return;
-          //       }
-          //       const div = document.createElement('div');
-          //       div.innerHTML = `The title of the input is <strong>${text.value}</strong>`;
-          //       res = div;
-          //     }
-          //   },
-          // });
-          // console.log(res
-
-          //  console.log(formatHTML5);
-          // console.log(
-          //   unwrapImages(
-          //     formatHTML5.replace("img", "file-component").replace("span", "p")
-          //   )
-          // );
-          // return unwrapImages(formatHTML5);
           return formatHTML5
             .replace("img", "file-component")
             .replace("span", "p");
-          // return formatHTML5.replace('img', 'file-component')
-
-          //     return formatHTML4;
         }
       },
 
