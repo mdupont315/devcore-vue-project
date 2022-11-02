@@ -28,7 +28,7 @@
             @click="toggleContentUploadSelector()"
           >
             <i
-              class="ri-file-download-line"
+              class="ri-file-upload-line"
               style="margin-top: 2px"
               v-if="!isLoading"
             ></i>
@@ -437,6 +437,7 @@ export default {
   margin-left: 10px;
   & > #idea_edit_content_btnUploadIdeaTemplate {
     border-radius: 3px;
+		margin-top:5px;
     border: none;
     background: #fff;
     &:hover:not(:disabled) {

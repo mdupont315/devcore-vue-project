@@ -434,9 +434,16 @@ export default {
           return content;
         }
       };
+      try {
+        const modifiedMarkup = loopContent(parsedContent.content);
+        return JSON.stringify({ type: "doc", content: modifiedMarkup });
+      } catch (e) {
+        console.log(e);
+				return parsedContent
+      }
 
-      const modifiedMarkup = loopContent(parsedContent.content);
-      return JSON.stringify({ type: "doc", content: modifiedMarkup });
+      // const modifiedMarkup = loopContent(parsedContent.content);
+      // return JSON.stringify({ type: "doc", content: modifiedMarkup });
     },
 
     async userRemovedResources(argMarkup = null) {
@@ -682,7 +689,6 @@ export default {
         ),
       ];
 
-
       if (currentSelectedFormId === form.id) {
         this.setContentActive();
       } else {
@@ -775,7 +781,7 @@ export default {
 
           let markup = contentForm.markup;
 
-					console.log("files: ", this.files)
+          console.log("files: ", this.files);
 
           if (this.files.length > 0) {
             const modifiedMarkup = await this.execCallbackToNodeType(

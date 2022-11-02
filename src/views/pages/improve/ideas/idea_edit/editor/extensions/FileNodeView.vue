@@ -66,7 +66,11 @@
             id="fileNodeView-lazy-load-preview-image"
           />
         </div>
-        <button @click="removeNode" class="file-remove-button">
+        <button
+          @click="removeNode"
+          class="file-remove-button"
+          style="margin-bottom: 20px"
+        >
           {{ $t("Remove") }}
         </button>
       </div>

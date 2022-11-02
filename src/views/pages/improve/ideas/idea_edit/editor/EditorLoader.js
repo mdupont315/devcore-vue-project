@@ -240,9 +240,9 @@ export default class ContentEditor {
         }
       }),
       History.configure({ depth: 10 }),
-      // FontFamily.configure({
-      //   types: ["textStyle"]
-      // }),
+      FontFamily.configure({
+        types: ["textStyle"]
+      }),
       //FontFamily,
       Text,
       // Draggable,
@@ -271,6 +271,7 @@ export default class ContentEditor {
       Gapcursor,
       Heading,
       CustomTable,
+      TextStyle,
       EventHandler,
       TrailingNode,
       FocusNode,
