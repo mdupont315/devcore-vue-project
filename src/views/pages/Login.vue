@@ -2,10 +2,13 @@
   <external-layout class="pg-login">
     <div v-if="loaded" class="form-container animated zoomIn fast">
       <div class="login-form card bg-light shadow-lg rounded-0 border-0">
-        <div class="card-header bg-dark rounded-0">
+        <!-- <div class="card-header bg-dark rounded-0">
           <img src="@/assets/img/logo.svg" />
-        </div>
-        <div class="card-body">
+        </div> -->
+        <div
+          class="card-body"
+          style="display: flex; flex-direction: column; place-content: center"
+        >
           <h1 class="h3 text-shadow text-center">{{ $t("Login") }}</h1>
           <hr />
           <b-form class="floating-labels" @submit.prevent="onSubmit">
