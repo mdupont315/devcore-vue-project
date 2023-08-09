@@ -7,7 +7,6 @@
 - Base common and layout components
 - Some help mixins
 - Vue CLI v4
-- Developed to work with: https://github.com/zmts/supra-api-nodejs
 
 ## Project structure
 - [`src`](#src)
@@ -136,7 +135,7 @@ Set up yours svg icons in `src/components/icons/` folder. Modify `UiIconBase.vue
 ## Build Setup
 ``` bash
 # clone repo
-git clone https://github.com/zmts/vuejs-boilerplate.git
+git clone https://github.com/Senguly/devcore-vue-project.git
 
 # install dependencies
 npm install
